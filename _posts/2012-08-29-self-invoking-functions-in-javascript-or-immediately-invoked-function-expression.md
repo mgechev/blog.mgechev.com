@@ -15,7 +15,8 @@ tags:
 ---
 JavaScript is a bit strange language, doing strange (some times) things if you don&#8217;t follow best practices and if you&#8217;re not familiar with the ECMA standard. There&#8217;re are different strange things in the syntax and the semantics. One &#8220;strange&#8221; think (actually a syntax sugar) are the self-executing (invoking) functions. Here&#8217;s the syntax:
 
-<pre lang="JavaScript">(function () {
+<pre lang="JavaScript">
+(function () {
     //body of the function
 }());
 </pre>
