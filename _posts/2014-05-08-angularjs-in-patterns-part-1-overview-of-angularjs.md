@@ -23,25 +23,6 @@ tags:
   - Software engineering
   - web application
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="719"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-719">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count">21</span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 In this series of blog posts I&#8217;m going to cover the paper I&#8217;m writing at [GitHub][1].
 

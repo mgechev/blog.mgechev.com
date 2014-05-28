@@ -14,25 +14,6 @@ tags:
   - JavaScript
   - jQuery
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="84"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-84">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 Hi! I haven&#8217;t wrote since a long time but there&#8217;s so much code and so little time&#8230;It&#8217;s bad that the biggest part of the code is not open source but what can we do&#8230;Last few hours I developed a JavaScript plugin for color animation. Of course for few hours I cant make something with great quality so it&#8217;s a little bit unstable (I think) but it works and it&#8217;s also valid for the JSLint standards. It uses easy algorithm. I think of the RGB color representation as a three dimensional space with coordinates in the range [0, 255]. The user is sets object with specific color (doesn&#8217;t matter background, font&#8230;btw that&#8217;s still not fully tested) which is actually a point in this three dimensional space. The target is another point in the 3D space so I just move from the first to the second point. I spoke enough. Let&#8217;s look at the code:
 

@@ -19,25 +19,6 @@ tags:
   - Programming
   - Talks
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="419"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-419">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count">1</span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 Before few months I was invited by Telerik Academy to make a talk about JavaScript. Last Monday Marian Kostadinov, Radoslav Georgiev and me made a whole seminar about the topic. I&#8217;m addicted to the Object-Oriented programming so I choose to talk about that. You can find my slides at <a href="http://blog.mgechev.com/slides/javascript-patterns" target="_blank">http://blog.mgechev.com/slides/javascript-patterns</a> and a video (in Bulgarian) bellow in the post:
 

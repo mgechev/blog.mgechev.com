@@ -20,26 +20,6 @@ tags:
   - Programming
   - webkit
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="200"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-200">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
-
 I haven&#8217;t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in <a title="StackOverflow" href="http://stackoverflow.com/questions/13177698/select-an-image-and-manipulate-it-in-javascript-no-form-submission/13178084#13178084" target="_blank">stackoverflow</a>. The post is connected with pure client side image scaling. While you&#8217;re reading the example I hope that you&#8217;ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.  
 So firstly I&#8217;ll post the source code with the example in JSFiddle, after that I&#8217;m going to explain everything step by step.
 

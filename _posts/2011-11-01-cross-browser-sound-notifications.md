@@ -17,26 +17,6 @@ tags:
   - JavaScript
   - Programming
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="77"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-77">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
-
 Few days ago I was creating a system in which it was necessary to implement a sound notification feature. Well it&#8217;s not very hard task but of course you have to be careful with the browser compatibility. At first my source was something like that:
 
 <pre lang="JavaScript">playSound: function () {

@@ -20,25 +20,6 @@ tags:
   - Programming
   - Projects
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="113"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-113">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 [<img class="alignleft size-medium wp-image-122" title="html5editor" src="http://blog.mgechev.com/wp-content/uploads/2012/04/html5editor-300x190.png" alt="" width="300" height="190" />][1]As you see HTML5 is everywhere (of course I exclude IE&#8230;or just before version 10). Web site used for quick image composition or edition is something very useful for the &#8220;modern web person&#8221;. There are few such services. Most of them use Flash. Nothing against it but&#8230;it&#8217;s too heavy for me&#8230;unnecessarily heavy. For all that stuff you can use HTML5 canvas. I also found some HTML5 image editors but their functionality was very limited. There is a feature which is very important and you cant find it in any of them. It&#8217;s frequently used in Adobe Photoshop and that&#8217;s why I decided to implement editor with that functionality &#8211; multiple layers. With multiple layers you can do whatever you want. You can combine different images change their color balances, contrast, blur&#8230;etc. I&#8217;ve started this editor a few weeks ago and I&#8217;m almost ready with it&#8217;s base functionality (layers manipulations). It&#8217;s open source, of course. Distributed under the terms of the General Public License. As you may be noticed in my older blog posts I&#8217;m fan of jQuery. Of course my use of jQuery is limited because I&#8217;m looking for best performance. More detailed look at the editor can be made in it&#8217;s [GitHub repository][2].
 

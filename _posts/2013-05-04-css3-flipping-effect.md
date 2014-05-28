@@ -14,25 +14,6 @@ tags:
   - flipping
   - HTML5
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="442"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-442">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count">17</span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 As you know because of the SIMD nature of the GPU it&#8217;s extremely good for graphical calculations. Since HTML5 and CSS3 are here we have a couple of ways for efficient and smooth animations one of them are the CSS3 transitions.
 

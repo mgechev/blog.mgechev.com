@@ -26,25 +26,6 @@ tags:
   - Programming
   - vnc
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="581"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-581">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 In this blog post I&#8217;ll tell few words about the course Advanced JavaScript which Georgi Penkov, Evgeni Kunev and me are leading this semester in <a href="http://fmi.uni-sofia.bg/" target="_blank">Sofia University</a>.
 

@@ -15,25 +15,6 @@ tags:
   - Programming
   - Strange syntax
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="374"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-374">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 To say that JavaScript is becoming more and more popular is such a typical and boring way to start such an awesome post&#8230;Anyway, JavaScript is becoming more and more popular each day&#8230;There&#8217;s client-side JavaScript with awesome API, you can do whatever you wish with it &#8211; write 3D games, stream video and audio, process files&#8230;There&#8217;s also a server-side JavaScript which is also awesome (I guess awesome will be a common word for this post). JavaScript is exiting language with big expressiveness power. It is object-oriented with many functional elements. It has prototype-based inheritance but if you wish you can implement inheritance in at least three different ways, which have countless subtypes&#8230;
 

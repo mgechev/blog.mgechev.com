@@ -16,25 +16,6 @@ tags:
   - localStorage
   - performance
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="167"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-167">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 Since HTML5 became wide supported the most popular aspects I hear about were it&#8217;s canvas, WebSockets and localStorage. I&#8217;ve got very close experience with the first two of the mentioned but the localStorage was somehow unknown for me since a month. I&#8217;ve researched the topic. Actually it&#8217;s quite interesting and useful as you might guess. Using localStorage you can save different kinds of data locally into key-value pairs. The data lives on your local machine until it&#8217;s deleted (cleared). The localStorage allows you to use more storage than cookies and have no expiration interval (the expiration completely depends on the user). As you might guess again the data stored into the localStorage is saved on the hard drive. May be you know that it&#8217;s very expensive to take data from the hard drive because of the mechanical movements required for buffering the data. The localStorage size depends on the implementation. In Chrome, Firefox, Opera and Safari you can use 5 MBs. Actually it&#8217;s enough for caching all the CSS and JavaScript of your webpage (I really hope so).
 

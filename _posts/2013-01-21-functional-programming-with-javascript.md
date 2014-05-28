@@ -27,25 +27,6 @@ tags:
   - Recursion
   - Schönfinkelization
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="336"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-336">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count">2</span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are &#8220;safe&#8221;, they will not make side effect i.e. evaluating an expression won&#8217;t change something in the internal state and lead to different result of the same expression when called next time. It seems very strange and useless to &#8220;imperative&#8221; guys like me, but actually there&#8217;s a list of benefits:
 

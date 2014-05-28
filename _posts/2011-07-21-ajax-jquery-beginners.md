@@ -14,26 +14,6 @@ tags:
   - JavaScript
   - Programming
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="27"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-27">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
-
 Before years I was writing all the code by my own, without additional libraries (including jQuery). For beginner developer it&#8217;s a good strategy. When you use **$.ajax** it&#8217;s all that easy:
 
 <pre lang="JavaScript">$.ajax({

@@ -20,25 +20,6 @@ tags:
   - performance
   - Pre-fetching
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="533"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-533">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 This blog post is concentrated about web performance. I&#8217;ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I&#8217;ve read are these by <a href="https://www.mobify.com/" target="_blank">Mobify</a>, <a href="http://shop.oreilly.com/product/0636920025955.do" target="_blank">Web Performance Daybook Volume</a>, <a href="http://shop.oreilly.com/product/9780596529307.do" target="_blank">High Performance Web Sites</a> and <a href="https://www.youtube.com/watch?v=PkOBnYxqj3k&list=PLjqQYuhKAW8Bg-HpGPDlbcecgyAVRPiYM" target="_blank">Critical rendering path &#8211; Crash course on web performance</a> and many others. I hope HTTP 2.0 will eliminate few of the dirty hacks we all make&#8230;  
 I&#8217;ll focus on the performance in the Single-Page Applications and especially template prefetching strategy we use in the web application of Brownie Points. I&#8217;ll give code samples with AngularJS but these methods can be also applied with Ember.js, Backbone.js (with little more pain) and other MV* frameworks, I guess.  

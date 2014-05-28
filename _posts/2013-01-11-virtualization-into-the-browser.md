@@ -30,25 +30,6 @@ tags:
   - Virtualization
   - VM
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="195"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-195">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 <a href="http://plainvm.mgechev.com/" target="_blank">plainvm</a> can take the virtualization into different level of usage. To prove this I&#8217;ll first ask few rhetorical questions and put their answers&#8230;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&#8230;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) &#8211; the browser. Another problem is that you don&#8217;t have such a great resources onto your mobile devices to run Windows/Linux/Mac even with double boot (yeah we can argue here about Debian&#8230;probably). We can use remote desktop via VNC/RDP but we have to install extra software and we will have access to a single machine not a whole cluster (well actually we can&#8230;I agree we can switch through different sessions, we can also become crazy).
 

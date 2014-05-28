@@ -24,25 +24,6 @@ tags:
   - Quicksort
   - Sorting
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="231"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-231">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 A few days ago, I&#8217;ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It&#8217;s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones &#8211; sorting (insertion, selection, bubble sort..). After that I implemented few &#8220;more advance&#8221; like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
 

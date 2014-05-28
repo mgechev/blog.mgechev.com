@@ -20,25 +20,6 @@ tags:
   - Development
   - JavaScript
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="612"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-612">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count">1</span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 At first sight AngularJS seems like a magical framework, which does some weird but awesome things like dependency injection, data binding only by setting a single property to the magical object named $scope and many other things.
 

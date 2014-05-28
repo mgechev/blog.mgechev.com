@@ -11,26 +11,6 @@ tags:
   - linux
   - ubuntu
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="150"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-150">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
-
 [<img class="alignright size-medium wp-image-156" title="Asus N56VZ + Ubuntu 12.04" src="http://blog.mgechev.com/wp-content/uploads/2012/08/UNSET1-300x225.jpg" alt="" width="300" height="225" />][1]It seems that it&#8217;s common a problem to setup Ubuntu on the new Asus N56VZ so I decided to create an English version of <a href="http://blog.mgechev.com/2012/07/22/asus-n56vz-ubuntu-12-04/" target="_blank">my post</a>.  
 I was struggling with three issues about two weeks. Here are they:
 

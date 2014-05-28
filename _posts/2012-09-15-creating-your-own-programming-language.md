@@ -14,26 +14,6 @@ tags:
   - Programming
   - programming languages
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="180"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-180">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
-
 And one more blog post by me! It&#8217;s going to be in brand new topic than the others. For about an year and a half I&#8217;ve got an idea which I wanted to accomplish&#8230;To create my own simple programming language. Actually it&#8217;s very useful task and quite interesting. Creating it you can get better understanding how the compilers and interpreters work and probably write better code. Unfortunately there were two problems&#8230;I didn&#8217;t have enough time for such task and&#8230;I&#8217;ve not studied formal grammars (and as I mentioned I don&#8217;t have enough time to study them&#8230;there are just so much more interesting things to read about :-P ). Last weekend I wasn&#8217;t in very good health condition. I think that I have a tradition to make different cool stuffs when I don&#8217;t feel very well :-)&#8230;Soo for two days I&#8217;ve wrote about forty Java classes which actually were ELang.
 
 I opened my Java IDE (I decided to not write the language in JavaScript) and I created few different classes&#8230;Actually I had idea to create something very basic, just variables, if, while, number expressions and boolean expressions. Oh&#8230;I almost forgot to tell that my language is interpreted so that&#8217;s why I decided to have three different stages in the execution process: lexing, parsing and interpreting. The lexing process was straight-forward so there&#8217;s nothing interesting about it&#8230;I&#8217;ve just created different tokens from the long string which is the actual program. Here&#8217;s more information about that <https://en.wikipedia.org/wiki/Tokenization>. After I finished with the lexing&#8230;ahh after that&#8230;it was the Parsing&#8230;Actually that was the process which has been scaring me :-). I&#8217;ve created an interface IStatement which was something that has a void method called &#8220;execute&#8221;. Here&#8217;s the interface:

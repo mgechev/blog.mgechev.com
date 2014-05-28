@@ -14,25 +14,6 @@ tags:
   - linux
   - vnc
 ---
-<!-- Kudos 1.1.1-->
-
-<div class="kudo-box kudo-c_tr" style="margin:0px px 30px 30px;">
-  <figure class="kudo kudoable" data-id="126"> <a class="kudo-object"> <div class="kudo-opening">
-    <div class="kudo-circle">
-      &nbsp;
-    </div>
-  </div></a> 
-  
-  <div class="kudo-meta kudo-meta-126">
-    <div class="kudo-meta-alpha kudo-hideonhover">
-      <span class="kudo-count"></span> <span class="kudo-text">Kudos</span>
-    </div>
-    
-    <div class="kudo-meta-beta kudo-dontmove">
-      <span>Don't<br />move!</span>
-    </div>
-  </div></figure>
-</div>
 
 I&#8217;m here again, after a long pause. For a while I&#8217;ve got problems with my health and I&#8217;m nailed at home&#8230;so I&#8217;ve go a lot of free time. Last night I&#8217;ve decided to root my Google Nexus S.  
 I use Ubuntu
