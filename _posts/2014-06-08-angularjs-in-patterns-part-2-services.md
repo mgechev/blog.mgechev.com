@@ -28,6 +28,8 @@ tags:
 ## Introduction
 
 This blog post continues the series "AngularJS in Patterns". You can find the original GitHub repository, which contains all the information at [github.com/mgechev/angularjs-in-patterns](https://github.com/mgechev/angularjs-in-patterns). If you like my work you can follow me at [github.com/mgechev](https://github.com/mgechev).
+
+
 ### Services
 
 In this sub-chapter we are going to take a look at the design and architectural patterns used in AngularJS' services.
