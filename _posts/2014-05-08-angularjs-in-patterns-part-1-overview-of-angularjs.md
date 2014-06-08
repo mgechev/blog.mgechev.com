@@ -64,8 +64,8 @@ Sample partial
    &lt;input ng-model="foo" value="bar"&gt;
    &lt;!-- Button tag with ng-click directive, and
           string expression 'buttonText'
-          wrapped in "{{ }}" markup --&gt;
-   &lt;button ng-click="changeFoo()"&gt;{{buttonText}}&lt;/button&gt;
+          wrapped in "&#123;&#123; &#125;&#125;" markup --&gt;
+   &lt;button ng-click="changeFoo()"&gt;&#123;&#123;buttonText&#125;&#125;&lt;/button&gt;
    &lt;script src="angular.js"&gt;&lt;/script&gt;
  &lt;/body&gt;
 &lt;/html&gt;
@@ -180,7 +180,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-<pre lang="html">&lt;div&gt;\{\{ name | uppercase \}\}&lt;/div&gt;
+<pre lang="html">&lt;div&gt;\&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
 </pre>
 
 Inside a controller the filter could be used as follows:
