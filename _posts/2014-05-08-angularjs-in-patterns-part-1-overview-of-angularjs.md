@@ -180,7 +180,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-<pre lang="html">&lt;div&gt;\&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
+<pre lang="html">&lt;div&gt;&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
 </pre>
 
 Inside a controller the filter could be used as follows:
