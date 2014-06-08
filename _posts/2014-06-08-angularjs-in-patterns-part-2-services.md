@@ -53,7 +53,7 @@ When given dependency is required by any component, AngularJS resolves it using 
 
 We can take better look at the AngularJS' source code, which implements the method `getService`:
 
-```JavaScript
+```
 function getService(serviceName) {
   if (cache.hasOwnProperty(serviceName)) {
     if (cache[serviceName] === INSTANTIATING) {
@@ -94,7 +94,7 @@ For further discussion on this topic Misko Hevery's [article](http://googletesti
 
 Lets consider the following snippet:
 
-```JavaScript
+```
 myModule.config(function ($provide) {
   $provide.provider('foo', function () {
     var baz = 42;
@@ -118,7 +118,7 @@ Each service, filter, directive and controller has a provider (i.e. object which
 
 We can dig a little bit deeper in AngularJS' implementation:
 
-```JavaScript
+```
 //...
 
 createInternalInjector(instanceCache, function(servicename) {
@@ -162,7 +162,7 @@ function invoke(fn, self, locals, serviceName){
 
 From the example above we can notice how the `$get` method is actually used:
 
-```JavaScript
+```
 instanceInjector.invoke(provider.$get, provider, undefined, servicename)
 ```
 
@@ -184,7 +184,7 @@ There are a few benefits of using the factory method pattern in this case, becau
 
 AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method `decorator` of `$provide` you can create "wrapper" of any service you have previously defined or used by a third-party:
 
-```JavaScript
+```
 myModule.controller('MainCtrl', function (foo) {
   foo.bar();
 });
@@ -234,7 +234,7 @@ There are a few facades in AngularJS. Each time you want to provide higher level
 
 For example, lets take a look how we can create an `XMLHttpRequest` POST request:
 
-```JavaScript
+```
 var http = new XMLHttpRequest(),
     url = '/example/new',
     params = encodeURIComponent(data);
@@ -253,7 +253,7 @@ http.send(params);
 ```
 But if we want to post this data using the AngularJS' `$http` service we can:
 
-```JavaScript
+```
 $http({
   method: 'POST',
   url: '/example/new',
@@ -265,7 +265,7 @@ $http({
 ```
 or we can even:
 
-```JavaScript
+```
 $http.post('/someUrl', data)
 .then(function (response) {
   alert(response);
@@ -291,7 +291,7 @@ In this sub-chapter we are going to take a look at AngularJS' implementation of 
 
 In the snippet bellow, there is a call to the `get` method of `$resource` instance, called `User`:
 
-```JavaScript
+```
 var User = $resource('/users/:id'),
     user = User.get({ id: 42 });
 console.log(user); //{}
@@ -301,7 +301,7 @@ console.log(user); //{}
 
 How does this works with AngularJS? Well, lets consider the following snippet:
 
-```JavaScript
+```
 function MainCtrl($scope, $resource) {
   var User = $resource('/users/:id'),
   $scope.user = User.get({ id: 42 });
@@ -328,7 +328,7 @@ According to the AngularJS' documentation `$resource` is:
 
 Here is how `$resource` could be used:
 
-```JavaScript
+```
 var User = $resource('/users/:id'),
     user = new User({
       name: 'foo',
@@ -342,7 +342,7 @@ The call of `$resource` will create a constructor function for our model instanc
 
 This way we can use the constructor function and its static methods by:
 
-```JavaScript
+```
 User.get({ userid: userid });
 ```
 
