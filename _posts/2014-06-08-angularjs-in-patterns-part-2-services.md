@@ -42,7 +42,7 @@ Note: Some of the described patterns are used in other components as well but th
 
 In the UML diagram bellow is illustrated the singleton design pattern.
 
-![Singleton](./wp-content/uploads/patterns/singleton.png "Fig. 1")
+![Singleton](/wp-content/uploads/patterns/singleton.png "Fig. 1")
 
 When given dependency is required by any component, AngularJS resolves it using the following algorithm:
 
@@ -92,7 +92,7 @@ For further discussion on this topic Misko Hevery's [article](http://googletesti
 
 >The factory method pattern is a creational pattern, which uses factory methods to deal with the problem of creating objects without specifying the exact class of object that will be created. This is done by creating objects via a factory method, which is either specified in an interface (abstract class) and implemented in implementing classes (concrete classes); or implemented in a base class, which can be overridden when inherited in derived classes; rather than by a constructor.
 
-![Factory Method](./wp-content/uploads/patterns/factory-method.png "Fig. 2")
+![Factory Method](/wp-content/uploads/patterns/factory-method.png "Fig. 2")
 
 Lets consider the following snippet:
 
@@ -182,7 +182,7 @@ There are a few benefits of using the factory method pattern in this case, becau
 
 >The decorator pattern (also known as Wrapper, an alternative naming shared with the Adapter pattern) is a design pattern that allows behavior to be added to an individual object, either statically or dynamically, without affecting the behavior of other objects from the same class.
 
-![Decorator](./wp-content/uploads/patterns/decorator.png "Fig. 4")
+![Decorator](/wp-content/uploads/patterns/decorator.png "Fig. 4")
 
 AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method `decorator` of `$provide` you can create "wrapper" of any service you have previously defined or used by a third-party:
 
@@ -232,7 +232,7 @@ Using this pattern is especially useful when we need to modify the functionality
 
 >4. wrap a poorly designed collection of APIs with a single well-designed API (as per task needs).
 
-![Facade](./wp-content/uploads/patterns/facade.png "Fig. 11")
+![Facade](/wp-content/uploads/patterns/facade.png "Fig. 11")
 
 There are a few facades in AngularJS. Each time you want to provide higher level API to given functionality you practically create a facade.
 
@@ -283,7 +283,7 @@ Even higher level of abstraction is being created by `$resource`, which is build
 
 >A proxy, in its most general form, is a class functioning as an interface to something else. The proxy could interface to anything: a network connection, a large object in memory, a file, or some other resource that is expensive or impossible to duplicate.
 
-![Proxy](./wp-content/uploads/patterns/proxy.png "Fig. 9")
+![Proxy](/wp-content/uploads/patterns/proxy.png "Fig. 9")
 
 We can distinguish three different types of proxy:
 
@@ -321,7 +321,7 @@ Initially when the snippet above executes, the property `user` of the `$scope` o
 
 >The Active Record object is an object, which carries both data and behavior. Usually most of the data in these objects is persistent, responsibility of the Active Record object is to take care of the communication with the database in order to create, update, retrieve or delete the data. It may delegate this responsibility to lower level objects but calls to instance or static methods of the active record object cause the database communication.
 
-![Active Record](./wp-content/uploads/patterns/active-record.png "Fig. 7")
+![Active Record](/wp-content/uploads/patterns/active-record.png "Fig. 7")
 
 AngularJS defines a service called `$resource`. In the current version of AngularJS (1.2+) it is being distributed in module outside of the AngularJS' core.
 
