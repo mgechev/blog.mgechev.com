@@ -1,7 +1,8 @@
-title: AngularJS in Patterns (Part 2). Serivces
+---
+title: AngularJS in Patterns (Part 3)
 author: Minko Gechev
 layout: post
-permalink: /2014/06/08/angularjs-in-patterns-part-2-services/
+permalink: /2014/07/05/angularjs-in-patterns-part-3/
 categories:
   - AngularJS
   - JavaScript
