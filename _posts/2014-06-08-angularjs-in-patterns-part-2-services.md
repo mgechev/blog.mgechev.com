@@ -1,5 +1,5 @@
 ---
-title: AngularJS in Patterns (Part 2). Serivces
+title: AngularJS in Patterns (Part 2). Services.
 author: Minko Gechev
 layout: post
 permalink: /2014/06/08/angularjs-in-patterns-part-2-services/
