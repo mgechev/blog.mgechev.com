@@ -577,7 +577,7 @@ The interesting part here is:
 }
 </pre>
 
-Basically this snippet checks whether the user have scrolled more than 50pxs. If he did, we don't want to scroll to bottom once he have started reading messages upwards, the history of the chat. Thats why depending on whether the user have or haven't scrolled we set `this.scrolled` to `true` or `false`.
+Basically, this snippet checks whether the user have scrolled more than 50pxs. If he did, we don't want to scroll to bottom once he have started reading messages from the history of the chat. Thats why depending on whether the user have or haven't scrolled we set `this.scrolled` to `true` or `false`.
 
 We use `this.scrolled` in `componentDidUpdate`:
 
@@ -590,7 +590,7 @@ We use `this.scrolled` in `componentDidUpdate`:
 }
 </pre>
 
-Once the component will be updated (for example because of new message added), we check whether the user have scrolled and if he did we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs` as explained above.
+Once the component will be updated (for example because of new message added), we check whether the user have scrolled and if he had, we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs`, as explained above.
 
 #### MessageInput.jsx
 
