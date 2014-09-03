@@ -125,9 +125,11 @@ Implementation I use is formed by combining both approaches from above:
 
 <pre lang="javascript">var MySingleton = (function () {
 
-  function MySingleton() {
+  var INSTANCE;
+
+  function MySingleton(foo) {
     if (!(this instanceof MySingleton)) {
-      return new MySingleton();
+      return new MySingleton(foo);
     }
     this.foo = foo;
   }
