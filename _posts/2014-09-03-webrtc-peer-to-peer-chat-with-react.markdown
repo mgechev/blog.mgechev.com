@@ -38,7 +38,7 @@ Before continue with the tutorial, lets tell a few words about what NAT is. NAT 
 
 ## Implementation
 
-Now lets get started with the actual implementation of our WebRTC based chat.
+Now lets get starting with the actual implementation of our WebRTC based chat.
 
 ### Architecture
 
@@ -48,18 +48,18 @@ Since I'm kind of traditionalist I'll start by providing a basic, high-level ove
 
 ![Architecture](/images/architecture.png "Architecture")
 
-The dashed arrows indicate signaling WebSocket connections. Each client initiates such connection to the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol))).
+The dashed arrows, in the diagram, indicate signaling WebSocket connections. Each client initiates such connection to the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol))). Actually the signaling protocol in our case is provided by Peer.js.
 
-The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. As you see we use full mesh, which scales bad especially when we use video or audio streaming. For the purpose of our chat full mesh is okay.
+The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. As you see we use full mesh, which scales badly especially when we use video or audio streaming. For the purpose of our chat full mesh is good enough.
 
 
 #### Low-level overview
 
-In the beginning of the blog post I mentioned that React.js application contains a finite count of React.js components composed together. In this subsection I'll illustrate which are the different components of our application and how are they composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
+In the beginning of the blog post I mentioned that React.js application contains a finite count of React.js components composed together. In this subsection I'll illustrate, which are the different components of our application and how they are composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
 
 ![Micro-architecture](/images/react-p2p.png "Micro-architecture")
 
-Lets concentrate on the left part of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the `ChatBox` component. In its left side is positioned the `MessagesList` component, which is a composition of `ChatMessage` components. Each `ChatMessage` component contains a different chat message, which has author, date when published and content. On the right-hand side of the `ChatBox` is positioned the `UsersList` component. This component lists all users, which are currently in the chat session. The last component is the `MessageInput` component. The `MessageInput` component is a simple text input, which once detect a press of the Enter key triggers an event, with data its value.
+Lets concentrate on the left-hand side of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the `ChatBox` component. In its left side is positioned the `MessagesList` component, which is composition of `ChatMessage` components. Each `ChatMessage` component contains a different chat message, which has author, date when published and content. On the right-hand side of the `ChatBox` is positioned the `UsersList` component. This component lists all users, which are currently in the chat session. The last component is the `MessageInput` component. The `MessageInput` component is a simple text input, which once detect a press of the Enter key triggers an event, with data - its value.
 
 The `ChatBox` component uses `ChatProxy`. The chat proxy is responsible for registering the current client to the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
 
@@ -106,7 +106,7 @@ This file defines primitive information for our server, like name, version, keyw
 * `peer` - A server, which implements the signaling of our application
 * `socket.io`
 
-Now lets take a look at our `bower.json`:
+Now lets take a look at `./bower.json`:
 
 <pre lang="JSON">{
   "name": "react-peerjs",
@@ -133,14 +133,14 @@ Now lets take a look at our `bower.json`:
   }
 }
 </pre>
-The `bower.json` file defines primitive information and dependencies for our client-side of the application.
+The `bower.json` file defines primitive information and dependencies for the client-side of the application.
 The required dependencies are:
 
-* `react` - the framework, we are going to use for building our view
+* `react` - the framework, we are going to use for building our UI.
+* `eventEmitter` - our components are going to fire events, which later are going to be handled by other components. EventEmitter will be used as based class for our "event-driven" components.
+* `peerjs` - wraps the browser's WebRTC API into high-level, easier to use API.
 * `jquery`
 * `bootstrap`
-* `eventEmitter` - our components are going to fire events, which later are going to be handled by other components
-* `peerjs` - wraps the browser's WebRTC API into high-level, easier to use API.
 
 And... `.bowerrc`
 
@@ -158,7 +158,7 @@ Now, in order to resolve all dependencies, run:
 
 Now lets start with our implementation.
 
-### Server side
+### Server-side
 
 We have a few lines of Node.js which are required for signaling and establishing p2p connection between the peers.
 
