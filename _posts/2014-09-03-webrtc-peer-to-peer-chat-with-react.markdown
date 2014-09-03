@@ -18,31 +18,31 @@ tags:
 ---
 
 
-# Introduction
+## Introduction
 
 In this blog post I'm going to illustrate how could be built WebRTC chat with React.js. Before we continue lets describe briefly what React.js and WebRTC are.
 
 The application from the tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).
 
-### React.js
+#### React.js
 
 React.js is [reactive](https://en.wikipedia.org/wiki/Reactive_programming) JavaScript framework, which helps you to build user interface. Facebook states that we can think of React as the "V" in MVC. React's main aspect is the state. When the state of the application changes this automatically propagates through the application's components. A React component is a self-container module, which is composed by one or more other components. Usually the component depends on state, which is being provided by a parent component. May be the explanation seems quite abstract now, but during the tutorial the picture will get much more clear.
 
-### WebRTC
+#### WebRTC
 
 RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is [already published](http://dev.w3.org/2011/webrtc/editor/webrtc.html) by W3C.
 
-### NAT
+#### NAT
 
 Before continue with the tutorial, lets say few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible by the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
 
-# Implementation
+## Implementation
 
 Now lets get started with the actual implementation of our WebRTC based chat.
 
-## Architecture
+### Architecture
 
-### High-level overview
+#### High-level overview
 
 Since I'm kind of traditionalist I'll start by providing a basic, high-level overview of the architecture of our p2p chat.
 
@@ -53,7 +53,7 @@ The dashed arrows indicate signaling WebSocket connections. Each client initiate
 The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. As you see we use full mesh, which scales bad especially when we use video or audio streaming. For the purpose of our chat full mesh is okay.
 
 
-### Low-level overview
+#### Low-level overview
 
 In the beginning of the blog post I mentioned that React.js application contains a finite count of React.js components composed together. In this subsection I'll illustrate which are the different components of our application and how are they composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
 
@@ -64,7 +64,7 @@ Lets concentrate on the left part of the diagram. As you see we have a set of ne
 The `ChatBox` component uses `ChatProxy`. The chat proxy is responsible for registering the current client to the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
 
 
-## Getting started
+### Getting started
 
 In this section we are going to setup our project...
 
@@ -163,7 +163,7 @@ bower install && npm install
 
 Now lets start with our implementation.
 
-## Server side
+### Server side
 
 We have a few lines of Node.js which are required for signaling and establishing p2p connection between the peers.
 
@@ -200,9 +200,9 @@ In the snippet above, we create a simple express server, which servers static fi
 
 Once our `PeerServer` detects that a peer has been connected to it, it triggers the event `USER_CONNECTED` to all peers. Once a client disconnects from the `PeerServer` we trigger `USER_DISCONNECTED`. These two events are very important for handling the list of currently available users.
 
-## Client-side
+### Client-side
 
-### ChatProxy.js
+#### ChatProxy.js
 
 Now lets take a look at the component responsible for communication between our peers.
 
@@ -301,7 +301,7 @@ Once we receive `connection` event we register the connected peer and emit `USER
 The full content of `ChatProxy` could be [found at GitHub](https://github.com/mgechev/ReactChat/blob/master/public/src/models/ChatProxy.js).
 
 
-### app.jsx
+#### app.jsx
 
 The initial view of the user would be:
 
@@ -342,7 +342,7 @@ $(function () {
 When the user clicks on `#connect-btn` we render the `ChatBox` component inside the `#container` element. So now lets see what the `ChatBox` does:
 
 
-### ChatBox.jsx
+#### ChatBox.jsx
 
 At `/public/src/components/chat/` create a file called `ChatBox.jsx` and add the following content:
 
@@ -486,7 +486,7 @@ addMessage: function (message) {
 
 The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `&#x3C;MessagesList ref=&#x22;messagesList&#x22;&#x3E;&#x3C;/MessagesList&#x3E;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
 
-### MessagesList.jsx
+#### MessagesList.jsx
 
 Inside `/public/src/components/chat/` add file called `MessagesList.jsx` and add the following content:
 
@@ -613,7 +613,7 @@ componentDidUpdate: function () {
 
 Once the component will be updated (for example because of new message added), we check whether the user have scrolled and if he did we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs` as explained above.
 
-### MessageInput.jsx
+#### MessageInput.jsx
 
 This is the last component we will look at.
 
@@ -661,7 +661,7 @@ Another interesting moment here is the key handler we add. On key up of `input.f
 &#x3C;/MessageInput&#x3E;
 ```
 
-# Run the project...
+## Run the project...
 
 The next step is to run the project by:
 
