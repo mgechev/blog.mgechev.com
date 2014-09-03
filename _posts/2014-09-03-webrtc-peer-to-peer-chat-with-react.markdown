@@ -286,7 +286,7 @@ this.peer.on('connection', function (conn) {
 
 Once we invoke the constructor function `Peer`, provided by peer.js, with the appropriate parameters, we bind to the `open` event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.
 
-Once we receive `connection` event we register the connected peer and emit `USER_CONNECTED` event. The `USER_CONNECTED` event will be handled by the `ChatBox`, which will lead to change of the state of the UI.
+When we receive `connection` event we register the connected peer and emit `USER_CONNECTED` event. The `USER_CONNECTED` event will be handled by the `ChatBox`, which will lead to change of the state of the UI.
 
 The full content of `ChatProxy` could be [found at GitHub](https://github.com/mgechev/ReactChat/blob/master/public/src/models/ChatProxy.js).
 
@@ -306,7 +306,7 @@ The initial view of the user would be:
 &#x3C;/section&#x3E;
 </pre>
 
-Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx`, file, which is located at `/public/app.jsx`:
+Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx` file, which is located at `/public/app.jsx`:
 
 <pre lang="JavaScript">
 /** @jsx React.DOM */
