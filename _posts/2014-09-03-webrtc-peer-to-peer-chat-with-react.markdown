@@ -198,7 +198,7 @@ Once our `PeerServer` detects that a peer has been connected to it, it triggers 
 
 #### ChatProxy.js
 
-Now lets take a look at the component responsible for communication between our peers.
+Now lets take a look at the component responsible for communication between our peers and registering them on the server.
 
 The biggest advantage of putting the logic for p2p communication and signaling out of the react components is achieving separation of concerns. This way we have highly coherent components, which are reusable and testable.
 
@@ -212,7 +212,7 @@ Inside `/public/src/models/` create a file called `ChatProxy.js`.
 ChatProxy.prototype = Object.create(EventEmitter.prototype);
 </pre>
 
-Our `ChatProxy` extends `EventEmitter`, this means that we are going to handle events fired by the `ChatProxy` when client connects, disconnects or receives a message.
+Our `ChatProxy` extends `EventEmitter`. We use inheritance because we want to reuse the functionality provided by the `EventEmitter` and fire events when we receive new message, client connects or disconnects.
 
 The most complex method, which `ChatProxy` implements is the `connect` method. Lets take a look at it:
 
@@ -252,7 +252,7 @@ The most complex method, which `ChatProxy` implements is the `connect` method. L
 };
 </pre>
 
-If the client have passed username to the `connect` call, we set the username, after that with `io()` we establish new socket.io connection. The socket.io connection is going to be used for receiving `USER_CONNECTED` and `USER_DISCONNECTED` events. Once we have been connected to the socket.io server, we bind to these events.
+If the client have passed username to the `connect` call we set the current username, after that with `io()` we establish new socket.io connection. The socket.io connection is going to be used for receiving `USER_CONNECTED` and `USER_DISCONNECTED` events. Once we have been connected to the socket.io server, we bind to these events. We need extra, socket.io, connection here because the API of Peer.js doesn't provide all required events by its public API.
 
 In the snippet:
 
@@ -266,7 +266,7 @@ In the snippet:
 });
 </pre>
 
-Once we receive event, which indicates that new user is connected, we make sure that the peer is not ourselves. In case new user is connected, we establish connection with by calling the "private" `_connectTo` method.
+Once we receive event, which indicates that new user is connected, we make sure that the connected peer is not us. In case new user is connected, we establish connection with it by calling the "private" method `_connectTo`.
 
 The callback for `USER_DISCONNECTED` is almost analogous so we won't take a further look at it.
 
