@@ -266,7 +266,7 @@ In the snippet:
 });
 </pre>
 
-Once we receive event, which indicates that new user is connected, we make sure that the connected peer is not us. In case new user is connected, we establish connection with it by calling the "private" method `_connectTo`.
+Once we receive event, which indicates that new user is connected, we make sure that the connected peer is not us. In this case, we establish connection with it by calling the "private" method `_connectTo`.
 
 The callback for `USER_DISCONNECTED` is almost analogous so we won't take a further look at it.
 
