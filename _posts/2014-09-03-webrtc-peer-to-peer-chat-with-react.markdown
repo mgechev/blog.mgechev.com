@@ -628,9 +628,9 @@ var MessageInput = React.createClass({
 });
 </pre>
 
-In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create two-way binding between given input and property of our state. The name of the property depends on the value we passed to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect to `this.state.value`.
+In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create two-way binding between given input and property of our state. The name of the property depends on the value we pass to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect on `this.state.value`.
 
-Another interesting moment here is the key handler we add. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
+Another interesting moment here is the key handler. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
 
 <pre lang="JavaScript">&#x3C;MessageInput
   ref=&#x22;messageInput&#x22;
@@ -644,5 +644,7 @@ The next step is to run the project by:
 
 <pre lang="bash">node index.js && open http://localhost:3001
 </pre>
+
+Fin!
 
 I hope the blog post was fun and useful! :-)
