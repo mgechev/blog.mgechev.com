@@ -61,6 +61,95 @@ The `ChatBox` component uses `ChatProxy`. The chat proxy is responsible for regi
 
 # Implementation
 
+## Getting started
+
+In this section we are going to setup our project...
+
+Create a `package.json` file with the content:
+
+```JSON
+{
+  "name": "react-peerjs",
+  "version": "0.0.0",
+  "description": "ReactJS chat with PeerJS",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "keywords": [
+    "webrtc",
+    "nodejs",
+    "react",
+    "javascript",
+    "awesome"
+  ],
+  "author": "mgechev",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.8.4",
+    "peer": "~0.2.6",
+    "socket.io": "~1.0.6"
+  }
+}
+```
+
+The dependencies of our server are:
+
+* `express` - we are going to use express as a static server
+* `peer` - A server, which implements the signaling of our application
+* `socket.io`
+
+Now lets take a look at our `bower.json`:
+
+```JSON
+{
+  "name": "react-peerjs",
+  "main": "index.js",
+  "version": "0.0.0",
+  "authors": [
+    "mgechev"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.11.1",
+    "jquery": "~2.1.1",
+    "bootstrap": "~3.2.0",
+    "eventEmitter": "~4.2.7",
+    "peerjs": "~0.3.9"
+  }
+}
+```
+
+We have a few more dependencies here:
+
+* `react` - the framework, we are going to use for building our view
+* `jquery`
+* `bootstrap`
+* `eventEmitter` - our components are going to fire events, which later are going to be handled by other components
+* `peerjs` - wraps the browser's WebRTC API into high-level, easier to use API.
+
+And... `.bowerrc`
+
+```JSON
+{
+  "directory": "public/lib"
+}
+```
+
+Now run:
+
+```bash
+bower install && npm install
+```
+
 Now lets start with our implementation.
 
 ## Server side
@@ -100,3 +189,347 @@ We create a simple express server, which servers static files from the directory
 Once our `PeerServer` detects that a peer has connected to it, it triggers the event `USER_CONNECTED` to all peers. Once a client disconnects to the `PeerServer` we trigger `USER_DISCONNECTED`. These two events are very important for handling the list of currently available users.
 
 The biggest advantage of putting the logic for p2p communication and signaling out of the react components is achieving separation of concerns. This way we have highly coherent components, which are reusable and testable.
+
+## Client-side
+
+### ChatProxy
+
+Now lets take a look at the component responsible for communication between our peers.
+
+Inside `/public/src/models/` create a file called `ChatProxy.js`.
+
+```JavaScript
+function ChatProxy() {
+  EventEmitter.call(this);
+  this._peers = {};
+}
+
+ChatProxy.prototype = Object.create(EventEmitter.prototype);
+```
+
+Our `ChatProxy` extends `EventEmitter`, this means that we are going to handle events fired by the `ChatProxy` when client connects, disconnects or receives a message.
+
+The most complex method, which `ChatProxy` implements is the `connect` method. Lets take a look at it:
+
+```JavaScript
+ChatProxy.prototype.connect = function (username) {
+  var self = this;
+  this.setUsername(username);
+  this.socket = io();
+  this.socket.on('connect', function () {
+    self.socket.on(Topics.USER_CONNECTED, function (userId) {
+      if (userId === self.getUsername()) {
+        return;
+      }
+      self._connectTo(userId);
+      self.emit(Topics.USER_CONNECTED, userId);
+      console.log('User connected', userId);
+    });
+    self.socket.on(Topics.USER_DISCONNECTED, function (userId) {
+      if (userId === self.getUsername()) {
+        return;
+      }
+      self._disconnectFrom(userId);
+      self.emit(Topics.USER_DISCONNECTED, userId);
+      console.log('User disconnected', userId);
+    });
+  });
+  console.log('Connecting with username', username);
+  this.peer = new Peer(username, {
+    host: location.hostname, port: 9000, path: '/chat'
+  });
+  this.peer.on('open', function (userId) {
+    self.setUsername(userId);
+  });
+  this.peer.on('connection', function (conn) {
+    self._registerPeer(conn.peer, conn);
+    self.emit(Topics.USER_CONNECTED, conn.peer);
+  });
+};
+```
+
+If the client have passed a username to the `connect` call we set the username, after that with `io()` we establish new Socket.io connection. We are going to use it for receiving `USER_CONNECTED` and `USER_DISCONNECTED` events. Once we have been connected to the socket.io server, we bind to these events.
+
+In the snippet:
+
+```JavaScript
+self.socket.on(Topics.USER_CONNECTED, function (userId) {
+  if (userId === self.getUsername()) {
+    return;
+  }
+  self._connectTo(userId);
+  self.emit(Topics.USER_CONNECTED, userId);
+  console.log('User connected', userId);
+});
+```
+
+Once we receive event, which indicates that new user is connected we make sure that the user is not ourselves. In case it is a different user we establish connection with by calling the "private" `_connectTo` method.
+
+The callback for `USER_DISCONNECTED` is almost analogous so we won't take a further look at it.
+
+The next interesting part of the `connect` method is the snippet where we establish new `Peer.js` connection:
+
+```JavaScript
+this.peer = new Peer(username, {
+  host: location.hostname, port: 9000, path: '/chat'
+});
+this.peer.on('open', function (userId) {
+  self.setUsername(userId);
+});
+this.peer.on('connection', function (conn) {
+  self._registerPeer(conn.peer, conn);
+  self.emit(Topics.USER_CONNECTED, conn.peer);
+});
+```
+
+Once we invoke the constructor function `Peer` with the appropriate parameters, we might receive an `open` event. The open event gives us the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we save it.
+
+Once we receive `connection` event we register the received peer and emit `USER_CONNECTED` event. The `USER_CONNECTED` event will be handled by the `ChatBox`, which will lead to change of the state of the UI.
+
+
+### app.jsx
+
+The initial view of the user would be:
+
+```html
+<section id="container">
+  <div class="reg-form-container">
+    <label for="username-input">Username</label>
+    <input type="text" id="username-input" class="form-control">
+    <br>
+    <button id="connect-btn" class="btn btn-primary">Connect</button>
+  </div>
+</section>
+```
+
+This is a simple text box asking the client for a username, which is optional. In order to see what happens once the user click on the `#connect-btn`, lets take a look at `app.jsx`:
+
+```jsx
+/** @jsx React.DOM */
+
+$(function () {
+  $('#connect-btn').click(function () {
+    initChat($('#container')[0],
+      $('#username-input').val());
+  });
+
+  function initChat(container, username) {
+    React.renderComponent(<ChatBox username={username}></ChatBox>, container);
+  }
+
+  window.onbeforeunload = function () {
+    return 'Wat?!';
+  };
+
+});
+```
+
+When the user clicks on `#connect-btn` we render the `ChatBox` component inside the `#container` element. The `ChatBox` component will be our next target:
+
+
+### ChatBox.jsx
+
+At `/public/src/components/chat/` create a file called `ChatBox.jsx` and add the following content:
+
+```JavaScript
+/** @jsx React.DOM */
+
+'use strict';
+
+var ChatBox = React.createClass({
+  getInitialState: function () {
+    return { users: [] };
+  },
+
+  componentDidMount: function () {
+    this.chatProxy = new ChatProxy();
+    this.chatProxy.connect(this.props.username);
+    this.chatProxy.onMessage(this.addMessage.bind(this));
+    this.chatProxy.onUserConnected(this.userConnected.bind(this));
+    this.chatProxy.onUserDisconnected(this.userDisconnected.bind(this));
+  },
+
+  userConnected: function (user) {
+    var users = this.state.users;
+    users.push(user);
+    this.setState({
+      users: users
+    });
+  },
+
+  userDisconnected: function (user) {
+    var users = this.state.users;
+    users.splice(users.indexOf(user), 1);
+    this.setState({
+      users: users
+    });
+  },
+
+  messageHandler: function (message) {
+    message = this.refs.messageInput.getDOMNode().value;
+    this.addMessage({
+      content: message,
+      author : this.chatProxy.getUsername()
+    });
+    this.chatProxy.broadcast(message);
+  },
+
+  addMessage: function (message) {
+    if (message) {
+      message.date = new Date();
+      this.refs.messagesList.addMessage(message);
+    }
+  },
+
+  render: function () {
+    return (
+      <div className="chat-box" ref="root">
+        <div className="chat-header ui-widget-header">React p2p Chat</div>
+        <div className="chat-content-wrapper row">
+          <MessagesList ref="messagesList"></MessagesList>
+          <UsersList users={this.state.users} ref="usersList"></UsersList>
+        </div>
+        <MessageInput
+          ref="messageInput"
+          messageHandler={this.messageHandler}>
+        </MessageInput>
+      </div>
+    );
+  }
+});
+
+```
+
+Lets take a look at the `render` method:
+
+```JSX
+render: function () {
+  return (
+    <div className="chat-box" ref="root">
+      <div className="chat-header ui-widget-header">React p2p Chat</div>
+      <div className="chat-content-wrapper row">
+        <MessagesList ref="messagesList"></MessagesList>
+        <UsersList users={this.state.users} ref="usersList"></UsersList>
+      </div>
+      <MessageInput
+        ref="messageInput"
+        messageHandler={this.messageHandler}>
+      </MessageInput>
+    </div>
+  );
+}
+```
+
+The `render` method returns the markup, which should be rendered. As you see we use components, which should be already defined and available in the given scope (components like `MessagesList` and `MessageInput`).
+
+Once the component has been mounted the `componentDidMount` method is being invoked:
+
+```JavaScript
+componentDidMount: function () {
+  this.chatProxy = new ChatProxy();
+  this.chatProxy.connect(this.props.username);
+  this.chatProxy.onMessage(this.addMessage.bind(this));
+  this.chatProxy.onUserConnected(this.userConnected.bind(this));
+  this.chatProxy.onUserDisconnected(this.userDisconnected.bind(this));
+},
+```
+
+In this method we create new `ChatProxy`, invoke its method `connect` and add event handlers. Once we receive a new message the method callback registered in `onMessage` will be invoked, once a user is connected the callback `userConnected` will be invoked and once a peer is being disconnected the callback `userDisconnected` will be invoked. We use `Function.prototype.bind` in order to change the context in the methods with appropriate one.
+
+`userConnected` and `userDisconnected` are analogous:
+
+```JavaScript
+userConnected: function (user) {
+  var users = this.state.users;
+  users.push(user);
+  this.setState({
+    users: users
+  });
+},
+
+userDisconnected: function (user) {
+  var users = this.state.users;
+  users.splice(users.indexOf(user), 1);
+  this.setState({
+    users: users
+  });
+}
+```
+
+They both change the state, which leads to call of the `render` method with the new state, which reflects on other components and on the current UI.
+
+In the `addMessage` method we have:
+
+```JavaScript
+addMessage: function (message) {
+  if (message) {
+    message.date = new Date();
+    this.refs.messagesList.addMessage(message);
+  }
+}
+```
+
+The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `<MessagesList ref="messagesList"></MessagesList>`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
+
+### MessagesList.jsx
+
+Inside `/public/src/components/chat/` add file called `MessagesList.jsx` and add the following content:
+
+
+```JavaScript
+/** @jsx React.DOM */
+
+'use strict';
+
+var MessagesList = React.createClass({
+
+  getInitialState: function () {
+    return { messages: [] };
+  },
+
+  addMessage: function (message) {
+    var messages = this.state.messages,
+        container = this.refs.messageContainer.getDOMNode();
+    messages.push(message);
+    this.setState({ messages: messages });
+    // Smart scrolling - when the user is
+    // scrolled a little we don't want to return him back
+    if (container.scrollHeight -
+        (container.scrollTop + container.offsetHeight) >= 50) {
+      this.scrolled = true;
+    } else {
+      this.scrolled = false;
+    }
+  },
+
+  componentDidUpdate: function () {
+    if (this.scrolled) {
+      return;
+    }
+    var container = this.refs.messageContainer.getDOMNode();
+    container.scrollTop = container.scrollHeight;
+  },
+
+  render: function () {
+    var messages;
+    messages = this.state.messages.map(function (m) {
+      return (
+        <ChatMessage message={m}></ChatMessage>
+      );
+    });
+    if (!messages.length) {
+      messages = <div className="chat-no-messages">No messages</div>;
+    }
+    return (
+      <div ref="messageContainer" className="chat-messages col-xs-9">
+        {messages}
+      </div>
+    );
+  }
+});
+```
+
+
+### MessageInput.jsx
+
+This is the last component we will look at. 
