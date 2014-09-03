@@ -44,7 +44,7 @@ Now lets get starting with the actual implementation of our WebRTC based chat.
 
 #### High-level overview
 
-Since I'm kind of traditionalist I'll start by providing a basic, high-level overview of the architecture of our p2p chat.
+Since I'm kind of traditionalist I'll start by providing a basic, high-level overview of the architecture of our p2p (peer to peer) chat.
 
 ![Architecture](/images/architecture.png "Architecture")
 
@@ -160,7 +160,7 @@ Now lets start with our implementation.
 
 ### Server-side
 
-We have a few lines of Node.js which are required for signaling and establishing p2p connection between the peers.
+We have a few lines of Node.js, which are required for signaling and establishing p2p connection between the peers.
 
 Create a file called `index.js` in the root of our application and add the following content:
 
@@ -190,7 +190,7 @@ peerServer.on('disconnect', function (id) {
 });
 </pre>
 
-In the snippet above, we create a simple express server, which servers static files from the directory `/public` in our root. After that we create a `PeerServer`, which on the other hand is responsible for handling the signaling between the different peers. In our case we can think of the `PeerServer` and the protocol, which it implements as alternative of [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol)).
+In the snippet above, we create a simple express server, which servers static files from the directory `/public`, located in the root folder. After that we create a `PeerServer`, which on the other hand is responsible for handling the signaling between the different peers. In our case we can think of the `PeerServer` and the protocol, which it implements as alternative of [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol)).
 
 Once our `PeerServer` detects that a peer has been connected to it, it triggers the event `USER_CONNECTED` to all peers. Once a client disconnects from the `PeerServer` we trigger `USER_DISCONNECTED`. These two events are very important for handling the list of currently available users.
 
