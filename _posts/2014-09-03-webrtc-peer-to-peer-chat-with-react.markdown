@@ -284,7 +284,7 @@ this.peer.on('connection', function (conn) {
 });
 </pre>
 
-Once we invoke the constructor function `Peer` with the appropriate parameters, we might receive an `open` event. The open event gives us the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we save it.
+Once we invoke the constructor function `Peer`, provided by peer.js, with the appropriate parameters, we bind to the `open` event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.
 
 Once we receive `connection` event we register the connected peer and emit `USER_CONNECTED` event. The `USER_CONNECTED` event will be handled by the `ChatBox`, which will lead to change of the state of the UI.
 
