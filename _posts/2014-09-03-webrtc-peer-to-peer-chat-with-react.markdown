@@ -20,21 +20,21 @@ tags:
 
 ## Introduction
 
-In this blog post I'm going to illustrate how could be built WebRTC chat with React.js. Before we continue lets describe briefly what React.js and WebRTC are.
+In this blog post I'm going to illustrate how could be built WebRTC chat with [React.js](https://facebook.github.io/react/). Before we continue lets describe briefly what React.js and WebRTC are.
 
-The application from the tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).
+The application described in the tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).
 
 #### React.js
 
-React.js is [reactive](https://en.wikipedia.org/wiki/Reactive_programming) JavaScript framework, which helps you to build user interface. Facebook states that we can think of React as the "V" in MVC. React's main aspect is the state. When the state of the application changes this automatically propagates through the application's components. A React component is a self-container module, which is composed by one or more other components. Usually the component depends on state, which is being provided by a parent component. May be the explanation seems quite abstract now, but during the tutorial the picture will get much more clear.
+React.js is [reactive](https://en.wikipedia.org/wiki/Reactive_programming) JavaScript framework, which helps you to build user interface. Facebook states that we can think of React as the "V" in MVC. React's main aspect is the state. When the state of the application changes this automatically propagates through the application's components. A React component is a self-contained module, which is composed by one or more other components. Usually the component depends on state, which is being provided by a parent component. May be the explanation seems quite abstract now, but during the tutorial the picture will get much more clear.
 
 #### WebRTC
 
-RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is [already published](http://dev.w3.org/2011/webrtc/editor/webrtc.html) by W3C.
+RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server between them (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE, we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is [already published](http://dev.w3.org/2011/webrtc/editor/webrtc.html) by W3C.
 
 #### NAT
 
-Before continue with the tutorial, lets say few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible by the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
+Before continue with the tutorial, lets tell a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
 
 ## Implementation
 
