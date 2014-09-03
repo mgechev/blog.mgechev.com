@@ -529,7 +529,130 @@ var MessagesList = React.createClass({
 });
 ```
 
+Lets take a look at the `render` method of this component:
+
+```JavaScript
+render: function () {
+  var messages;
+  messages = this.state.messages.map(function (m) {
+    return (
+      <ChatMessage message={m}></ChatMessage>
+    );
+  });
+  if (!messages.length) {
+    messages = <div className="chat-no-messages">No messages</div>;
+  }
+  return (
+    <div ref="messageContainer" className="chat-messages col-xs-9">
+      {messages}
+    </div>
+  );
+}
+```
+
+Initially we iterate over all messages from the state of the current component (`this.state.messages`). Using `Array.prototype.map` we turn our messages into `ChatMessages` and later render them into the `div.chat-messages`.
+
+In `addMessage` we add new chat messages by appending them to the list of all messages:
+
+```JavaScript
+addMessage: function (message) {
+  var messages = this.state.messages,
+      container = this.refs.messageContainer.getDOMNode();
+  messages.push(message);
+  this.setState({ messages: messages });
+  // Smart scrolling - when the user is
+  // scrolled a little we don't want to return him back
+  if (container.scrollHeight -
+      (container.scrollTop + container.offsetHeight) >= 50) {
+    this.scrolled = true;
+  } else {
+    this.scrolled = false;
+  }
+}
+```
+
+The interesting part here is:
+
+
+```JavaScript
+if (container.scrollHeight -
+    (container.scrollTop + container.offsetHeight) >= 50) {
+  this.scrolled = true;
+} else {
+  this.scrolled = false;
+}
+```
+
+Basically this snippet checks whether the user have scrolled more than 50pxs. If he did we don't want to scroll to bottom once he have started reading messages upwards in the chat. Thats why depending on whether the user have or haven't scrolled upwards we set `this.scrolled` to `true` or `false`.
+
+We use `this.scrolled` in `componentDidUpdate`:
+
+```JavaScript
+componentDidUpdate: function () {
+  if (this.scrolled) {
+    return;
+  }
+  var container = this.refs.messageContainer.getDOMNode();
+  container.scrollTop = container.scrollHeight;
+}
+```
+
+Once the component will be updated (for example because of new message added), we check whether the user have scrolled and if he did we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs` as explained above.
 
 ### MessageInput.jsx
 
-This is the last component we will look at. 
+This is the last component we will look at.
+
+```JavaScript
+/** @jsx React.DOM */
+
+'use strict';
+
+var MessageInput = React.createClass({
+
+  mixins: [React.addons.LinkedStateMixin],
+
+  keyHandler: function (event) {
+    var msg = this.state.message.trim();
+    if (event.keyCode === 13 && msg.length) {
+      this.props.messageHandler(msg);
+      this.setState({ message: '' });
+    }
+  },
+
+  getInitialState: function () {
+    return { message: '' };
+  },
+
+  render: function () {
+    return (
+      <input type="text"
+        className = 'form-control'
+        placeholder='Enter a message...'
+        valueLink={this.linkState('message')}
+        onKeyUp={this.keyHandler}/>
+    );
+  }
+});
+```
+
+In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create binding between given input and property in our state. The name of the property depends on the value we passed to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect to `this.state.value`.
+
+Another interesting moment here is the key handler we add. On key up of `input.form-control` the `keyHandler` method will be called. On the other hand it checks whether the user have pressed enter, and whether the length of the trimmed value of the current message is more than zero, if it is it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`: 
+
+```JavaScript
+<MessageInput
+  ref="messageInput"
+  messageHandler={this.messageHandler}>
+</MessageInput>
+```
+
+# Run the project...
+
+The next step is to run the project by:
+
+```bash
+node index.js && open http://localhost:3001
+```
+
+Have fun!
