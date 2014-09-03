@@ -308,7 +308,7 @@ The initial view of the user would be:
 
 Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx`, file, which is located at `/public/app.jsx`:
 
-<pre lang="JavaScript">app.jsx
+<pre lang="JavaScript">
 /** @jsx React.DOM */
 
 $(function () {
