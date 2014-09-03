@@ -645,4 +645,4 @@ The next step is to run the project by:
 <pre lang="bash">node index.js && open http://localhost:3001
 </pre>
 
-Have fun!
+I hope the blog post was fun and useful! :-)
