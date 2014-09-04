@@ -34,7 +34,7 @@ RTC stands for Real-Time Communication. Until browsers implemented WebRTC our on
 
 #### NAT
 
-Before we continue with the tutorial, lets tell a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public ones and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
+Before we continue with the tutorial, lets say a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public ones and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
 
 ## Implementation
 
@@ -50,7 +50,7 @@ Since I'm kind of traditionalist I'll start by providing a basic, high-level ove
 
 The dashed arrows, in the diagram, indicate [signaling](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) WebSocket connections. Each client initiates such connection with the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol))). Actually the signaling protocol in our case is provided by Peer.js.
 
-The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. As you see we use full mesh, which scales badly especially when we use video or audio streaming. For the purpose of our chat full mesh is good enough.
+The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. We use full mesh, which scales badly especially when we use video or audio streaming. For the purpose of our chat full mesh is good enough.
 
 
 #### Low-level overview
@@ -61,7 +61,7 @@ In the beginning of the blog post I mentioned that React.js application contains
 
 Lets concentrate on the left-hand side of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the `ChatBox` component. In its left-hand side is positioned the `MessagesList` component, which is composition of `ChatMessage` components. Each `ChatMessage` component contains a different chat message, which has author, date when published and content. On the right-hand side of the `ChatBox` is positioned the `UsersList` component. This component lists all users, which are currently in the chat session. The last component is the `MessageInput` component. The `MessageInput` component is a simple text input, which once detect a press of the Enter key triggers an event, with data - its value.
 
-The `ChatBox` component uses `ChatProxy`. The `ChatProxy` is responsible for registering the current client to the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
+The `ChatBox` component uses `ChatProxy`. The `ChatProxy` is responsible for registering the current client on the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
 
 
 ### Getting started
@@ -200,7 +200,7 @@ Once our `PeerServer` detects that a peer has been connected to it, it triggers 
 
 Now lets take a look at the component responsible for communication between our peers and registering them on the server.
 
-The biggest advantage of putting the logic for p2p communication and signaling out of the react components is achieving separation of concerns. This way we have highly coherent components, which are reusable and testable.
+The biggest advantage of putting the logic for p2p communication and signaling out of the react components is achieving separation of concerns. This way we achieve highly coherent components, which are reusable and testable.
 
 Inside `/public/src/models/` create a file called `ChatProxy.js`.
 
