@@ -1,6 +1,6 @@
 ---
 title: Google+ API
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2011/09/16/google-api/
 categories:

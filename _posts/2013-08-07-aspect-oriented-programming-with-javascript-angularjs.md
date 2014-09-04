@@ -1,6 +1,6 @@
 ---
 title: Aspect-Oriented Programming with AngularJS
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/08/07/aspect-oriented-programming-with-javascript-angularjs/
 categories:

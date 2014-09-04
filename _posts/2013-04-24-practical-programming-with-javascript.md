@@ -1,6 +1,6 @@
 ---
 title: Practical programming with JavaScript
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/04/24/practical-programming-with-javascript/
 categories:

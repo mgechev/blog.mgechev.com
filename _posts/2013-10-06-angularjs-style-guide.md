@@ -1,6 +1,6 @@
 ---
 title: AngularJS style guide
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/10/06/angularjs-style-guide/
 categories:

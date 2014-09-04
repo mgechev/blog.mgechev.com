@@ -1,6 +1,6 @@
 ---
 title: HTML5 image editor
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/04/25/html5-image-editor/
 categories:

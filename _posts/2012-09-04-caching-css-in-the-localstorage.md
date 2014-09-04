@@ -1,6 +1,6 @@
 ---
 title: Caching CSS with localStorage
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/09/04/caching-css-in-the-localstorage/
 categories:

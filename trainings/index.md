@@ -1,6 +1,6 @@
 ---
 title: Trainings
-author: Minko Gechev
+author: minko_gechev
 layout: page
 ---
 

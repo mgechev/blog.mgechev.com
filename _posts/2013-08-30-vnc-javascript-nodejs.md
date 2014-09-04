@@ -1,6 +1,6 @@
 ---
 title: VNC client on 200 lines of JavaScript
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/08/30/vnc-javascript-nodejs/
 categories:

@@ -1,6 +1,6 @@
 ---
 title: AngularJS Inheritance Patterns
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/12/18/inheritance-services-controllers-in-angularjs/
 categories:

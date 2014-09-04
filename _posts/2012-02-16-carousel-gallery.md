@@ -1,6 +1,6 @@
 ---
 title: Carousel Gallery
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/02/16/carousel-gallery/
 categories:

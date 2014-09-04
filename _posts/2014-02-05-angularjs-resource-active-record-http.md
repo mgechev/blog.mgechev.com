@@ -1,6 +1,6 @@
 ---
 title: The magic of $resource (or simply a client-side Active Record)
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/02/05/angularjs-resource-active-record-http/
 categories:

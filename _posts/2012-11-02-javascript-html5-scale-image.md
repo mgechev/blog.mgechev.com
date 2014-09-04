@@ -1,6 +1,6 @@
 ---
 title: JavaScript image scaling
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/11/02/javascript-html5-scale-image/
 categories:

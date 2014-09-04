@@ -1,6 +1,6 @@
 ---
 title: Self-invoking functions in JavaScript (or Immediately Invoked Function Expressions)
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/08/29/self-invoking-functions-in-javascript-or-immediately-invoked-function-expression/
 categories:

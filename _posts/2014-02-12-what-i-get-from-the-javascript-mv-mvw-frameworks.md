@@ -1,6 +1,6 @@
 ---
 title: 'What I get from the JavaScript MV* frameworks'
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/02/12/what-i-get-from-the-javascript-mv-mvw-frameworks/
 categories:

@@ -1,6 +1,6 @@
 ---
 title: AngularJS in Patterns (Part 1). Overview of AngularJS
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/
 categories:

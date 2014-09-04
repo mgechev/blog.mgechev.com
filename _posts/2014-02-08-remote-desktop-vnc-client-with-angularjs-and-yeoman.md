@@ -1,6 +1,6 @@
 ---
 title: Remote Desktop Client with AngularJS and Yeoman
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/
 categories:

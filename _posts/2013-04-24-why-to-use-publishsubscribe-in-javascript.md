@@ -1,6 +1,6 @@
 ---
 title: Why I should use publish/subscribe in JavaScript
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/04/24/why-to-use-publishsubscribe-in-javascript/
 categories:

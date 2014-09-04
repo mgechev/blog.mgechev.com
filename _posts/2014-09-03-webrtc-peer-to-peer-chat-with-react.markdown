@@ -1,6 +1,6 @@
 ---
 title: WebRTC chat with React.js
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/09/03/webrtc-peer-to-peer-chat-with-react/
 categories:

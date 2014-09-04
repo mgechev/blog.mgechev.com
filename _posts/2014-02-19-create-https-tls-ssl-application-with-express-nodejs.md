@@ -1,6 +1,6 @@
 ---
 title: Express over HTTPS
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/02/19/create-https-tls-ssl-application-with-express-nodejs/
 categories:

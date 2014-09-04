@@ -1,6 +1,6 @@
 ---
 title: Singleton in JavaScript
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/04/16/singleton-in-javascript/
 categories:

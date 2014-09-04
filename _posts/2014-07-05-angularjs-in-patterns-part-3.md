@@ -1,6 +1,6 @@
 ---
 title: AngularJS in Patterns (Part 3)
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2014/07/05/angularjs-in-patterns-part-3/
 categories:

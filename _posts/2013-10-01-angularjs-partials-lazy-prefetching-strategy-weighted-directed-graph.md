@@ -1,6 +1,6 @@
 ---
 title: Lazy prefetching of AngularJS partials
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/
 categories:

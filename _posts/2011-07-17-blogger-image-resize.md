@@ -1,6 +1,6 @@
 ---
 title: Blogger image resize
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2011/07/17/blogger-image-resize/
 categories:

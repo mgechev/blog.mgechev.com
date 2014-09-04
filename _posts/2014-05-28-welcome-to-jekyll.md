@@ -1,5 +1,6 @@
 ---
 layout: post
+author: minko_gechev
 title:  "Using GitHub Pages with Jekyll!"
 date:   2014-05-28 16:36:34
 categories: jekyll update

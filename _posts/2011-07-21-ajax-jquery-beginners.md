@@ -1,6 +1,6 @@
 ---
 title: Ajax without jQuery for beginners
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2011/07/21/ajax-jquery-beginners/
 categories:

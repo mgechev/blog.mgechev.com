@@ -1,6 +1,6 @@
 ---
 title: Asus N56VZ + Ubuntu 12.04 (en)
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/08/19/asus-n56vz-ubuntu-12-04-en/
 categories:

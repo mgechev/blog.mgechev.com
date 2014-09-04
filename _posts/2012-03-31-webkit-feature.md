@@ -1,6 +1,6 @@
 ---
 title: 'Курсови проекти &#8211; ФМИ'
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/03/31/%d0%ba%d1%83%d1%80%d1%81%d0%be%d0%b2%d0%b8-%d0%bf%d1%80%d0%be%d0%b5%d0%ba%d1%82%d0%b8-%d1%84%d0%bc%d0%b8/
 categories:

@@ -1,6 +1,6 @@
 ---
 title: Advanced JavaScript at Sofia University
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/10/24/advanced-javascript-in-sofia-university/
 categories:

@@ -1,6 +1,6 @@
 ---
 title: Functional programming with JavaScript
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/01/21/functional-programming-with-javascript/
 categories:

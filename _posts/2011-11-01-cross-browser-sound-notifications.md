@@ -1,6 +1,6 @@
 ---
 title: Sound notification in web page
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2011/11/01/cross-browser-sound-notifications/
 categories:

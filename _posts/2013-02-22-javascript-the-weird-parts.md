@@ -1,6 +1,6 @@
 ---
 title: JavaScript, the weird parts
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/02/22/javascript-the-weird-parts/
 categories:

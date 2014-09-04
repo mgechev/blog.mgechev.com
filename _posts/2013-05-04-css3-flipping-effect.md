@@ -1,6 +1,6 @@
 ---
 title: CSS3 flipping effect
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/05/04/css3-flipping-effect/
 categories:

@@ -1,6 +1,6 @@
 ---
 title: 'Looking for performance? Probably you should NOT use [].sort (V8)'
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/11/24/javascript-sorting-performance-quicksort-v8/
 categories:

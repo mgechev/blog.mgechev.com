@@ -1,6 +1,6 @@
 ---
 title: Color animation plugin for jQuery
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/01/16/color-animation-plugin-for-jquery/
 categories:

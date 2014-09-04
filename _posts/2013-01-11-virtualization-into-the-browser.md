@@ -1,6 +1,6 @@
 ---
 title: plainvm
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2013/01/11/virtualization-into-the-browser/
 categories:

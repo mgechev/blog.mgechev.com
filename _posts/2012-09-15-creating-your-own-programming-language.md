@@ -1,6 +1,6 @@
 ---
 title: ELang
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/09/15/creating-your-own-programming-language/
 categories:

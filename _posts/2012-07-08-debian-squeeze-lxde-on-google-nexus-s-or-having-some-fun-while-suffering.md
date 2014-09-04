@@ -1,6 +1,6 @@
 ---
 title: Debian Squeeze + LXDE on Google Nexus S (or having some fun while suffering)
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2012/07/08/debian-squeeze-lxde-on-google-nexus-s-or-having-some-fun-while-suffering/
 categories:

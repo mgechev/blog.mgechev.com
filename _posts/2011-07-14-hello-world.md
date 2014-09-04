@@ -1,6 +1,6 @@
 ---
 title: Hello world!
-author: Minko Gechev
+author: minko_gechev
 layout: post
 permalink: /2011/07/14/hello-world/
 categories:
