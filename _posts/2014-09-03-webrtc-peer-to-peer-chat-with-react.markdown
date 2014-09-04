@@ -164,7 +164,8 @@ We have a few lines of Node.js, which are required for signaling and establishin
 
 Create a file called `index.js` in the root of our application and add the following content:
 
-<pre lang="JavaScript">var PeerServer = require('peer').PeerServer,
+{% highlight javascript %}
+var PeerServer = require('peer').PeerServer,
     express = require('express'),
     Topics = require('./public/src/Topics.js'),
     app = express(),
@@ -188,7 +189,7 @@ peerServer.on('disconnect', function (id) {
   io.emit(Topics.USER_DISCONNECTED, id);
   console.log('User disconnected with #', id);
 });
-</pre>
+{% endhighlight %}
 
 In the snippet above, we create a simple express server, which servers static files from the directory `/public`, located in the root folder. After that we create a `PeerServer`, which on the other hand is responsible for handling the signaling between the different peers. In our case we can think of the `PeerServer` and the protocol, which it implements as alternative of [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol)).
 
@@ -204,19 +205,21 @@ The biggest advantage of putting the logic for p2p communication and signaling o
 
 Inside `/public/src/models/` create a file called `ChatProxy.js`.
 
-<pre lang="JavaScript">function ChatProxy() {
+{% highlight javascript %}
+function ChatProxy() {
   EventEmitter.call(this);
   this._peers = {};
 }
 
 ChatProxy.prototype = Object.create(EventEmitter.prototype);
-</pre>
+{% endhighlight %}
 
 Our `ChatProxy` extends `EventEmitter`. We use inheritance because we want to reuse the functionality provided by the `EventEmitter` and fire events when we receive new message, client connects or disconnects.
 
 The most complex method, which `ChatProxy` implements is the `connect` method. Lets take a look at it:
 
-<pre lang="JavaScript">ChatProxy.prototype.connect = function (username) {
+{% highlight javascript %}
+ChatProxy.prototype.connect = function (username) {
   var self = this;
   this.setUsername(username);
   this.socket = io();
@@ -250,13 +253,14 @@ The most complex method, which `ChatProxy` implements is the `connect` method. L
     self.emit(Topics.USER_CONNECTED, conn.peer);
   });
 };
-</pre>
+{% endhighlight %}
 
 If the client have passed username to the `connect` call we set the current username, after that with `io()` we establish new socket.io connection. The socket.io connection is going to be used for receiving `USER_CONNECTED` and `USER_DISCONNECTED` events. Once we have been connected to the socket.io server, we bind to these events. We need extra, socket.io, connection here because the API of Peer.js doesn't provide all required events by its public API.
 
 In the snippet:
 
-<pre lang="JavaScript">self.socket.on(Topics.USER_CONNECTED, function (userId) {
+{% highlight javascript %}
+self.socket.on(Topics.USER_CONNECTED, function (userId) {
   if (userId === self.getUsername()) {
     return;
   }
@@ -264,7 +268,7 @@ In the snippet:
   self.emit(Topics.USER_CONNECTED, userId);
   console.log('User connected', userId);
 });
-</pre>
+{% endhighlight %}
 
 Once we receive event, which indicates that new user is connected, we make sure that the connected peer is not us. In this case, we establish connection with it by calling the "private" method `_connectTo`.
 
@@ -272,7 +276,8 @@ The callback for `USER_DISCONNECTED` is almost analogous so we won't take a furt
 
 The next interesting part of the `connect` method is the snippet where we establish new `Peer.js` connection:
 
-<pre lang="JavaScript">this.peer = new Peer(username, {
+{% highlight javascript %}
+this.peer = new Peer(username, {
   host: location.hostname, port: 9000, path: '/chat'
 });
 this.peer.on('open', function (userId) {
@@ -282,7 +287,7 @@ this.peer.on('connection', function (conn) {
   self._registerPeer(conn.peer, conn);
   self.emit(Topics.USER_CONNECTED, conn.peer);
 });
-</pre>
+{% endhighlight %}
 
 Once we invoke the constructor function `Peer`, provided by Peer.js, with the appropriate parameters, we bind to the `open` event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.
 
@@ -308,7 +313,7 @@ The initial view of the user would be:
 
 Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx` file, which is located at `/public/app.jsx`:
 
-<pre lang="JavaScript">
+{% highlight JavaScript %}
 /** @jsx React.DOM */
 
 $(function () {
@@ -326,7 +331,7 @@ $(function () {
   };
 
 });
-</pre>
+{% endhighlight %}
 
 When the user clicks on `#connect-btn` we render the `ChatBox` component inside the `#container` element. So now lets see what the `ChatBox` does:
 
@@ -335,7 +340,8 @@ When the user clicks on `#connect-btn` we render the `ChatBox` component inside 
 
 At `/public/src/components/chat/` create a file called `ChatBox.jsx` and add the following content:
 
-<pre lang="JavaScript">/** @jsx React.DOM */
+{% highlight JavaScript %}
+/** @jsx React.DOM */
 
 'use strict';
 
@@ -400,8 +406,7 @@ var ChatBox = React.createClass({
     );
   }
 });
-
-</pre>
+{% endhighlight %}
 
 Lets take a look at the `render` method:
 
@@ -426,20 +431,22 @@ The `render` method returns the markup, which should be rendered. We use compone
 
 Once the component has been mounted the `componentDidMount` method is being invoked:
 
-<pre lang="JavaScript">componentDidMount: function () {
+{% highlight JavaScript %}
+componentDidMount: function () {
   this.chatProxy = new ChatProxy();
   this.chatProxy.connect(this.props.username);
   this.chatProxy.onMessage(this.addMessage.bind(this));
   this.chatProxy.onUserConnected(this.userConnected.bind(this));
   this.chatProxy.onUserDisconnected(this.userDisconnected.bind(this));
 },
-</pre>
+{% endhighlight %}
 
 In this method we create new `ChatProxy`, invoke its method `connect` and add event handlers. Once we receive a new message the callback registered for `onMessage` will be invoked, once a user is connected the callback `userConnected` will be invoked and once a peer is being disconnected the callback `userDisconnected` will be invoked. We use `Function.prototype.bind` in order to change the context for the callbacks with appropriate one.
 
 `userConnected` and `userDisconnected` are similar:
 
-<pre lang="JavaScript">userConnected: function (user) {
+{% highlight JavaScript %}
+userConnected: function (user) {
   var users = this.state.users;
   users.push(user);
   this.setState({
@@ -454,19 +461,20 @@ userDisconnected: function (user) {
     users: users
   });
 }
-</pre>
+{% endhighlight %}
 
 They both change the state, which leads to call of the `render` method with the new state, which reflects on other components and respectively on the current UI.
 
 In the `addMessage` method we have:
 
-<pre lang="JavaScript">addMessage: function (message) {
+{% highlight JavaScript %}
+addMessage: function (message) {
   if (message) {
     message.date = new Date();
     this.refs.messagesList.addMessage(message);
   }
 }
-</pre>
+{% endhighlight %}
 
 The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `&#x3C;MessagesList ref=&#x22;messagesList&#x22;&#x3E;&#x3C;/MessagesList&#x3E;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
 
@@ -474,7 +482,8 @@ The interesting part here is the line: `this.refs.messagesList.addMessage(messag
 
 Inside `/public/src/components/chat/` add file called `MessagesList.jsx` and add the following content:
 
-<pre lang="JavaScript">/** @jsx React.DOM */
+{% highlight JavaScript %}
+/** @jsx React.DOM */
 
 'use strict';
 
@@ -524,11 +533,12 @@ var MessagesList = React.createClass({
     );
   }
 });
-</pre>
+{% endhighlight %}
 
 Lets take a look at the `render` method of this component:
 
-<pre lang="JavaScript">render: function () {
+{% highlight JavaScript %}
+render: function () {
   var messages;
   messages = this.state.messages.map(function (m) {
     return (
@@ -544,13 +554,14 @@ Lets take a look at the `render` method of this component:
     &#x3C;/div&#x3E;
   );
 }
-</pre>
+{% endhighlight %}
 
 Initially we iterate over all messages from the state of the current component (`this.state.messages`). Using `Array.prototype.map` we turn our messages array into `ChatMessages` and later render them into the `div.chat-messages`.
 
 In `addMessage` we add new chat messages by appending them to the list of all messages:
 
-<pre lang="JavaScript">addMessage: function (message) {
+{% highlight JavaScript %}
+addMessage: function (message) {
   var messages = this.state.messages,
       container = this.refs.messageContainer.getDOMNode();
   messages.push(message);
@@ -564,31 +575,33 @@ In `addMessage` we add new chat messages by appending them to the list of all me
     this.scrolled = false;
   }
 }
-</pre>
+{% endhighlight %}
 
 The interesting part here is:
 
 
-<pre lang="JavaScript">if (container.scrollHeight -
+{% highlight JavaScript %}
+if (container.scrollHeight -
     (container.scrollTop + container.offsetHeight) >= 50) {
   this.scrolled = true;
 } else {
   this.scrolled = false;
 }
-</pre>
+{% endhighlight %}
 
 Basically, this snippet checks whether the user have scrolled more than 50pxs. If he did, we don't want to scroll to bottom once he have started reading messages from the history of the chat. Thats why depending on whether the user have or haven't scrolled we set `this.scrolled` to `true` or `false`.
 
 We use `this.scrolled` in `componentDidUpdate`:
 
-<pre lang="JavaScript">componentDidUpdate: function () {
+{% highlight JavaScript %}
+componentDidUpdate: function () {
   if (this.scrolled) {
     return;
   }
   var container = this.refs.messageContainer.getDOMNode();
   container.scrollTop = container.scrollHeight;
 }
-</pre>
+{% endhighlight %}
 
 Once the component is going to be updated (for example because of new message added), we check whether the user have scrolled and if he had, we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs`, as explained above.
 
@@ -596,7 +609,8 @@ Once the component is going to be updated (for example because of new message ad
 
 This is the last component we will look at.
 
-<pre lang="JavaScript">/** @jsx React.DOM */
+{% highlight JavaScript %}
+/** @jsx React.DOM */
 
 'use strict';
 
@@ -626,17 +640,18 @@ var MessageInput = React.createClass({
     );
   }
 });
-</pre>
+{% endhighlight %}
 
 In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create two-way data binding between given input and property of our state. The name of the property depends on the value we pass to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect on `this.state.value`.
 
 Another interesting moment here is the key handler. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
 
-<pre lang="JavaScript">&#x3C;MessageInput
+{% highlight JavaScript %}
+&#x3C;MessageInput
   ref=&#x22;messageInput&#x22;
   messageHandler={this.messageHandler}&#x3E;
 &#x3C;/MessageInput&#x3E;
-</pre>
+{% endhighlight %}
 
 ## Run the project...
 
