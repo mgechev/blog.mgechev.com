@@ -20,9 +20,9 @@ tags:
 
 ## Introduction
 
-In this blog post I'm going to illustrate how could be built WebRTC chat with [React.js](https://facebook.github.io/react/). Before we continue lets describe briefly what React.js and WebRTC are.
+In this blog post I'm going to share how could be build WebRTC chat with [React.js](https://facebook.github.io/react/). Before we continue lets describe briefly what React.js and WebRTC are.
 
-The application described in the tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).
+The application from this tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).
 
 #### React.js
 
@@ -34,7 +34,7 @@ RTC stands for Real-Time Communication. Until browsers implemented WebRTC our on
 
 #### NAT
 
-Before continue with the tutorial, lets tell a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
+Before we continue with the tutorial, lets tell a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public ones and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in [this wiki article](https://en.wikipedia.org/wiki/Network_address_translation).
 
 ## Implementation
 
@@ -48,7 +48,7 @@ Since I'm kind of traditionalist I'll start by providing a basic, high-level ove
 
 ![Architecture](/images/architecture.png "Architecture")
 
-The dashed arrows, in the diagram, indicate signaling WebSocket connections. Each client initiates such connection to the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol))). Actually the signaling protocol in our case is provided by Peer.js.
+The dashed arrows, in the diagram, indicate [signaling](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) WebSocket connections. Each client initiates such connection with the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as [SIP](https://en.wikipedia.org/wiki/Session_Initiation_Protocol) or [XMPP Jingle](https://en.wikipedia.org/wiki/Jingle_(protocol))). Actually the signaling protocol in our case is provided by Peer.js.
 
 The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. As you see we use full mesh, which scales badly especially when we use video or audio streaming. For the purpose of our chat full mesh is good enough.
 
