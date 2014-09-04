@@ -284,7 +284,7 @@ this.peer.on('connection', function (conn) {
 });
 </pre>
 
-Once we invoke the constructor function `Peer`, provided by peer.js, with the appropriate parameters, we bind to the `open` event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.
+Once we invoke the constructor function `Peer`, provided by Peer.js, with the appropriate parameters, we bind to the `open` event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.
 
 When we receive `connection` event we register the connected peer and emit `USER_CONNECTED` event. The `USER_CONNECTED` event will be handled by the `ChatBox`, which will lead to change of the state of the UI.
 
@@ -422,7 +422,7 @@ Lets take a look at the `render` method:
 }
 </pre>
 
-The `render` method returns the markup, which should be rendered. We use components, which should be already defined and available in the given scope (components like `MessagesList` and `MessageInput`).
+The `render` method returns the markup, which should be rendered. We use components, which are already defined and available in the given scope (components like `MessagesList` and `MessageInput`).
 
 Once the component has been mounted the `componentDidMount` method is being invoked:
 
@@ -546,7 +546,7 @@ Lets take a look at the `render` method of this component:
 }
 </pre>
 
-Initially we iterate over all messages from the state of the current component (`this.state.messages`). Using `Array.prototype.map` we turn our messages into `ChatMessages` and later render them into the `div.chat-messages`.
+Initially we iterate over all messages from the state of the current component (`this.state.messages`). Using `Array.prototype.map` we turn our messages array into `ChatMessages` and later render them into the `div.chat-messages`.
 
 In `addMessage` we add new chat messages by appending them to the list of all messages:
 
@@ -590,7 +590,7 @@ We use `this.scrolled` in `componentDidUpdate`:
 }
 </pre>
 
-Once the component will be updated (for example because of new message added), we check whether the user have scrolled and if he had, we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs`, as explained above.
+Once the component is going to be updated (for example because of new message added), we check whether the user have scrolled and if he had, we set `scrollTop` to the appropriate value. For getting the scroll container we use `this.refs`, as explained above.
 
 #### MessageInput.jsx
 
@@ -628,7 +628,7 @@ var MessageInput = React.createClass({
 });
 </pre>
 
-In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create two-way binding between given input and property of our state. The name of the property depends on the value we pass to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect on `this.state.value`.
+In this component we use the mixin `React.addons.LinkedStateMixin`, which adds the method `linkState` to our component. Once the `linkState` method is called we can create two-way data binding between given input and property of our state. The name of the property depends on the value we pass to the `linkState` call. For example if we invoke `this.linkState('value')`, once the value of the input is being changed, this will reflect on `this.state.value`.
 
 Another interesting moment here is the key handler. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
 
