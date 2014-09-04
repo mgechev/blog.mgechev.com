@@ -55,13 +55,13 @@ The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channe
 
 #### Low-level overview
 
-In the beginning of the blog post I mentioned that React.js application contains a finite count of React.js components composed together. In this subsection I'll illustrate, which are the different components of our application and how they are composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
+In the beginning of the blog post I mentioned that React.js application contains a finite amount of React.js components composed together. In this subsection I'll illustrate, which are the different components of our application and how they are composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
 
 ![Micro-architecture](/images/react-p2p.png "Micro-architecture")
 
-Lets concentrate on the left-hand side of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the `ChatBox` component. In its left side is positioned the `MessagesList` component, which is composition of `ChatMessage` components. Each `ChatMessage` component contains a different chat message, which has author, date when published and content. On the right-hand side of the `ChatBox` is positioned the `UsersList` component. This component lists all users, which are currently in the chat session. The last component is the `MessageInput` component. The `MessageInput` component is a simple text input, which once detect a press of the Enter key triggers an event, with data - its value.
+Lets concentrate on the left-hand side of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the `ChatBox` component. In its left-hand side is positioned the `MessagesList` component, which is composition of `ChatMessage` components. Each `ChatMessage` component contains a different chat message, which has author, date when published and content. On the right-hand side of the `ChatBox` is positioned the `UsersList` component. This component lists all users, which are currently in the chat session. The last component is the `MessageInput` component. The `MessageInput` component is a simple text input, which once detect a press of the Enter key triggers an event, with data - its value.
 
-The `ChatBox` component uses `ChatProxy`. The chat proxy is responsible for registering the current client to the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
+The `ChatBox` component uses `ChatProxy`. The `ChatProxy` is responsible for registering the current client to the server and talking with the other peers. For simplicity I've used [Peer.js](http://peerjs.com/), which provides nice high-level API, wrapping the browser's WebRTC API.
 
 
 ### Getting started
