@@ -55,16 +55,16 @@ They state that the view is composition of components. In AngularJS the situatio
 Lets look at the following example:
 
 {% highlight html %}
-&#x3C;!doctype html&#x3E;
-&#x3C;html&#x3E;
-  &#x3C;head&#x3E;
-  &#x3C;/head&#x3E;
-  &#x3C;body&#x3E;
-    &#x3C;zippy title=&#x22;zippy&#x22;&#x3E;
+&#x3C;!doctype html>;
+&#x3C;html>;
+  &#x3C;head>;
+  &#x3C;/head>;
+  &#x3C;body>;
+    &#x3C;zippy title="zippy&#x22;>;
       zippy!
-    &#x3C;/zippy&#x3E;
-  &#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+    &#x3C;/zippy>;
+  &#x3C;/body>;
+&#x3C;/html>;
 {% endhighlight %}
 
 {% highlight javascript %}
@@ -173,12 +173,12 @@ For JavaScript there are plenty of template engines, such as mustache.js, handle
 For example:
 
 {% highlight html %}
-&#x3C;script type=&#x22;template/mustache&#x22;&#x3E;
-  &#x3C;h2&#x3E;Names&#x3C;/h2&#x3E;
+&#x3C;script type="template/mustache&#x22;>;
+  &#x3C;h2>;Names&#x3C;/h2<
   {{#names}}
-    &#x3C;strong&#x3E;{{name}}&#x3C;/strong&#x3E;
+    &#x3C;strong>;{{name}}&#x3C;/strong<
   {{/names}}
-&#x3C;/script&#x3E;
+&#x3C;/script>;
 {% endhighlight %}
 
 The template engine turns this string into DOM elements by compiling it within a given context. This way all the expressions embedded in the markup are evaluated and replaced by their value.
@@ -186,10 +186,10 @@ The template engine turns this string into DOM elements by compiling it within a
 For example if we evaluate the template above in the context of the following object: `{ names: ['foo', 'bar', 'baz'] }`, so we will get:
 
 {% highlight html %}
-&#x3C;h2&#x3E;Names&#x3C;/h2&#x3E;
-  &#x3C;strong&#x3E;foo&#x3C;/strong&#x3E;
-  &#x3C;strong&#x3E;bar&#x3C;/strong&#x3E;
-  &#x3C;strong&#x3E;baz&#x3C;/strong&#x3E;
+&#x3C;h2>;Names&#x3C;/h2<
+  &#x3C;strong>;foo&#x3C;/strong<
+  &#x3C;strong>;bar&#x3C;/strong<
+  &#x3C;strong>;baz&#x3C;/strong<
 {% endhighlight %}
 
 AngularJS templates are actually HTML, they are not in an intermediate format like the traditional templates are.
@@ -198,9 +198,9 @@ What AngularJS compiler does is to traverse the DOM tree and look for already kn
 For example:
 
 {% highlight html %}
-&#x3C;ul ng-repeat=&#x22;name in names&#x22;&#x3E;
-  &#x3C;li&#x3E;{{name}}&#x3C;/li&#x3E;
-&#x3C;/ul&#x3E;
+&#x3C;ul ng-repeat="name in names&#x22;>;
+  &#x3C;li>;{{name}}&#x3C;/li<
+&#x3C;/ul>;
 {% endhighlight %}
 
 in the context of the scope:
@@ -298,13 +298,13 @@ Before continuing with the application of the command pattern lets describe how 
 When we want to bind our model to the view we use the directives `ng-bind` (for single-way data binding) and `ng-model` (for two-way data binding). For example, if we want each change in the model `foo` to reflect the view we can:
 
 {% highlight html %}
-&#x3C;span ng-bind=&#x22;foo&#x22;&#x3E;&#x3C;/span&#x3E;
+&#x3C;span ng-bind="foo&#x22;>;&#x3C;/span<
 {% endhighlight %}
 
 Now each time we change the value of `foo` the inner text of the span will be changed. We can achieve the same effect with more complex AngularJS expressions, like:
 
 {% highlight html %}
-&#x3C;span ng-bind=&#x22;foo + &#x27; &#x27; + bar | uppercase&#x22;&#x3E;&#x3C;/span&#x3E;
+&#x3C;span ng-bind="foo + &#x27; &#x27; + bar | uppercase&#x22;>;&#x3C;/span<
 {% endhighlight %}
 
 In the example above the value of the span will be the concatenated uppercased value of `foo` and `bar`. What happens behind the scene?
@@ -350,17 +350,17 @@ The controllers in AngularJS are quite similar to the code-behind in ASP.NET Web
 Here is an example hierarchy between few controllers:
 
 {% highlight html %}
-&#x3C;!doctype html&#x3E;
-&#x3C;html&#x3E;
-  &#x3C;head&#x3E;
-  &#x3C;/head&#x3E;
-  &#x3C;body ng-controller=&#x22;MainCtrl&#x22;&#x3E;
-    &#x3C;div ng-controller=&#x22;ChildCtrl&#x22;&#x3E;
-      &#x3C;span&#x3E;{{user.name}}&#x3C;/span&#x3E;
-      &#x3C;button ng-click=&#x22;click()&#x22;&#x3E;Click&#x3C;/button&#x3E;
-    &#x3C;/div&#x3E;
-  &#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+&#x3C;!doctype html>;
+&#x3C;html>;
+  &#x3C;head>;
+  &#x3C;/head>;
+  &#x3C;body ng-controller="MainCtrl&#x22;>;
+    &#x3C;div ng-controller="ChildCtrl&#x22;>;
+      &#x3C;span>;{{user.name}}&#x3C;/span<
+      &#x3C;button ng-click="click()&#x22;>;Click&#x3C;/button<
+    &#x3C;/div>;
+  &#x3C;/body>;
+&#x3C;/html>;
 {% endhighlight %}
 
 {% highlight javascript %}
@@ -498,18 +498,18 @@ function MainCtrl($scope, User) {
 And the following partial:
 
 {% highlight html %}
-&#x3C;div&#x3E;
-  &#x3C;div&#x3E;
+&#x3C;div>;
+  &#x3C;div>;
     Name: {{user.name}}
-  &#x3C;/div&#x3E;
-  &#x3C;div&#x3E;
+  &#x3C;/div>;
+  &#x3C;div>;
     Address: {{user.address}}
-  &#x3C;/div&#x3E;
-  &#x3C;div&#x3E;
+  &#x3C;/div>;
+  &#x3C;div>;
     Friends with ids:
-    &#x3C;ul&#x3E;
-      &#x3C;li ng-repeat=&#x22;friend in user.friends&#x22;&#x3E;{{friend}}&#x3C;/li&#x3E;
-    &#x3C;/ul&#x3E;
-  &#x3C;/div&#x3E;
-&#x3C;/div&#x3E;
+    &#x3C;ul>;
+      &#x3C;li ng-repeat="friend in user.friends&#x22;>;{{friend}}&#x3C;/li<
+    &#x3C;/ul>;
+  &#x3C;/div>;
+&#x3C;/div>;
 {% endhighlight %}
