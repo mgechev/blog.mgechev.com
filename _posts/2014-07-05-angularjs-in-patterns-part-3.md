@@ -71,7 +71,7 @@ Lets look at the following example:
 myModule.directive('zippy', function () {
   return {
     restrict: 'E',
-    template: '<div><div class=&quot;header&quot;></div><div class=&quot;content&quot; ng-transclude>&lt;/div>&lt;/div>',
+    template: '<div><div class="header&quot;></div><div class=&quot;content&quot; ng-transclude>&lt;/div>&lt;/div>',
     link: function (scope, el) {
       el.find('.header').click(function () {
         el.find('.content').toggle();
