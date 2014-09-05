@@ -70,12 +70,12 @@ In this section we are going to setup our project...
 
 Create a directory called `react-p2p` and enter it:
 
-<pre lang="bash">mkdir react-p2p && cd react-p2p
-</pre>
+{% highlight bash %}mkdir react-p2p && cd react-p2p
+{% endhighlight %}
 
 Create a `package.json` file with the content:
 
-<pre lang="JSON">{
+{% highlight JSON %}{
   "name": "react-peerjs",
   "version": "0.0.0",
   "description": "ReactJS chat with PeerJS",
@@ -98,7 +98,7 @@ Create a `package.json` file with the content:
     "socket.io": "~1.0.6"
   }
 }
-</pre>
+{% endhighlight %}
 
 This file defines primitive information for our server, like name, version, keywords and dependencies. The dependencies of our server are:
 
@@ -108,7 +108,7 @@ This file defines primitive information for our server, like name, version, keyw
 
 Now lets take a look at `./bower.json`:
 
-<pre lang="JSON">{
+{% highlight JSON %}{
   "name": "react-peerjs",
   "main": "index.js",
   "version": "0.0.0",
@@ -132,7 +132,7 @@ Now lets take a look at `./bower.json`:
     "peerjs": "~0.3.9"
   }
 }
-</pre>
+{% endhighlight %}
 The `bower.json` file defines primitive information and dependencies for the client-side of the application.
 The required dependencies are:
 
@@ -144,17 +144,17 @@ The required dependencies are:
 
 And... `.bowerrc`
 
-<pre lang="JSON">{
+{% highlight JSON %}{
   "directory": "public/lib"
 }
-</pre>
+{% endhighlight %}
 
 In `.bowerrc` we define that we want all bower dependencies to be saved at `/public/lib`.
 
 Now, in order to resolve all dependencies, run:
 
-<pre lang="bash">bower install && npm install
-</pre>
+{% highlight bash %}bower install && npm install
+{% endhighlight %}
 
 Now lets start with our implementation.
 
@@ -300,16 +300,16 @@ The full content of `ChatProxy` could be [found at GitHub](https://github.com/mg
 
 The initial view of the user would be:
 
-<pre lang="html">
-&lt;section id=&#x22;container&#x22;&gt;
-  &lt;div class=&#x22;reg-form-container&#x22;&gt;
-    &lt;label for=&#x22;username-input&#x22;&gt;Username&#x3C;/label&#x3E;
-    &lt;input type=&#x22;text&#x22; id=&#x22;username-input&#x22; class=&#x22;form-control&#x22;&gt;
-    &lt;br&gt;
-    &lt;button id=&#x22;connect-btn&#x22; class=&#x22;btn btn-primary&#x22;&gt;Connect&#x3C;/button&#x3E;
-  &lt;/div&gt;
-&lt;/section&gt;
-</pre>
+{% highlight html %}
+<section id="container">
+  <div class="reg-form-container">
+    <label for="username-input">Username&#x3C;/label>;
+    <input type="text" id="username-input" class="form-control">
+    <br>
+    <button id="connect-btn" class="btn btn-primary">Connect&#x3C;/button>;
+  </div>
+</section>
+{% endhighlight %}
 
 Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx` file, which is located at `/public/app.jsx`:
 
@@ -323,7 +323,7 @@ $(function () {
   });
 
   function initChat(container, username) {
-    React.renderComponent(&lt;ChatBox username={username}&gt;&#x3C;/ChatBox&#x3E;, container);
+    React.renderComponent(<ChatBox username={username}>&#x3C;/ChatBox>;, container);
   }
 
   window.onbeforeunload = function () {
@@ -392,17 +392,17 @@ var ChatBox = React.createClass({
 
   render: function () {
     return (
-      &lt;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&gt;
-        &lt;div className=&#x22;chat-header ui-widget-header&#x22;&gt;React p2p Chat&#x3C;/div&#x3E;
-        &lt;div className=&#x22;chat-content-wrapper row&#x22;&gt;
-          &lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;
-          &lt;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&gt;&#x3C;/UsersList&#x3E;
-        &lt;/div&gt;
-        &lt;MessageInput
-          ref=&#x22;messageInput&#x22;
-          messageHandler={this.messageHandler}&gt;
-        &lt;/MessageInput&gt;
-      &lt;/div&gt;
+      <div className="chat-box" ref="root">
+        <div className="chat-header ui-widget-header">React p2p Chat&#x3C;/div>;
+        <div className="chat-content-wrapper row">
+          <MessagesList ref="messagesList">&#x3C;/MessagesList>;
+          <UsersList users={this.state.users} ref="usersList">&#x3C;/UsersList>;
+        </div>
+        <MessageInput
+          ref="messageInput"
+          messageHandler={this.messageHandler}>
+        </MessageInput>
+      </div>
     );
   }
 });
@@ -410,22 +410,22 @@ var ChatBox = React.createClass({
 
 Lets take a look at the `render` method:
 
-<pre lang="JSX">render: function () {
+{% highlight JSX %}render: function () {
   return (
-    &lt;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&gt;
-      &lt;div className=&#x22;chat-header ui-widget-header&#x22;&gt;React p2p Chat&#x3C;/div&#x3E;
-      &lt;div className=&#x22;chat-content-wrapper row&#x22;&gt;
-        &lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;
-        &lt;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&gt;&#x3C;/UsersList&#x3E;
-      &lt;/div&gt;
-      &lt;MessageInput
-        ref=&#x22;messageInput&#x22;
-        messageHandler={this.messageHandler}&gt;
-      &lt;/MessageInput&gt;
-    &lt;/div&gt;
+    <div className="chat-box" ref="root">
+      <div className="chat-header ui-widget-header">React p2p Chat&#x3C;/div>;
+      <div className="chat-content-wrapper row">
+        <MessagesList ref="messagesList">&#x3C;/MessagesList>;
+        <UsersList users={this.state.users} ref="usersList">&#x3C;/UsersList>;
+      </div>
+      <MessageInput
+        ref="messageInput"
+        messageHandler={this.messageHandler}>
+      </MessageInput>
+    </div>
   );
 }
-</pre>
+{% endhighlight %}
 
 The `render` method returns the markup, which should be rendered. We use components, which are already defined and available in the given scope (components like `MessagesList` and `MessageInput`).
 
@@ -476,7 +476,7 @@ addMessage: function (message) {
 }
 {% endhighlight %}
 
-The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `&lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
+The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `<MessagesList ref="messagesList">&#x3C;/MessagesList>;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
 
 #### MessagesList.jsx
 
@@ -520,16 +520,16 @@ var MessagesList = React.createClass({
     var messages;
     messages = this.state.messages.map(function (m) {
       return (
-        &lt;ChatMessage message={m}&gt;&#x3C;/ChatMessage&#x3E;
+        <ChatMessage message={m}>&#x3C;/ChatMessage>;
       );
     });
     if (!messages.length) {
-      messages = &lt;div className=&#x22;chat-no-messages&#x22;&gt;No messages&#x3C;/div&#x3E;;
+      messages = <div className="chat-no-messages">No messages&#x3C;/div>;;
     }
     return (
-      &lt;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&gt;
+      <div ref="messageContainer" className="chat-messages col-xs-9">
         {messages}
-      &lt;/div&gt;
+      </div>
     );
   }
 });
@@ -542,16 +542,16 @@ render: function () {
   var messages;
   messages = this.state.messages.map(function (m) {
     return (
-      &lt;ChatMessage message={m}&gt;&#x3C;/ChatMessage&#x3E;
+      <ChatMessage message={m}>&#x3C;/ChatMessage>;
     );
   });
   if (!messages.length) {
-    messages = &lt;div className=&#x22;chat-no-messages&#x22;&gt;No messages&#x3C;/div&#x3E;;
+    messages = <div className="chat-no-messages">No messages&#x3C;/div>;;
   }
   return (
-    &lt;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&gt;
+    <div ref="messageContainer" className="chat-messages col-xs-9">
       {messages}
-    &lt;/div&gt;
+    </div>
   );
 }
 {% endhighlight %}
@@ -632,11 +632,11 @@ var MessageInput = React.createClass({
 
   render: function () {
     return (
-      &lt;input type=&#x22;text&#x22;
+      <input type="text"
         className = &#x27;form-control&#x27;
         placeholder=&#x27;Enter a message...&#x27;
         valueLink={this.linkState(&#x27;message&#x27;)}
-        onKeyUp={this.keyHandler}/&gt;
+        onKeyUp={this.keyHandler}/>
     );
   }
 });
@@ -647,18 +647,18 @@ In this component we use the mixin `React.addons.LinkedStateMixin`, which adds t
 Another interesting moment here is the key handler. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
 
 {% highlight JavaScript %}
-&lt;MessageInput
-  ref=&#x22;messageInput&#x22;
-  messageHandler={this.messageHandler}&gt;
-&lt;/MessageInput&gt;
+<MessageInput
+  ref="messageInput"
+  messageHandler={this.messageHandler}>
+</MessageInput>
 {% endhighlight %}
 
 ## Run the project...
 
 The next step is to run the project by:
 
-<pre lang="bash">node index.js && open http://localhost:3001
-</pre>
+{% highlight bash %}node index.js && open http://localhost:3001
+{% endhighlight %}
 
 Fin!
 
