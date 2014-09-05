@@ -32,8 +32,11 @@ Here are two simple steps, which can be used to achieve this result:
 You will be asked a couple of questions&#8230;  
 <img src="http://blog.mgechev.com/wp-content/uploads/2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675" />
 
-In this case we generated a self-signed certificate for 365 days. </li> 
-2. ### Use Express with HTTPS
+In this case we generated a self-signed certificate for 365 days.
+
+### Use Express with HTTPS
+
+{% highlight JavaScript %}
 
     var fs = require('fs'),
     https = require('https'),
@@ -50,10 +53,14 @@ In this case we generated a self-signed certificate for 365 days. </li>
       return res.end('<h1>Hello, Secure World!</h1>');
     });
 
+{% endhighlight %}
+
 This script will create Express application running over HTTPs.  
 Run the application:
 
+{% highlight bash %}
     $ node index.js
+{% endhighlight %}
 
 Enter the passphrase you entered during the creation of the certificate&#8230;
 
