@@ -44,7 +44,7 @@ Here is the implementation of the Mergesort:
 {% highlight javascript %}/* Mergesort */
 var mergeSort = (function () {
     function merger(array, start, end) {
-        if (Math.abs(end - start) &lt;= 1) {
+        if (Math.abs(end - start) <= 1) {
             return [];
         }
         var middle = Math.ceil((start + end) / 2);
@@ -64,16 +64,16 @@ var mergeSort = (function () {
             size = end - start,
             i;
 
-        for (i = 0; i &lt; maxSize; i += 1) {
-            if (i &lt; leftSize) {
+        for (i = 0; i < maxSize; i += 1) {
+            if (i < leftSize) {
                 left[i] = array[start + i];
             }
-            if (i &lt; rightSize) {
+            if (i < rightSize) {
                 right[i] = array[middle + i];
             }
         }
         i = 0;
-        while (i &lt; size) {
+        while (i < size) {
             if (left.length &#038;&#038; right.length) {
                 if (left[0] >= right[0]) {
                     array[start + i] = right.shift();
@@ -106,10 +106,10 @@ var heapSort = (function () {
             right = 2 * index + 2,
             largest = index;
      
-        if (left &lt; heapSize &#038;&#038; array[left] > array[index])
+        if (left < heapSize &#038;&#038; array[left] > array[index])
             largest = left;
 
-        if (right &lt; heapSize &#038;&#038; array[right] > array[largest])
+        if (right < heapSize &#038;&#038; array[right] > array[largest])
             largest = right;
      
         if (largest !== index) {
@@ -220,8 +220,8 @@ sub get_algorithm($) {
     my $sort_type = shift;
     my $file = $sorts{$sort_type};
     my $result = '';
-    open(FH, "&lt;./algorithms/$file");
-    while (&lt;FH>) {
+    open(FH, "<./algorithms/$file");
+    while (<FH>) {
         $result .= $_;
     }
     close(FH);
@@ -240,7 +240,7 @@ sub test_algorithms($ $ $) {
     my ($tests_count, $size, $max) = @_;
     my %result = ();
     my ($array, $count);
-    for (my $i = 0; $i &lt; $tests_count; $i += 1) {
+    for (my $i = 0; $i < $tests_count; $i += 1) {
         $array = generate_js_array($size, $max);
         $count = $i + 1;
         for my $algorithm (keys(%sorts)) {
@@ -261,13 +261,13 @@ sub build_csv($) {
     my @current_result;
     my $data = '';
     print "Building a CSV statistics...\n";
-    for (my $i = 0; $i &lt; scalar(@algorithms); $i += 1) {
+    for (my $i = 0; $i < scalar(@algorithms); $i += 1) {
         $current = $algorithms[$i];
         $data .= $current . ',';
         @current_result = @{$result{$current}};
-        for (my $j = 0; $j &lt; scalar(@current_result); $j += 1) {
+        for (my $j = 0; $j < scalar(@current_result); $j += 1) {
             $data .= $current_result[$j];
-            if ($j &lt; scalar(@current_result) - 1) {
+            if ($j < scalar(@current_result) - 1) {
                 $data .= ',';
             }
         }
@@ -340,8 +340,8 @@ Let me include one more algorithm implementation. It will be quicksort. Its&#821
         var cmp = array[right - 1],
             minEnd = left,
             maxEnd;
-        for (maxEnd = left; maxEnd &lt; right - 1; maxEnd += 1) {
-            if (array[maxEnd] &lt;= cmp) {
+        for (maxEnd = left; maxEnd < right - 1; maxEnd += 1) {
+            if (array[maxEnd] <= cmp) {
                 swap(array, maxEnd, minEnd);
                 minEnd += 1;
             }
@@ -358,7 +358,7 @@ Let me include one more algorithm implementation. It will be quicksort. Its&#821
     }
     
     function quickSort(array, left, right) {
-        if (left &lt; right) {
+        if (left < right) {
             var p = partition(array, left, right);
             quickSort(array, left, p);
             quickSort(array, p + 1, right);

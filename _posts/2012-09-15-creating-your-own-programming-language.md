@@ -95,7 +95,7 @@ enddef;
 def factorial(n)
     result = 1;
     current = 1;
-    while current &lt;= n:
+    while current <= n:
         result = result * current;
         current = current + 1;
     endwhile;

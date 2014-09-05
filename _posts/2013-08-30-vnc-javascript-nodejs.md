@@ -152,7 +152,7 @@ The last method from our Node.js proxy we will look at is the &#8220;handleFrame
   var rgb = new Buffer(rect.width * rect.height * 3, 'binary'),
     offset = 0;
 
-  for (var i = 0; i &lt; rect.data.length; i += 4) {
+  for (var i = 0; i < rect.data.length; i += 4) {
     rgb[offset++] = rect.data[i + 2];
     rgb[offset++] = rect.data[i + 1];
     rgb[offset++] = rect.data[i];
@@ -178,46 +178,46 @@ And now our simple client!
 
 Edit the content of the file ./static/index.html with the following content:
 
-{% highlight html %}&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-    &lt;head&gt;
-        &lt;link rel="stylesheet" href="./css/bootstrap.min.css" /&gt;
-        &lt;link rel="stylesheet" href="./css/styles.css" /&gt;
-    &lt;/head&gt;
-    &lt;body&gt;
-        &lt;div class="form-wrapper" id="form-wrapper"&gt;
-            &lt;form class="form-horizontal" onsubmit="return false"&gt;
-              &lt;div class="control-group"&gt;
-                &lt;label class="control-label" for="host"&gt;Host:&lt;/label&gt;
-                &lt;div class="controls"&gt;
-                  &lt;input type="text" id="host" name="host" value="192.168.100.6" /&gt;&lt;br /&gt;
-                &lt;/div&gt;
-              &lt;/div&gt;
-              &lt;div class="control-group"&gt;
-                &lt;label class="control-label" for="port"&gt;Port:&lt;/label&gt;
-                &lt;div class="controls"&gt;
-                  &lt;input type="text" id="port" name="port" value="5900" /&gt;&lt;br /&gt;
-                &lt;/div&gt;
-              &lt;/div&gt;
-              &lt;div class="control-group"&gt;
-                &lt;label class="control-label" for="port"&gt;Port:&lt;/label&gt;
-                &lt;div class="controls"&gt;
-                  &lt;input type="password" id="password" name="password" value="paralaks" /&gt;&lt;br /&gt;
-                &lt;/div&gt;
-              &lt;/div&gt;
-              &lt;div class="control-group"&gt;
-                &lt;div class="controls"&gt;
-                  &lt;button class="btn" id="loginBtn"&gt;Log in&lt;/button&gt;
-                &lt;/div&gt;
-              &lt;/div&gt;
-            &lt;/form&gt;
-        &lt;/div&gt;
-        &lt;canvas id="screen"&gt;
-        &lt;/canvas&gt;
-        &lt;script src="http://localhost:8091/socket.io/socket.io.js"&gt;&lt;/script&gt;
-        &lt;script src="./js/client.js"&gt;&lt;/script&gt;
-    &lt;/body&gt;
-&lt;/html&gt;
+{% highlight html %}<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/bootstrap.min.css" />
+        <link rel="stylesheet" href="./css/styles.css" />
+    </head>
+    <body>
+        <div class="form-wrapper" id="form-wrapper">
+            <form class="form-horizontal" onsubmit="return false">
+              <div class="control-group">
+                <label class="control-label" for="host">Host:&lt;/label&gt;
+                <div class="controls">
+                  <input type="text" id="host" name="host" value="192.168.100.6" />&lt;br /&gt;
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="port">Port:&lt;/label&gt;
+                <div class="controls">
+                  <input type="text" id="port" name="port" value="5900" />&lt;br /&gt;
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label" for="port">Port:&lt;/label&gt;
+                <div class="controls">
+                  <input type="password" id="password" name="password" value="paralaks" />&lt;br /&gt;
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="controls">
+                  <button class="btn" id="loginBtn">Log in&lt;/button&gt;
+                </div>
+              </div>
+            </form>
+        </div>
+        <canvas id="screen">
+        </canvas>
+        <script src="http://localhost:8091/socket.io/socket.io.js">&lt;/script&gt;
+        <script src="./js/client.js">&lt;/script&gt;
+    </body>
+</html>
 {% endhighlight %}
 
 We've added simple bootstrap form and a canvas. Now create sub-directory of our project base directory: "./static/js" and create the file "client.js" in it.

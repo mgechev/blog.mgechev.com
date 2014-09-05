@@ -150,7 +150,7 @@ In the code above map doubles the array. map is not the only function which is s
 Another element which is common for almost all modern programming languages is the recursion. It&#8217;s function which calls itself inside it&#8217;s body:
 
 {% highlight JavaScript %}function factorial(n) {
-    if (n &lt;= 1) return 1;
+    if (n <= 1) return 1;
     return n * factorial(n - 1);
 }
 {% endhighlight %}
@@ -231,7 +231,7 @@ This is basic example using function for solving a quadratic equation:
 {% highlight JavaScript %}function quadraticEquation(a, b, c) {
     var d = b * b - 4 * a * c,
         x1, x2;
-    if (d &lt; 0) throw "No roots in R";
+    if (d < 0) throw "No roots in R";
     x1 = (-b - Math.sqrt(d)) / (2 * a);
     x2 = (-b + Math.sqrt(d)) / (2 * a);
     return {

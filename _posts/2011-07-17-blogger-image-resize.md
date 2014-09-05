@@ -31,7 +31,7 @@ $(document).ready(function() {
     //which are in all divs from this kind
     (function performResize() {
         var container = $('.post-body');
-        for (var i = 0; i &lt; container.length; i++) {
+        for (var i = 0; i < container.length; i++) {
             getImages(container[i]);
         }
     })();
@@ -46,7 +46,7 @@ $(document).ready(function() {
             }
         } else {
             if ($(container).children().length > 0) {
-                for (var i = 0; i &lt; $(container).children().length; i++) {
+                for (var i = 0; i < $(container).children().length; i++) {
                     getImages($(container).children().get(i));
                 }
             } else {

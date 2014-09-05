@@ -76,7 +76,7 @@ Hi! I haven&#8217;t wrote since a long time but there&#8217;s so much code and s
 
         function getHex(dec) {
             var hex = Math.round(dec).toString(16);
-            if (hex.length &lt; 2) {
+            if (hex.length < 2) {
                 hex = '0' + hex;
             }
             return hex;

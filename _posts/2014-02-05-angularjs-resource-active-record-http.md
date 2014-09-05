@@ -102,9 +102,9 @@ So if we have:
 
 with the following markup:
 
-{% highlight html %}&lt;ul ng-controller="MainCtrl"&gt;
-  &lt;li ng-repeat="user in users"&gt;{{user.name}}&lt;/li&gt;
-&lt;/ul&gt;
+{% highlight html %}<ul ng-controller="MainCtrl">
+  <li ng-repeat="user in users">{{user.name}}&lt;/li&gt;
+</ul>
 {% endhighlight %}
 
 Now if somewhere else, something keeps the reference to the `users` array it can simply:
@@ -154,13 +154,13 @@ Now let&#8217;s get all users:
 
 And now visualize all users&#8230;:
 
-{% highlight javascript %}&lt;table&gt;
-  &lt;tr ng-repeat="user in users"&gt;
-    &lt;td&gt;{{user.id}}&lt;/td&gt;
-    &lt;td&gt;&lt;a ng-href="#/users/{{user.id}}"&gt;{{user.name}}&lt;/a&gt;&lt;/td&gt;
-    &lt;td&gt;{{user.job}}&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/table&gt;
+{% highlight javascript %}<table>
+  <tr ng-repeat="user in users">
+    <td>{{user.id}}&lt;/td&gt;
+    <td>&lt;a ng-href="#/users/{{user.id}}"&gt;{{user.name}}&lt;/a&gt;&lt;/td&gt;
+    <td>{{user.job}}&lt;/td&gt;
+  </tr>
+</table>
 {% endhighlight %}
 
 You might think that the operation `query` is synchronous because of the way we set the value of `$scope.users`. This will be very bad, right? Well, it is asynchronous, `MainCtrl` simply uses two of the concepts we discussed above: functional lexical scope, `$digest` loop.  

@@ -219,7 +219,7 @@ The next method of our proxy, we are going to look at is `encodeFrame`:
   var rgb = new Buffer(rect.width * rect.height * 3, 'binary'),
       offset = 0;
 
-  for (var i = 0; i &lt; rect.fb.length; i += 4) {
+  for (var i = 0; i < rect.fb.length; i += 4) {
     rgb[offset++] = rect.fb[i + 2];
     rgb[offset++] = rect.fb[i + 1];
     rgb[offset++] = rect.fb[i];
@@ -321,34 +321,34 @@ angular.module('angApp', [
 
 For next step, replace the content of `app/views/main.html` with:
 
-{% highlight html %}&lt;div class="container"&gt;
+{% highlight html %}<div class="container">
 
-  &lt;div class="row" style="margin-top:20px"&gt;
-      &lt;div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3"&gt;
-      &lt;form role="form" name="vnc-form" novalidate&gt;
-        &lt;fieldset&gt;
-          &lt;h2&gt;VNC Login&lt;/h2&gt;
-          &lt;hr class="colorgraph"&gt;
-          &lt;div class="form-error" ng-bind="errorMessage"&gt;&lt;/div&gt;
-          &lt;div class="form-group"&gt;
-              &lt;input type="text" name="hostname" id="hostname-input" class="form-control input-lg" placeholder="Hostname" ng-model="host.hostname" required ng-minlength="3"&gt;
-          &lt;/div&gt;
-          &lt;div class="form-group"&gt;
-              &lt;input type="number" min="1" max="65535" name="port" id="port-input" class="form-control input-lg" placeholder="Port" ng-model="host.port" required&gt;
-          &lt;/div&gt;
-          &lt;div class="form-group"&gt;
-              &lt;input type="password" name="password" id="password-input" class="form-control input-lg" placeholder="Password" ng-model="host.password"&gt;
-          &lt;/div&gt;
-          &lt;div class="form-group"&gt;
-              &lt;a href="" class="btn btn-lg btn-primary btn-block" ng-click="login()"&gt;Login&lt;/a&gt;
-          &lt;/div&gt;
-          &lt;hr class="colorgraph"&gt;
-        &lt;/fieldset&gt;
-      &lt;/form&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
+  <div class="row" style="margin-top:20px">
+      <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+      <form role="form" name="vnc-form" novalidate>
+        <fieldset>
+          <h2>VNC Login&lt;/h2&gt;
+          <hr class="colorgraph">
+          <div class="form-error" ng-bind="errorMessage">&lt;/div&gt;
+          <div class="form-group">
+              <input type="text" name="hostname" id="hostname-input" class="form-control input-lg" placeholder="Hostname" ng-model="host.hostname" required ng-minlength="3">
+          </div>
+          <div class="form-group">
+              <input type="number" min="1" max="65535" name="port" id="port-input" class="form-control input-lg" placeholder="Port" ng-model="host.port" required>
+          </div>
+          <div class="form-group">
+              <input type="password" name="password" id="password-input" class="form-control input-lg" placeholder="Password" ng-model="host.password">
+          </div>
+          <div class="form-group">
+              <a href="" class="btn btn-lg btn-primary btn-block" ng-click="login()">Login&lt;/a&gt;
+          </div>
+          <hr class="colorgraph">
+        </fieldset>
+      </form>
+    </div>
+  </div>
 
-&lt;/div&gt;{% endhighlight %}
+</div>{% endhighlight %}
 
 You should also insert some CSS at `app/styles/main.css`:
 
@@ -512,7 +512,7 @@ function VNCClient($q, Io) {
 
   this.toRfbKeyCode = function (code, shift) {
     var keyMap = VNCClient.keyMap;
-    for (var i = 0, m = keyMap.length; i &lt; m; i++)
+    for (var i = 0, m = keyMap.length; i < m; i++)
       if (code == keyMap[i][0])
         return keyMap[i][shift ? 2 : 1];
     return null;
@@ -624,18 +624,18 @@ angular.module('clientApp').factory('Io', function () {
 
 Don&#8217;t forget to include the line:
 
-{% highlight html %}&lt;script src="/socket.io/socket.io.js"&gt;&lt;/script&gt;
+{% highlight html %}<script src="/socket.io/socket.io.js">&lt;/script&gt;
 {% endhighlight %}
 
 in `app/index.html`.
 
 And now, the last component is the VNC screen directive! But before looking at it, replace the content of `app/views/vnc.html` with the following markup:
 
-{% highlight html %}&lt;div class="screen-wrapper"&gt;
-  &lt;vnc-screen&gt;&lt;/vnc-screen&gt;
-  &lt;button class="btn btn-danger" ng-show="connected()" ng-click="disconnect()"&gt;Disconnect&lt;/button&gt;
-  &lt;a href="#/" ng-hide="connected()"&gt;Back&lt;/a&gt;
-&lt;/div&gt;{% endhighlight %}
+{% highlight html %}<div class="screen-wrapper">
+  <vnc-screen>&lt;/vnc-screen&gt;
+  <button class="btn btn-danger" ng-show="connected()" ng-click="disconnect()">Disconnect&lt;/button&gt;
+  <a href="#/" ng-hide="connected()">Back&lt;/a&gt;
+</div>{% endhighlight %}
 
 as you see we include our VNC screen completely declaratively: `<vnc-screen></vnc-screen>`. In the markup above, we have few directives: ` ng-show="connected()", ng-click="disconnect()", ng-hide="connected()"`, they has expressions referring to methods attached to the scope in the `VncCtrl`:
 
@@ -662,7 +662,7 @@ Now lets create the VNC screen directive:
 
 {% highlight javascript %}var VNCScreenDirective = function (VNCClient) {
   return {
-    template: '&lt;canvas class="vnc-screen">&lt;/canvas>',
+    template: '<canvas class="vnc-screen">&lt;/canvas>',
     replace: true,
     restrict: 'E',
     link: function postLink(scope, element, attrs) {
@@ -798,7 +798,7 @@ Screen.prototype.resize = function () {
       height = parent.offsetHeight;
   this.canvas.width = width;
   this.canvas.height = width / ratio;
-  if (this.canvas.height &gt; height) {
+  if (this.canvas.height > height) {
     this.canvas.height = height;
     this.canvas.width = height * ratio;
   }

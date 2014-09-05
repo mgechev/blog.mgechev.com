@@ -58,17 +58,17 @@ Initially each SPA loads index.html file. In the case of AngularJS this file con
 
 Sample partial
 
-{% highlight html %}&lt;html ng-app&gt;
- &lt;!-- Body tag augmented with ngController directive  --&gt;
- &lt;body ng-controller="MyController"&gt;
-   &lt;input ng-model="foo" value="bar"&gt;
-   &lt;!-- Button tag with ng-click directive, and
+{% highlight html %}<html ng-app>
+ <!-- Body tag augmented with ngController directive  -->
+ <body ng-controller="MyController">
+   <input ng-model="foo" value="bar">
+   <!-- Button tag with ng-click directive, and
           string expression 'buttonText'
-          wrapped in "&#123;&#123; &#125;&#125;" markup --&gt;
-   &lt;button ng-click="changeFoo()"&gt;&#123;&#123;buttonText&#125;&#125;&lt;/button&gt;
-   &lt;script src="angular.js"&gt;&lt;/script&gt;
- &lt;/body&gt;
-&lt;/html&gt;
+          wrapped in "&#123;&#123; &#125;&#125;" markup -->
+   <button ng-click="changeFoo()">&#123;&#123;buttonText&#125;&#125;&lt;/button&gt;
+   <script src="angular.js">&lt;/script&gt;
+ </body>
+</html>
 {% endhighlight %}
 
 With AngularJS expressions partials define what kind of actions should be performed for handling different user interactions. In the example above the value of the attribute ng-click states that the method changeFoo of the current scope will be invoked.
@@ -103,12 +103,12 @@ Another important characteristics of the scopes of any AngularJS application is 
 
 Scope inheritance is illustrated in the following example:
 
-{% highlight html %}&lt;div ng-controller="BaseCtrl"&gt;
-  &lt;div id="child" ng-controller="ChildCtrl"&gt;
-    &lt;button id="parent-method" ng-click="foo()"&gt;Parent method&lt;/button&gt;
-    &lt;button ng-click="bar()"&gt;Child method&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
+{% highlight html %}<div ng-controller="BaseCtrl">
+  <div id="child" ng-controller="ChildCtrl">
+    <button id="parent-method" ng-click="foo()">Parent method&lt;/button&gt;
+    <button ng-click="bar()">Child method&lt;/button&gt;
+  </div>
+</div>
 {% endhighlight %}
 
 {% highlight javascript %}function BaseCtrl($scope) {
@@ -142,7 +142,7 @@ Example:
 
 {% highlight javascript %}myModule.directive('alertButton', function () {
   return {
-    template: '&lt;button ng-transclude&gt;&lt;/button&gt;',
+    template: '<button ng-transclude>&lt;/button&gt;',
     scope: {
       content: '@'
     },
@@ -158,7 +158,7 @@ Example:
 });
 {% endhighlight %}
 
-{% highlight html %}&lt;alert-button content="42"&gt;Click me&lt;/alert-button&gt;
+{% highlight html %}<alert-button content="42">Click me&lt;/alert-button&gt;
 {% endhighlight %}
 
 In the example above the tag <alert-button></alert-button> will be replaced button element. When the user clicks on the button the string 42 will be alerted.
@@ -180,7 +180,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-{% highlight html %}&lt;div&gt;&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
+{% highlight html %}<div>&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
 {% endhighlight %}
 
 Inside a controller the filter could be used as follows:

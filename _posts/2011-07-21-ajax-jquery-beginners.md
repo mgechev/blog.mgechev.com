@@ -37,7 +37,7 @@ Many developers don&#8217;t have an idea how to write this without a library. In
         xmlHttp;
     //In this array we are starting from the first element (newest version) and trying to create it. If there is an
     //exception thrown we are handling it (and doing nothing ^^)
-    for (var i = 0; i &lt; ieXMLHttpVersions.length; i++) {
+    for (var i = 0; i < ieXMLHttpVersions.length; i++) {
       try {
         xmlHttp = new ActiveXObject(ieXMLHttpVersions[i]);
         return xmlHttp;
@@ -87,7 +87,7 @@ This data have to be structured like url. You can the function bellow:
 {% highlight JavaScript %}function insinfo(sendForm) {
    var dataArray = [];
    //Getting the data from all elements in the form
-   for (var i = 0; i &lt; sendForm.elements.length; i++) {
+   for (var i = 0; i < sendForm.elements.length; i++) {
      var encodedData = encodeURIComponent(sendForm.elements[i].name);
      encodedData += "=";
      encodedData += encodeURIComponent(sendForm.elements[i].value);

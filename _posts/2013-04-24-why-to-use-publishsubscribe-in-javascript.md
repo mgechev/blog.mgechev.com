@@ -56,7 +56,7 @@ BookCollection.prototype.removeBook = function (book) {
    if (typeof book === 'number') {
        removed = this.books.splice(book, 1);
    }
-   for (var i = 0; i &lt; this.books.length; i += 1) {
+   for (var i = 0; i < this.books.length; i += 1) {
       if (this.books[i] === book) {
           removed = this.books.splice(i, 1);
       }

@@ -55,7 +55,7 @@ So firstly I&#8217;ll post the source code with the example in JSFiddle, after t
   
   
 </table>
-&lt;canvas width="200" height="200" style="border: 1px solid black;" id="canvas">&lt;/canvas>
+<canvas width="200" height="200" style="border: 1px solid black;" id="canvas">&lt;/canvas>
 
 
 <button id="saveButton">Save</button>{% endhighlight %}

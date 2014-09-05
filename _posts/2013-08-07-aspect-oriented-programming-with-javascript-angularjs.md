@@ -130,7 +130,7 @@ We may want to apply authorization for reading news:
                 return deferred.promise;
             },
             getArticleById: function (id) {
-                for (var i = 0; i &lt; sampleArticles.length; i += 1) {
+                for (var i = 0; i < sampleArticles.length; i += 1) {
                     if (sampleArticles[i].id === id)  {
                         return sampleArticles[i];
                     }
@@ -157,7 +157,7 @@ We may also want to apply authorization to the getArticleById method, so:
 
 {% highlight javascript %}getArticleById: function (id) {
     Authorization();
-    for (var i = 0; i &lt; sampleArticles.length; i += 1) {
+    for (var i = 0; i < sampleArticles.length; i += 1) {
         if (sampleArticles[i].id === id)  {
             return sampleArticles[i];
         }
@@ -180,7 +180,7 @@ getPrivateArticles: function () {
 getArticleById: function (id) {
     try {
         Authorization();
-        for (var i = 0; i &lt; sampleArticles.length; i += 1) {
+        for (var i = 0; i < sampleArticles.length; i += 1) {
             if (sampleArticles[i].id === id)  {
                 return sampleArticles[i];
             }

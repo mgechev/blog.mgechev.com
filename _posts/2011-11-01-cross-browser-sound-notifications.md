@@ -20,14 +20,14 @@ tags:
 Few days ago I was creating a system in which it was necessary to implement a sound notification feature. Well it&#8217;s not very hard task but of course you have to be careful with the browser compatibility. At first my source was something like that:
 
 {% highlight JavaScript %}playSound: function () {
-	this.config.soundNotify.html('&lt;embed src="' + this.config.soundFile + '.wav" hidden=true autostart=true loop=false>');
+	this.config.soundNotify.html('<embed src="' + this.config.soundFile + '.wav" hidden=true autostart=true loop=false>');
 }
 {% endhighlight %}
 
 Actually in my Linux it was working pretty well (I tried it mainly in Chrome).  
 After that I decided to try it in a different environment (OS, browser&#8230;). Well I started the app in Google Chrome installed on Windows 7. It was working again :). After that&#8230;IE&#8230;and yes it wasn&#8217;t working (the browser asked me to start an add-on but this stinks&#8230;). Well IE has a tag for background sound. So I added:
 
-{% highlight HTML %}&lt;bgsound id="sound">
+{% highlight HTML %}<bgsound id="sound">
 {% endhighlight %}
 
 In the JS I&#8217;ve added:
@@ -41,7 +41,7 @@ I tried the script in Firefox&#8230;It asked me if I want to install Quick time 
 As you know in HTML5 you have an audio tag. If you use new browser you can use this tag and I think that it&#8217;s the best way for sound notification here is it:
 
 {% highlight JavaScript %}if (this.config.audioSupported) {
-	var soundElement = '&lt;audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
+	var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
 	this.config.soundNotify.html(soundElement);
 	$('#audioNotifier')[0].play();
 }
@@ -86,7 +86,7 @@ Here is the result:
 		document.all.sound.src = this.config.soundFile + '.wav';
 	} else {
 		if (this.config.audioSupported) {
-			var soundElement = '&lt;audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
+			var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
 			this.config.soundNotify.html(soundElement);
 			$('#audioNotifier')[0].play();
 		} else if (this.config.hasFlash) {
@@ -95,7 +95,7 @@ Here is the result:
 			var embed = $('#swfAudio').children('embed');
 			embed.play();
 		} else {
-			this.config.soundNotify.html('&lt;embed src="' + this.config.soundFile + '.wav" hidden=true autostart=true loop=false>');
+			this.config.soundNotify.html('<embed src="' + this.config.soundFile + '.wav" hidden=true autostart=true loop=false>');
 		}
 	}
 }
