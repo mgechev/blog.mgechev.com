@@ -103,7 +103,7 @@ So if we have:
 with the following markup:
 
 {% highlight html %}<ul ng-controller="MainCtrl">
-  <li ng-repeat="user in users">{{user.name}}&lt;/li&gt;
+  <li ng-repeat="user in users">{{user.name}}</li>
 </ul>
 {% endhighlight %}
 
@@ -156,9 +156,9 @@ And now visualize all users&#8230;:
 
 {% highlight javascript %}<table>
   <tr ng-repeat="user in users">
-    <td>{{user.id}}&lt;/td&gt;
-    <td>&lt;a ng-href="#/users/{{user.id}}"&gt;{{user.name}}&lt;/a&gt;&lt;/td&gt;
-    <td>{{user.job}}&lt;/td&gt;
+    <td>{{user.id}}</td>
+    <td><a ng-href="#/users/{{user.id}}">{{user.name}}</a></td>
+    <td>{{user.job}}</td>
   </tr>
 </table>
 {% endhighlight %}

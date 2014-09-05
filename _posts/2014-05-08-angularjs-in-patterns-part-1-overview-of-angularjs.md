@@ -65,8 +65,8 @@ Sample partial
    <!-- Button tag with ng-click directive, and
           string expression 'buttonText'
           wrapped in "&#123;&#123; &#125;&#125;" markup -->
-   <button ng-click="changeFoo()">&#123;&#123;buttonText&#125;&#125;&lt;/button&gt;
-   <script src="angular.js">&lt;/script&gt;
+   <button ng-click="changeFoo()">&#123;&#123;buttonText&#125;&#125;</button>
+   <script src="angular.js"></script>
  </body>
 </html>
 {% endhighlight %}
@@ -105,8 +105,8 @@ Scope inheritance is illustrated in the following example:
 
 {% highlight html %}<div ng-controller="BaseCtrl">
   <div id="child" ng-controller="ChildCtrl">
-    <button id="parent-method" ng-click="foo()">Parent method&lt;/button&gt;
-    <button ng-click="bar()">Child method&lt;/button&gt;
+    <button id="parent-method" ng-click="foo()">Parent method</button>
+    <button ng-click="bar()">Child method</button>
   </div>
 </div>
 {% endhighlight %}
@@ -142,7 +142,7 @@ Example:
 
 {% highlight javascript %}myModule.directive('alertButton', function () {
   return {
-    template: '<button ng-transclude>&lt;/button&gt;',
+    template: '<button ng-transclude></button>',
     scope: {
       content: '@'
     },
@@ -158,7 +158,7 @@ Example:
 });
 {% endhighlight %}
 
-{% highlight html %}<alert-button content="42">Click me&lt;/alert-button&gt;
+{% highlight html %}<alert-button content="42">Click me</alert-button>
 {% endhighlight %}
 
 In the example above the tag <alert-button></alert-button> will be replaced button element. When the user clicks on the button the string 42 will be alerted.
@@ -180,7 +180,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-{% highlight html %}<div>&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
+{% highlight html %}<div>&#123;&#123; name | uppercase &#125;&#125;</div>
 {% endhighlight %}
 
 Inside a controller the filter could be used as follows:

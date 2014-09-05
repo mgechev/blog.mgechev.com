@@ -327,9 +327,9 @@ For next step, replace the content of `app/views/main.html` with:
       <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
       <form role="form" name="vnc-form" novalidate>
         <fieldset>
-          <h2>VNC Login&lt;/h2&gt;
+          <h2>VNC Login</h2>
           <hr class="colorgraph">
-          <div class="form-error" ng-bind="errorMessage">&lt;/div&gt;
+          <div class="form-error" ng-bind="errorMessage"></div>
           <div class="form-group">
               <input type="text" name="hostname" id="hostname-input" class="form-control input-lg" placeholder="Hostname" ng-model="host.hostname" required ng-minlength="3">
           </div>
@@ -340,7 +340,7 @@ For next step, replace the content of `app/views/main.html` with:
               <input type="password" name="password" id="password-input" class="form-control input-lg" placeholder="Password" ng-model="host.password">
           </div>
           <div class="form-group">
-              <a href="" class="btn btn-lg btn-primary btn-block" ng-click="login()">Login&lt;/a&gt;
+              <a href="" class="btn btn-lg btn-primary btn-block" ng-click="login()">Login</a>
           </div>
           <hr class="colorgraph">
         </fieldset>
@@ -624,7 +624,7 @@ angular.module('clientApp').factory('Io', function () {
 
 Don&#8217;t forget to include the line:
 
-{% highlight html %}<script src="/socket.io/socket.io.js">&lt;/script&gt;
+{% highlight html %}<script src="/socket.io/socket.io.js"></script>
 {% endhighlight %}
 
 in `app/index.html`.
@@ -632,9 +632,9 @@ in `app/index.html`.
 And now, the last component is the VNC screen directive! But before looking at it, replace the content of `app/views/vnc.html` with the following markup:
 
 {% highlight html %}<div class="screen-wrapper">
-  <vnc-screen>&lt;/vnc-screen&gt;
-  <button class="btn btn-danger" ng-show="connected()" ng-click="disconnect()">Disconnect&lt;/button&gt;
-  <a href="#/" ng-hide="connected()">Back&lt;/a&gt;
+  <vnc-screen></vnc-screen>
+  <button class="btn btn-danger" ng-show="connected()" ng-click="disconnect()">Disconnect</button>
+  <a href="#/" ng-hide="connected()">Back</a>
 </div>{% endhighlight %}
 
 as you see we include our VNC screen completely declaratively: `<vnc-screen></vnc-screen>`. In the markup above, we have few directives: ` ng-show="connected()", ng-click="disconnect()", ng-hide="connected()"`, they has expressions referring to methods attached to the scope in the `VncCtrl`:
@@ -662,7 +662,7 @@ Now lets create the VNC screen directive:
 
 {% highlight javascript %}var VNCScreenDirective = function (VNCClient) {
   return {
-    template: '<canvas class="vnc-screen">&lt;/canvas>',
+    template: '<canvas class="vnc-screen"></canvas>',
     replace: true,
     restrict: 'E',
     link: function postLink(scope, element, attrs) {

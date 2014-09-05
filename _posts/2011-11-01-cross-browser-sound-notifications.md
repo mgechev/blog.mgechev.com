@@ -41,7 +41,7 @@ I tried the script in Firefox&#8230;It asked me if I want to install Quick time 
 As you know in HTML5 you have an audio tag. If you use new browser you can use this tag and I think that it&#8217;s the best way for sound notification here is it:
 
 {% highlight JavaScript %}if (this.config.audioSupported) {
-	var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
+	var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer></audio>';
 	this.config.soundNotify.html(soundElement);
 	$('#audioNotifier')[0].play();
 }
@@ -86,7 +86,7 @@ Here is the result:
 		document.all.sound.src = this.config.soundFile + '.wav';
 	} else {
 		if (this.config.audioSupported) {
-			var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer>&lt;/audio>';
+			var soundElement = '<audio style="display:none; width: 0px; height: 0px;" id="audioNotifier" src="' + this.config.soundFile + '.wav" controls preload="auto" autobuffer></audio>';
 			this.config.soundNotify.html(soundElement);
 			$('#audioNotifier')[0].play();
 		} else if (this.config.hasFlash) {

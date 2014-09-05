@@ -180,7 +180,7 @@ o1 === o2 //false
 
 Nothing weird at all&#8230;from the elementary math we know that:
 
-{% highlight JavaScript %}a >= b ^ a <= b &lt;=> a = b
+{% highlight JavaScript %}a >= b ^ a <= b <=> a = b
 {% endhighlight %}
 
 Lets try this in JavaScript:

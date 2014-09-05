@@ -188,34 +188,34 @@ Edit the content of the file ./static/index.html with the following content:
         <div class="form-wrapper" id="form-wrapper">
             <form class="form-horizontal" onsubmit="return false">
               <div class="control-group">
-                <label class="control-label" for="host">Host:&lt;/label&gt;
+                <label class="control-label" for="host">Host:</label>
                 <div class="controls">
-                  <input type="text" id="host" name="host" value="192.168.100.6" />&lt;br /&gt;
+                  <input type="text" id="host" name="host" value="192.168.100.6" /><br />
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label" for="port">Port:&lt;/label&gt;
+                <label class="control-label" for="port">Port:</label>
                 <div class="controls">
-                  <input type="text" id="port" name="port" value="5900" />&lt;br /&gt;
+                  <input type="text" id="port" name="port" value="5900" /><br />
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label" for="port">Port:&lt;/label&gt;
+                <label class="control-label" for="port">Port:</label>
                 <div class="controls">
-                  <input type="password" id="password" name="password" value="paralaks" />&lt;br /&gt;
+                  <input type="password" id="password" name="password" value="paralaks" /><br />
                 </div>
               </div>
               <div class="control-group">
                 <div class="controls">
-                  <button class="btn" id="loginBtn">Log in&lt;/button&gt;
+                  <button class="btn" id="loginBtn">Log in</button>
                 </div>
               </div>
             </form>
         </div>
         <canvas id="screen">
         </canvas>
-        <script src="http://localhost:8091/socket.io/socket.io.js">&lt;/script&gt;
-        <script src="./js/client.js">&lt;/script&gt;
+        <script src="http://localhost:8091/socket.io/socket.io.js"></script>
+        <script src="./js/client.js"></script>
     </body>
 </html>
 {% endhighlight %}
