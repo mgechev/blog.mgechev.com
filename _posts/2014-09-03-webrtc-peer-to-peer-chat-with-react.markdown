@@ -301,14 +301,14 @@ The full content of `ChatProxy` could be [found at GitHub](https://github.com/mg
 The initial view of the user would be:
 
 <pre lang="html">
-&#x3C;section id=&#x22;container&#x22;&#x3E;
-  &#x3C;div class=&#x22;reg-form-container&#x22;&#x3E;
-    &#x3C;label for=&#x22;username-input&#x22;&#x3E;Username&#x3C;/label&#x3E;
-    &#x3C;input type=&#x22;text&#x22; id=&#x22;username-input&#x22; class=&#x22;form-control&#x22;&#x3E;
-    &#x3C;br&#x3E;
-    &#x3C;button id=&#x22;connect-btn&#x22; class=&#x22;btn btn-primary&#x22;&#x3E;Connect&#x3C;/button&#x3E;
-  &#x3C;/div&#x3E;
-&#x3C;/section&#x3E;
+&lt;section id=&#x22;container&#x22;&gt;
+  &lt;div class=&#x22;reg-form-container&#x22;&gt;
+    &lt;label for=&#x22;username-input&#x22;&gt;Username&#x3C;/label&#x3E;
+    &lt;input type=&#x22;text&#x22; id=&#x22;username-input&#x22; class=&#x22;form-control&#x22;&gt;
+    &lt;br&gt;
+    &lt;button id=&#x22;connect-btn&#x22; class=&#x22;btn btn-primary&#x22;&gt;Connect&#x3C;/button&#x3E;
+  &lt;/div&gt;
+&lt;/section&gt;
 </pre>
 
 Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the `#connect-btn`, lets take a look at the `app.jsx` file, which is located at `/public/app.jsx`:
@@ -323,7 +323,7 @@ $(function () {
   });
 
   function initChat(container, username) {
-    React.renderComponent(&#x3C;ChatBox username={username}&#x3E;&#x3C;/ChatBox&#x3E;, container);
+    React.renderComponent(&lt;ChatBox username={username}&gt;&#x3C;/ChatBox&#x3E;, container);
   }
 
   window.onbeforeunload = function () {
@@ -392,17 +392,17 @@ var ChatBox = React.createClass({
 
   render: function () {
     return (
-      &#x3C;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&#x3E;
-        &#x3C;div className=&#x22;chat-header ui-widget-header&#x22;&#x3E;React p2p Chat&#x3C;/div&#x3E;
-        &#x3C;div className=&#x22;chat-content-wrapper row&#x22;&#x3E;
-          &#x3C;MessagesList ref=&#x22;messagesList&#x22;&#x3E;&#x3C;/MessagesList&#x3E;
-          &#x3C;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&#x3E;&#x3C;/UsersList&#x3E;
-        &#x3C;/div&#x3E;
-        &#x3C;MessageInput
+      &lt;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&gt;
+        &lt;div className=&#x22;chat-header ui-widget-header&#x22;&gt;React p2p Chat&#x3C;/div&#x3E;
+        &lt;div className=&#x22;chat-content-wrapper row&#x22;&gt;
+          &lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;
+          &lt;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&gt;&#x3C;/UsersList&#x3E;
+        &lt;/div&gt;
+        &lt;MessageInput
           ref=&#x22;messageInput&#x22;
-          messageHandler={this.messageHandler}&#x3E;
-        &#x3C;/MessageInput&#x3E;
-      &#x3C;/div&#x3E;
+          messageHandler={this.messageHandler}&gt;
+        &lt;/MessageInput&gt;
+      &lt;/div&gt;
     );
   }
 });
@@ -412,17 +412,17 @@ Lets take a look at the `render` method:
 
 <pre lang="JSX">render: function () {
   return (
-    &#x3C;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&#x3E;
-      &#x3C;div className=&#x22;chat-header ui-widget-header&#x22;&#x3E;React p2p Chat&#x3C;/div&#x3E;
-      &#x3C;div className=&#x22;chat-content-wrapper row&#x22;&#x3E;
-        &#x3C;MessagesList ref=&#x22;messagesList&#x22;&#x3E;&#x3C;/MessagesList&#x3E;
-        &#x3C;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&#x3E;&#x3C;/UsersList&#x3E;
-      &#x3C;/div&#x3E;
-      &#x3C;MessageInput
+    &lt;div className=&#x22;chat-box&#x22; ref=&#x22;root&#x22;&gt;
+      &lt;div className=&#x22;chat-header ui-widget-header&#x22;&gt;React p2p Chat&#x3C;/div&#x3E;
+      &lt;div className=&#x22;chat-content-wrapper row&#x22;&gt;
+        &lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;
+        &lt;UsersList users={this.state.users} ref=&#x22;usersList&#x22;&gt;&#x3C;/UsersList&#x3E;
+      &lt;/div&gt;
+      &lt;MessageInput
         ref=&#x22;messageInput&#x22;
-        messageHandler={this.messageHandler}&#x3E;
-      &#x3C;/MessageInput&#x3E;
-    &#x3C;/div&#x3E;
+        messageHandler={this.messageHandler}&gt;
+      &lt;/MessageInput&gt;
+    &lt;/div&gt;
   );
 }
 </pre>
@@ -476,7 +476,7 @@ addMessage: function (message) {
 }
 {% endhighlight %}
 
-The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `&#x3C;MessagesList ref=&#x22;messagesList&#x22;&#x3E;&#x3C;/MessagesList&#x3E;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
+The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `&lt;MessagesList ref=&#x22;messagesList&#x22;&gt;&#x3C;/MessagesList&#x3E;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
 
 #### MessagesList.jsx
 
@@ -520,16 +520,16 @@ var MessagesList = React.createClass({
     var messages;
     messages = this.state.messages.map(function (m) {
       return (
-        &#x3C;ChatMessage message={m}&#x3E;&#x3C;/ChatMessage&#x3E;
+        &lt;ChatMessage message={m}&gt;&#x3C;/ChatMessage&#x3E;
       );
     });
     if (!messages.length) {
-      messages = &#x3C;div className=&#x22;chat-no-messages&#x22;&#x3E;No messages&#x3C;/div&#x3E;;
+      messages = &lt;div className=&#x22;chat-no-messages&#x22;&gt;No messages&#x3C;/div&#x3E;;
     }
     return (
-      &#x3C;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&#x3E;
+      &lt;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&gt;
         {messages}
-      &#x3C;/div&#x3E;
+      &lt;/div&gt;
     );
   }
 });
@@ -542,16 +542,16 @@ render: function () {
   var messages;
   messages = this.state.messages.map(function (m) {
     return (
-      &#x3C;ChatMessage message={m}&#x3E;&#x3C;/ChatMessage&#x3E;
+      &lt;ChatMessage message={m}&gt;&#x3C;/ChatMessage&#x3E;
     );
   });
   if (!messages.length) {
-    messages = &#x3C;div className=&#x22;chat-no-messages&#x22;&#x3E;No messages&#x3C;/div&#x3E;;
+    messages = &lt;div className=&#x22;chat-no-messages&#x22;&gt;No messages&#x3C;/div&#x3E;;
   }
   return (
-    &#x3C;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&#x3E;
+    &lt;div ref=&#x22;messageContainer&#x22; className=&#x22;chat-messages col-xs-9&#x22;&gt;
       {messages}
-    &#x3C;/div&#x3E;
+    &lt;/div&gt;
   );
 }
 {% endhighlight %}
@@ -632,11 +632,11 @@ var MessageInput = React.createClass({
 
   render: function () {
     return (
-      &#x3C;input type=&#x22;text&#x22;
+      &lt;input type=&#x22;text&#x22;
         className = &#x27;form-control&#x27;
         placeholder=&#x27;Enter a message...&#x27;
         valueLink={this.linkState(&#x27;message&#x27;)}
-        onKeyUp={this.keyHandler}/&#x3E;
+        onKeyUp={this.keyHandler}/&gt;
     );
   }
 });
@@ -647,10 +647,10 @@ In this component we use the mixin `React.addons.LinkedStateMixin`, which adds t
 Another interesting moment here is the key handler. On key up of `input.form-control` the `keyHandler` method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes `this.props.messageHandler`. `this.props.messageHandler` is passed by the `ChatBox` component as property of the `MessageInput`:
 
 {% highlight JavaScript %}
-&#x3C;MessageInput
+&lt;MessageInput
   ref=&#x22;messageInput&#x22;
-  messageHandler={this.messageHandler}&#x3E;
-&#x3C;/MessageInput&#x3E;
+  messageHandler={this.messageHandler}&gt;
+&lt;/MessageInput&gt;
 {% endhighlight %}
 
 ## Run the project...
