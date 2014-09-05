@@ -64,8 +64,8 @@ Sample partial
    <input ng-model="foo" value="bar">
    <!-- Button tag with ng-click directive, and
           string expression 'buttonText'
-          wrapped in "{{ }}" markup -->
-   <button ng-click="changeFoo()">{{buttonText}}</button>
+          wrapped in "{{"{{ "}}}}" markup -->
+   <button ng-click="changeFoo()">{{"{{buttonText"}}}}</button>
    <script src="angular.js"></script>
  </body>
 </html>
