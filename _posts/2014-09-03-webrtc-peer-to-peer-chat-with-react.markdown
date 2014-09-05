@@ -75,7 +75,7 @@ Create a directory called `react-p2p` and enter it:
 
 Create a `package.json` file with the content:
 
-{% highlight JSON %}{
+{% highlight javascript %}{
   "name": "react-peerjs",
   "version": "0.0.0",
   "description": "ReactJS chat with PeerJS",
@@ -108,7 +108,7 @@ This file defines primitive information for our server, like name, version, keyw
 
 Now lets take a look at `./bower.json`:
 
-{% highlight JSON %}{
+{% highlight javascript %}{
   "name": "react-peerjs",
   "main": "index.js",
   "version": "0.0.0",
@@ -144,7 +144,7 @@ The required dependencies are:
 
 And... `.bowerrc`
 
-{% highlight JSON %}{
+{% highlight javascript %}{
   "directory": "public/lib"
 }
 {% endhighlight %}
@@ -410,7 +410,7 @@ var ChatBox = React.createClass({
 
 Lets take a look at the `render` method:
 
-{% highlight JSX %}render: function () {
+{% highlight javascript %}render: function () {
   return (
     <div className="chat-box" ref="root">
       <div className="chat-header ui-widget-header">React p2p Chat&#x3C;/div>;
