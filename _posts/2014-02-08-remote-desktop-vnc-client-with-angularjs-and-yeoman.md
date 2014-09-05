@@ -20,9 +20,10 @@ tags:
   - vnc
 ---
 
-[<img src="http://blog.mgechev.com/wp-content/uploads/2014/02/yeoman-vnc-angular.png" alt="yeoman-vnc-angular" width="600" height="200" class="aligncenter size-full wp-image-647" />][1]
 
 In this blog post I&#8217;m going to show you how to build a VNC client using [AngularJS][2] and [Yeoman][3]. The source code used in the post is available at my [GitHub][4]. Click [here][5] to see the final result.
+
+[<img src="http://blog.mgechev.com/wp-content/uploads/2014/02/yeoman-vnc-angular.png" alt="yeoman-vnc-angular" width="600" height="200" class="aligncenter size-full wp-image-647" />][1]
 
 It seems I have affinity to the remote desktop protocols, because this is my third project at [GitHub][6], which implements one ([VNC client on 200 lines of JavaScript][7], [VNC client for Chrome DevTools][8] and [VNC client with AngularJS][4]).
 
