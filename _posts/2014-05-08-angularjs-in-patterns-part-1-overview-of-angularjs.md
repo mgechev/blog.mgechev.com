@@ -180,7 +180,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-{% highlight html %}<div>{{ name | uppercase }}</div>
+{% highlight html %}<div>{{ "{{ name | uppercase " }}}}</div>
 {% endhighlight %}
 
 Inside a controller the filter could be used as follows:
