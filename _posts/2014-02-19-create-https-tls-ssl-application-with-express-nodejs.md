@@ -27,7 +27,12 @@ Here are two simple steps, which can be used to achieve this result:
 
     If you don&#8217;t already have certificate you need to generate one:
 
+{% highlight bash %}
+
   $ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
+
+{% endhighlight %}
+
     
 You will be asked a couple of questions&#8230;  
 <img src="http://blog.mgechev.com/wp-content/uploads/2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675" />
