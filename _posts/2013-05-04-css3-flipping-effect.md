@@ -23,7 +23,7 @@ Anyway <a href="http://jsfiddle.net/mgechev/GpK25/16/" target="_blank">here is d
 
 Here is the CSS:
 
-<pre lang="CSS">.panel {
+{% highlight CSS %}.panel {
     width: 300px;
     height: 300px;
     margin: auto;
@@ -76,13 +76,13 @@ Here is the CSS:
     -moz-transform: rotateX(0deg);
     transform: rotateX(0deg);
 }
-</pre>
+{% endhighlight %}
 
 You can see that it&#8217;s extremely simple &#8211; just rotating the front and back panes with difference 180 degrees when the user hover the panel.
 
 The HTML is even simpler:
 
-<pre lang="html"><div class="panel">
+{% highlight html %}<div class="panel">
   <div class="front card">
     
   </div>
@@ -93,7 +93,7 @@ The HTML is even simpler:
   </div>
   
 </div>
-</pre>
+{% endhighlight %}
 
 And of course, there&#8217;s no JavaScript. You just don&#8217;t need it.
 

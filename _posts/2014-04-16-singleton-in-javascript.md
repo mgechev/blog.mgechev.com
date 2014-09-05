@@ -35,14 +35,14 @@ Thanks God we don&#8217;t have to consider all these corner cases in JavaScript.
 
 The simplest singleton implementation in JavaScript is:
 
-<pre lang="javascript">var Singleton = {};
-</pre>
+{% highlight javascript %}var Singleton = {};
+{% endhighlight %}
 
 And yes &#8211; this is singleton!
 
 Addy Osmani suggests the following implementation at his book [&#8220;Learning JavaScript Design Patterns&#8221;][1]:
 
-<pre lang="javascript">var mySingleton = (function () {
+{% highlight javascript %}var mySingleton = (function () {
   // Instance stores a reference to the Singleton
   var instance;
   function init() {
@@ -75,7 +75,7 @@ Addy Osmani suggests the following implementation at his book [&#8220;Learning J
     }
   };
 })();
-</pre>
+{% endhighlight %}
 
 This implementation is based on the module pattern. The module pattern is applied two times &#8211; the first application aims to provide the actual singleton and keeps the private data/behavior inside a closure. The second usage of the module pattern aims to provide the public interface used for getting the singleton object, which is kept inside a closure.
 
@@ -89,7 +89,7 @@ As drawback I can point the lack of specific &#8220;type&#8221; of the singleton
 
 Another implementation of singleton, which I found in the network is [&#8220;The best Singleton pattern&#8221;][2]:
 
-<pre lang="javascript">(function(global) {
+{% highlight javascript %}(function(global) {
   "use strict";
   var MySingletonClass = function() {
 
@@ -109,7 +109,7 @@ var b = MySingletonClass();
 global.MySingleton = a; //or b
 
 }(window));
-</pre>
+{% endhighlight %}
 
 Here are the main advantages of this implementation:
 
@@ -118,12 +118,12 @@ Here are the main advantages of this implementation:
 
 As drawback I can state the fact that you can easy change the prototype property `_singletonInstance` of your singleton. This way, when `MySingleton` is called once again, it will create a new object:
 
-<pre lang="javascript">Object.getPrototypeOf(MySingleton)._singletonInstance = null;
-</pre>
+{% highlight javascript %}Object.getPrototypeOf(MySingleton)._singletonInstance = null;
+{% endhighlight %}
 
 Implementation I use is formed by combining both approaches from above:
 
-<pre lang="javascript">var MySingleton = (function () {
+{% highlight javascript %}var MySingleton = (function () {
 
   var INSTANCE;
 
@@ -153,7 +153,7 @@ Implementation I use is formed by combining both approaches from above:
   };
 
 }());
-</pre>
+{% endhighlight %}
 
 In this example we use the module pattern once again, in order to enclose the singleton implementation into a lexical closure and provide a public interface for getting its instance.
 

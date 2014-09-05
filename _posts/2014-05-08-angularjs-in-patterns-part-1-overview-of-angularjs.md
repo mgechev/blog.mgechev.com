@@ -58,7 +58,7 @@ Initially each SPA loads index.html file. In the case of AngularJS this file con
 
 Sample partial
 
-<pre lang="html">&lt;html ng-app&gt;
+{% highlight html %}&lt;html ng-app&gt;
  &lt;!-- Body tag augmented with ngController directive  --&gt;
  &lt;body ng-controller="MyController"&gt;
    &lt;input ng-model="foo" value="bar"&gt;
@@ -69,7 +69,7 @@ Sample partial
    &lt;script src="angular.js"&gt;&lt;/script&gt;
  &lt;/body&gt;
 &lt;/html&gt;
-</pre>
+{% endhighlight %}
 
 With AngularJS expressions partials define what kind of actions should be performed for handling different user interactions. In the example above the value of the attribute ng-click states that the method changeFoo of the current scope will be invoked.
 
@@ -77,7 +77,7 @@ With AngularJS expressions partials define what kind of actions should be perfor
 
 The AngularJS controllers are JavaScript functions, which help handling the user interactions with the web application (for example mouse events, keyboard events, etc.), by attaching methods to the scope. All required external, for the controllers, components are provided through the Dependency Injection mechanism of AngularJS. The controllers are also responsible for providing the model to the partials by attaching data to the scope. We can think of this data as view model.
 
-<pre lang="javascript">function MyController($scope) {
+{% highlight javascript %}function MyController($scope) {
 
   $scope.buttonText = 'Click me to change foo!';
   $scope.foo = 42;
@@ -87,7 +87,7 @@ The AngularJS controllers are JavaScript functions, which help handling the user
     alert('Foo changed');
   };
 }
-</pre>
+{% endhighlight %}
 
 For example, if we wire the sample controller above with the partial provided in the previous section the user will be able to interact with the application in few different ways.
 
@@ -103,15 +103,15 @@ Another important characteristics of the scopes of any AngularJS application is 
 
 Scope inheritance is illustrated in the following example:
 
-<pre lang="html">&lt;div ng-controller="BaseCtrl"&gt;
+{% highlight html %}&lt;div ng-controller="BaseCtrl"&gt;
   &lt;div id="child" ng-controller="ChildCtrl"&gt;
     &lt;button id="parent-method" ng-click="foo()"&gt;Parent method&lt;/button&gt;
     &lt;button ng-click="bar()"&gt;Child method&lt;/button&gt;
   &lt;/div&gt;
 &lt;/div&gt;
-</pre>
+{% endhighlight %}
 
-<pre lang="javascript">function BaseCtrl($scope) {
+{% highlight javascript %}function BaseCtrl($scope) {
   $scope.foo = function () {
     alert('Base foo');
   };
@@ -122,7 +122,7 @@ function ChildCtrl($scope) {
     alert('Child bar');
   };
 }
-</pre>
+{% endhighlight %}
 
 With div#child is associated ChildCtrl but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl) the method foo is accessible by button#parent-method.
 
@@ -140,7 +140,7 @@ By citing the name of the directives they can be used inside the declarative par
 
 Example:
 
-<pre lang="javascript">myModule.directive('alertButton', function () {
+{% highlight javascript %}myModule.directive('alertButton', function () {
   return {
     template: '&lt;button ng-transclude&gt;&lt;/button&gt;',
     scope: {
@@ -156,10 +156,10 @@ Example:
     }
   };
 });
-</pre>
+{% endhighlight %}
 
-<pre lang="html">&lt;alert-button content="42"&gt;Click me&lt;/alert-button&gt;
-</pre>
+{% highlight html %}&lt;alert-button content="42"&gt;Click me&lt;/alert-button&gt;
+{% endhighlight %}
 
 In the example above the tag <alert-button></alert-button> will be replaced button element. When the user clicks on the button the string 42 will be alerted.
 
@@ -171,30 +171,30 @@ The filters in AngularJS are responsible for encapsulating logic required for fo
 
 Here is definition of a sample filter, which turns given string to uppercase:
 
-<pre lang="javascript">myModule.filter('uppercase', function () {
+{% highlight javascript %}myModule.filter('uppercase', function () {
   return function (str) {
     return (str || '').toUpperCase();
   };
 });
-</pre>
+{% endhighlight %}
 
 Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
 
-<pre lang="html">&lt;div&gt;&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
-</pre>
+{% highlight html %}&lt;div&gt;&#123;&#123; name | uppercase &#125;&#125;&lt;/div&gt;
+{% endhighlight %}
 
 Inside a controller the filter could be used as follows:
 
-<pre lang="javascript">function MyCtrl(uppercaseFilter) {
+{% highlight javascript %}function MyCtrl(uppercaseFilter) {
   $scope.name = uppercaseFilter('foo'); //FOO
 }
-</pre>
+{% endhighlight %}
 
 ## Services
 
 Every piece of logic, which doesn&#8217;t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too &#8220;fat&#8221; the repetitive code should be placed inside a service.
 
-<pre lang="javascript">myModule.service('Developer', function () {
+{% highlight javascript %}myModule.service('Developer', function () {
   this.name = 'Foo';
   this.motherLanguage = 'JavaScript';
   this.live = function () {
@@ -203,14 +203,14 @@ Every piece of logic, which doesn&#8217;t belong to the components described abo
     }
   };
 });
-</pre>
+{% endhighlight %}
 
 The service could be injected inside any component, which supports dependency injection (controllers, other services, filters, directives).
 
-<pre lang="javascript">function MyCtrl(developer) {
+{% highlight javascript %}function MyCtrl(developer) {
   var developer = new Developer();
   developer.live();
 }
-</pre>
+{% endhighlight %}
 
  [1]: https://github.com/mgechev/angularjs-in-patterns

@@ -18,9 +18,9 @@ And one more blog post by me! It&#8217;s going to be in brand new topic than the
 
 I opened my Java IDE (I decided to not write the language in JavaScript) and I created few different classes&#8230;Actually I had idea to create something very basic, just variables, if, while, number expressions and boolean expressions. Oh&#8230;I almost forgot to tell that my language is interpreted so that&#8217;s why I decided to have three different stages in the execution process: lexing, parsing and interpreting. The lexing process was straight-forward so there&#8217;s nothing interesting about it&#8230;I&#8217;ve just created different tokens from the long string which is the actual program. Here&#8217;s more information about that <https://en.wikipedia.org/wiki/Tokenization>. After I finished with the lexing&#8230;ahh after that&#8230;it was the Parsing&#8230;Actually that was the process which has been scaring me :-). I&#8217;ve created an interface IStatement which was something that has a void method called &#8220;execute&#8221;. Here&#8217;s the interface:
 
-<pre lang="Java">public interface IStatement {
+{% highlight Java %}public interface IStatement {
     void execute();
-}</pre>
+}{% endhighlight %}
 
 <div>
 </div>
@@ -33,9 +33,9 @@ I opened my Java IDE (I decided to not write the language in JavaScript) and I c
 </div>
 
 <div>
-  <pre lang="Java">public interface IExpression {
+  {% highlight Java %}public interface IExpression {
     Value evaluate();
-}</pre>
+}{% endhighlight %}
 </div>
 
 <div>
@@ -55,26 +55,26 @@ I opened my Java IDE (I decided to not write the language in JavaScript) and I c
 <div>
 </div>
 
-<pre lang="Java">public void interpret() {
+{% highlight Java %}public void interpret() {
     Iterator iter = this.statements.iterator();
     IStatement current;
     while (iter.hasNext()) {
         current = iter.next();
         current.execute();
     }
-}</pre>
+}{% endhighlight %}
 
 I also want to have interaction with the user. So there are also implementations of read and print methods. That&#8217;s why I&#8217;ve created special kind of IExpression (actually there&#8217;s nothing special but just separated in different package :-) ). The print function is a list of IExpressions. After the list is evaluated everything is just put on the user&#8217;s screen&#8230;Here is the implementation:
 
-<pre lang="Java">public Value evaluate() {
+{% highlight Java %}public Value evaluate() {
     Value result = this.toPrint.evaluate();
     System.out.print(result.getValue());
     return result;
-}</pre>
+}{% endhighlight %}
 
 Easy, right? With this kind of language I&#8217;ve achieved programs like that:
 
-<pre lang="ELang">def fibonacci(n)
+{% highlight text %}def fibonacci(n)
     if n >= 0:
         a1 = 0;
         a2 = 1;
@@ -113,11 +113,11 @@ n = read;
 print 'The result for the number you entered for factorial is: ';
 print factorial(n);
 print '\n';
-</pre>
+{% endhighlight %}
 
 It also allows recursion:
 
-<pre lang="ELang">def recursiveFibonacci(n)
+{% highlight text %}def recursiveFibonacci(n)
     if n == 0:
         return 0;
     endif;
@@ -126,7 +126,7 @@ It also allows recursion:
     endif;
     return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
 enddef;
-</pre>
+{% endhighlight %}
 
 The github repository can be found here: <https://github.com/mgechev/ELang/>
 

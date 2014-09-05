@@ -54,7 +54,7 @@ They state that the view is composition of components. In AngularJS the situatio
 
 Lets look at the following example:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;!doctype html&#x3E;
 &#x3C;html&#x3E;
   &#x3C;head&#x3E;
@@ -65,9 +65,9 @@ Lets look at the following example:
     &#x3C;/zippy&#x3E;
   &#x3C;/body&#x3E;
 &#x3C;/html&#x3E;
-</pre>
+{% endhighlight %}
 
-<pre lang="javascript">
+{% highlight javascript %}
 myModule.directive('zippy', function () {
   return {
     restrict: 'E',
@@ -79,7 +79,7 @@ myModule.directive('zippy', function () {
     }
   }
 });
-</pre>
+{% endhighlight %}
 
 This example defines a simple directive, which is a UI component. The defined component (called "zippy") has header and content. Click on its header toggles the visibility of the content.
 
@@ -103,18 +103,18 @@ The main differences between the JavaScript expressions and AngularJS expression
 
 Inside the `$parse` service are defined two main components:
 
-<pre lang="javascript">
+{% highlight javascript %}
 //Responsible for converting given string into tokens
 var Lexer;
 //Responsible for parsing the tokens and evaluating the expression
 var Parser;
-</pre>
+{% endhighlight %}
 
 Once given expression have been tokenized it is cached internally, because of performance concerns.
 
 The terminal expressions in the AngularJS DSL are defined as follows:
 
-<pre lang="javascript">
+{% highlight javascript %}
 var OPERATORS = {
   /* jshint bitwise : false */
   'null':function(){return null;},
@@ -143,7 +143,7 @@ var OPERATORS = {
   '|':function(self, locals, a,b){return b(self, locals)(self, locals, a(self, locals));},
   '!':function(self, locals, a){return !a(self, locals);}
 };
-</pre>
+{% endhighlight %}
 
 We can think of the function associated with each terminal as implementation of the `AbstractExpression`'s interface.
 
@@ -151,11 +151,11 @@ Each `Client` interprets given AngularJS expression in a specific context - spec
 
 Few sample AngularJS expressions are:
 
-<pre lang="javascript">
+{% highlight javascript %}
 // toUpperCase filter is applied to the result of the expression
 // (foo) ? bar : baz
 (foo) ? bar : baz | toUpperCase
-</pre>
+{% endhighlight %}
 
 #### Template View
 
@@ -172,42 +172,42 @@ For JavaScript there are plenty of template engines, such as mustache.js, handle
 
 For example:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;script type=&#x22;template/mustache&#x22;&#x3E;
   &#x3C;h2&#x3E;Names&#x3C;/h2&#x3E;
   {{#names}}
     &#x3C;strong&#x3E;{{name}}&#x3C;/strong&#x3E;
   {{/names}}
 &#x3C;/script&#x3E;
-</pre>
+{% endhighlight %}
 
 The template engine turns this string into DOM elements by compiling it within a given context. This way all the expressions embedded in the markup are evaluated and replaced by their value.
 
 For example if we evaluate the template above in the context of the following object: `{ names: ['foo', 'bar', 'baz'] }`, so we will get:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;h2&#x3E;Names&#x3C;/h2&#x3E;
   &#x3C;strong&#x3E;foo&#x3C;/strong&#x3E;
   &#x3C;strong&#x3E;bar&#x3C;/strong&#x3E;
   &#x3C;strong&#x3E;baz&#x3C;/strong&#x3E;
-</pre>
+{% endhighlight %}
 
 AngularJS templates are actually HTML, they are not in an intermediate format like the traditional templates are.
 What AngularJS compiler does is to traverse the DOM tree and look for already known directives (elements, attributes, classes or even comments). When AngularJS finds any of these directives it invokes the logic associated with them, which may involve evaluation of different expressions in the context of the current scope.
 
 For example:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;ul ng-repeat=&#x22;name in names&#x22;&#x3E;
   &#x3C;li&#x3E;{{name}}&#x3C;/li&#x3E;
 &#x3C;/ul&#x3E;
-</pre>
+{% endhighlight %}
 
 in the context of the scope:
 
-<pre lang="javascript">
+{% highlight javascript %}
 $scope.names = ['foo', 'bar', 'baz'];
-</pre>
+{% endhighlight %}
 
 will produce the same result as the one above. The main difference here is that the template is not wrapped inside a `script` tag but is HTML instead.
 
@@ -224,24 +224,24 @@ There are two basic ways of communication between the scopes in an AngularJS app
 
 Each AngularJS scope has public methods called `$on`, `$emit` and `$broadcast`. The method `$on` accepts topic as first argument and callback as second. We can think of the callback as an observer - an object, which implements the `Observer` interface (in JavaScript the functions are first-class, so we can provide only implementation of the `notify` method):
 
-<pre lang="javascript">
+{% highlight javascript %}
 function ExampleCtrl($scope) {
   $scope.$on('event-name', function handler() {
     //body
   });
 }
-</pre>
+{% endhighlight %}
 
 In this way the current scope "subscribes" to events of type `event-name`. When `event-name` is triggered in any parent or child scope of the given one, `handler` would be called.
 
 The methods `$emit` and `$broadcast` are used for triggering events respectively upwards and downwards through the scope chain.
 For example:
 
-<pre lang="javascript">
+{% highlight javascript %}
 function ExampleCtrl($scope) {
   $scope.$emit('event-name', { foo: 'bar' });
 }
-</pre>
+{% endhighlight %}
 
 The scope in the example above, triggers the event `event-name` to all scopes upwards. This means that each of the parent scopes of the given one, which are subscribed to the event `event-name`, would be notified and their handler callback will be invoked.
 
@@ -267,7 +267,7 @@ When `$emit` or `$broadcast` are called we can think of the scope chain as event
 
 In the example bellow you can see an example in which `ChildCtrl` triggers an event, which is propagated upwards through the scope chain. In the case above each of the parent scopes (the one used in `ParentCtrl` and the one used in `MainCtrl`) are going to handle the event by logging into the console: `"foo received"`. If any of the scopes should be considered as final destination it can call the method `stopPropagation` of the event object, passed to the callback.
 
-<pre lang="javascript">
+{% highlight javascript %}
 myModule.controller('MainCtrl', function ($scope) {
   $scope.$on('foo', function () {
     console.log('foo received');
@@ -283,7 +283,7 @@ myModule.controller('ParentCtrl', function ($scope) {
 myModule.controller('ChildCtrl', function ($scope) {
   $scope.$emit('foo');
 });
-</pre>
+{% endhighlight %}
 
 The different handlers from the UML diagram above are the different scopes, injected to the controllers.
 
@@ -297,15 +297,15 @@ Before continuing with the application of the command pattern lets describe how 
 
 When we want to bind our model to the view we use the directives `ng-bind` (for single-way data binding) and `ng-model` (for two-way data binding). For example, if we want each change in the model `foo` to reflect the view we can:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;span ng-bind=&#x22;foo&#x22;&#x3E;&#x3C;/span&#x3E;
-</pre>
+{% endhighlight %}
 
 Now each time we change the value of `foo` the inner text of the span will be changed. We can achieve the same effect with more complex AngularJS expressions, like:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;span ng-bind=&#x22;foo + &#x27; &#x27; + bar | uppercase&#x22;&#x3E;&#x3C;/span&#x3E;
-</pre>
+{% endhighlight %}
 
 In the example above the value of the span will be the concatenated uppercased value of `foo` and `bar`. What happens behind the scene?
 
@@ -313,7 +313,7 @@ Each `$scope` has method called `$watch`. When the AngularJS compiler find the d
 
 Here are the first a couple of lines of the implementation of `$watch`:
 
-<pre lang="javascript">
+{% highlight javascript %}
 $watch: function(watchExp, listener, objectEquality) {
   var scope = this,
       get = compileToFn(watchExp, 'watch'),
@@ -326,7 +326,7 @@ $watch: function(watchExp, listener, objectEquality) {
         eq: !!objectEquality
       };
 //...
-</pre>
+{% endhighlight %}
 
 We can think of the `watcher` object as a command. The expression of the command is being evaluated on each [`"$digest"`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) loop. Once AngularJS detects change in the expression, it invokes the `listener` function. The `watcher` command encapsulates the whole information required for watching given expression and delegates the execution of the command to the `listener` (the actual receiver). We can think of the `$scope` as the command's `Client` and the `$digest` loop as the command's `Invoker`.
 
@@ -349,7 +349,7 @@ Similarly to the page controllers, AngularJS controllers handle user interaction
 The controllers in AngularJS are quite similar to the code-behind in ASP.NET WebForms, since their responsibilities almost overlap.
 Here is an example hierarchy between few controllers:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;!doctype html&#x3E;
 &#x3C;html&#x3E;
   &#x3C;head&#x3E;
@@ -361,9 +361,9 @@ Here is an example hierarchy between few controllers:
     &#x3C;/div&#x3E;
   &#x3C;/body&#x3E;
 &#x3C;/html&#x3E;
-</pre>
+{% endhighlight %}
 
-<pre lang="javascript">
+{% highlight javascript %}
 function MainCtrl($scope, $location, User) {
   if (!User.isAuthenticated()) {
     $location.path('/unauthenticated');
@@ -376,7 +376,7 @@ function ChildCtrl($scope, User) {
   };
   $scope.user = User.get(0);
 }
-</pre>
+{% endhighlight %}
 
 This example aims to illustrates the most trivial way to reuse logic by using a base controller, anyway in production applications I don't recommend you to put your authorization logic in the controllers. The access to the different routes could be determined on a higher level of abstraction. 
 
@@ -390,7 +390,7 @@ This is actually not a design pattern from Gang of Four, neither one from P of E
 
 Using the module pattern you can achieve privacy based on the JavaScript's functional lexical scope. Each module may has zero or more private members, which are hidden in the local scope of a function. This function returns an object, which exports the public API of the given module:
 
-<pre lang="javascript">
+{% highlight javascript %}
 var Page = (function () {
 
   var title;
@@ -409,7 +409,7 @@ var Page = (function () {
     getTitle: getTitle
   };
 }());
-</pre>
+{% endhighlight %}
 
 In the example above we have IIFE (Immediately-Invoked Function Expression), which after being called returns an object, with two methods (`setTitle` and `getTitle`). The returned object is being assigned to the `Page` variable.
 
@@ -417,7 +417,7 @@ In this case the user of the `Page` object doesn't has direct access to the `tit
 
 The module pattern is very useful when defining services in AngularJS. Using this pattern we can simulate (and actually achieve) privacy:
 
-<pre lang="javascript">
+{% highlight javascript %}
 app.factory('foo', function () {
 
   function privateMember() {
@@ -434,7 +434,7 @@ app.factory('foo', function () {
     publicMember: publicMember
   };
 });
-</pre>
+{% endhighlight %}
 
 Once we want to inject `foo` inside any other component we won't be able to use the private methods, but only the public ones. This solution is extremely powerful especially when one is building a reusable library.
 
@@ -461,7 +461,7 @@ And our API has the methods:
 
 Possible solution is to have two different services, one for the first method and one for the second one. Probably more useful solution would be if we have a single service called `User`, which loads the user's friends when we request the user:
 
-<pre lang="javascript">
+{% highlight javascript %}
 app.factory('User', function ($q) {
 
   function User(name, address, friends) {
@@ -480,24 +480,24 @@ app.factory('User', function ($q) {
   };
   return User;
 });
-</pre>
+{% endhighlight %}
 
 This way we create pseudo-data mapper, which adapts our API according to the SPA requirements.
 
 We can use the `User` service by:
 
-<pre lang="javascript">
+{% highlight javascript %}
 function MainCtrl($scope, User) {
   User.get({ id: 1 })
   .then(function (data) {
     $scope.user = data;
   });
 }
-</pre>
+{% endhighlight %}
 
 And the following partial:
 
-<pre lang="html">
+{% highlight html %}
 &#x3C;div&#x3E;
   &#x3C;div&#x3E;
     Name: {{user.name}}
@@ -512,4 +512,4 @@ And the following partial:
     &#x3C;/ul&#x3E;
   &#x3C;/div&#x3E;
 &#x3C;/div&#x3E;
-</pre>
+{% endhighlight %}

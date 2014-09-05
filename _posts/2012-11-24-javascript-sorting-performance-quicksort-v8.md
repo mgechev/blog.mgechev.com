@@ -27,7 +27,7 @@ tags:
 
 A few days ago, I&#8217;ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It&#8217;s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones &#8211; sorting (insertion, selection, bubble sort..). After that I implemented few &#8220;more advance&#8221; like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
 
-<pre lang="javascript">function sort() { [native code] }</pre>
+{% highlight javascript %}function sort() { [native code] }{% endhighlight %}
 
 That&#8217;s why I&#8217;ve wrote not optimized version of mergesort and I&#8217;ve run it with generated array with 500k elements. I waited&#8230;waited&#8230;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I&#8217;ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google&#8217;s V8 engine</a>). After merge sort I&#8217;ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I&#8217;ve generated another array with 500k elements using a simple perl script. The result was very interesting&#8230;In the chart bellow you can see mergesort compared to heapsort for array with 50k elements.
 
@@ -41,7 +41,7 @@ In the X-axis it&#8217;s an attempt number, the Y-axis is the time required for 
 
 Here is the implementation of the Mergesort:
 
-<pre lang="javascript">/* Mergesort */
+{% highlight javascript %}/* Mergesort */
 var mergeSort = (function () {
     function merger(array, start, end) {
         if (Math.abs(end - start) &lt;= 1) {
@@ -95,11 +95,11 @@ var mergeSort = (function () {
 
 }());
 
-</pre>
+{% endhighlight %}
 
 And the heapsort:
 
-<pre lang="javascript">/* Heapsort */
+{% highlight javascript %}/* Heapsort */
 var heapSort = (function () {
     function heapify(array, index, heapSize) {
         var left = 2 * index + 1,
@@ -141,7 +141,7 @@ var heapSort = (function () {
         return array;
     };
 }());
-</pre>
+{% endhighlight %}
 
 If you find any mistakes in any of the implementations I&#8217;ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.  
 After I&#8217;ve made the test between merge and heap sorts I noticed that there&#8217;s a quite big difference&#8230;So that&#8217;s why I started heap vs the default sort to see how faster the native sort will be:
@@ -156,7 +156,7 @@ As you see the result is quite unexpected&#8230;I&#8217;ve checked my algorithm 
 
 That is the perl script which I used for the test:
 
-<pre lang="perl">#!/usr/bin/perl
+{% highlight perl %}#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -293,16 +293,16 @@ arrays with size $array_size, maximum size of each element $max.\n";
     close(FH);
     print "Exiting\n";
 }
-</pre>
+{% endhighlight %}
 
 If you find any issue in the script please let me know, I&#8217;ll fix it as soon as possible.  
 For the test cases I used both &#8211; different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn&#8217;t found any difference between both alternatives that&#8217;s why I choose to generate a single array for each test (for faster testing).
 
 So let me tell you few words about the script because not everyone is familiar with perl and it&#8217;s syntax. I have three configuration variables: $max, $array\_size and $tests\_count. $max defines the maximum size of the array&#8217;s elements, $array\_size is the size of the arrays we want to test with and $tests\_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort => &#8216;heapsort.js&#8217;, Default => &#8216;default.js&#8217; ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I&#8217;ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven&#8217;t mentioned explicitly that I use something different). In all test cases I&#8217;ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven&#8217;t mentioned explicity different CPU) with Fedora 18, x86_64. The content of default.js is:
 
-<pre lang="javascript">array.sort(function (a, b) {
+{% highlight javascript %}array.sort(function (a, b) {
     return a - b;
-});</pre>
+});{% endhighlight %}
 
 Let start&#8230;  
 In the charts bellow there&#8217;s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
@@ -334,7 +334,7 @@ If we increase the array to more than 300k elements mergesort&#8217;s performanc
 
 Let me include one more algorithm implementation. It will be quicksort. Its&#8217; implementation is like taken from a book, nothing special:
 
-<pre lang="javascript">var quickSort = (function () {
+{% highlight javascript %}var quickSort = (function () {
 
     function partition(array, left, right) {
         var cmp = array[right - 1],
@@ -370,7 +370,7 @@ Let me include one more algorithm implementation. It will be quicksort. Its&#821
         return quickSort(array, 0, array.length);
     };
 }());
-</pre>
+{% endhighlight %}
 
 I'll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:
 

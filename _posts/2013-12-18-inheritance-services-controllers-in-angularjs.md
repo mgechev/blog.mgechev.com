@@ -20,7 +20,7 @@ Since AngularJS does not provide any built-in features for using inheritance, in
 
 First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller. This is the case because by implementation the scope in the child controller will inherit prototypically from the scope of its parent. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
 
-<pre lang="javascript">myModule.controller('ParentCtrl', function ($scope) {
+{% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.parentMethod = function () {
     //body...
   };
@@ -29,11 +29,11 @@ First, lets talk about controllers. Actually it is very unlikely to inherit from
 myModule.controller('ChildCtrl', function ($scope) {
   $scope.parentMethod(); //it'll work
 });
-</pre>
+{% endhighlight %}
 
 Of course, the inheritance creates very strong coupling but only in single direction (i.e. the child is strongly coupled to its parent), so you can&#8217;t directly call children methods from your parent controller. For doing this you need to use event dispatching:
 
-<pre lang="javascript">myModule.controller('ParentCtrl', function ($scope) {
+{% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.$broadcast('event', args);
   $scope.$on('event-response', function (result) {
   });
@@ -46,13 +46,13 @@ myModule.controller('ChildCtrl', function ($scope) {
     $scope.$emit('event-response', result);
   });
 });
-</pre>
+{% endhighlight %}
 
 I&#8217;m providing this snippet only informative, if you need to call children methods from your parent controller there might be something wrong in your code.
 
 OK, but now let&#8217;s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which to encapsulate the common logic, and two children controllers which to inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:
 
-<pre lang="javascript">function BaseCtrl($scope, $location, ...) {
+{% highlight javascript %}function BaseCtrl($scope, $location, ...) {
   $scope.commonScopeMethod = function () {
     //body
   };
@@ -64,11 +64,11 @@ BaseCtrl.prototype.commonMethod1 = function () {
 BaseCtrl.prototype.commonMethod2 = function () {
   //body
 };
-</pre>
+{% endhighlight %}
 
 Now the children controllers can easily inherit from the base controller by:
 
-<pre lang="javascript">function ChildCtrl1($scope, $location, ...) {
+{% highlight javascript %}function ChildCtrl1($scope, $location, ...) {
   BaseCtrl.call(this, $scope, $location, ...);
   $scope.childScopeMethod = function () {
   };
@@ -83,7 +83,7 @@ ChildCtrl1.prototype.childMethod1 = function () {
 //Register ChildCtrl1 as AngularJS controller
 myModule.controller('ChildCtrl1', ChildCtrl1);
 
-</pre>
+{% endhighlight %}
 
 As you see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
 
@@ -102,7 +102,7 @@ If you need inheritance between services which are instantiated through `module.
 
 Lets create the base service:
 
-<pre lang="javascript">var BaseService = (function () {
+{% highlight javascript %}var BaseService = (function () {
   var privateVar = 0;
   return {
     someAwesomeStuff: function () {
@@ -113,11 +113,11 @@ Lets create the base service:
     };
   };
 }());
-</pre>
+{% endhighlight %}
 
 and here is the child service:
 
-<pre lang="javascript">var ChildService = Object.create(BaseService);
+{% highlight javascript %}var ChildService = Object.create(BaseService);
 ChildService.someMoreAwesomeStuff = function () {
   //body...
 };
@@ -125,14 +125,14 @@ ChildService.someMoreAwesomeStuff = function () {
 module.factory('ChildService', function () {
   return ChildService;
 });
-</pre>
+{% endhighlight %}
 
 Now you can inject `ChildService` in different component and reuse the inherited from `BaseService` functionality.
 
-<pre lang="javascript">function MyCtrl(ChildService) {
+{% highlight javascript %}function MyCtrl(ChildService) {
   ChildService.someAwesomeStuff();
 }
-</pre>
+{% endhighlight %}
 
 You can check example [right here][3].
 
@@ -140,7 +140,7 @@ You can check example [right here][3].
 
 One more pattern for inheritance with services is injecting the parent through dependency injection and creating new object, which inherits from the parent prototypically:
 
-<pre lang="javascript">module.factory('ParentService', function ($q, $http) {
+{% highlight javascript %}module.factory('ParentService', function ($q, $http) {
   return {
     //public API
   };
@@ -153,7 +153,7 @@ module.factory('ChildService', function (ParentService, $sce) {
   };
   return child;
 });
-</pre>
+{% endhighlight %}
 
 This pattern is definitely much more useful when you need to inject some dependencies to the parent service.
 
@@ -165,7 +165,7 @@ Why I prefer using service instead of factory? Well, may be I&#8217;m a confused
 
 Here is an example of how you can take advantage of the Klassical inheritance pattern for AngularJS services created with `module.service`:
 
-<pre lang="javascript">function Human(name) {
+{% highlight javascript %}function Human(name) {
   this.name = name;
 }
 Human.prototype.talk = function () {
@@ -187,7 +187,7 @@ angular.module('demo').service('Human', Human);
 angular.module('demo').service('Superhero', Superhero);
 angular.module('demo').value('name', 'Super Dev');
 angular.module('demo').value('AbilitiesCollection', ['C++', 'JavaScript']);
-</pre>
+{% endhighlight %}
 
 You can check this related [exercise from ng-tutorial][7].
 

@@ -60,7 +60,7 @@ When given dependency is required by any component, AngularJS resolves it using 
 
 We can take better look at the AngularJS' source code, which implements the method `getService`:
 
-<pre lang="javascript">
+{% highlight javascript %}
 function getService(serviceName) {
   if (cache.hasOwnProperty(serviceName)) {
     if (cache[serviceName] === INSTANTIATING) {
@@ -82,7 +82,7 @@ function getService(serviceName) {
     }
   }
 }
-</pre>
+{% endhighlight %}
 
 We can think of each service as a singleton, because each service is instantiated no more than a single time. We can consider the cache as a singleton manager. There is a slight variation from the UML diagram illustrated above because instead of keeping static, private reference to the singleton inside its constructor function, we keep the reference inside the singleton manager (stated in the snippet above as `cache`).
 
@@ -101,7 +101,7 @@ For further discussion on this topic Misko Hevery's [article](http://googletesti
 
 Lets consider the following snippet:
 
-<pre lang="javascript">
+{% highlight javascript %}
 myModule.config(function ($provide) {
   $provide.provider('foo', function () {
     var baz = 42;
@@ -117,7 +117,7 @@ myModule.config(function ($provide) {
   });
 });
 
-</pre>
+{% endhighlight %}
 
 In the code above we use the `config` callback in order to define new "provider". Provider is an object, which has a method called `$get`. Since in JavaScript we don't have interfaces and the language is duck-typed there is a convention to name the factory method of the providers that way.
 
@@ -125,7 +125,7 @@ Each service, filter, directive and controller has a provider (i.e. object which
 
 We can dig a little bit deeper in AngularJS' implementation:
 
-<pre lang="javascript">
+{% highlight javascript %}
 //...
 
 createInternalInjector(instanceCache, function(servicename) {
@@ -165,13 +165,13 @@ function invoke(fn, self, locals, serviceName){
 
   return fn.apply(self, args);
 }
-</pre>
+{% endhighlight %}
 
 From the example above we can notice how the `$get` method is actually used:
 
-<pre lang="javascript">
+{% highlight javascript %}
 instanceInjector.invoke(provider.$get, provider, undefined, servicename)
-</pre>
+{% endhighlight %}
 
 The snippet above calls the `invoke` method of `instanceInjector` with the factory method (i.e. `$get`) of given service, as first argument. Inside `invoke`'s body `annotate` is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is being called: `fn.apply(self, args)`.
 
@@ -192,7 +192,7 @@ There are a few benefits of using the factory method pattern in this case, becau
 AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method `decorator` of `$provide` you can create "wrapper" of any service you have previously defined or used by a third-party:
 
 
-<pre lang="javascript">
+{% highlight javascript %}
 myModule.controller('MainCtrl', function (foo) {
   foo.bar();
 });
@@ -218,7 +218,7 @@ myModule.config(function ($provide) {
     return $delegate;
   });
 });
-</pre>
+{% endhighlight %}
 
 The example above defines new service called `foo`. In the `config` callback is called the method `$provide.decorator` with first argument `"foo"`, which is the name of the service, we want to decorate and second argument factory function, which implements the actual decoration. `$delegate` keeps reference to the original service `foo`. Using the dependency injection mechanism of AngularJS, reference to this local dependency is passed as first argument of the constructor function.
 We decorate the service by overriding its method `bar`. The actual decoration is simply extending `bar` by invoking one more `console.log statement` - `console.log('Decorated');` and after that call the original `bar` method with the appropriate context.
@@ -243,7 +243,7 @@ There are a few facades in AngularJS. Each time you want to provide higher level
 
 For example, lets take a look how we can create an `XMLHttpRequest` POST request:
 
-<pre lang="javascript">
+{% highlight javascript %}
 var http = new XMLHttpRequest(),
     url = '/example/new',
     params = encodeURIComponent(data);
@@ -259,10 +259,10 @@ http.onreadystatechange = function () {
   }
 }
 http.send(params);
-</pre>
+{% endhighlight %}
 But if we want to post this data using the AngularJS' `$http` service we can:
 
-<pre lang="javascript">
+{% highlight javascript %}
 $http({
   method: 'POST',
   url: '/example/new',
@@ -271,15 +271,15 @@ $http({
 .then(function (response) {
   alert(response);
 });
-</pre>
+{% endhighlight %}
 or we can even:
 
-<pre lang="javascript">
+{% highlight javascript %}
 $http.post('/someUrl', data)
 .then(function (response) {
   alert(response);
 });
-</pre>
+{% endhighlight %}
 The second option provides pre-configured version, which creates a HTTP POST request to the given URL.
 
 Even higher level of abstraction is being created by `$resource`, which is build over the `$http` service. We will take a further look at this service in [Active Record](#active-record) and [Proxy](#proxy) sections.
@@ -300,26 +300,26 @@ In this sub-chapter we are going to take a look at AngularJS' implementation of 
 
 In the snippet bellow, there is a call to the `get` method of `$resource` instance, called `User`:
 
-<pre lang="javascript">
+{% highlight javascript %}
 var User = $resource('/users/:id'),
     user = User.get({ id: 42 });
 console.log(user); //{}
-</pre>
+{% endhighlight %}
 
 `console.log` would outputs an empty object. Since the AJAX request, which happens behind the scene, when `User.get` is invoked, is asynchronous, we don't have the actual user when `console.log` is called. Just after `User.get` makes the GET request it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.
 
 How does this works with AngularJS? Well, lets consider the following snippet:
 
-<pre lang="javascript">
+{% highlight javascript %}
 function MainCtrl($scope, $resource) {
   var User = $resource('/users/:id'),
   $scope.user = User.get({ id: 42 });
 }
-</pre>
+{% endhighlight %}
 
-<pre lang="html">
+{% highlight html %}
 <span ng-bind="user.name"></span>
-</pre>
+{% endhighlight %}
 Initially when the snippet above executes, the property `user` of the `$scope` object will be with value an empty object (`{}`), which means that `user.name` will be undefined and nothing will be rendered. Internally AngularJS will keep reference to this empty object. Once the server returns response for the get request, AngularJS will populate the object with the data, received from the server. During the next `$digest` loop AngularJS will detect change in `$scope.user`, which will lead to update of the view.
 
 #### Active Record
@@ -337,7 +337,7 @@ According to the AngularJS' documentation `$resource` is:
 
 Here is how `$resource` could be used:
 
-<pre lang="javascript">
+{% highlight javascript %}
 var User = $resource('/users/:id'),
     user = new User({
       name: 'foo',
@@ -345,15 +345,15 @@ var User = $resource('/users/:id'),
     });
 
 user.$save();
-</pre>
+{% endhighlight %}
 
 The call of `$resource` will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operations.
 
 This way we can use the constructor function and its static methods by:
 
-<pre lang="javascript">
+{% highlight javascript %}
 User.get({ userid: userid });
-</pre>
+{% endhighlight %}
 
 The code above will immediately return an empty object and keep reference to it. Once the response have been successfully returned and parsed, AngularJS will populate this object with the received data (see [proxy](#proxy)).
 

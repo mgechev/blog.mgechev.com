@@ -25,7 +25,7 @@ So firstly I&#8217;ll post the source code with the example in JSFiddle, after t
 
 **The HTML form**
 
-<pre lang="html"><input id="picture" type="file" name="picture" />
+{% highlight html %}<input id="picture" type="file" name="picture" />
 <table>
   
   <tr>
@@ -58,11 +58,11 @@ So firstly I&#8217;ll post the source code with the example in JSFiddle, after t
 &lt;canvas width="200" height="200" style="border: 1px solid black;" id="canvas">&lt;/canvas>
 
 
-<button id="saveButton">Save</button></pre>
+<button id="saveButton">Save</button>{% endhighlight %}
 
 **JavaScript (the actual code)**
 
-<pre lang="javascript">(function () {
+{% highlight javascript %}(function () {
 
     (function () {
         document.getElementById('picture').addEventListener('change', handleFileSelect, false);
@@ -115,7 +115,7 @@ So firstly I&#8217;ll post the source code with the example in JSFiddle, after t
                 ctx.drawImage(this, 0, 0, can.width, can.height);
         };
     }
-}());</pre>
+}());{% endhighlight %}
 
 
 
@@ -124,24 +124,24 @@ So let's begin with the HTML. I've created a simple form with a file input, a ta
 Now let's look at the JavaScript. The script is relatively simple and actually we don't need any framework for it. We don't even need to create any globals (cool, ah?). I've wrapped the whole stuff into a self-invoking function. In the function we have one more self-invoking function which sets the event handlers. I decided to make it <a href="http://blog.mgechev.com/2012/08/29/self-invoking-functions-in-javascript/" target="_blank">self-invoking</a> anonymous because in that way I'll be sure that it'll be called just once. In the initialization I simply add an event listener on the file input, which waits for value change. On keyup there're two event listeners - listening for width/height change of the text inputs. And the last event listener will be executed when an event is triggered by click on the "Save" button. Nothing so special...(actually the whole idea is to show you how simple is that :-)).  
 Let's first look at the *handleFileSelect*. When a file is selected I get the file (
 
-<pre lang="javascript">var file = evt.target.files[0];</pre>
+{% highlight javascript %}var file = evt.target.files[0];{% endhighlight %}
 
 ) and check for it's type (actually I check it's mime type). If the file is not an image I simply log an error and stop the function execution. Otherwise (if the file is an image) I create *new FileReader*. As you might guess from it's name it's responsible for reading the file. With the line:
 
-<pre lang="javascript">reader.readAsDataURL(file);</pre>
+{% highlight javascript %}reader.readAsDataURL(file);{% endhighlight %}
 
 I read the file. Here the file won't be read in binary but in base64 encoding instead. Because the file loading is asynchronous (imagine we want to load 1 GB file and the loading was synchronous, our application would block until the file is completely loaded...) that's why I've added callback which will be invoked when the file is being read. In this callback I set the *currentImage* to the loaded image and call the *renderImage* method.  
 Now let's look into the *renderImage*. The *renderImage* method already has access to the *currentImage* so it just creates new *img* element (that's because the *drawImage* method accepts as first argument *img* element) with *src* the base64 encoded image. On load of the created *img* element I render it on the canvas, using it's 2d context.
 
 Now let's look at the *handleSizeChanged*. This method changes the size of the canvas on change of any of the text inputs. On *keyup* of a text input *handleSizeChanged* is being fired. In *handleSizeChanged* I first get the input id (because I'm lazy aand I don't want to look at two cases - width/height). After that I validate the input id - it's valid only if it's value is width or height (who knows may be someone has changed the element's id). After that if the value of the field is a text (with the regex
 
-<pre lang="javascript">/^\d+$/</pre>
+{% highlight javascript %}/^\d+$/{% endhighlight %}
 
 I check that) I set the size of the canvas.
 
 The save of the image is that simple:
 
-<pre lang="javascript">document.location = canvas.toDataURL();</pre>
+{% highlight javascript %}document.location = canvas.toDataURL();{% endhighlight %}
 
 And that's all. Simple isn't it?
 

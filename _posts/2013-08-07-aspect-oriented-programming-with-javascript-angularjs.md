@@ -50,23 +50,23 @@ Let&#8217;s define the concept of cross-cutting concern:
 The most common examples for cross-cutting concerns are logging, authentication and transactions.  
 Let&#8217;s focus in logging. We may need to log different informations when different methods are called. That means we should have things like:
 
-<pre lang="javascript">function foo() {
+{% highlight javascript %}function foo() {
   Logger.log('log before');
   //body
   Logger.log('log after');
-}</pre>
+}{% endhighlight %}
 
 If we change the interface of our logger we should change it everywhere, this may affect hundreds of different files.  
 The situation can become even more complex if we add authentication:
 
-<pre lang="javascript">function foo() {
+{% highlight javascript %}function foo() {
   try {
     Authotization.isAuthorized();
     //body
   } catch (e) {
     //handle the error
   }
-}</pre>
+}{% endhighlight %}
 
 It may look ok for one or few functions/methods but if their count increase you can shoot yourself in the foot with so many duplicates.  
 OOP don&#8217;t gives us tools for handling such problems. It may suggest to create few helper classes and just copy and paste pieces of code from one place to another.
@@ -81,7 +81,7 @@ To show you how AOP can be useful in AngularJS let me introduce you <a title="Gi
 
 You can define the cross-cutting concerns in separate services. For example here is a definition of logging service which logs the method calls and thrown exceptions:
 
-<pre lang="javascript">DemoApp.factory('Logger', function () {
+{% highlight javascript %}DemoApp.factory('Logger', function () {
     return function (args) {
         if (args.exception) {
             console.log('%cException: ' + args.exception.message + '. '
@@ -92,25 +92,25 @@ You can define the cross-cutting concerns in separate services. For example here
         console.log('Method: ' + args.method + ', Pointcut: ' + args.when + ', with arguments: ' +
                     angular.toJson(args.args) + throwData);
     };
-});</pre>
+});{% endhighlight %}
 
 The definition of that service doesn&#8217;t differ from the usual service definition.  
 Here is definition of one more service which can cause problems with the code maintenance because it is a cross-cutting concern:
 
-<pre lang="javascript">DemoApp.factory('Authorization', function (User) {
+{% highlight javascript %}DemoApp.factory('Authorization', function (User) {
     return function () {
         if (User.getUsername() !== 'foo' &#038;&#038;
             User.getPassword() !== 'bar') {
             throw new Error('Not authorized');
         }
     };
-});</pre>
+});{% endhighlight %}
 
 The given service just checks whether user&#8217;s user name and password are equal respectively to &#8220;foo&#8221; and &#8220;bar&#8221;, if they are not equal to these values the service throws an Error(&#8216;Not authorized&#8217;).
 
 We may want to apply authorization for reading news:
 
-<pre lang="javascript">DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
+{% highlight javascript %}DemoApp.service('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
 
     var sampleArticles = [
             { id: 0, title: 'Title 1', content: 'Content 1' },
@@ -142,20 +142,20 @@ We may want to apply authorization for reading news:
             }
         };
     return api;
-});</pre>
+});{% endhighlight %}
 
 This is simple service which contains two kinds of articles (simple object literals): sampleArticles and privateArticles. The api object is the actual service public interface.
 
 We may want to apply authorization to the private articles, before the getPrivateArticles method return its result. The usual way to do it is:
 
-<pre lang="javascript">getPrivateArticles: function () {
+{% highlight javascript %}getPrivateArticles: function () {
     Authorization();
     return privateArticles;
-}</pre>
+}{% endhighlight %}
 
 We may also want to apply authorization to the getArticleById method, so:
 
-<pre lang="javascript">getArticleById: function (id) {
+{% highlight javascript %}getArticleById: function (id) {
     Authorization();
     for (var i = 0; i &lt; sampleArticles.length; i += 1) {
         if (sampleArticles[i].id === id)  {
@@ -163,11 +163,11 @@ We may also want to apply authorization to the getArticleById method, so:
         }
     }
     return undefined;
-}</pre>
+}{% endhighlight %}
 
 We have two duplicate lines of code. At this moment it&#8217;s not a big deal but we may want to add logging and see special error message in the console when Error is thrown:
 
-<pre lang="javascript">//...
+{% highlight javascript %}//...
 getPrivateArticles: function () {
     try {
         Authorization();
@@ -191,22 +191,22 @@ getArticleById: function (id) {
     }
     return undefined;
 }
-//...</pre>
+//...{% endhighlight %}
 
 Now we have a lot of duplicates and if we want to change something in the code which authorises the user and logs the error we should change it in both places. We may have service with large interface which requires logging and authorisation (or something else) in all of its methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.
 
 We can achieve the same effect as in the code above just by applying Authorization and Logger service to the api object:
 
-<pre lang="javascript">return execute(Logger).onThrowOf(execute(Authorization).before(api, {
+{% highlight javascript %}return execute(Logger).onThrowOf(execute(Authorization).before(api, {
     methodPattern: /Special|getArticleById/
-}));</pre>
+}));{% endhighlight %}
 
 This code will invoke the Authorization service before executing the methods which match the pattern: /Special|getArticleById/ when an Error is thrown the Logger will log it with detailed information. Notice that onThrowOf, before and all the methods listed bellow return object with the same methods so chaining is possible. We can also match the methods not only by their names but also by their arguments:
 
-<pre lang="javascript">return execute(Logger).onThrowOf(execute(Authorization).before(api, {
+{% highlight javascript %}return execute(Logger).onThrowOf(execute(Authorization).before(api, {
     methodPattern: /Special|getArticleById/,
     argsPatterns: [/^user$, /^[Ii]d(_num)?$/]
-}));</pre>
+}));{% endhighlight %}
 
 Now the aspects will be applied only to the methods which match both the methodPattern and argsPatterns rules.
 
@@ -222,10 +222,10 @@ Currently execute supports the following pointcuts:
 
 Aspects can be applied not only to objects but also to functions:
 
-<pre lang="javascript">DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
+{% highlight javascript %}DemoApp.factory('ArticlesCollection', function ($q, $timeout, execute, Logger, Authorization) {
     return execute(Logger).before(function () {
         //body
     });
-});</pre>
+});{% endhighlight %}
 
 <a title="GitHub" href="https://github.com/mgechev/angular-aop" target="_blank">AngularAOP</a> can be found at: <a title="GitHub" href="https://github.com/mgechev/angular-aop" target="_blank">GitHub</a>

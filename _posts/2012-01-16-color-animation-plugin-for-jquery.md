@@ -17,7 +17,7 @@ tags:
 
 Hi! I haven&#8217;t wrote since a long time but there&#8217;s so much code and so little time&#8230;It&#8217;s bad that the biggest part of the code is not open source but what can we do&#8230;Last few hours I developed a JavaScript plugin for color animation. Of course for few hours I cant make something with great quality so it&#8217;s a little bit unstable (I think) but it works and it&#8217;s also valid for the JSLint standards. It uses easy algorithm. I think of the RGB color representation as a three dimensional space with coordinates in the range [0, 255]. The user is sets object with specific color (doesn&#8217;t matter background, font&#8230;btw that&#8217;s still not fully tested) which is actually a point in this three dimensional space. The target is another point in the 3D space so I just move from the first to the second point. I spoke enough. Let&#8217;s look at the code:
 
-<pre lang="JavaScript">(function ($) {
+{% highlight JavaScript %}(function ($) {
     'use strict';
     $.fn.colorAnimation = function (userOptions) {
 
@@ -123,6 +123,6 @@ Hi! I haven&#8217;t wrote since a long time but there&#8217;s so much code and s
         }());
     };
 }(jQuery));
-</pre>
+{% endhighlight %}
 
 The whole project you can see in my github repository: <a href="https://github.com/mgechev/jquery-color-animation-plugin" target="_blank" title="GitHub">GitHub</a>

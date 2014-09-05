@@ -50,18 +50,18 @@ If the user is in the home page he may go to the projects page or the user&#8217
 
 We can define our routes relations like:
 
-<pre lang="javascript">var pageRelations = {
+{% highlight javascript %}var pageRelations = {
   'home': ['user-profile', 'user-projects'],
   'user-project': ['home', 'project'],
   'user-profile': ['home', 'user-projects', 'project'],
   'project': ['user-projects', 'project-issues', 'project-wiki'],
   'project-wiki': ['project'],
   'project-issues': ['project']
-};</pre>
+};{% endhighlight %}
 
 With routing definition like this:
 
-<pre lang="javascript">var routes = [
+{% highlight javascript %}var routes = [
   {
     id: 'home',
     url: '/home',
@@ -127,11 +127,11 @@ With routing definition like this:
 
 routes.forEach(function (r) {
   $routeProvider.when(r.url, r);
-});</pre>
+});{% endhighlight %}
 
 And to prefetch the neighbour views&#8217; templates when we are at specific state:
 
-<pre lang="javascript">var prefetched = {};
+{% highlight javascript %}var prefetched = {};
 $rootScope.$on('$routeStateChange', function (evnt, state) {
   pageRelations[state.id].forEach(function (c) {
     var n = routes[c];
@@ -140,7 +140,7 @@ $rootScope.$on('$routeStateChange', function (evnt, state) {
       $templateCache.put(n.templateUrl, t);
     });
   });
-});</pre>
+});{% endhighlight %}
 
 The pre-fetching control can be put at directive or top-level controller. I prefer the directive option, because if there are more things to be prefetched, not only the templates, you can configure it using markup and you won&#8217;t have to change your JavaScript code when you decide to change your pre-fetching options.
 
@@ -149,19 +149,19 @@ If we look more abstract of the thing we did &#8211; we actually created a <a hr
 With not so complex web application everything is cool, the browser can run up to 6 different threads, one for each XHR. But when from a single page the user can go to 30 others and your server response time is not that fast the things may become not very efficient. If the order of the neighbours in the array is not the most appropriate one the user may have to wait because the first few threads won&#8217;t fetch the template required by him.  
 To do it better you should review each connection between the pages and sort the neighbours arrays by some kind of weight. It can be statistical data gained from the user, your suggestion, six sense, you can even roll dice if you think you&#8217;ll be more accurate. To keep the array ordered by hand is error-prone so you can do something like:
 
-<pre lang="javascript">var pageRelations = {
+{% highlight javascript %}var pageRelations = {
   'home': [{ name: 'user-profile', weight: 10 }, { name: 'user-projects', weight: 8 }],
   'user-projects': [{ name: 'home', weight: 7 }, { name: 'project', weight: 9 }],
   'user-profile': [{ name: 'home', weight: 8 }, { name: 'user-projects', weight: 4 }, { name: 'project', weight: 9 }],
   'project': [{ name: 'user-projects', weight: 8 }, { name: 'project-issues', weight: 9 }, { name: 'project-wiki', weight: 6 }],
   'project-wiki': [{ name: 'project', weight: 9 }],
   'project-issues': [{ name: 'project', weight: 9 }]
-};</pre>
+};{% endhighlight %}
 
 Now the pageRelations is a hash table with keys &#8211; the web app&#8217;s pages, values &#8211; all neighbour views for the current one, and rating associated to each neighbour.  
 In that way you actually use a directed <a href="https://en.wikipedia.org/wiki/Graph_theory" target="_blank">graph</a> with weighted edges, all you have to do is to walk the neighbours of the current node (current page) by their priority and prefetch the template for each node:
 
-<pre lang="javascript">$rootScope.$on('$routeStateChange', function (evnt, state) {
+{% highlight javascript %}$rootScope.$on('$routeStateChange', function (evnt, state) {
   pageRelations[state.id].sort(function (a, b) {
     return b.weight - a.weight;
   }).forEach(function (c) {
@@ -171,6 +171,6 @@ In that way you actually use a directed <a href="https://en.wikipedia.org/wiki/G
       $templateCache.put(n.templateUrl, t);
     });
   });
-});</pre>
+});{% endhighlight %}
 
 And that&#8217;s all. Possible issue which should be taken under attention is the loading of the images used by the prefetched templates, it&#8217;s not enough to load only the html, usually the images takes more bandwidth. Here you can use different approaches &#8211; parse the template, take all &#8220;img&#8221; elements and pre-fetch their source. Anyway, this doesn&#8217;t work with the CSS &#8220;background-image&#8221; property. When there are elements with &#8220;background-image&#8221; property you can get it&#8217;s value only after the element is added to the DOM tree but adding each template and walking its elements may have performance impact when you have large, complex templates.

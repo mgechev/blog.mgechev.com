@@ -35,7 +35,7 @@ As talking about loose coupling we should mention the <a href="https://en.wikipe
 
 Here is an example:
 
-<pre lang="JavaScript">//Model
+{% highlight JavaScript %}//Model
 function Book(name, isbn) {
     this.name = name;
     this.isbn = isbn;
@@ -89,7 +89,7 @@ var BookListView = (function () {
       }
    }
 }());
-</pre>
+{% endhighlight %}
 
 Another example. If you don&#8217;t like the MV* approach you can use something a little different (there&#8217;s an intersection between the one I&#8217;ll describe next and the last mentioned). Just structure your application in different modules. For example look at Twitter.
 
@@ -99,7 +99,7 @@ If you look at the interface you simply have different boxes. You can think of e
 
 Here is a basic example of the last approach (this is not original twitter code it&#8217;s just a sample by me):
 
-<pre lang="JavaScript">var Twitter.Timeline = (function () {
+{% highlight JavaScript %}var Twitter.Timeline = (function () {
    var tweets = [];
    function publishTweet(tweet) {
       tweets.push(tweet);
@@ -124,7 +124,7 @@ var Twitter.TweetPoster = (function () {
        }
    };
 }());
-</pre>
+{% endhighlight %}
 
 For this approach there&#8217;s very good talk by <a href="http://www.nczonline.net/" target="_blank">Nicholas Zakas</a>. For the first MV* approach the best articles and books, I know, are published by <a href=" http://addyosmani.com/blog/" target="_blank">Addy Osmani</a>.
 

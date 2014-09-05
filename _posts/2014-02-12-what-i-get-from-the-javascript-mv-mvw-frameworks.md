@@ -46,26 +46,26 @@ Most of the MV* frameworks are build with testing in mind. For example, in Angul
 
 JavaScript is weird. It doesn&#8217;t tell you how you should write your code. You can use functional style, procedural style, OO style. There&#8217;s a lack of many of the tools available in languages like Java and C#. You don&#8217;t have namespaces, you even don&#8217;t have a single way for creating objects. You can create object by using the object literal:
 
-<pre lang="javascript">var obj = { foo: 42 };
-</pre>
+{% highlight javascript %}var obj = { foo: 42 };
+{% endhighlight %}
 
 or the module pattern
 
-<pre lang="javascript">var obj = (function () {
+{% highlight javascript %}var obj = (function () {
   var bar = 42;
   return {
     foo: bar
   };
 }());
-</pre>
+{% endhighlight %}
 
 or constructor function
 
-<pre lang="javascript">function Foo() {
+{% highlight javascript %}function Foo() {
   this.foo = 42;
 }
 var obj = new Foo();
-</pre>
+{% endhighlight %}
 
 &#8230;If you have team with 15 JavaScript developers and each of them has his own opinion how JavaScript should be used you are in big troubles. MV* frameworks give you strict guidelines for how you should organize your code. Each of the developers will be forced to use &#8220;the Angular way&#8221;, &#8220;the Backbone way&#8221;, or whatever way your project uses.
 

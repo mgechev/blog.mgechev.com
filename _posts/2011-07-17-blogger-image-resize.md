@@ -14,7 +14,7 @@ tags:
 ---
 That&#8217;s my second post here and the first one which is going to have any sense. Today a friend of mine was fighting with Google&#8217;s blog system&#8230;He was posting some data with images in it. When he was setting width and height of images in the html editor they were being resized later after he post the article. When he tried to put any CSS restriction about picture&#8217;s width the effect was &#8211; picture flattened (because blogger was setting the picture height). I looked at the source for few minutes, stopped the JavaScript because I thought that it is the problem but there was no result&#8230;So I wrote a tiny script which deals with the problem. And here is it:
 
-<pre lang="JavaScript">   
+{% highlight JavaScript %}   
 /*
     Blogger image resize script Copyright (C) 2011  Minko Gechev (http://mgechev.com)
     This program comes with ABSOLUTELY NO WARRANTY; for details type http://www.gnu.org/licenses/gpl-3.0.html.
@@ -63,7 +63,7 @@ $(document).ready(function() {
         image.height(newHeight);
     }    
 });
-</pre>
+{% endhighlight %}
 
 I hope that it's going to be helpful for some of you.  
 Greetings!
