@@ -174,9 +174,9 @@ For example:
 
 {% highlight html %}
 <script type="template/mustache">
-  <h2>Names</h2<
+  <h2>Names</h2>
   {{#names}}
-    <strong>{{name}}</strong<
+    <strong>{{name}}</strong>
   {{/names}}
 </script>
 {% endhighlight %}
@@ -186,10 +186,10 @@ The template engine turns this string into DOM elements by compiling it within a
 For example if we evaluate the template above in the context of the following object: `{ names: ['foo', 'bar', 'baz'] }`, so we will get:
 
 {% highlight html %}
-<h2>Names</h2<
-  <strong>foo</strong<
-  <strong>bar</strong<
-  <strong>baz</strong<
+<h2>Names</h2>
+  <strong>foo</strong>
+  <strong>bar</strong>
+  <strong>baz</strong>
 {% endhighlight %}
 
 AngularJS templates are actually HTML, they are not in an intermediate format like the traditional templates are.
