@@ -303,10 +303,10 @@ The initial view of the user would be:
 {% highlight html %}
 <section id="container">
   <div class="reg-form-container">
-    <label for="username-input">Username</label>;
+    <label for="username-input">Username</label>
     <input type="text" id="username-input" class="form-control">
     <br>
-    <button id="connect-btn" class="btn btn-primary">Connect</button>;
+    <button id="connect-btn" class="btn btn-primary">Connect</button>
   </div>
 </section>
 {% endhighlight %}
@@ -323,7 +323,7 @@ $(function () {
   });
 
   function initChat(container, username) {
-    React.renderComponent(<ChatBox username={username}></ChatBox>;, container);
+    React.renderComponent(<ChatBox username={username}></ChatBox>, container);
   }
 
   window.onbeforeunload = function () {
@@ -393,10 +393,10 @@ var ChatBox = React.createClass({
   render: function () {
     return (
       <div className="chat-box" ref="root">
-        <div className="chat-header ui-widget-header">React p2p Chat</div>;
+        <div className="chat-header ui-widget-header">React p2p Chat</div>
         <div className="chat-content-wrapper row">
-          <MessagesList ref="messagesList"></MessagesList>;
-          <UsersList users={this.state.users} ref="usersList"></UsersList>;
+          <MessagesList ref="messagesList"></MessagesList>
+          <UsersList users={this.state.users} ref="usersList"></UsersList>
         </div>
         <MessageInput
           ref="messageInput"
@@ -413,10 +413,10 @@ Lets take a look at the `render` method:
 {% highlight javascript %}render: function () {
   return (
     <div className="chat-box" ref="root">
-      <div className="chat-header ui-widget-header">React p2p Chat</div>;
+      <div className="chat-header ui-widget-header">React p2p Chat</div>
       <div className="chat-content-wrapper row">
-        <MessagesList ref="messagesList"></MessagesList>;
-        <UsersList users={this.state.users} ref="usersList"></UsersList>;
+        <MessagesList ref="messagesList"></MessagesList>
+        <UsersList users={this.state.users} ref="usersList"></UsersList>
       </div>
       <MessageInput
         ref="messageInput"
@@ -476,7 +476,7 @@ addMessage: function (message) {
 }
 {% endhighlight %}
 
-The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `<MessagesList ref="messagesList"></MessagesList>;`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
+The interesting part here is the line: `this.refs.messagesList.addMessage(message);`, where we use `this.refs`. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the `ref` attribute of given component (like `<MessagesList ref="messagesList"></MessagesList>`) we can later access the component by using `this.refs.REF_ATTRIBUTE_VALUE`.
 
 #### MessagesList.jsx
 
@@ -520,11 +520,11 @@ var MessagesList = React.createClass({
     var messages;
     messages = this.state.messages.map(function (m) {
       return (
-        <ChatMessage message={m}></ChatMessage>;
+        <ChatMessage message={m}></ChatMessage>
       );
     });
     if (!messages.length) {
-      messages = <div className="chat-no-messages">No messages</div>;;
+      messages = <div className="chat-no-messages">No messages</div>;
     }
     return (
       <div ref="messageContainer" className="chat-messages col-xs-9">
@@ -542,11 +542,11 @@ render: function () {
   var messages;
   messages = this.state.messages.map(function (m) {
     return (
-      <ChatMessage message={m}></ChatMessage>;
+      <ChatMessage message={m}></ChatMessage>
     );
   });
   if (!messages.length) {
-    messages = <div className="chat-no-messages">No messages</div>;;
+    messages = <div className="chat-no-messages">No messages</div>;
   }
   return (
     <div ref="messageContainer" className="chat-messages col-xs-9">
