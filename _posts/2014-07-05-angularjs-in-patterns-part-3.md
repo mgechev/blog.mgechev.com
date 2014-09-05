@@ -60,7 +60,7 @@ Lets look at the following example:
   <head>
   </head>
   <body>
-    <zippy title="zippy&#x22;>
+    <zippy title="zippy">
       zippy!
     </zippy>
   </body>
@@ -173,7 +173,7 @@ For JavaScript there are plenty of template engines, such as mustache.js, handle
 For example:
 
 {% highlight html %}
-<script type="template/mustache&#x22;>
+<script type="template/mustache">
   <h2>Names</h2<
   {{#names}}
     <strong>{{name}}</strong<
@@ -198,7 +198,7 @@ What AngularJS compiler does is to traverse the DOM tree and look for already kn
 For example:
 
 {% highlight html %}
-<ul ng-repeat="name in names&#x22;>
+<ul ng-repeat="name in names">
   <li>{{name}}</li<
 </ul>
 {% endhighlight %}
@@ -298,13 +298,13 @@ Before continuing with the application of the command pattern lets describe how 
 When we want to bind our model to the view we use the directives `ng-bind` (for single-way data binding) and `ng-model` (for two-way data binding). For example, if we want each change in the model `foo` to reflect the view we can:
 
 {% highlight html %}
-<span ng-bind="foo&#x22;></span<
+<span ng-bind="foo"></span<
 {% endhighlight %}
 
 Now each time we change the value of `foo` the inner text of the span will be changed. We can achieve the same effect with more complex AngularJS expressions, like:
 
 {% highlight html %}
-<span ng-bind="foo + " " + bar | uppercase&#x22;></span<
+<span ng-bind="foo + " " + bar | uppercase"></span<
 {% endhighlight %}
 
 In the example above the value of the span will be the concatenated uppercased value of `foo` and `bar`. What happens behind the scene?
@@ -354,10 +354,10 @@ Here is an example hierarchy between few controllers:
 <html>
   <head>
   </head>
-  <body ng-controller="MainCtrl&#x22;>
-    <div ng-controller="ChildCtrl&#x22;>
+  <body ng-controller="MainCtrl">
+    <div ng-controller="ChildCtrl">
       <span>{{user.name}}</span<
-      <button ng-click="click()&#x22;>Click</button<
+      <button ng-click="click()">Click</button<
     </div>
   </body>
 </html>
@@ -508,7 +508,7 @@ And the following partial:
   <div>
     Friends with ids:
     <ul>
-      <li ng-repeat="friend in user.friends&#x22;>{{friend}}</li<
+      <li ng-repeat="friend in user.friends">{{friend}}</li<
     </ul>
   </div>
 </div>
