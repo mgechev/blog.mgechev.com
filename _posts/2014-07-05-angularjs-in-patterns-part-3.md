@@ -42,7 +42,7 @@ This is the last blog post of the series "AngularJS in Patterns". You can find t
 
 >The composite pattern is a partitioning design pattern. The composite pattern describes that a group of objects are to be treated in the same way as a single instance of an object. The intent of a composite is to "compose" objects into tree structures to represent part-whole hierarchies.
 
-![Composite](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/composite.svg "Fig. 3")
+![Composite](/images/patterns/structural/composite.svg "Fig. 3")
 
 According to the Gang of Four, MVC is nothing more than combination of:
 
@@ -91,7 +91,7 @@ In the second, JavaScript, example we see that the `template` property of the di
 
 >In computer programming, the interpreter pattern is a design pattern that specifies how to evaluate sentences in a language. The basic idea is to have a class for each symbol (terminal or nonterminal) in a specialized computer language. The syntax tree of a sentence in the language is an instance of the composite pattern and is used to evaluate (interpret) the sentence.
 
-![Interpreter](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/interpreter.svg "Fig. 6")
+![Interpreter](/images/patterns/behavioral/interpreter.svg "Fig. 6")
 
 Behind its `$parse` service, AngularJS provides its own implementation of interpreter of a DSL (Domain Specific Language). The used DSL is simplified and modified version of JavaScript.
 The main differences between the JavaScript expressions and AngularJS expressions that AngularJS expressions:
@@ -161,7 +161,7 @@ Few sample AngularJS expressions are:
 
 > Renders information into HTML by embedding markers in an HTML page.
 
-![Template View](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/template-view.svg "Fig. 8")
+![Template View](/images/patterns/peaa/template-view.svg "Fig. 8")
 
 The dynamic page rendering is not that trivial thing. It is connected with a lot of string concatenations, manipulations and frustration. Far easier way to build your dynamic page is to write your markup and embed little expressions inside it, which are lately evaluated in given context and so the whole template is being compiled to its end format. In our case this format is going to be HTML (or even DOM). This is exactly what the template engines do - they take given DSL, evaluate it in the appropriate context and then turn it into its end format.
 
@@ -218,7 +218,7 @@ will produce the same result as the one above. The main difference here is that 
 
 >The observer pattern is a software design pattern in which an object, called the subject, maintains a list of its dependents, called observers, and notifies them automatically of any state changes, usually by calling one of their methods. It is mainly used to implement distributed event handling systems.
 
-![Observer](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/observer.svg "Fig. 7")
+![Observer](/images/patterns/behavioral/observer.svg "Fig. 7")
 
 There are two basic ways of communication between the scopes in an AngularJS application. The first one is calling methods of parent scope by a child scope. This is possible since the child scope inherits prototypically by its parent, as mentioned above (see [Scope](#scope)). This allows communication in a single direction - child to parent. Some times it is necessary to call method of given child scope or notify it about a triggered event in the context of the parent scope. AngularJS provides built-in observer pattern, which allows this. Another possible use case, of the observer pattern, is when multiple scopes are interested in given event but the scope, in which context the event is triggered, is not aware of them. This allows decoupling between the different scopes, non of the scopes should be aware of the rest of the scopes.
 
@@ -254,7 +254,7 @@ In the JavaScript community this pattern is better known as publish/subscribe.
 
 >The chain-of-responsibility pattern is a design pattern consisting of a source of command objects and a series of processing objects. Each processing object contains logic that defines the types of command objects that it can handle; the rest are passed to the next processing object in the chain. A mechanism also exists for adding new processing objects to the end of this chain.
 
-![Chain of Responsibilities](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/chain-of-responsibilities.svg "Fig. 5")
+![Chain of Responsibilities](/images/patterns/behavioral/chain-of-responsibilities.svg "Fig. 5")
 
 As stated above the scopes in an AngularJS application form a hierarchy known as the scope chain. Some of the scopes are "isolated", which means that they don't inherit prototypically by their parent scope, but are connected to it via their `$parent` property.
 
@@ -291,7 +291,7 @@ The different handlers from the UML diagram above are the different scopes, inje
 
 >In object-oriented programming, the command pattern is a behavioral design pattern in which an object is used to represent and encapsulate all the information needed to call a method at a later time. This information includes the method name, the object that owns the method and values for the method parameters.
 
-![Command](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/command.svg "Fig. 11")
+![Command](/images/patterns/behavioral/command.svg "Fig. 11")
 
 Before continuing with the application of the command pattern lets describe how AngularJS implements data binding.
 
@@ -336,7 +336,7 @@ We can think of the `watcher` object as a command. The expression of the command
 
 >An object that handles a request for a specific page or action on a Web site. Martin Fowler
 
-![Page Controller](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/page-controller.svg "Fig. 8")
+![Page Controller](/images/patterns/peaa/page-controller.svg "Fig. 8")
 
 According to [4](#references) the page controller:
 
@@ -442,7 +442,7 @@ Once we want to inject `foo` inside any other component we won't be able to use 
 
 >A Data Mapper is a Data Access Layer that performs bidirectional transfer of data between a persistent data store (often a relational database) and an in memory data representation (the domain layer). The goal of the pattern is to keep the in memory representation and the persistent data store independent of each other and the data mapper itself.
 
-![Data Mapper](https://rawgit.com/mgechev/angularjs-in-patterns/master/images/data-mapper.svg "Fig. 10")
+![Data Mapper](/images/patterns/peaa/data-mapper.svg "Fig. 10")
 
 As the description above states, the data mapper is used for bidirectional transfer of data between a persistent data store and an in memory data representation. Usually our AngularJS application communicates with API server, which is written in any server-side language (Ruby, PHP, Java, JavaScript, etc.).
 
