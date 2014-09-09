@@ -323,7 +323,8 @@ $(function () {
   });
 
   function initChat(container, username) {
-    React.renderComponent(<ChatBox username={username}></ChatBox>, container);
+    React.renderComponent(<ChatBox chatProxy={new ChatProxy()}
+      username={username}></ChatBox>, container);
   }
 
   window.onbeforeunload = function () {
@@ -351,7 +352,7 @@ var ChatBox = React.createClass({
   },
 
   componentDidMount: function () {
-    this.chatProxy = new ChatProxy();
+    this.chatProxy = this.props.chatProxy;
     this.chatProxy.connect(this.props.username);
     this.chatProxy.onMessage(this.addMessage.bind(this));
     this.chatProxy.onUserConnected(this.userConnected.bind(this));
@@ -433,7 +434,7 @@ Once the component has been mounted the `componentDidMount` method is being invo
 
 {% highlight JavaScript %}
 componentDidMount: function () {
-  this.chatProxy = new ChatProxy();
+  this.chatProxy = this.props.chatProxy;
   this.chatProxy.connect(this.props.username);
   this.chatProxy.onMessage(this.addMessage.bind(this));
   this.chatProxy.onUserConnected(this.userConnected.bind(this));
