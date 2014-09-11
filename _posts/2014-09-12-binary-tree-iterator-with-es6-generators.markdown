@@ -38,7 +38,7 @@ Once we have defined given generator, we can instantiate it by simply invoking i
 var gen = generator();
 {% endhighlight %}
 
-Ok, so far we know how to define generators. The interesting part comes when we include the keyword `yield` into the game. With `yield` we can suspend the execution of the current generator and change the control flow:
+Ok, so far we know how to define generators and instantiate them. The interesting part comes when we include the keyword `yield` into the game. With `yield` we can suspend the execution of the current generator and change the control flow:
 
 {% highlight javascript %}
 function* generator(param) {
@@ -53,7 +53,7 @@ gen.next(); // { value: 3.1415926535, done: false }
 gen.next(1.618); // { value: 1.618, done: true }
 {% endhighlight %}
 
-Initially we create a new instance of the generator and pass Pi as parameter. Later with `yield 42` we suspend the execution of the generator. By calling the `.next` method we restore the execution from the last suspension point. By passing argument to `.next` we can get value from the outside of the generator (like in `var returnRes = yield param`).
+Initially we create a new instance of the generator and pass Pi as parameter. Later with `yield 42` we suspend the execution of the generator. By calling the `next` method we restore the execution from the last suspension point. By passing argument to `next` we can get value from the outside of the generator (like in `var returnRes = yield param`).
 
 So far so good, but some times we want to pass the execution to another generator. For this case we have a special syntax - `yield* generator(params)`:
 
