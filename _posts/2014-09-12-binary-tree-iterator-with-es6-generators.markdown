@@ -86,11 +86,11 @@ The iterator pattern belongs to the behavioral design patterns. It is used with 
 
 !["Iterator"](/images/patterns/behavioral/iterator.svg "Iterator")
 
-Big advantage of this design pattern is that the abstract `Iterator` class can provide common interface, which could be later implemented by multiple `ConcreteIterators`. This way we can traverse different collections (BSTs, linked lists, hash maps, etc.) using the same interface provided by the collection's iterator.
+Big advantage of this design pattern is that the abstract `Iterator` class provides common interface, which could be later implemented by multiple `ConcreteIterators`. This way we can traverse different collections (BSTs, linked lists, hash maps, etc.) using the same interface provided by the collection's iterator.
 
 ## Implementation
 
-In this section we'll take a look at the actual implementation of our BST iterator. Since the logic behind the data structure is not in the scope of this blog post, you can take a look at my repository - [javascript-algorithms](https://github.com/mgechev/javascript-algorithms) for additional details.
+In this section we'll take a look at the actual implementation of our BST iterator. Since the logic behind the data structure is not in the scope of this blog post, you can take a look at my repository - [javascript-algorithms](https://github.com/mgechev/javascript-algorithms/blob/master/src/data-structures/binary-search-tree.js) for additional details.
 In this article we are going to extend the BST's API by adding a method called `getIterator`.
 Here is its implementation:
 
