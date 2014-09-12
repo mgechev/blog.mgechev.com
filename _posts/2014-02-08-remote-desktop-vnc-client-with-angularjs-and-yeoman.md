@@ -904,6 +904,8 @@ Now open the url: <http://localhost:8090>, and rock!
 
 ## Demo {#vnc-demo-video}
 
+<iframe width="420" height="315" src="//www.youtube.com/embed/FwPjTt4dQmw" frameborder="0" allowfullscreen></iframe>
+
  [1]: http://blog.mgechev.com/wp-content/uploads/2014/02/yeoman-vnc-angular.png
  [2]: http://angularjs.org/
  [3]: http://yeoman.io/
