@@ -32,7 +32,7 @@ function* generator() {
 }
 {% endhighlight %}
 
-Once we have defined given generator, we can instantiate it by simply invoking it like a function:
+Once we have defined given generator, we can instantiate it (more preciously we create an [iterator](http://en.wikipedia.org/wiki/Generator_(computer_programming)#Uses)) by simply invoking it like a function:
 
 {% highlight javascript %}
 var gen = generator();
@@ -141,4 +141,3 @@ while (!(current = i.next()).done) {
 }
 // 0 1 5 6
 {% endhighlight %}
-
