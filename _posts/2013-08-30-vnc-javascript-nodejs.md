@@ -50,7 +50,7 @@ npm init{% endhighlight %}
 Now you should have folder called &#8220;js-vnc&#8221; with file named &#8220;package.json&#8221; in it.  
 Use the following lines of code to install almost all the dependencies:
 
-{% highlight bash %}npm install rfb2 -save
+{% highlight bash %}npm install rfb2 --save
 npm install connect --save
 npm install socket.io --save{% endhighlight %}
 
