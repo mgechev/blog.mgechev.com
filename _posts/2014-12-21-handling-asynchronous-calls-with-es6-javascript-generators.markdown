@@ -24,6 +24,8 @@ A few months ago Jake Archibald wrote an [article](http://jakearchibald.com/2014
 
 In this blog post we'll take a look at standard ways of handling asynchronous calls and how we can improve the readability of our code using generators. We'll also take a further look at the implementation of `spawn`, since there are few tricky moments there.
 
+The code from the demo is at my [GitHub](https://github.com/mgechev/generators-async-demo).
+
 ## Prerequisites
 
 You must be familiar with how JavaScript promises work. You can read this amazing [HTML5 rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) about them and take a look at my [Light Q implantation](https://github.com/mgechev/light-q) for the underlaying details.
