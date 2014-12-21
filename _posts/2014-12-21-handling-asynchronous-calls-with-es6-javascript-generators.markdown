@@ -13,8 +13,6 @@ tags:
   - JavaScript
 ---
 
-## Introduction
-
 ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version.
 This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.
 
