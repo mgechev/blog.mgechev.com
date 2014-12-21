@@ -150,8 +150,8 @@ I believe, the code looks a little bit more compact. We still fetch up-to 6 user
 Since `async` functions are still not implemented in the modern browsers, as Jake suggests, we can use generators as something akin to them. Let's leave our `getJSON` implementation untouched and implement `loadUsers` using a generator:
 
 {% highlight javascript %}
-functions loadUsers() {
-  spawn(functions * () {
+function loadUsers() {
+  spawn(function * () {
     var users = yield getJSON('users.json');
     for (var user of users.users_list.map(getJSON)) {
       console.log(yield user);
