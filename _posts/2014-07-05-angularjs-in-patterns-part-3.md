@@ -24,9 +24,6 @@ tags:
   - web application
 ---
 
-
-## Introduction
-
 <blockquote>
 This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
 </blockquote>

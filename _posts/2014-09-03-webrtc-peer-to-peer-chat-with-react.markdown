@@ -17,9 +17,6 @@ tags:
   - Peer to Peer
 ---
 
-
-## Introduction
-
 In this blog post I'm going to share how could be build WebRTC chat with [React.js](https://facebook.github.io/react/). Before we continue lets describe briefly what React.js and WebRTC are.
 
 The application from this tutorial is [available at GitHub](https://github.com/mgechev/ReactChat).

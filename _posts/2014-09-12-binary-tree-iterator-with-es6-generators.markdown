@@ -11,8 +11,6 @@ image:
 date: 2014-09-11T19:07:34+03:00
 ---
 
-## Introduction
-
 ES6 specification is being clarified every passed day! One of the key features of the new version of the language are the [generators](https://en.wikipedia.org/wiki/Generator_(computer_programming)).
 Generators (a.k.a. semicoroutines) will play quite important role after they are being officially released. They could be used to simplify the asynchronous control flow of any JavaScript program (look at [co](https://github.com/visionmedia/co)). Another important role is using them for creating iterators.
 
