@@ -94,9 +94,11 @@ The service, which response us with the address of the source is what STUN does.
 
 In this section we will implement our backend. The backend is the `Web App` component from the sequence diagram above. Basically it's main functionality is to provide static files (htmls, js, css) and to redirect requests by the peers.
 
+This component will maintain a collection of rooms, to each room we will have associated collection of `socket.io` sockets of the peers, connected to the given room.
+
 In order to implement the whole functionality of our WebRTC application with JavaScript we can use Node.js.
 
-Let's begin!
+So let's begin!
 
 {% highlight bash %}
 mkdir webrtc-app && cd webrtc-app
@@ -115,7 +117,7 @@ config.PORT = process.env.PORT || config.PORT;
 server.run(config);
 {% endhighlight %}
 
-Inside the root of your app, invoke the following commands:
+Inside the root of your app, invoke the following commands, in order to install the required dependencies:
 
 {% highlight bash %}
 npm install express --save
@@ -199,7 +201,7 @@ exports.run = function (config) {
 };
 {% endhighlight %}
 
-Now let's take a look at it's content step-by-step:
+Now let's take a look at its content step-by-step:
 
 {% highlight javascript %}
 var express = require('express'),
@@ -227,7 +229,7 @@ socketio.listen(server, { log: false })
 });
 {% endhighlight %}
 
-We start the http server and attach socket.io to it. The `connection` event in `socket.io` means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:
+We start the HTTP server and attach `socket.io` to it. The `connection` event in `socket.io` means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:
 
 {% highlight javascript %}
 var currentRoom, id;
@@ -245,7 +247,7 @@ socket.on('disconnect', function () {
 });
 {% endhighlight %}
 
-These are the three events we're going to handle. The `init` event use used for initialization of a room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it:
+These are the three events we're going to handle. The `init` event is used for initialization of given room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it:
 
 {% highlight javascript %}
 currentRoom = (data || {}).room || roomId++;
@@ -270,6 +272,8 @@ if (!data) {
 }
 {% endhighlight %}
 
+One more detail is that when a client connects to given room we notify all other peers associated to the room about the newly connected peer.
+
 We also have a callback (`fn`), which we invoke with the client's ID and the room's id, once the client has successfully connected.
 
 The `msg` event is an `SDP` message or `ICE` candidate, which should be redirected from specific peer to another peer:
@@ -284,7 +288,7 @@ if (rooms[currentRoom] && rooms[currentRoom][to]) {
 }
 {% endhighlight %}
 
-The id of given peer is always an integer so that's why we parse it as first line of the event handler. After that we emit the message to the specified peer in the `to` property of the event object.
+The id of given peer is always an integer so that's why we parse it as first line of the event handler. After that we emit the message to the specified peer in the `to` property of the event data object.
 
 The last event handler (and last part of the server) is the disconnect handler:
 
@@ -300,9 +304,28 @@ rooms[currentRoom].forEach(function (socket) {
 });
 {% endhighlight %}
 
-Once given peer disconnects from the server (for example the user close its browser or refresh it), we remove its socket from the collection of sockets associated for the given room (the `filter` call). After that we emit `peer.disconnects` event to all peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the given peer.
+Once given peer disconnects from the server (for example the user close his or her browser or refresh it), we remove its socket from the collection of sockets associated for the given room (the `filter` call). After that we emit `peer.disconnected` event to all other peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.
 
-Create the following directory structure:
+## Web client
+
+### Setup
+
+In order to create a new application using AngularJS' Yeoman generator you can follow these steps:
+
+{% highlight bash %}
+npm install -g yeoman
+npm install -g generator-angular
+cd .. # if you're inside the lib directory
+mkdir public && cd public
+yo angular
+{% endhighlight %}
+
+You'll be asked a few questions, answer them as follows:
+
+![Setup](/images/yeoman-angular-webrtc/setup.png "Setup")
+
+Basically, we only need `angular-route` as dependency and since we want our application to look relatively well with little amount of effort we require Bootstrap as well.
+
 
 {% highlight text %}
 ├── LICENSE
@@ -319,20 +342,3 @@ Create the following directory structure:
 
 Inside `index.js` in the root add:
 
-## Setup
-
-In order to create a new application using AngularJS' Yeoman generator you can follow these steps:
-
-{% highlight bash %}
-npm install -g yeoman
-npm install -g generator-angular
-mkdir webrtc-app && cd webrtc-app
-mkdir public && cd public
-yo angular
-{% endhighlight %}
-
-You'll be asked a few questions, answer them as follow:
-
-![Setup](/images/yeoman-angular-webrtc/setup.png "Setup")
-
-Basically, we only need `angular-route` as dependency and since we want our application to look relatively well with little amount of effort we require Bootstrap as well.
