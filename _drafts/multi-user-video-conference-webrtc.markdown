@@ -326,6 +326,66 @@ You'll be asked a few questions, answer them as follows:
 
 Basically, we only need `angular-route` as dependency and since we want our application to look relatively well with little amount of effort we require Bootstrap as well.
 
+### Implementation
+
+As first step, we need to handle some browser inconsistencies. Inside `public/app/scripts`, create a file called `adapter.js` and add the following content:
+
+{% highlight javascript %}
+window.RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+window.RTCIceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
+window.RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
+window.URL = window.URL || window.mozURL || window.webkitURL;
+window.navigator.getUserMedia = window.navigator.getUserMedia || window.navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia;
+{% endhighlight %}
+
+Since Firefox and Chrome still support the WebRTC API with `moz` and `webkit` prefixes, we need to handle these inconsistencies.
+
+Now lets create a service, called `VideoStream`, which is responsible for providing us a media stream:
+
+{% highlight bash %}
+yo angular:factory VideoStream
+{% endhighlight %}
+
+And lets edit its content:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .factory('VideoStream', function ($q) {
+    var stream;
+    return {
+      get: function () {
+        if (stream) {
+          return $q.when(stream);
+        } else {
+          var d = $q.defer();
+          navigator.getUserMedia({
+            video: true,
+            audio: true
+          }, function (s) {
+            stream = s;
+            d.resolve(stream);
+          }, function (e) {
+            d.reject(e);
+          });
+          return d.promise;
+        }
+      }
+    };
+  });
+{% endhighlight %}
+
+Our service uses `$q` in order to provide a video stream using `getUserMedia`. Once we invoke `getUserMedia` the browser will ask the user for permissions over his/her microphone and web cam:
+
+![](/images/yeoman-angular-webrtc/webcam-permissions.png)
+
+After we gain access to the video stream we cache it inside the `stream` variable, in order to not ask the user for web camera permissions each time we want to access it.
+
+Now lets create a new controller, called `RoomCtrl`:
+
+{% highlight bash %}
+yo angular:controller Room
+{% endhighlight %}
+
 
 {% highlight text %}
 ├── LICENSE
