@@ -92,6 +92,233 @@ The service, which response us with the address of the source is what STUN does.
 
 ## Backend
 
+In this section we will implement our backend. The backend is the `Web App` component from the sequence diagram above. Basically it's main functionality is to provide static files (htmls, js, css) and to redirect requests by the peers.
+
+In order to implement the whole functionality of our WebRTC application with JavaScript we can use Node.js.
+
+Let's begin!
+
+{% highlight bash %}
+mkdir webrtc-app && cd webrtc-app
+npm init # initialize the app
+mkdir lib
+{% endhighlight %}
+
+Inside file called `index.js` in the root add the following content:
+
+{% highlight javascript %}
+var config = require('./config/config.json'),
+    server = require('./lib/server');
+
+config.PORT = process.env.PORT || config.PORT;
+
+server.run(config);
+{% endhighlight %}
+
+Inside the root of your app, invoke the following commands:
+
+{% highlight bash %}
+npm install express --save
+npm install socket.io --save
+{% endhighlight %}
+
+Now go to `lib`:
+
+{% highlight text %}
+cd lib
+{% endhighlight %}
+
+And create a file called `server.js`. It should has the following content:
+
+{% highlight javascript %}
+var express = require('express'),
+    expressApp = express(),
+    socketio = require('socket.io'),
+    http = require('http'),
+    server = http.createServer(expressApp),
+    rooms = {},
+    roomId = 1,
+    userIds = {};
+
+expressApp.use(express.static(\_\_dirname + '/../public/dist/'));
+
+exports.run = function (config) {
+
+  server.listen(config.PORT);
+  console.log('Listening on', config.PORT);
+  socketio.listen(server, { log: false })
+  .on('connection', function (socket) {
+
+    var currentRoom, id;
+
+    socket.on('init', function (data, fn) {
+      currentRoom = (data || {}).room || roomId++;
+      var room = rooms[currentRoom];
+      if (!data) {
+        rooms[currentRoom] = [socket];
+        id = userIds[currentRoom] = 0;
+        fn(currentRoom, id);
+        console.log('Room created, with #', currentRoom);
+      } else {
+        if (!room) {
+          return;
+        }
+        userIds[currentRoom] += 1;
+        id = userIds[currentRoom];
+        fn(currentRoom, id);
+        room.forEach(function (s) {
+          s.emit('peer.connected', { id: id });
+        });
+        room[id] = socket;
+        console.log('Peer connected to room', currentRoom, 'with #', id);
+      }
+    });
+
+    socket.on('msg', function (data) {
+      var to = parseInt(data.to, 10);
+      if (rooms[currentRoom] && rooms[currentRoom][to]) {
+        console.log('Redirecting message to', to, 'by', data.by);
+        rooms[currentRoom][to].emit('msg', data);
+      } else {
+        console.warn('Invalid user');
+      }
+    });
+
+    socket.on('disconnect', function () {
+      if (!currentRoom || !rooms[currentRoom]) {
+        return;
+      }
+      rooms[currentRoom] = rooms[currentRoom].filter(function (s) {
+        return s !== socket;
+      });
+      rooms[currentRoom].forEach(function (socket) {
+        socket.emit('peer.disconnected', { id: id });
+      });
+    });
+  });
+};
+{% endhighlight %}
+
+Now let's take a look at it's content step-by-step:
+
+{% highlight javascript %}
+var express = require('express'),
+    expressApp = express(),
+    socketio = require('socket.io'),
+    http = require('http'),
+    server = http.createServer(expressApp),
+    rooms = {},
+    roomId = 1,
+    userIds = {};
+
+expressApp.use(express.static(\_\_dirname + '/../public/dist/'));
+{% endhighlight %}
+
+In the snippet above we require all dependencies and configure the created express app to use a directory for providing static files. This directory is located inside a directory called `public`, which is in the root of our app.
+
+{% highlight javascript %}
+server.listen(config.PORT);
+console.log('Listening on', config.PORT);
+socketio.listen(server, { log: false })
+.on('connection', function (socket) {
+
+  // Additional logic
+
+});
+{% endhighlight %}
+
+We start the http server and attach socket.io to it. The `connection` event in `socket.io` means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:
+
+{% highlight javascript %}
+var currentRoom, id;
+
+socket.on('init', function (data, fn) {
+  // Handle init message
+});
+
+socket.on('msg', function (data) {
+  // Handle message
+});
+
+socket.on('disconnect', function () {
+  // Handle disconnect event
+});
+{% endhighlight %}
+
+These are the three events we're going to handle. The `init` event use used for initialization of a room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it:
+
+{% highlight javascript %}
+currentRoom = (data || {}).room || roomId++;
+var room = rooms[currentRoom];
+if (!data) {
+  rooms[currentRoom] = [socket];
+  id = userIds[currentRoom] = 0;
+  fn(currentRoom, id);
+  console.log('Room created, with #', currentRoom);
+} else {
+  if (!room) {
+    return;
+  }
+  userIds[currentRoom] += 1;
+  id = userIds[currentRoom];
+  fn(currentRoom, id);
+  room.forEach(function (s) {
+    s.emit('peer.connected', { id: id });
+  });
+  room[id] = socket;
+  console.log('Peer connected to room', currentRoom, 'with #', id);
+}
+{% endhighlight %}
+
+We also have a callback (`fn`), which we invoke with the client's ID and the room's id, once the client has successfully connected.
+
+The `msg` event is an `SDP` message or `ICE` candidate, which should be redirected from specific peer to another peer:
+
+{% highlight javascript %}
+var to = parseInt(data.to, 10);
+if (rooms[currentRoom] && rooms[currentRoom][to]) {
+  console.log('Redirecting message to', to, 'by', data.by);
+  rooms[currentRoom][to].emit('msg', data);
+} else {
+  console.warn('Invalid user');
+}
+{% endhighlight %}
+
+The id of given peer is always an integer so that's why we parse it as first line of the event handler. After that we emit the message to the specified peer in the `to` property of the event object.
+
+The last event handler (and last part of the server) is the disconnect handler:
+
+{% highlight javascript %}
+if (!currentRoom || !rooms[currentRoom]) {
+  return;
+}
+rooms[currentRoom] = rooms[currentRoom].filter(function (s) {
+  return s !== socket;
+});
+rooms[currentRoom].forEach(function (socket) {
+  socket.emit('peer.disconnected', { id: id });
+});
+{% endhighlight %}
+
+Once given peer disconnects from the server (for example the user close its browser or refresh it), we remove its socket from the collection of sockets associated for the given room (the `filter` call). After that we emit `peer.disconnects` event to all peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the given peer.
+
+Create the following directory structure:
+
+{% highlight text %}
+├── LICENSE
+├── Procfile
+├── README.md
+├── config
+│   └── config.json
+├── index.js
+├── lib
+│   └── server.js
+├── package.json
+└── public
+{% endhighlight %}
+
+Inside `index.js` in the root add:
+
 ## Setup
 
 In order to create a new application using AngularJS' Yeoman generator you can follow these steps:
