@@ -549,7 +549,15 @@ VideoStream.get()
 }, function () {
   $scope.error = 'No audio/video permissions. Please refresh your browser and allow the audio/video capturing.';
 });
-$scope.peers = [];
+{% endhighlight %}
+
+`VideoStream.get()` returns a promise, which once resolved gives us the media stream. When the promise is resolved we initialize the `Room` passing the stream as argument. In order to visualize the video captured by our web cam we use `URL.createObjectURL`, to be able to set it as `src` of a video element in our HTML.
+
+As next step we check whether the `roomId` is provided. If it is provided we simply join the room with the associated `roomId`: `Room.joinRoom(parseInt($routeParams.roomId, 10));`, otherwise we create a new room. Once the room is created we redirect the user to the room's URL.
+
+The rest of the `RoomCtrl` is handling two events:
+
+{% highlight javascript %}
 Room.on('peer.stream', function (peer) {
   console.log('Client connected, adding new stream');
   $scope.peers.push({
@@ -564,6 +572,14 @@ Room.on('peer.disconnected', function (peer) {
   });
 });
 {% endhighlight %}
+
+- `peer.stream` - a peer stream is received. Once we receive a new peer stream we add it to the array `$scope.peers`, which is visualized on the page. The markup on the page maps each `stream` to a video element.
+- `peer.disconnected` - once a peer disconnects the `peer.disconnected` event is being fired. When we receive this event we can simply remove the disconnected peer from the collection.
+
+
+#### Room
+
+The last component from our app is the `Room` service.
 
 
 {% highlight text %}
