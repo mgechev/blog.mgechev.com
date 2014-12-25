@@ -196,11 +196,11 @@ exports.run = function (config) {
       if (!currentRoom || !rooms[currentRoom]) {
         return;
       }
-      rooms[currentRoom] = rooms[currentRoom].filter(function (s) {
-        return s !== socket;
-      });
+      delete rooms[currentRoom][rooms[currentRoom].indexOf(socket)];
       rooms[currentRoom].forEach(function (socket) {
-        socket.emit('peer.disconnected', { id: id });
+        if (socket) {
+          socket.emit('peer.disconnected', { id: id });
+        }
       });
     });
   });
@@ -310,7 +310,7 @@ rooms[currentRoom].forEach(function (socket) {
 });
 {% endhighlight %}
 
-Once given peer disconnects from the server (for example the user close his or her browser or refresh it), we remove its socket from the collection of sockets associated for the given room (the `filter` call). After that we emit `peer.disconnected` event to all other peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.
+Once given peer disconnects from the server (for example the user close his or her browser or refresh the page), we remove its socket from the collection of sockets associated for the given room (the delete operator usage). After that we emit `peer.disconnected` event to all other peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.
 
 ## Web client
 
@@ -330,7 +330,7 @@ You'll be asked a few questions, answer them as follows:
 
 ![Setup](/images/yeoman-angular-webrtc/setup.png "Setup")
 
-Basically, we only need `angular-route` as dependency and since we want our application to look relatively well with little amount of effort we require Bootstrap as well.
+Basically, we only need `angular-route` as dependency and since we want our application to look relatively well designed with little amount of effort we require Bootstrap as well.
 
 ### Implementation
 
@@ -344,7 +344,7 @@ window.URL = window.URL || window.mozURL || window.webkitURL;
 window.navigator.getUserMedia = window.navigator.getUserMedia || window.navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia;
 {% endhighlight %}
 
-Since Firefox and Chrome still support the WebRTC API with `moz` and `webkit` prefixes, we need to handle these inconsistencies.
+Since Firefox and Chrome still support the WebRTC API with `moz` and `webkit` prefixes, we need to take care of it.
 
 Now lets create a service, called `VideoStream`, which is responsible for providing us a media stream:
 
@@ -382,9 +382,77 @@ angular.module('publicApp')
 
 Our service uses `$q` in order to provide a video stream using `getUserMedia`. Once we invoke `getUserMedia` the browser will ask the user for permissions over his/her microphone and web cam:
 
-![](/images/yeoman-angular-webrtc/webcam-permissions.png)
+![](/images/yeoman-angular-webrtc/webcam-permissions.png "Permissions for using the camera and microphone")
 
 After we gain access to the video stream we cache it inside the `stream` variable, in order to not ask the user for web camera permissions each time we want to access it.
+
+#### App configuration
+
+Now it's time to configure the routes in our application. Edit`public/app/scripts/app.js` and add the following route definition:
+
+{% highlight javascript %}
+angular
+  .module('publicApp', [
+    'ngRoute'
+  ])
+  .config(function ($routeProvider) {
+    $routeProvider
+      .when('/room/:roomId', {
+        templateUrl: 'views/room.html',
+        controller: 'RoomCtrl'
+      })
+      .when('/room', {
+        templateUrl: 'views/room.html',
+        controller: 'RoomCtrl'
+      })
+      .otherwise({
+        redirectTo: '/room'
+      });
+  });
+{% endhighlight %}
+
+Here we define two routes:
+
+- `/room` - for users accessing the app for first time (without having link to specific room). They will visit `/room` and after allowing access to their web cam, they will automatically create a new room and will be redirected to another URL (`/room/:roomId`). Once they are redirected to this URL they can share it with other users they want to talk with.
+- `/room/:roomId` - users who have already created room can share their URL with other users, who can join the video call.
+
+Of course, if you guess the URL of another users' session you can join their video call without much effort, for the sake of simplicity we've used this simple (and not secure) mechanism.
+
+Add this constant definition in the bottom of `app.js`:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .constant('config', {
+      // Change it for your app URL
+      SIGNALIG_SERVER_URL: YOUR_APP_URL
+  });
+{% endhighlight %}
+
+We will use this constant in order connect `socket.io` to the server.
+
+#### Io
+
+Now lets create one more service called `Io`.
+
+{% highlight bash %}
+yo angular:factory Io
+{% endhighlight %}
+
+Inside `/public/app/scripts/services/io.js` set the following content:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .factory('Io', function () {
+    if (typeof io === 'undefined') {
+      throw new Error('Socket.io required');
+    }
+    return io;
+  });
+{% endhighlight %}
+
+Basically here we wrap `io` inside a service, in order to allow the users to inject it, instead of using the global `io`. This will allow us to mock `io` easily instead of monkey patching it, when we want to write tests.
+
+#### RoomCtrl
 
 Now lets create a new controller, called `RoomCtrl`:
 
@@ -392,6 +460,110 @@ Now lets create a new controller, called `RoomCtrl`:
 yo angular:controller Room
 {% endhighlight %}
 
+
+Edit `/public/app/scripts/controllers/room.js`:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .controller('RoomCtrl', function ($sce, VideoStream, $location, $routeParams, $scope, Room) {
+
+    if (!window.RTCPeerConnection || !navigator.getUserMedia) {
+      $scope.error = 'WebRTC is not supported by your browser. You can try the app with Chrome and Firefox.';
+      return;
+    }
+
+    var stream;
+
+    VideoStream.get()
+    .then(function (s) {
+      stream = s;
+      Room.init(stream);
+      stream = URL.createObjectURL(stream);
+      if (!$routeParams.roomId) {
+        Room.createRoom()
+        .then(function (roomId) {
+          $location.path('/room/' + roomId);
+        });
+      } else {
+        Room.joinRoom(parseInt($routeParams.roomId, 10));
+      }
+    }, function () {
+      $scope.error = 'No audio/video permissions. Please refresh your browser and allow the audio/video capturing.';
+    });
+    $scope.peers = [];
+    Room.on('peer.stream', function (peer) {
+      console.log('Client connected, adding new stream');
+      $scope.peers.push({
+        id: peer.id,
+        stream: URL.createObjectURL(peer.stream)
+      });
+    });
+    Room.on('peer.disconnected', function (peer) {
+      console.log('Client disconnected, removing stream');
+      $scope.peers = $scope.peers.filter(function (p) {
+        return p.id !== peer.id;
+      });
+    });
+
+    $scope.getLocalVideo = function () {
+      return $sce.trustAsResourceUrl(stream);
+    };
+  });
+{% endhighlight %}
+
+Now lets look at the code step-by-step:
+
+`RoomCtrl` accepts as dependencies the following components:
+
+- `$sce` - Used for setting the src of the video elements.
+- `VideoStream` - used for getting the video stream from the user's camera
+- `$location` - used for redirecting the user to the room's URL
+- `$routeParams` - used for getting the room id
+- `$scope` - used for attaching data to it in order to achieve data-binding with the view
+- `Room` - service which we are going to define next. It is used for managing the peer connections.
+
+{% highlight javascript %}
+if (!window.RTCPeerConnection || !navigator.getUserMedia) {
+  $scope.error = 'WebRTC is not supported by your browser. You can try the app with Chrome and Firefox.';
+  return;
+}
+{% endhighlight %}
+
+In the snippet above we check whether WebRTC is supported. If it isn't we simply set content of the `$scope.error` property and stop the controller execution.
+
+{% highlight javascript %}
+var stream;
+VideoStream.get()
+.then(function (s) {
+  stream = s;
+  Room.init(stream);
+  stream = URL.createObjectURL(stream);
+  if (!$routeParams.roomId) {
+    Room.createRoom()
+    .then(function (roomId) {
+      $location.path('/room/' + roomId);
+    });
+  } else {
+    Room.joinRoom(parseInt($routeParams.roomId, 10));
+  }
+}, function () {
+  $scope.error = 'No audio/video permissions. Please refresh your browser and allow the audio/video capturing.';
+});
+$scope.peers = [];
+Room.on('peer.stream', function (peer) {
+  console.log('Client connected, adding new stream');
+  $scope.peers.push({
+    id: peer.id,
+    stream: URL.createObjectURL(peer.stream)
+  });
+});
+Room.on('peer.disconnected', function (peer) {
+  console.log('Client disconnected, removing stream');
+  $scope.peers = $scope.peers.filter(function (p) {
+    return p.id !== peer.id;
+  });
+});
+{% endhighlight %}
 
 
 {% highlight text %}
