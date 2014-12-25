@@ -579,21 +579,311 @@ Room.on('peer.disconnected', function (peer) {
 
 #### Room
 
-The last component from our app is the `Room` service.
+The last component from our app is the `Room` service:
 
-
-{% highlight text %}
-├── LICENSE
-├── Procfile
-├── README.md
-├── config
-│   └── config.json
-├── index.js
-├── lib
-│   └── server.js
-├── package.json
-└── public
+{% highlight bash %}
+yo angular:factory Room
 {% endhighlight %}
 
-Inside `index.js` in the root add:
+Edit the file `/public/app/scripts/services/room.js` and set the following content:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .factory('Room', function ($rootScope, $q, Io, config) {
+
+    var iceConfig = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }]},
+        peerConnections = {},
+        currentId, roomId,
+        stream;
+
+    function getPeerConnection(id) {
+      if (peerConnections[id]) {
+        return peerConnections[id];
+      }
+      var pc = new RTCPeerConnection(iceConfig);
+      peerConnections[id] = pc;
+      pc.addStream(stream);
+      pc.onicecandidate = function (evnt) {
+        socket.emit('msg', { by: currentId, to: id, ice: evnt.candidate, type: 'ice' });
+      };
+      pc.onaddstream = function (evnt) {
+        console.log('Received new stream');
+        api.trigger('peer.stream', [{
+          id: id,
+          stream: evnt.stream
+        }]);
+        if (!$rootScope.$$digest) {
+          $rootScope.$apply();
+        }
+      };
+      return pc;
+    }
+
+    function makeOffer(id) {
+      var pc = getPeerConnection(id);
+      pc.createOffer(function (sdp) {
+        pc.setLocalDescription(sdp);
+        console.log('Creating an offer for', id);
+        socket.emit('msg', { by: currentId, to: id, sdp: sdp, type: 'sdp-offer' });
+      }, function (e) {
+        console.log(e);
+      },
+      { mandatory: { OfferToReceiveVideo: true, OfferToReceiveAudio: true }});
+    }
+
+    function handleMessage(data) {
+      var pc = getPeerConnection(data.by);
+      switch (data.type) {
+        case 'sdp-offer':
+          pc.setRemoteDescription(new RTCSessionDescription(data.sdp), function () {
+            console.log('Setting remote description by offer');
+            pc.createAnswer(function (sdp) {
+              pc.setLocalDescription(sdp);
+              socket.emit('msg', { by: currentId, to: data.by, sdp: sdp, type: 'sdp-answer' });
+            });
+          });
+          break;
+        case 'sdp-answer':
+          pc.setRemoteDescription(new RTCSessionDescription(data.sdp), function () {
+            console.log('Setting remote description by answer');
+          }, function (e) {
+            console.error(e);
+          });
+          break;
+        case 'ice':
+          if (data.ice) {
+            console.log('Adding ice candidates');
+            pc.addIceCandidate(new RTCIceCandidate(data.ice));
+          }
+          break;
+      }
+    }
+
+    var socket = Io.connect(config.SIGNALIG_SERVER_URL),
+        connected = false;
+
+    function addHandlers(socket) {
+      socket.on('peer.connected', function (params) {
+        makeOffer(params.id);
+      });
+      socket.on('peer.disconnected', function (data) {
+        api.trigger('peer.disconnected', [data]);
+        if (!$rootScope.$$digest) {
+          $rootScope.$apply();
+        }
+      });
+      socket.on('msg', function (data) {
+        handleMessage(data);
+      });
+    }
+
+    var api = {
+      joinRoom: function (r) {
+        if (!connected) {
+          socket.emit('init', { room: r }, function (roomid, id) {
+            currentId = id;
+            roomId = roomid;
+          });
+          connected = true;
+        }
+      },
+      createRoom: function () {
+        var d = $q.defer();
+        socket.emit('init', null, function (roomid, id) {
+          d.resolve(roomid);
+          roomId = roomid;
+          currentId = id;
+          connected = true;
+        });
+        return d.promise;
+      },
+      init: function (s) {
+        stream = s;
+      }
+    };
+    EventEmitter.call(api);
+    Object.setPrototypeOf(api, EventEmitter.prototype);
+
+    addHandlers(socket);
+    return api;
+  });
+{% endhighlight %}
+
+`Room` accets the following dependencies:
+
+- `$rootScope` - the root scope, in order to invoke the `$digest` loop, once `socket.io` event is received
+- `$q` - in order to provide promise based interface
+- `Io` - the wrapped `socket.io` global function
+- `config` - the configuration constant we defined in `app.js`.
+
+`Room` provides the following public API:
+
+{% highlight javascript %}
+var api = {
+  joinRoom: function (r) {
+    if (!connected) {
+      socket.emit('init', { room: r }, function (roomid, id) {
+        currentId = id;
+        roomId = roomid;
+      });
+      connected = true;
+    }
+  },
+  createRoom: function () {
+    var d = $q.defer();
+    socket.emit('init', null, function (roomid, id) {
+      d.resolve(roomid);
+      roomId = roomid;
+      currentId = id;
+      connected = true;
+    });
+    return d.promise;
+  },
+  init: function (s) {
+    stream = s;
+  }
+};
+{% endhighlight %}
+
+As described above `joinRoom` is used for joining already existing rooms, `createRoom` is used for creating new rooms and `init` is used for initializing the `Room` service.
+
+The `socket.io` events handled in this service are:
+
+- `peer.connected` - fired when new peer join the room. Once this event is fired we make new SDP offer to this peer
+- `peer.disconnected` - fired when peer disconnects
+- `msg` - fired when new SDP offer/answer or ICE candidate are received
+
+Lets take a look at how new offer is being initiated, when a peer connects the room:
+
+{% highlight javascript %}
+function makeOffer(id) {
+  var pc = getPeerConnection(id);
+  pc.createOffer(function (sdp) {
+    pc.setLocalDescription(sdp);
+    console.log('Creating an offer for', id);
+    socket.emit('msg', { by: currentId, to: id, sdp: sdp, type: 'sdp-offer' });
+  }, function (e) {
+    console.log(e);
+  },
+  { mandatory: { OfferToReceiveVideo: true, OfferToReceiveAudio: true }});
+}
+{% endhighlight %}
+
+Once new peer join the room `makeOffer` is invoked with the peer's id. The first thing we do is to `getPeerConnection`. If connection with the peer id already exists `getPeerConnection` will return it, otherwise it will create a new `RTCPeerConnection` and attach the required event handlers to it. After we have the peer connection we invoke the `createOffer` method. This method will make a new request to the provided STUN server in the `RTCPeerConnection` configuration and will gather the ICE candidates. Based on the ICE candidates and the supported codecs, etc. it will create a new SDP offer, which we send to the server. As we saw above the server will redirect our offer to the peer pointed by the property `to` of the event object.
+
+Now lets take a look at the handler of the `msg` message:
+
+{% highlight javascript %}
+socket.on('msg', function (data) {
+  handleMessage(data);
+});
+{% endhighlight %}
+
+Here we directly invoke `handleMessage`. So lets trace its implementation:
+
+{% highlight javascript %}
+function handleMessage(data) {
+  var pc = getPeerConnection(data.by);
+  switch (data.type) {
+    case 'sdp-offer':
+      pc.setRemoteDescription(new RTCSessionDescription(data.sdp), function () {
+        console.log('Setting remote description by offer');
+        pc.createAnswer(function (sdp) {
+          pc.setLocalDescription(sdp);
+          socket.emit('msg', { by: currentId, to: data.by, sdp: sdp, type: 'sdp-answer' });
+        });
+      });
+      break;
+    case 'sdp-answer':
+      pc.setRemoteDescription(new RTCSessionDescription(data.sdp), function () {
+        console.log('Setting remote description by answer');
+      }, function (e) {
+        console.error(e);
+      });
+      break;
+    case 'ice':
+      if (data.ice) {
+        console.log('Adding ice candidates');
+        pc.addIceCandidate(new RTCIceCandidate(data.ice));
+      }
+      break;
+  }
+}
+{% endhighlight %}
+
+In the first line we get the peer connection to the peer with id pointed by the property named `by`. Once we get the connection we switch through the different message types:
+
+- `sdp-offer` - if we receive this message, this means that we have just connected to the room and the rest of the peers inside this room want to initiate new peer connection with us. In order to answer them with our ICE candidates, video codecs, etc. we create a new answer using `createAnswer` but before that we `setRemoteDescription` (the description of the remote peer). Once we prepare the SDP answer we send it to the appropriate peer via the server.
+- `sdp-answer` - if we receive SDP answer by given peer, this means that we have already sent SDN offer to this peer. We set the remote description and we hope that we'll successfully initiate the media connection between us.
+- `ice` - if in the process of negotiation new ICE candidates are being discovered the `RTCPeerConnection` instance will trigger `onicecandidate` event, which will redirect new `msg` message to the peer with whom we're currently negotiating. We simply add the ICE candidate to the appropriate peer connection using the `addIceCandidate` method.
+
+
+The last method we're going to take a look at, in this tutorial, is `getPeerConnection`:
+
+{% highlight javascript %}
+var peerConnections = {};
+
+function getPeerConnection(id) {
+  if (peerConnections[id]) {
+    return peerConnections[id];
+  }
+  var pc = new RTCPeerConnection(iceConfig);
+  peerConnections[id] = pc;
+  pc.addStream(stream);
+  pc.onicecandidate = function (evnt) {
+    socket.emit('msg', { by: currentId, to: id, ice: evnt.candidate, type: 'ice' });
+  };
+  pc.onaddstream = function (evnt) {
+    console.log('Received new stream');
+    api.trigger('peer.stream', [{
+      id: id,
+      stream: evnt.stream
+    }]);
+    if (!$rootScope.$$digest) {
+      $rootScope.$apply();
+    }
+  };
+  return pc;
+}
+{% endhighlight %}
+
+This method uses `peerConnections` object, which creates a mapping between peer id and `RTCPeerConnection` object. Initially we check whether we have associated peer connection to the given id, if we do we simply return it. If we don't have such peer connection we create a new one, we add the event handlers `onicecandidate` and `onaddstream`, we cache it and we return it.
+
+Once `onaddstream` is triggered, this means that the connection was successfully initiated. We can trigger `peer.stream` event and later visualize it in a video element on the page.
+
+#### videoPlayer
+
+This is the last component in our app. Create it using:
+
+{% highlight bash %}
+yo angular:directive videoPlayer
+{% endhighlight %}
+
+Inside `public/app/scripts/directives/videoplayer.js` set the following content:
+
+{% highlight javascript %}
+angular.module('publicApp')
+  .directive('videoPlayer', function ($sce) {
+    return {
+      template: '<div><video ng-src="{{trustSrc()}}" autoplay></video></div>',
+      restrict: 'E',
+      replace: true,
+      scope: {
+        vidSrc: '@'
+      },
+      link: function (scope) {
+        console.log('Initializing video-player');
+        scope.trustSrc = function () {
+          if (!scope.vidSrc) {
+            return undefined;
+          }
+          return $sce.trustAsResourceUrl(scope.vidSrc);
+        };
+      }
+    };
+  });
+{% endhighlight %}
+
+## Conclusion
+
 
