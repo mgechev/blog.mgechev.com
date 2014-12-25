@@ -886,4 +886,29 @@ angular.module('publicApp')
 
 ## Conclusion
 
+### Full-mesh limitations
+
+As you can see from the tutorial's demo, the application works effectively with less than 10 users (or even 5, depending on your network bandwidth capacity and CPU).
+
+This is limitation of the full-mesh topology. When we have session with `n` peers each of these `n` peers has established `n-1` `RTCPeerConnection` with the others. This means that his video stream will be encoded `n-1` times and will be sent `n-1` times through the network. This is very inefficient and is almost impractical in production. Solution for this problem is the usage of WebRTC gateway. There are a few open-source projects which solve this issue:
+
+- [Jitsi Videobridge](https://jitsi.org/Projects/JitsiVideobridge) - they have build WebRTC compatible video bridge, which uses XMPP Jingle for signaling and Colibri (XMPP extension created by the Jitsi team) for establishment of connection with the bridge. The bridge provides audio mixing with very high quality and only forwards the video, which makes it very effective when using a cheap hardware with low computational power.
+- [licode](http://lynckia.com/licode/) - another open-source project, which provides video and audio mixing and custom JSON based protocol for signaling. The last time I tried to used it it's mixing wasn't with very high quality, in case of background sound the audio connection was almost impractical.
+
+### Signaling protocol
+
+In the tutorial above is used custom JSON protocol for signaling. Better choice will be to use standardized protocol, such as XMPP Jingle or SIP.
+
+### More
+
+There are a plenty of other topics we didn't cover but are unfortunately outside the scope of this tutorial. If you're interested in further reading you can check out the resources bellow or ping me for additional information.
+
+## Resources
+
+- [HTML5 Rocks WebRTC intro](http://www.html5rocks.com/en/tutorials/webrtc/basics/)
+- [HTML5 Rocks, WebRTC infrastructure](http://www.html5rocks.com/en/tutorials/webrtc/infrastructure/)
+- [HTML5 Rocks, WebRTC data channel](http://www.html5rocks.com/en/tutorials/webrtc/datachannels/)
+- [WebRTC.org](http://www.webrtc.org/)
+- [WebRTC hacks](https://webrtchacks.com/)
+
 
