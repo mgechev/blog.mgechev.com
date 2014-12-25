@@ -41,6 +41,8 @@ Why AngularJS? Well, AngularJS comes with out-of-the-box router (if you use the 
 
 Can I use something else, instead of AngularJS? Yes, sure you can. For such single-page applications, with highly intensive DOM manipulations and limited amount of views (which I call vertical single-page application), I'd recommend React.js or WebComponents.
 
+![Yeoman and WebRTC](/images/yeoman-angular-webrtc/yeoman-webrtc.png)
+
 ## WebRTC intro
 
 In my blog post ["WebRTC chat with React.js"](http://blog.mgechev.com/2014/09/03/webrtc-peer-to-peer-chat-with-react/) I already did a brief introduction about what WebRTC is and how it works:
