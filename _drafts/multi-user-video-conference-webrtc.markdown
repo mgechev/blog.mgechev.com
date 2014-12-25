@@ -23,6 +23,9 @@ tags:
 ---
 
 This blog post is a tutorial for how to implement a multi-user video conference with WebRTC, AngularJS and Yeoman. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how ICE is used for NAT traversal.
+
+You can find demo at [Heroku](https://mgechev-webrtc.herokuapp.com), the source code can be found [at GitHub](https://github.com/mgechev/angular-webrtc).
+
 Why I chose Yeoman and AngularJS?
 
 Yeoman's generators can handle very quickly all the boilerpates required for the application. Yeoman creates a Gruntjs build configuration, which allows you to deploy well optimized application with only a few lines of bash:
@@ -385,6 +388,7 @@ Now lets create a new controller, called `RoomCtrl`:
 {% highlight bash %}
 yo angular:controller Room
 {% endhighlight %}
+
 
 
 {% highlight text %}
