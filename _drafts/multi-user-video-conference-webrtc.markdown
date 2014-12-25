@@ -108,6 +108,7 @@ So let's begin!
 mkdir webrtc-app && cd webrtc-app
 npm init # initialize the app
 mkdir lib
+touch index.js
 {% endhighlight %}
 
 Inside file called `index.js` in the root add the following content:
@@ -116,6 +117,7 @@ Inside file called `index.js` in the root add the following content:
 var config = require('./config/config.json'),
     server = require('./lib/server');
 
+// In case the port is set using an environment variable (Heroku)
 config.PORT = process.env.PORT || config.PORT;
 
 server.run(config);
@@ -205,7 +207,7 @@ exports.run = function (config) {
 };
 {% endhighlight %}
 
-Now let's take a look at its content step-by-step:
+Now let's take a look at the code above step-by-step:
 
 {% highlight javascript %}
 var express = require('express'),
@@ -233,7 +235,7 @@ socketio.listen(server, { log: false })
 });
 {% endhighlight %}
 
-We start the HTTP server and attach `socket.io` to it. The `connection` event in `socket.io` means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:
+We start the HTTP server and attach `socket.io` to it (decorate it with `socket.io`). The `connection` event in `socket.io` means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:
 
 {% highlight javascript %}
 var currentRoom, id;
@@ -300,11 +302,11 @@ The last event handler (and last part of the server) is the disconnect handler:
 if (!currentRoom || !rooms[currentRoom]) {
   return;
 }
-rooms[currentRoom] = rooms[currentRoom].filter(function (s) {
-  return s !== socket;
-});
+delete rooms[currentRoom][rooms[currentRoom].indexOf(socket)];
 rooms[currentRoom].forEach(function (socket) {
-  socket.emit('peer.disconnected', { id: id });
+  if (socket) {
+    socket.emit('peer.disconnected', { id: id });
+  }
 });
 {% endhighlight %}
 
