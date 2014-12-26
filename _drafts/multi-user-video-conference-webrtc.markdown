@@ -24,7 +24,7 @@ tags:
 
 This is a tutorial for how to implement a multi-user video conference with WebRTC, AngularJS and Yeoman. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the [ICE (Interactive-Connectivity Establishment) framework](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) is used for NAT traversal.
 
-You can find deployed version of the project, we're going to take a look at in this tutorial at [Heroku](https://mgechev-webrtc.herokuapp.com), the source code can be found [at GitHub](https://github.com/mgechev/angular-webrtc).
+You can find deployed version of the project, we're going to take a look at in this tutorial, at [Heroku](https://mgechev-webrtc.herokuapp.com), the source code can be found [at GitHub](https://github.com/mgechev/angular-webrtc).
 
 Why I chose Yeoman and AngularJS?
 
@@ -39,7 +39,7 @@ git push heroku master
 
 Why AngularJS? Well, AngularJS comes with out-of-the-box router (if you use the module `angular-route`), with well defined components, which enforce the separation of concerns principle and nice data-binding mechanism.
 
-Can I use something else, instead of AngularJS? Yes, sure you can. For such single-page applications, with highly intensive DOM manipulations and limited amount of views (which I call vertical single-page application), I'd recommend React.js or WebComponents.
+Can I use something else, instead of AngularJS? Yes, sure you can. For such single-page applications, with highly intensive DOM manipulations and limited amount of views (which I call vertical single-page applications), I'd recommend React.js or WebComponents.
 
 ![Yeoman and WebRTC](/images/yeoman-angular-webrtc/yeoman-webrtc.png)
 
@@ -49,7 +49,9 @@ In my blog post ["WebRTC chat with React.js"](http://blog.mgechev.com/2014/09/03
 
 > RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server between them (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE, we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is [already published](http://dev.w3.org/2011/webrtc/editor/webrtc.html) by W3C.
 
-Now I'll explain in a little bit deeper details how a WebRTC session is being established. If you don't aim deep technical understanding you can skip this section and go directly to the server's implementation.
+In the previous article we used Peer.js in order to open data channel between the peers, who participate in the chat room.
+
+This time we'll use the plain browser WebRTC API and I'll explain in a little bit deeper details how a WebRTC session is being established. If you don't aim deep technical understanding you can skip this section and go directly to the server's implementation.
 
 ### How WebRTC works?
 
@@ -57,10 +59,10 @@ Now let's take a look at the following UML sequence diagram:
 
 !["Sequence diagram"](/images/yeoman-angular-webrtc/sequence-webrtc.png "WebRTC Sequence Diagram")
 
-In the sequence diagram above we're following how `Alice` establishes peer connection with `Bob`, through our application server in the middle (`Web App`).
+In the sequence diagram above we're following how `Alice` establishes peer connection with `Bob`, through the application server in the middle (`Web App`).
 
-1. Initially `Alice` calls `Bob`, through the application server (`Web App`), for example by invoking a RESTful method (POST /call/`Bob`).
-2. Through push notification the application server tells `Bob` that `Alice` is calling him. The `Web App` may use WebSockets and send a notification to `Bob` about `Alice`'s call.
+1. Initially `Alice` calls `Bob`, through the application server (`Web App`), for example by invoking a RESTful method (`POST /call/Bob`).
+2. Through a push notification the application server tells `Bob` that `Alice` is calling him. The `Web App` may use WebSockets and send a notification to `Bob` about `Alice`'s call.
 3. `Bob` response to the push notification and states that he wants to talk with `Alice`.
 4. The `Web App` redirects `Bob`'s response to `Alice`.
 5. Once `Alice` knows that `Bob` accepted her call, she starts the `ICE candidates gathering process`. We'll take a further look at it in the section bellow.
@@ -88,7 +90,7 @@ When given host is behind NAT it doesn't has a public IP address. This means tha
 
 ##### STUN
 
-So why we would need the STUN servers? Before answering this question lets answer another one "How we can understand whether we're behind a NAT or not?".
+So why we would need the STUN servers and what actually are they? Before answering these questions lets answer another one "How we can understand whether we're behind a NAT or not?".
 
 Let's suppose we're behind a NAT and we want to reach a remote service. If we make a request to the service and the service response us with the source address of the request we can compare it with the address of our machine. If they differ we're obviously behind a NAT. Note that the service must be located outside of our local network(s).
 
@@ -96,13 +98,20 @@ How we can be sure whether the received address by the service's response is the
 
 The service, which response us with the address of the source of the request is what STUN does. Now when we have the IP address of the NAT we can use a new ICE candidate called reflexive ICE candidate, with value the IP address and port, which the NAT server used in the network address translation.
 
-## Backend
+As next step lets take a look at our application. The application has two main components:
 
-In this section we will implement our backend. The backend is the `Web App` component from the sequence diagram above. Basically it's main functionality is to provide static files (htmls, js, css) and to redirect requests by the peers.
+- back-end - the application server, which is responsible for the communication between the different peers until a p2p connection is established (the `Web App` from the sequence diagram above)
+- web app - the AngularJS application, which is the actual multi-user video chat (`Alice` and `Bob` from the sequence diagram above are two different instances of this application)
+
+You can try the application at [Heroku](https://mgechev-webrtc.herokuapp.com).
+
+## Back-end
+
+In this section we will implement our back-end. The back-end is the `Web App` component from the sequence diagram above. Basically it's main functionality is to provide static files (htmls, js, css) and to redirect requests by the peers.
 
 This component will maintain a collection of rooms, to each room we will have associated collection of `socket.io` sockets of the peers connected to the given room.
 
-In order to implement the whole functionality of our WebRTC application with JavaScript we can use Node.js for our backend.
+In order to implement the whole functionality of our WebRTC application with JavaScript we can use Node.js for our back-end.
 
 So let's begin!
 
