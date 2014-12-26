@@ -162,7 +162,7 @@ var express = require('express'),
     roomId = 1,
     userIds = {};
 
-expressApp.use(express.static(\_\_dirname + '/../public/dist/'));
+expressApp.use(express.static(__dirname + '/../public/dist/'));
 
 exports.run = function (config) {
 
@@ -233,7 +233,7 @@ var express = require('express'),
     roomId = 1,
     userIds = {};
 
-expressApp.use(express.static(\_\_dirname + '/../public/dist/'));
+expressApp.use(express.static(__dirname + '/../public/dist/'));
 {% endhighlight %}
 
 In the snippet above we require all dependencies and configure the created express app to use a directory for providing static files. This directory is located inside a directory called `public`, which is in the root of our app.
@@ -243,9 +243,7 @@ server.listen(config.PORT);
 console.log('Listening on', config.PORT);
 socketio.listen(server, { log: false })
 .on('connection', function (socket) {
-
   // Additional logic
-
 });
 {% endhighlight %}
 
