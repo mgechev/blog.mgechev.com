@@ -364,7 +364,7 @@ Basically, we only need `angular-route` as dependency and since we want our appl
 
 ### Implementation
 
-As first step, we need to handle some browser inconsistencies. Inside `public/app/scripts`, create a file called `adapter.js` and add the following content:
+As first step, we need to handle some browser inconsistencies. Inside `public/app/scripts`, create a file called `adapter.js` and add the following content inside it:
 
 {% highlight javascript %}
 window.RTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
@@ -376,7 +376,9 @@ window.navigator.getUserMedia = window.navigator.getUserMedia || window.navigato
 
 Since Firefox and Chrome still support the WebRTC API with `moz` and `webkit` prefixes, we need to take care of it.
 
-Now lets create a service, called `VideoStream`, which is responsible for providing us a media stream:
+Great! So far our future app will work on Chrome and Firefox!
+
+Now lets create a service, called `VideoStream`, which is responsible for providing us a media stream to the other components in the application:
 
 {% highlight bash %}
 yo angular:factory VideoStream
@@ -410,13 +412,13 @@ angular.module('publicApp')
   });
 {% endhighlight %}
 
-Our service uses `$q` in order to provide a video stream using `getUserMedia`. Once we invoke `getUserMedia` the browser will ask the user for permissions over his/her microphone and web cam:
+`VideoStream` uses `$q` in order to provide a video stream using `getUserMedia`. Once we invoke `getUserMedia` the browser will ask the user for permissions over his/her microphone and web cam:
 
 ![](/images/yeoman-angular-webrtc/webcam-permissions.png "Permissions for using the camera and microphone")
 
 After we gain access to the video stream we cache it inside the `stream` variable, in order to not ask the user for web camera permissions each time we want to access it.
 
-#### App configuration
+#### Application configuration
 
 Now it's time to configure the routes in our application. Edit`public/app/scripts/app.js` and add the following route definition:
 
@@ -443,10 +445,10 @@ angular
 
 Here we define two routes:
 
-- `/room` - for users accessing the app for first time (without having link to specific room). They will visit `/room` and after allowing access to their web cam, they will automatically create a new room and will be redirected to another URL (`/room/:roomId`). Once they are redirected to this URL they can share it with other users they want to talk with.
+- `/room` - for users accessing the application for first time (without having link to a specific room). They will visit `/room` and after allowing access to their web cam (because of logic inside `RoomCtrl`), they will automatically create a new room and will be redirected to another URL (`/room/:roomId`). Once they are redirected to this URL they can share it with other users they want to talk with.
 - `/room/:roomId` - users who have already created room can share their URL with other users, who can join the video call.
 
-Of course, if you guess the URL of another users' session you can join their video call without much effort, for the sake of simplicity we've used this simple (and not secure) mechanism.
+Of course, if you guess the URL of another users' session you can join their video call without much effort, for the sake of simplicity we've used this simple (and not secure) mechanism. Be polite and do not violate other users' privacy. :-)
 
 Add this constant definition in the bottom of `app.js`:
 
@@ -458,7 +460,7 @@ angular.module('publicApp')
   });
 {% endhighlight %}
 
-We will use this constant in order connect `socket.io` to the server.
+We will use this constant in order connect `socket.io` client with the server.
 
 #### Io
 
@@ -489,7 +491,6 @@ Now lets create a new controller, called `RoomCtrl`:
 {% highlight bash %}
 yo angular:controller Room
 {% endhighlight %}
-
 
 Edit `/public/app/scripts/controllers/room.js`:
 
@@ -545,7 +546,7 @@ Now lets look at the code step-by-step:
 
 `RoomCtrl` accepts as dependencies the following components:
 
-- `$sce` - Used for setting the src of the video elements.
+- `$sce` - used for setting the source of the video elements
 - `VideoStream` - used for getting the video stream from the user's camera
 - `$location` - used for redirecting the user to the room's URL
 - `$routeParams` - used for getting the room id
@@ -581,7 +582,7 @@ VideoStream.get()
 });
 {% endhighlight %}
 
-`VideoStream.get()` returns a promise, which once resolved gives us the media stream. When the promise is resolved we initialize the `Room` passing the stream as argument. In order to visualize the video captured by our web cam we use `URL.createObjectURL`, to be able to set it as `src` of a video element in our HTML.
+`VideoStream.get()` returns a promise, which once resolved gives us the media stream of the user. When the promise is resolved we initialize the `Room` passing the stream as argument. In order to visualize the video captured by our web cam we use `URL.createObjectURL`, to be able to set it as `src` of a video element in our HTML.
 
 As next step we check whether the `roomId` is provided. If it is provided we simply join the room with the associated `roomId`: `Room.joinRoom(parseInt($routeParams.roomId, 10));`, otherwise we create a new room. Once the room is created we redirect the user to the room's URL.
 
@@ -606,10 +607,9 @@ Room.on('peer.disconnected', function (peer) {
 - `peer.stream` - a peer stream is received. Once we receive a new peer stream we add it to the array `$scope.peers`, which is visualized on the page. The markup on the page maps each `stream` to a video element.
 - `peer.disconnected` - once a peer disconnects the `peer.disconnected` event is being fired. When we receive this event we can simply remove the disconnected peer from the collection.
 
+#### Room service
 
-#### Room
-
-The last component from our app is the `Room` service:
+The last component from our application is the `Room` service:
 
 {% highlight bash %}
 yo angular:factory Room
@@ -739,9 +739,9 @@ angular.module('publicApp')
   });
 {% endhighlight %}
 
-`Room` accets the following dependencies:
+`Room` accepts the following dependencies:
 
-- `$rootScope` - the root scope, in order to invoke the `$digest` loop, once `socket.io` event is received
+- `$rootScope` - it is used in order to invoke the `$digest` loop, once `socket.io` event is received. Since the `socket.io` event handlers are not wrapped inside `$scope.$appy` we need to invoke `$digest` manually.
 - `$q` - in order to provide promise based interface
 - `Io` - the wrapped `socket.io` global function
 - `config` - the configuration constant we defined in `app.js`.
@@ -779,7 +779,7 @@ As described above `joinRoom` is used for joining already existing rooms, `creat
 
 The `socket.io` events handled in this service are:
 
-- `peer.connected` - fired when new peer join the room. Once this event is fired we make new SDP offer to this peer
+- `peer.connected` - fired when new peer joins the room. Once this event is fired we initiate new SDP offer to this peer
 - `peer.disconnected` - fired when peer disconnects
 - `msg` - fired when new SDP offer/answer or ICE candidate are received
 
@@ -799,7 +799,7 @@ function makeOffer(id) {
 }
 {% endhighlight %}
 
-Once new peer join the room `makeOffer` is invoked with the peer's id. The first thing we do is to `getPeerConnection`. If connection with the peer id already exists `getPeerConnection` will return it, otherwise it will create a new `RTCPeerConnection` and attach the required event handlers to it. After we have the peer connection we invoke the `createOffer` method. This method will make a new request to the provided STUN server in the `RTCPeerConnection` configuration and will gather the ICE candidates. Based on the ICE candidates and the supported codecs, etc. it will create a new SDP offer, which we send to the server. As we saw above the server will redirect our offer to the peer pointed by the property `to` of the event object.
+Once new peer joins the room `makeOffer` is invoked with the peer's id. The first thing we do is to `getPeerConnection`. If connection with the specified peer id already exists `getPeerConnection` will return it, otherwise it will create a new `RTCPeerConnection` and attach the required event handlers to it. After we have the peer connection we invoke the `createOffer` method. This method will make a new request to the provided STUN server in the `RTCPeerConnection` configuration and will gather the ICE candidates. Based on the ICE candidates and the supported codecs, etc. it will create a new SDP offer, which we will send to the server. As we saw above the server will redirect the offer to the peer pointed by the property `to` of the event object.
 
 Now lets take a look at the handler of the `msg` message:
 
@@ -809,7 +809,7 @@ socket.on('msg', function (data) {
 });
 {% endhighlight %}
 
-Here we directly invoke `handleMessage`. So lets trace its implementation:
+Here we directly invoke `handleMessage`, so lets trace the function's implementation:
 
 {% highlight javascript %}
 function handleMessage(data) {
@@ -841,12 +841,11 @@ function handleMessage(data) {
 }
 {% endhighlight %}
 
-In the first line we get the peer connection to the peer with id pointed by the property named `by`. Once we get the connection we switch through the different message types:
+In the first line we get the peer connection with the peer with id pointed by the `by` property. Once we get the connection we switch through the different message types:
 
 - `sdp-offer` - if we receive this message, this means that we have just connected to the room and the rest of the peers inside this room want to initiate new peer connection with us. In order to answer them with our ICE candidates, video codecs, etc. we create a new answer using `createAnswer` but before that we `setRemoteDescription` (the description of the remote peer). Once we prepare the SDP answer we send it to the appropriate peer via the server.
-- `sdp-answer` - if we receive SDP answer by given peer, this means that we have already sent SDN offer to this peer. We set the remote description and we hope that we'll successfully initiate the media connection between us.
+- `sdp-answer` - if we receive SDP answer by given peer, this means that we have already sent SDN offer to this peer. We set the remote description and we hope that we'll successfully initiate the media connection between us (we hope we're not both behind symmetric NATs).
 - `ice` - if in the process of negotiation new ICE candidates are being discovered the `RTCPeerConnection` instance will trigger `onicecandidate` event, which will redirect new `msg` message to the peer with whom we're currently negotiating. We simply add the ICE candidate to the appropriate peer connection using the `addIceCandidate` method.
-
 
 The last method we're going to take a look at, in this tutorial, is `getPeerConnection`:
 
@@ -883,7 +882,7 @@ Once `onaddstream` is triggered, this means that the connection was successfully
 
 #### videoPlayer
 
-This is the last component in our app. Create it using:
+This is the last component in our application. Create it using:
 
 {% highlight bash %}
 yo angular:directive videoPlayer
@@ -916,22 +915,24 @@ angular.module('publicApp')
 
 ## Conclusion
 
+Now lets make a retrospective of the solution provided above.
+
 ### Full-mesh limitations
 
-As you can see from the tutorial's demo, the application works effectively with less than 10 users (or even 5, depending on your network bandwidth capacity and CPU).
+As you can experience from the tutorial's demo, the application works effectively with less than 10 users (or even 5, depending on your network bandwidth capacity and CPU).
 
-This is limitation of the full-mesh topology. When we have session with `n` peers each of these `n` peers has established `n-1` `RTCPeerConnection` with the others. This means that his video stream will be encoded `n-1` times and will be sent `n-1` times through the network. This is very inefficient and is almost impractical in production. Solution for this problem is the usage of WebRTC gateway. There are a few open-source projects which solve this issue:
+This is limitation of the full-mesh topology. When we have session with `n` peers each of these `n` peers should establish `n-1` `RTCPeerConnection` with the other peers in the room. This means that his video stream will be encoded `n-1` times and will be sent `n-1` times through the network. This is very inefficient and is almost impractical in production, when communication between multiple parties is required. Solution for this problem is the usage of WebRTC gateway. There are a few open-source projects which solve this issue:
 
-- [Jitsi Videobridge](https://jitsi.org/Projects/JitsiVideobridge) - they have build WebRTC compatible video bridge, which uses XMPP Jingle for signaling and Colibri (XMPP extension created by the Jitsi team) for establishment of connection with the bridge. The bridge provides audio mixing with very high quality and only forwards the video, which makes it very effective when using a cheap hardware with low computational power.
-- [licode](http://lynckia.com/licode/) - another open-source project, which provides video and audio mixing and custom JSON based protocol for signaling. The last time I tried to used it it's mixing wasn't with very high quality, in case of background sound the audio connection was almost impractical.
+- [Jitsi Videobridge](https://jitsi.org/Projects/JitsiVideobridge) - Jitsi's team have build a WebRTC compatible video bridge, which uses XMPP Jingle for signaling and Colibri (XMPP extension created by the Jitsi's team) for establishment of connection with the bridge. The bridge provides audio mixing with very high quality and only forwards the video, which makes it very effective when using a cheap hardware with low computational power.
+- [licode](http://lynckia.com/licode/) - another open-source project, which provides video and audio mixing and custom JSON based protocol for signaling. The last time I tried to use it, its mixing wasn't with very high quality, in case of background sound the audio connection was almost impossible to use.
 
 ### Signaling protocol
 
-In the tutorial above is used custom JSON protocol for signaling. Better choice will be to use standardized protocol, such as XMPP Jingle or SIP.
+In this tutorial we used custom JSON protocol for signaling. Better choice will be to use standardized protocol, such as XMPP Jingle or SIP. This will allow you better flexibility in case you need to integrate your service with other, already existing services.
 
 ### More
 
-There are a plenty of other topics we didn't cover but are unfortunately outside the scope of this tutorial. If you're interested in further reading you can check out the resources bellow or ping me for additional information.
+There are a plenty of other topics we didn't cover but they are unfortunately outside the scope of this tutorial. If you're interested in further reading you can check out the resources bellow or ping me for additional information.
 
 ## Resources
 
