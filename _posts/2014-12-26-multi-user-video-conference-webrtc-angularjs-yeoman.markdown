@@ -22,7 +22,7 @@ tags:
   - Programming
 ---
 
-This is a tutorial for how to implement a multi-user video conference with WebRTC, AngularJS and Yeoman. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the [ICE (Interactive-Connectivity Establishment) framework](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) is used for NAT traversal.
+This is a tutorial for how to implement a multi-user video conference with [WebRTC](http://webrtc.org), [AngularJS](http://angularjs.org) and [Yeoman](http://yeoman.io/). It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the [ICE (Interactive-Connectivity Establishment) framework](https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment) is used for NAT traversal.
 
 You can find deployed version of the project, we're going to take a look at in this tutorial, at [Heroku](https://mgechev-webrtc.herokuapp.com), the source code can be found [at GitHub](https://github.com/mgechev/angular-webrtc).
 
