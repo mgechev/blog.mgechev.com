@@ -98,7 +98,9 @@ How we can be sure whether the received address by the service's response is the
 
 The service, which response us with the address of the source of the request is what STUN does. Now when we have the IP address of the NAT we can use a new ICE candidate called reflexive ICE candidate, with value the IP address and port, which the NAT server used in the network address translation.
 
-As next step lets take a look at our application. The application has two main components:
+## Implementation
+
+As next step lets take a look at our sample application's implementation. The application has two main components:
 
 - back-end - the application server, which is responsible for the communication between the different peers until a p2p connection is established (the `Web App` from the sequence diagram above)
 - web app - the AngularJS application, which is the actual multi-user video chat (`Alice` and `Bob` from the sequence diagram above are two different instances of this application)
@@ -117,12 +119,13 @@ So let's begin!
 
 {% highlight bash %}
 mkdir webrtc-app && cd webrtc-app
-npm init # initialize the app
+# initialize the app
+npm init
 mkdir lib
 touch index.js
 {% endhighlight %}
 
-Inside file called `index.js` in the root add the following content:
+Inside the file called `index.js` in the root add the following content:
 
 {% highlight javascript %}
 var config = require('./config/config.json'),
@@ -321,7 +324,22 @@ rooms[currentRoom].forEach(function (socket) {
 });
 {% endhighlight %}
 
-Once given peer disconnects from the server (for example the user close his or her browser or refresh the page), we remove its socket from the collection of sockets associated for the given room (the delete operator usage). After that we emit `peer.disconnected` event to all other peers, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.
+Once given peer disconnects from the server (for example the user close his or her browser or refresh the page), we remove its socket from the collection of sockets associated with the given room (the delete operator usage). After that we emit `peer.disconnected` event to all other peers in the room, with the `id` of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.
+
+The last part of the back-end is the configuration. Inside the root create a directory called config:
+
+{% highlight bash %}
+cd .. # if you're inside the lib directory
+mkdir config && cd config
+{% endhighlight %}
+
+Create a file called `config.json` and set the following content:
+
+{% highlight json %}
+{
+  "PORT": 5555
+}
+{% endhighlight %}
 
 ## Web client
 
@@ -332,7 +350,8 @@ In order to create a new application using AngularJS' Yeoman generator you can f
 {% highlight bash %}
 npm install -g yeoman
 npm install -g generator-angular
-cd .. # if you're inside the lib directory
+# if you're inside config
+cd ..
 mkdir public && cd public
 yo angular
 {% endhighlight %}
