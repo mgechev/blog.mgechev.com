@@ -57,7 +57,7 @@ This time we'll use the plain browser WebRTC API and I'll explain in a little bi
 
 Now let's take a look at the following UML sequence diagram:
 
-!["Sequence diagram"](/images/yeoman-angular-webrtc/sequence-webrtc.png "WebRTC Sequence Diagram")
+[!["Sequence diagram"](/images/yeoman-angular-webrtc/sequence-webrtc.png "WebRTC Sequence Diagram")](/images/yeoman-angular-webrtc/sequence-webrtc.png)
 
 In the sequence diagram above we're following how `Alice` establishes peer connection with `Bob`, through the application server in the middle (`Web App`).
 
