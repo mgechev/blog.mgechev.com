@@ -20,17 +20,17 @@ All you need is VLC video player and web browser, which supports HTML5.
 
 Open VLC and select *"Open Capture Device"*:
 
-!["VLC option"](/images/desktop-stream-html5-video/capture-vlc.png "")
+!["VLC option"](/images/desktop-stream-html5-video/capture-vlc.png)
 
 
 As next step chose *"Capture"* and from the drop down bellow select *"Screen"*. Adjust the frame rate and mark the checkbox *"Streaming/Saving:"*
 
-!["VLC capture config"](/images/desktop-stream-html5-video/capture-cnfig-vlc.png "")
+!["VLC capture config"](/images/desktop-stream-html5-video/capture-cnfig-vlc.png)
 
 
 Click settings and select that you want to *"Stream"* the video (from the radio buttons), after that for stream type select *"HTTP"* and for *"Encapsulation Method"* *"OGG"*. Fill the address to be: *"127.0.0.1"* and from the *"Transcoding options"* chose *"Video"* and select *"theo"*. Select appropriate bitrate and scale:
 
-!["VLC stream config"](/images/desktop-stream-html5-video/capture-stream-vlc.png "")
+!["VLC stream config"](/images/desktop-stream-html5-video/capture-stream-vlc.png)
 
 The last step is to write some markup...:
 
@@ -40,7 +40,7 @@ The last step is to write some markup...:
 
 Here is how my result looks like in JSBin:
 
-!["Result"](/images/desktop-stream-html5-video/result.png "")
+!["Result"](/images/desktop-stream-html5-video/result.png)
 
 ## Under the hood...
 
