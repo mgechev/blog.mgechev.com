@@ -41,3 +41,7 @@ The last step is to write some markup...:
 Here is how my result looks like in JSBin:
 
 ![](/images/desktop-stream-html5-video/result.png "")
+
+## Under the hood...
+
+Coming soon :-).
