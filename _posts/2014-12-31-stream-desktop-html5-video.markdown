@@ -40,7 +40,7 @@ The last step is to write some markup...:
 
 Here is how my result looks like in JSBin:
 
-!["Result"](/images/desktop-stream-html5-video/result.png)
+[!["Result"](/images/desktop-stream-html5-video/result.png)](/images/desktop-stream-html5-video/result.png)
 
 ## Under the hood...
 
