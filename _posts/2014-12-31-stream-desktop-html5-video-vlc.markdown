@@ -44,4 +44,10 @@ Here is how my result looks like in JSBin:
 
 ## Under the hood...
 
-Coming soon :-).
+As you saw from the tutorial, it is very easy to create HTTP VLC video stream through HTML5 video tag but what exactly happens under the hood?
+
+Initially VLC starts [HLS](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) (HTTP Live Streaming) server. We can connect to this server by specifying the `src` attribute of the video element.
+
+Once the streaming server is started, VLC can start the screen capturing. Basically, for the screen capturing VLC creates screen shots (each `x` ms) and encodes them with the specified video codec. The way VLC implements the screen capturing is a platform specific thing, for example you can take a look at the source code for Mac OS X [here](https://github.com/videolan/vlc/blob/d36bc0a71a7a69afd085c8b2754ecfbc5876fd2b/modules/access/screen/mac.c#L147-L236).
+
+Once the video is encoded it can be sent though the HLS stream.
