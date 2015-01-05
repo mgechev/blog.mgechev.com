@@ -266,7 +266,7 @@ socket.on('disconnect', function () {
 });
 {% endhighlight %}
 
-These are the three events we're going to handle. The `init` event is used for initialization of given room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it:
+These are the three events we're going to handle. The `init` event is used for initialization of given room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it. We generate room randomly using [`node-uuid` module](https://github.com/broofa/node-uuid#getting-started):
 
 {% highlight javascript %}
 currentRoom = (data || {}).room || uuid.v4();
