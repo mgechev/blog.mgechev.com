@@ -142,6 +142,7 @@ Inside the root of your app, invoke the following commands, in order to install 
 {% highlight bash %}
 npm install express --save
 npm install socket.io --save
+npm install node-uuid --save
 {% endhighlight %}
 
 Now go to `lib`:
@@ -158,8 +159,8 @@ var express = require('express'),
     socketio = require('socket.io'),
     http = require('http'),
     server = http.createServer(expressApp),
+    uuid = require('node-uuid'),
     rooms = {},
-    roomId = 1,
     userIds = {};
 
 expressApp.use(express.static(__dirname + '/../public/dist/'));
@@ -174,7 +175,7 @@ exports.run = function (config) {
     var currentRoom, id;
 
     socket.on('init', function (data, fn) {
-      currentRoom = (data || {}).room || roomId++;
+      currentRoom = (data || {}).room || uuid.v4();
       var room = rooms[currentRoom];
       if (!data) {
         rooms[currentRoom] = [socket];
@@ -229,8 +230,8 @@ var express = require('express'),
     socketio = require('socket.io'),
     http = require('http'),
     server = http.createServer(expressApp),
+    uuid = require('node-uuid'),
     rooms = {},
-    roomId = 1,
     userIds = {};
 
 expressApp.use(express.static(__dirname + '/../public/dist/'));
@@ -268,7 +269,7 @@ socket.on('disconnect', function () {
 These are the three events we're going to handle. The `init` event is used for initialization of given room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (`rooms[room_id]` is an array of sockets). If the room is not created we create the room and add the current client to it:
 
 {% highlight javascript %}
-currentRoom = (data || {}).room || roomId++;
+currentRoom = (data || {}).room || uuid.v4();
 var room = rooms[currentRoom];
 if (!data) {
   rooms[currentRoom] = [socket];
@@ -514,7 +515,7 @@ angular.module('publicApp')
           $location.path('/room/' + roomId);
         });
       } else {
-        Room.joinRoom(parseInt($routeParams.roomId, 10));
+        Room.joinRoom($routeParams.roomId);
       }
     }, function () {
       $scope.error = 'No audio/video permissions. Please refresh your browser and allow the audio/video capturing.';
@@ -573,7 +574,7 @@ VideoStream.get()
       $location.path('/room/' + roomId);
     });
   } else {
-    Room.joinRoom(parseInt($routeParams.roomId, 10));
+    Room.joinRoom($routeParams.roomId);
   }
 }, function () {
   $scope.error = 'No audio/video permissions. Please refresh your browser and allow the audio/video capturing.';
@@ -582,7 +583,7 @@ VideoStream.get()
 
 `VideoStream.get()` returns a promise, which once resolved gives us the media stream of the user. When the promise is resolved we initialize the `Room` passing the stream as argument. In order to visualize the video captured by our web cam we use `URL.createObjectURL`, to be able to set it as `src` of a video element in our HTML.
 
-As next step we check whether the `roomId` is provided. If it is provided we simply join the room with the associated `roomId`: `Room.joinRoom(parseInt($routeParams.roomId, 10));`, otherwise we create a new room. Once the room is created we redirect the user to the room's URL.
+As next step we check whether the `roomId` is provided. If it is provided we simply join the room with the associated `roomId`: `Room.joinRoom($routeParams.roomId);`, otherwise we create a new room. Once the room is created we redirect the user to the room's URL.
 
 The rest of the `RoomCtrl` is handling two events:
 
