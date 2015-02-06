@@ -14,17 +14,17 @@ tags:
   - Binary Data
 ---
 
-Last couple of weeks I'm trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I'd be talking with the remote TCP server, through TCP sockets, connecting directly from the front-end and consuming the received binary data.
+Last couple of weeks I'm trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I'd be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.
 
 Because of limitations of the client-side API, JavaScript doesn't has access to plain TCP sockets, there's no full happiness. The second best option would be to use intermediate proxy, which:
 
-- Establishes connection with the client (our front-end JavaScript)
+- Establishes connection with the client (our client-side JavaScript)
 - Establishes TCP connection with the remote TCP server
 - Forwards each message from the client to the TCP server and vice versa
 
-### History
+## History
 
-#### Dark Ages
+### Dark Ages
 
 Before the era of the duplex network communication in JavaScript (i.e. before WebSockets, I don't consider long polling as solution), the flow would be something like:
 
@@ -37,9 +37,9 @@ Before the era of the duplex network communication in JavaScript (i.e. before We
 
 Which wasn't fun, at all. You initiate new POST/GET request for each client request and in case "Keep-Alive" is not set you might need to open TCP socket for each HTTP connection.
 
-#### Renaissance
+### Renaissance
 
-After the era of the WebSockets, but without binary data support we would:
+After the era of the WebSockets, but without binary data support, we would:
 
 - Send textual data to the remote WebSocket
 - Translate the received data by the proxy
@@ -52,15 +52,15 @@ I haven't included the initial WebSocket handshake, since there isn't any signif
 
 The performance of the second case is much better by a few reasons:
 
-- You don't need to send additional HTTP headers, which in some cases are huge
-- You reuse a single TCP socket for each message by the client
-- You have duplex connection, which allows you to receive push notifications
+- No need to send additional HTTP headers, which in some cases are huge
+- Reuse a single TCP connection for each message by the client
+- Have duplex connection, which allows you to receive push notifications
 
-Anyway, there's still a way of improvement. In the perfect case we want to talk directly to the remote TCP server, without any translation of the protocol required, remember?
+Anyway, there's still place of improvement. In the perfect case we want to talk directly to the remote TCP server, without translation of the protocol.
 
-Nowadays, most browsers (even IE10), support transfer of binary data over WebSockets. This allows us to skip two more steps (translate the message sent by the client and response received by the TCP server) and reduce the bandwidth usage (since encoding to Base64 will increase the size with around 30%).
+Nowadays, most browsers (even IE10), support transfer of binary data over WebSockets. This allows us to skip two more steps (translate the message sent by the client and response received by the TCP server) and reduce the bandwidth usage (since encoding to base64 will increase the size of the message with around 30%).
 
-Using this strategy we got something like:
+Using binary WebSockets, we got something like:
 
 - Send binary data to the proxy's WebSocket
 - Forward the data to the TCP server
@@ -121,13 +121,13 @@ And our high-level architecture will look like:
 
 There's a place for improvements in the code above but you get the basic idea - receive binary data and forward it to the remote TCP server, after the handshake was initiated.
 
-### Processing binary data in JavaScript
+## Processing binary data in JavaScript
 
 There are a few primitives we're going to use: [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer), [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) and [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob).
 
 > The ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer. You can not directly manipulate the contents of an ArrayBuffer; instead, you create one of the typed array objects or a DataView object which represents the buffer in a specific format, and use that to read and write the contents of the buffer.
 
-The `TypedArray`s allow us to process individual words (with length 8, 16, 32 bit) in order to handle the binary messages received by the proxy. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:
+The `TypedArray`s allow us to process words (with length 8, 16, 32 bits) in order to handle the binary messages received by the proxy. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:
 
 {% highlight JavaScript %}
 var socket = new WebSocket('ws://127.0.0.1:8081');
@@ -159,13 +159,13 @@ connection.onmessage = function (e) {
 };
 {% endhighlight %}
 
-`DataView` provides a interface, which allows us to read specific data type by providing given offset. For example `dv.getUint32(2)` will return unsigned 32 bit integer with offset 2 bytes since the beginning.
+`DataView` provides interface, which allows us to read specific data type by providing given offset. For example `dv.getUint32(2)` will return unsigned 32 bit integer with offset 2 bytes from the beginning of the buffer.
 
-##### Handling endianness
+### Handling endianness
 
 Endianness refer to the convention used to interpret the bytes making up a data word when those bytes are stored in computer memory. For the one-byte data types we don't have any issues handling the byte order, for 16, 32 and 64 we need to do some additional work.
 
-The `TypedArray`'s standard doesn't refer to specific endianness used in them, everything depends on the underlaying machine. Usually little endian is used, but in order to prevent hard-coded values in, we can use the function `getEndianness`:
+The `TypedArray`'s standard doesn't refer to specific endianness used in them, everything depends on the underlaying machine. The usual byte ordering is little endian, but in order to prevent hard-coded values we can use the function `getEndianness`:
 
 {% highlight JavaScript %}
 function getEndianness() {
@@ -191,16 +191,16 @@ Let's take a look at the function's implementation:
 
 - Initially we construct an `ArrayBuffer` with size 4 bytes
 - We create array with unsigned 8bit integers, based on the `ArrayBuffer` we just created
-- We create array with unsigned 32bit integers, based on the same `ArrayBuffer`.
-- We assign 8bit values to all indexes in the 8bit array (`0xa1`, `0xb2`, `0xc3`, `0xd4`).
+- We create array with unsigned 32bit integers, based on the same `ArrayBuffer`
+- We assign 8bit values to all indexes in the 8bit array (`0xa1`, `0xb2`, `0xc3`, `0xd4`). This is going to change the `ArrayBuffer` used by both `Uint8Array` and `Uint32Array`
 
-If the bytes in the only 32bit word in the second array, keep their initial ordering (i.e. the most significant value is the one we assigned to index 0), the machine provides big endian encoding, otherwise it is little endian.
+If the bytes, in the only 32bit word in the second array, keep their initial ordering (i.e. the most significant value is the one we assigned to index 0), the machine has big endian encoding, otherwise it uses little endian.
 
-This snippet is used in my [`BlobReader` implementation, which you can find at GitHub](https://github.com/mgechev/blobreader/blob/master/src/index.js#L6-L22). `DataView` handles the endianness by specifying the second argument in it's `get`-methods. Value `true` as second argument, indicates that the data, which should be read is in little endian encoding, `false` corresponds to big endian.
+This snippet is used in my [`BlobReader` implementation, which you can find at GitHub](https://github.com/mgechev/blobreader/blob/master/src/index.js#L6-L22). `DataView` handles the endianness by specifying the second argument in it's `get`-methods. Value `true` as second argument, indicates that the data which should be read is in little endian encoding, `false` corresponds to big endian.
 
 So far we can parse short binary strings with the primitives our browser provides (`ArrayBuffer`, `TypedArray`s and `DataView`).
 
-### Reading blobs
+### Reading Blobs
 
 As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default (in the main execution thread). `Blob`s can be read synchronously when used inside `Workers` with [`FileReaderSync`](http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface).
 
