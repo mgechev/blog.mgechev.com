@@ -119,7 +119,7 @@ There's a place for improvements in the code above but you get the basic idea - 
 
 ### Handling binary data in JavaScript
 
-There're a few primitives we're going to use: [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer), [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray), [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob).
+There are a few primitives we're going to use: [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer), [TypedArray](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) and [Blob](https://developer.mozilla.org/en/docs/Web/API/Blob).
 
 > The ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer. You can not directly manipulate the contents of an ArrayBuffer; instead, you create one of the typed array objects or a DataView object which represents the buffer in a specific format, and use that to read and write the contents of the buffer.
 
@@ -130,9 +130,9 @@ var connection = new WebSocket('ws://127.0.0.1:8081');
 connection.binaryType = 'arraybuffer';
 {% endhighlight %}
 
-The two possible values for `binaryType` are `arraybuffer` and `blob`. In most cases `arraybuffer` will be the one, which allows faster processing since it can be used with the synchronous API of the `DataView`. In case of large pieces of binary data I'd prefer usage of `blob`.
+The two possible values for `binaryType`, of the WebSocket, are `arraybuffer` and `blob`. In most cases `arraybuffer` will be the one, which allows faster processing since it can be used with the synchronous API of the `DataView`. In case of large pieces of binary data I'd prefer the usage of `blob`.
 
-So how would we process the following example:
+So how would we process the following example, using `DataView` and `arraybuffer` binary type:
 
 {% highlight text %}
 2      U16      framebuffer-width
@@ -140,3 +140,84 @@ So how would we process the following example:
 16 PIXEL_FORMAT server-pixel-format
 4      U32      name-length
 {% endhighlight %}
+
+{% highlight JavaScript %}
+connection.onmessage = function (e) {
+  var data = e.data;
+  var dv = new DataView(data);
+  var width = dv.getUint16(0);
+  var height = dv.getUint16(2);
+  var format = getPixelFormat(dv);
+  var len = dv.getUint32(20);
+  console.log('We have width: ' + width +
+      'px, height: ' +
+      height + 'px, name length: ' + len);
+};
+{% endhighlight %}
+
+`DataView` provides a nice interface, which allows us to read specific data type by providing given offset.
+
+##### Handling endianness
+
+Endianness refer to the convention used to interpret the bytes making up a data word when those bytes are stored in computer memory. For the one-byte data types we don't have any issues handling the byte order, for 16, 32 and 64 we need to do some additional work.
+
+The `TypedArray`'s standard doesn't refer to specific endianness used in them, everything depends on the underlaying machine.
+
+{% highlight JavaScript %}
+function getEndianness() {
+  var a = new ArrayBuffer(4);
+  var b = new Uint8Array(a);
+  var c = new Uint32Array(a);
+  b[0] = 0xa1;
+  b[1] = 0xb2;
+  b[2] = 0xc3;
+  b[3] = 0xd4;
+  if (c[0] === 0xd4c3b2a1) {
+    return BlobReader.ENDIANNESS.LITTLE_ENDIAN;
+  }
+  if (c[0] === 0xa1b2c3d4) {
+    return BlobReader.ENDIANNESS.BIG_ENDIAN;
+  } else {
+    throw new Error('Unrecognized endianness');
+  }
+}
+{% endhighlight %}
+
+This snippet is used in my [`BlobReader` implementation, which you can find at GitHub](https://github.com/mgechev/blobreader). `DataView` handles the endianness by specifying the second argument in it's `get`-methods. Value `true` as second argument, indicates that the data, which should be read is in little endian encoding.
+
+### Reading blobs
+
+As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default, in the main execution thread. `Blob`s can be used synchronously when used inside `Workers`.
+
+[For ease I created a library, which provides simple interface for reading `Blob`s.](https://github.com/mgechev/blobreader).
+
+`BlobReader` allows you to read blobs in the following fashion:
+
+{% highlight JavaScript %}
+// Blob definition
+var uint8 = new Uint8Array([1, 2]);
+var uint16 = new Uint16Array([3]);
+var uint82 = new Uint8Array([4, 3]);
+var uint32 = new Uint32Array([8]);
+var blob = new Blob([uint8, uint16, uint82, uint32]);
+
+// Reading the blob
+BlobReader(blob)
+.readUint8('uint8', 2)
+.readUint16('uint16')
+.readUint8('uint82')
+.skip()
+.readUint32('uint32')
+.commit(function (data) {
+  expect(data.uint8[0]).toBe(1);
+  expect(data.uint8[1]).toBe(2);
+  expect(data.uint16).toBe(3);
+  expect(typeof data.uint82).toBe('number');
+  expect(data.uint82).toBe(4);
+  expect(data.uint32).toBe(8);
+});
+{% endhighlight %}
+
+There are shortcut methods for reading the main data types, each of the methods accepts name of the property to be read, number of words (8, 16 or 32 bit) and format (little or big endian). Using the property name you can access the read data as property of the object passed in the `commit` callback. `skip` allows you to skip padding.
+
+You can lookup the whole API of the library [here](https://github.com/mgechev/blobreader/tree/master/docs).
