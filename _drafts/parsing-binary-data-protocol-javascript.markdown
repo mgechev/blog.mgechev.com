@@ -123,4 +123,20 @@ There're a few primitives we're going to use: [ArrayBuffer](https://developer.mo
 
 > The ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer. You can not directly manipulate the contents of an ArrayBuffer; instead, you create one of the typed array objects or a DataView object which represents the buffer in a specific format, and use that to read and write the contents of the buffer.
 
+The TypedArrays allow us to process individual words (8, 16, 32 bit) in order to handle the binary messages received by the server. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:
 
+{% highlight JavaScript %}
+var connection = new WebSocket('ws://127.0.0.1:8081');
+connection.binaryType = 'arraybuffer';
+{% endhighlight %}
+
+The two possible values for `binaryType` are `arraybuffer` and `blob`. In most cases `arraybuffer` will be the one, which allows faster processing since it can be used with the synchronous API of the `DataView`. In case of large pieces of binary data I'd prefer usage of `blob`.
+
+So how would we process the following example:
+
+{% highlight text %}
+2      U16      framebuffer-width
+2      U16      framebuffer-height
+16 PIXEL_FORMAT server-pixel-format
+4      U32      name-length
+{% endhighlight %}
