@@ -263,7 +263,7 @@ We can reduce the latency by changing the TCP server to a WebSocket server, whic
 
 The solutions in this blog post are already used in production in different applications/frameworks. As example you can take a look at [FreeRDP WebConnect](https://github.com/FreeRDP/FreeRDP-WebConnect), which is used by [CloudBase](http://www.cloudbase.it/freerdp-html5-proxy-windows/).
 
-Although it looks like doing awesome (dark|light) magic in the browser, you should be aware of some issues:
+Although it looks like doing awesome magic and providing magically legacy services in your browser, you should be aware of some issues:
 
 ### Security
 
