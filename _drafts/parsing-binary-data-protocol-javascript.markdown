@@ -115,6 +115,10 @@ wss.on('connection', function (ws) {
 console.log('Listening on', 8081);
 {% endhighlight %}
 
+And our high-level architecture will look like:
+
+![](/images/binary-protocol-processing/cps.png)
+
 There's a place for improvements in the code above but you get the basic idea - receive binary data and forward it to the remote TCP server, after the handshake was initiated.
 
 ### Processing binary data in JavaScript
@@ -198,7 +202,7 @@ So far we can parse short binary strings with the primitives our browser provide
 
 ### Reading blobs
 
-As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default (in the main execution thread). `Blob`s can be read synchronously when used inside `Workers` with `FileReaderSync`.
+As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default (in the main execution thread). `Blob`s can be read synchronously when used inside `Workers` with [`FileReaderSync`](http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface).
 
 `Blob` has method in it's prototype called `slice`. It accepts interval, as two integers, and returns "sub-blob" composed by the bytes in the interval:
 
@@ -246,3 +250,36 @@ BlobReader(blob)
 There are shortcut methods for reading the main data types, each of the methods accepts name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the `commit` callback. `skip` allows you to skip bytes (like padding).
 
 You can lookup the whole API of the library [here](https://github.com/mgechev/blobreader/tree/master/docs).
+
+### Reducing the latency
+
+So far, we improved the protocol processing by using WebSockets, instead of HTTP, we transfer binary, instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram bellow:
+
+![](/images/binary-protocol-processing/cps.png)
+
+We can reduce the latency by changing the TCP server to a WebSocket server, which could be achieved with thin wrapper (something like [websockify](https://github.com/kanaka/websockify)).
+
+## Conclusion
+
+The solution we talked about is already used in production in different applications/frameworks. As example you can take a look at [FreeRDP WebConnect](https://github.com/FreeRDP/FreeRDP-WebConnect).
+
+Although it looks like the magical way you can do magic in the browser you should be aware of some things:
+
+### Security
+
+Make sure you use encrypted connection when required (`wss`)
+
+### Performance
+
+Although v8 is extremely fast, you may hit some critical performance issues. In these cases you can move parts of the protocol processing in [`WebWorkers`](http://www.html5rocks.com/en/tutorials/workers/basics/).
+
+### Browser Support
+
+Not all the features we talked about are widely supported, even in the modern browsers.
+
+## References
+
+1. [`BlobReader`](https://github.com/mgechev/blobreader)
+2. [FileReader API](http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface)
+3. [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)
+4. [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
