@@ -1,5 +1,5 @@
 ---
-title: Processing Binary Data with Client-Side JavaScript
+title: Processing Binary Protocols with Client-Side JavaScript
 author: minko_gechev
 layout: post
 categories:
