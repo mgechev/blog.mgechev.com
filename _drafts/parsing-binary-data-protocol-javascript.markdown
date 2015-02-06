@@ -117,7 +117,7 @@ console.log('Listening on', 8081);
 
 And our high-level architecture will look like:
 
-![](/images/binary-protocol-processing/cps.png)
+![](/images/binary-protocol-processing/client-proxy-server.png)
 
 There's a place for improvements in the code above but you get the basic idea - receive binary data and forward it to the remote TCP server, after the handshake was initiated.
 
@@ -202,7 +202,7 @@ So far we can parse short binary strings with the primitives our browser provide
 
 ### Reading Blobs
 
-As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default (in the main execution thread). `Blob`s can be read synchronously when used inside `Workers` with [`FileReaderSync`](http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface).
+As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use `Blob` data instead of `ArayBuffer`. `Blob`s could be read using the `FileReader` API, which is asynchronous by default (always in the main execution thread). `Blob`s can be read synchronously when used inside `Workers` with [`FileReaderSync`](http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface).
 
 `Blob` has method in it's prototype called `slice`. It accepts interval, as two integers, and returns "sub-blob" composed by the bytes in the interval:
 
@@ -216,7 +216,7 @@ fr.onload = function (e) {
 fr.readAsArrayBuffer(subBlob);
 {% endhighlight %}
 
-Each time you want to read specific part of the blob you need to create `FileReader` API and eventually slice it. This requires a lot of additional, repetitive work. Also, when you read the code above it is not very semantically clear that you want to read the third element of the array, since there's a lot of additional code around the construction of the `FileReader` and handling the `onload` event.
+Each time you want to read specific part of the blob you need to create `FileReader` instance and eventually slice it. This requires a lot of additional, repetitive work. Also, when you read the code above it is not very semantically clear that you want to read the third element of the array, since there's a lot of additional code around the construction of the `FileReader` and handling the `onload` event.
 
 In order to simplify the process of reading `Blob`s I created [`BlobReader`](https://github.com/mgechev/blobreader), which provides simple interface for reading binary large objects.
 
@@ -247,23 +247,23 @@ BlobReader(blob)
 });
 {% endhighlight %}
 
-There are shortcut methods for reading the main data types, each of the methods accepts name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the `commit` callback. `skip` allows you to skip bytes (like padding).
+There are shortcut methods for reading the main data types, each of the methods accept name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the `commit` callback. `skip` allows you to skip bytes (like padding).
 
 You can lookup the whole API of the library [here](https://github.com/mgechev/blobreader/tree/master/docs).
 
 ### Reducing the latency
 
-So far, we improved the protocol processing by using WebSockets, instead of HTTP, we transfer binary, instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram bellow:
+So far, we improved the protocol processing by using WebSockets instead of HTTP, we transfer binary instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram bellow:
 
-![](/images/binary-protocol-processing/cps.png)
+![](/images/binary-protocol-processing/client-proxy-server.png)
 
 We can reduce the latency by changing the TCP server to a WebSocket server, which could be achieved with thin wrapper (something like [websockify](https://github.com/kanaka/websockify)).
 
 ## Conclusion
 
-The solution we talked about is already used in production in different applications/frameworks. As example you can take a look at [FreeRDP WebConnect](https://github.com/FreeRDP/FreeRDP-WebConnect).
+The solutions in this blog post are already used in production in different applications/frameworks. As example you can take a look at [FreeRDP WebConnect](https://github.com/FreeRDP/FreeRDP-WebConnect), which is used by [CloudBase](http://www.cloudbase.it/freerdp-html5-proxy-windows/).
 
-Although it looks like the magical way you can do magic in the browser you should be aware of some things:
+Although it looks like doing awesome (dark|light) magic in the browser, you should be aware of some issues:
 
 ### Security
 
