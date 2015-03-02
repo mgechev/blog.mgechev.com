@@ -1,5 +1,5 @@
 ---
-title: Immutability in AngularJS
+title: Boost the Performance of Your AngularJS Application Using Immutable Data
 author: minko_gechev
 layout: post
 categories:
