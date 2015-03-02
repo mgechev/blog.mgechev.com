@@ -323,7 +323,7 @@ Here are the results I got from running the benchmark with plain JavaScript arra
 | 1000  | 2.555 | 2.675 | 2.747 | 2.853 |
 | 10000 | 2.861 | 4.025 | 7.736 | 15.68 |
 
-When the collection gets bigger the test case running time gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations.
+When the collection gets bigger the test case running time gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations performed by `$watchCollection`.
 
 #### Immutable JavaScript list
 
@@ -336,13 +336,13 @@ Here are the results running the same code with immutable list:
 | 10000 | 2.832 | 2.538 | 2.599 | 2.708 |
 
 
-We see how much better performance the Immutable.js collection has. Once we increase the collection size and number of watchers the running time of the `Plain JavaScript array` test case grows exponentially.
+We see how much better performance the Immutable.js collection has. Once we increase the collection size and the number of watchers the running time of the `Plain JavaScript array` test case grows exponentially. In the case of immutable data the running time stays stable.
 
-On the other hand, since when using immutable list the watcher runs with a constant complexity we have only a simple overhead caused by creating a new data-structure on each change.
+On the other hand, since when using immutable list, the watcher runs with a constant complexity we have only the simple overhead caused by creating a new data-structure on each change.
 
 ### DOM rendering
 
-Lets explore what will happen if we render the collection. For testing the immutable list I used this markup:
+Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:
 
 ```html
 <!DOCTYPE html>
@@ -362,7 +362,7 @@ Lets explore what will happen if we render the collection. For testing the immut
 
 And for testing the plain JavaScript array I used the same markup with the `immutable` attribute removed. I changed the parameters of these test cases to:
 
-### Conclusion Size
+#### Collection Size
 
 - 10k
 
@@ -374,7 +374,7 @@ And for testing the plain JavaScript array I used the same markup with the `immu
 - 25
 - 30
 
-As here I don't count the watcher added by `ng-repeat`.
+The watcher added by `ng-repeat` is being ignored for now.
 
 And here are the results:
 
@@ -388,18 +388,41 @@ Here is a chart for better understanding of the benchmark:
 
 ![/images/immutable-angular/immutable-angular-1.png]()
 
-Initially the plain JavaScript array does better but once we increase the number of bindings the performance decrease dramatically.
+Initially the plain JavaScript array does better but once we increase the number of bindings the performance decreases dramatically.
 
-But lets go a little bit further...Lets do some CPU profiling when using immutable collection with 30 bindings:
+But lets go a little bit further...Lets do CPU profiling for the test cases, which runs with immutable collection and 30 watchers.
 
 ![/images/immutable-angular/cpu-profile.png]()
 
-The biggest slowdown comes from the watcher added inside `ng-repeat`. Lets dig into AngularJS's source code and change that watcher to a simple `$watch` instead of `$watchCollection` (**do not do this in AngularJS copy you are going to use in production otherwise `ng-repeat`'s binding will not work with mutable data structures**) and see what will happen...
+The biggest slowdown comes from the watcher added by `ng-repeat`. Lets dig into AngularJS's source code and change that watcher to a simple `$watch` instead of `$watchCollection` (**do not do this in AngularJS copy you are going to use in production otherwise `ng-repeat`'s binding will not work with mutable data structures**) and see what will happen...
 
 ![/images/immutable-angular/immutable-watch.png]()
 
-After running the 30 bindings benchmark with the immutable list by changing `ng-repeat`'s implementation we got almost a second improvement!
+After running the 30 bindings benchmark with the immutable list with changed `ng-repeat`'s implementation, we got almost 1 second improvement!
+
+### Heap Profiling
+
+In order to make this performance test complete, lets profile the memory usage!
+
+When running the Chrome DevTools Heap Profiler, in the test case with 30 watchers and plain JavaScript object, we get pretty low memory usage:
+
+![/images/immutable-angular/plain-memory.png]()
+
+As expected, when using Immutable.js the memory usage is a bit higher because of the overhead of creating new data structure on change.
+
+![/images/immutable-angular/immutable-memory.png]()
 
 ## Conclusion
 
+The benchmarks I did aren't using the best profiling APIs available nowadays, probably a better idea would be to use [benchpress](https://github.com/angular/angular/tree/master/modules/benchpress) instead but they still give quite accurate perspective of when it is reasonable to use immutable data structures in an AngularJS application.
 
+The main content of the blog post clearly shows that, when dealing with a big data set with a lot of bindings it is definitely a good idea to make it immutable, especially if it changes rarely. Model's immutability boost the performance of the watchers, checking for change, by allowing them to use simple equality check instead of linear algorithm.
+
+On the other hand, we noticed that we have a little overhead by the creation of the immutable data on change. We also have a slightly bigger memory usage, which when dealing with enormous amount data might be a deal breaker.
+
+### Place for improvement
+
+In the package [`angular-immutable`](https://github.com/mgechev/angular-immutable) I implemented a directive, which allows iterating over immutable data structures and binding to them (using `ng-repeat`, `ng-bind`, for example). Unfortunately, this directive allows only one-way data-binding. Two places for improvements are:
+
+- Allow two-way data-binding to immutable data
+- Implement optimized version of `ng-repeat`, which uses `$watch` instead of `$watchCollection`, for increasing the watcher's speed.
