@@ -84,18 +84,18 @@ let SampleCtrl = ($scope) => {
 app.controller('SampleCtrl', SampleCtrl);
 {% endhighlight %}
 
-{% highlight JavaScript %}
-&#x3C;!DOCTYPE html&#x3E;
-&#x3C;html lang=&#x22;en&#x22;&#x3E;
-&#x3C;head&#x3E;
-  &#x3C;title&#x3E;&#x3C;/title&#x3E;
-&#x3C;/head&#x3E;
-&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
-  &#x3C;ul&#x3E;
-    &#x3C;li ng-repeat=&#x22;item in list&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
-  &#x3C;/ul&#x3E;
-&#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+{% highlight html %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+  <ul>
+    <li ng-repeat="item in list" ng-bind="item"></li>
+  </ul>
+</body>
+</html>
 {% endhighlight %}
 
 ### Result:
