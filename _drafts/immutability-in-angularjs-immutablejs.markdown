@@ -26,32 +26,32 @@ React is awesome, there are no two opinions. I'm also huge AngularJS fan. A few 
 
 On 28 of May, 2014, the first commit of [Immutable.js](https://github.com/facebook/immutable-js) was pushed in the facebook's organization on GitHub. Immutable.js is a set of immutable data structures (List, Set, Map, etc.) implemented in JavaScript. What exactly is an immutable data structure? Well it is a data structure, which can't change. Each action, which intends to change the collection creates a new one.
 
-```javascript
+{% highlight JavaScript %}
 let list = Immutable.List([1, 2, 3]);
 let changed = list.push(4);
 list.toString();    // List [ 1, 2, 3 ]
 changed.toString(); // List [ 1, 2, 3, 4 ]
 list === changed    // false
-```
+{% endhighlight %}
 
 Compared to the mutable JavaScript lists:
 
-```javascript
+{% highlight JavaScript %}
 let list = [1, 2, 3];
 list.push(4);
 console.log(list); // [1, 2, 3, 4]
-```
+{% endhighlight %}
 
 ## AngularJS data-binding
 
 There are a lot of posts about how the AngularJS data-binding and dirty checking works. I even created a light AngularJS implementation in order [to illustrate it](https://github.com/mgechev/light-angularjs/blob/master/src/Scope.js#L61-L80) better. Basically it involves a lot of evaluations and comparisons of the watched expression and their results. For example:
 
-```javascript
+{% highlight JavaScript %}
 $scope.collection = generateHugeCollection();
 $scope.$watchCollection('collection', function (val) {
   // do some stuff with the changed value
 });
-```
+{% endhighlight %}
 
 Once we register watcher, which watches the expression `'collection'`, the expression gets evaluated at least once on each `$digest` loop and its current value gets compared to the previous value on each evaluation. The evaluation of this expression is with constant complexity (`O(1)`), since it only involves lookup of the property `collection`, but the equality check has a linear complexity (`O(n)`) (in case `$watchCollection` is used, otherwise it could be worst).
 
@@ -66,15 +66,15 @@ At least `n` times for `n` bindings.
 
 Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of `$watch` to `O(1)`, since now we don't need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:
 
-```javascript
+{% highlight JavaScript %}
 previous === current // O(1)
-```
+{% endhighlight %}
 
 ## Immutable.js and AngularJS
 
 Lets create a simple example in which we bind with `ng-repeat` to immutable list and render it in our HTML page:
 
-```javascript
+{% highlight JavaScript %}
 var app = angular.module('sampleApp', []);
 
 let SampleCtrl = ($scope) => {
@@ -82,21 +82,21 @@ let SampleCtrl = ($scope) => {
 };
 
 app.controller('SampleCtrl', SampleCtrl);
-```
+{% endhighlight %}
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title></title>
-</head>
-<body ng-app="sampleApp" ng-controller="SampleCtrl">
-  <ul>
-    <li ng-repeat="item in list" ng-bind="item"></li>
-  </ul>
-</body>
-</html>
-```
+{% highlight JavaScript %}
+&#x3C;!DOCTYPE html&#x3E;
+&#x3C;html lang=&#x22;en&#x22;&#x3E;
+&#x3C;head&#x3E;
+  &#x3C;title&#x3E;&#x3C;/title&#x3E;
+&#x3C;/head&#x3E;
+&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
+  &#x3C;ul&#x3E;
+    &#x3C;li ng-repeat=&#x22;item in list&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
+  &#x3C;/ul&#x3E;
+&#x3C;/body&#x3E;
+&#x3C;/html&#x3E;
+{% endhighlight %}
 
 ### Result:
 
@@ -114,21 +114,21 @@ Not exactly what we wanted, right? What Immutable.js does is to wrap the plain J
 
 What we can do now? Well, we can simply watch `$scope.list.toJS()` instead of only `$scope.list`. Anyway, this will be far from effective:
 
-```javascript
+{% highlight JavaScript %}
 let list = Immutable.List([1, 2, 3]);
 let jsList = list.toJS();
 list.toJS() === jsList // false
-```
+{% endhighlight %}
 
 This mean that Immutable.js creates a new JavaScript object for each call of `toJS`. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:
 
-```javascript
+{% highlight JavaScript %}
 $scope.$watchCollection(function () {
   return $scope.list._tail.array;
 }, function (val) {
   // do something with the changed value
 });
-```
+{% endhighlight %}
 
 Each time you watch a private property a kitty, somewhere, suffer! There are two reasons this is a bad choice:
 
@@ -146,7 +146,7 @@ In order to deal with this issue, I created a simple directive, which allows bin
 
 Lets take a look at the code example, which uses `angular-immutable`:
 
-```javascript
+{% highlight JavaScript %}
 var app = angular.module('sampleApp', ['immutable']);
 
 let SampleCtrl = ($scope) => {
@@ -154,21 +154,21 @@ let SampleCtrl = ($scope) => {
 };
 
 app.controller('SampleCtrl', SampleCtrl);
-```
+{% endhighlight %}
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title></title>
-</head>
-<body ng-app="sampleApp" ng-controller="SampleCtrl">
-  <ul>
-    <li immutable="list" ng-repeat="item in list" ng-bind="item"></li>
-  </ul>
-</body>
-</html>
-```
+{% highlight html %}
+&#x3C;!DOCTYPE html&#x3E;
+&#x3C;html lang=&#x22;en&#x22;&#x3E;
+&#x3C;head&#x3E;
+  &#x3C;title&#x3E;&#x3C;/title&#x3E;
+&#x3C;/head&#x3E;
+&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
+  &#x3C;ul&#x3E;
+    &#x3C;li immutable=&#x22;list&#x22; ng-repeat=&#x22;item in list&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
+  &#x3C;/ul&#x3E;
+&#x3C;/body&#x3E;
+&#x3C;/html&#x3E;
+{% endhighlight %}
 
 ### Result:
 
@@ -185,7 +185,7 @@ With only two slight changes we made it work! All we did was:
 
 Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` directive's source code:
 
-```javascript
+{% highlight JavaScript %}
 /* global angular */
 
 var immutableDirective = () => {
@@ -210,7 +210,7 @@ var immutableDirective = () => {
 
 angular.module('immutable', [])
   .directive('immutable', immutableDirective);
-```
+{% endhighlight %}
 
 `immutableDirective` is a directive, which has higher priority than `ng-repeat`. It creates a new scope, which prototypically inherits from the parent scope and defines a link function. Inside the link function, we make sure the value of the `immutable` attribute is a property name (no expressions allowed), if it is we simply add a watcher to the `$parent`'s immutable property. Once the reference change, we set the value of the property of the current scope, named the same way as the parent's immutable one.
 
@@ -255,7 +255,7 @@ I run 24 tests - 12 using immutable list and 12 using plain JavaScript array. Si
 
 The code I run is:
 
-```javascript
+{% highlight JavaScript %}
 function SampleCtrl($scope, $timeout) {
   'use strict';
   // Current runs count
@@ -287,29 +287,29 @@ function SampleCtrl($scope, $timeout) {
   }
   changeCollection();
 }
-```
+{% endhighlight %}
 
 The code for Immutable.js is similar except that the body of `$timeout` looks like:
 
-```javascript
+{% highlight JavaScript %}
 var idx = Math.random() * SIZE - 1;
 $scope.list = $scope.list.set(idx, Math.random());
-```
+{% endhighlight %}
 
 And here is the markup, which I used:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-</head>
-<body ng-app="sampleApp" ng-controller="SampleCtrl">
-<script src="/scripts/all.js"></script>
-</body>
-</html>
-```
+{% highlight html %}
+&#x3C;!DOCTYPE html&#x3E;
+&#x3C;html lang=&#x22;en&#x22;&#x3E;
+&#x3C;head&#x3E;
+  &#x3C;meta charset=&#x22;UTF-8&#x22;&#x3E;
+  &#x3C;title&#x3E;&#x3C;/title&#x3E;
+&#x3C;/head&#x3E;
+&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
+&#x3C;script src=&#x22;/scripts/all.js&#x22;&#x3E;&#x3C;/script&#x3E;
+&#x3C;/body&#x3E;
+&#x3C;/html&#x3E;
+{% endhighlight %}
 
 ### Results
 
@@ -344,21 +344,21 @@ On the other hand, since when using immutable list, the watcher runs with a cons
 
 Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-</head>
-<body ng-app="sampleApp" ng-controller="SampleCtrl">
-<ul>
-  <li immutable="list" ng-repeat="item in list track by $index" ng-bind="item"></li>
-</ul>
-<script src="/scripts/all.js"></script>
-</body>
-</html>
-```
+{% highlight html %}
+&#x3C;!DOCTYPE html&#x3E;
+&#x3C;html lang=&#x22;en&#x22;&#x3E;
+&#x3C;head&#x3E;
+  &#x3C;meta charset=&#x22;UTF-8&#x22;&#x3E;
+  &#x3C;title&#x3E;&#x3C;/title&#x3E;
+&#x3C;/head&#x3E;
+&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
+&#x3C;ul&#x3E;
+  &#x3C;li immutable=&#x22;list&#x22; ng-repeat=&#x22;item in list track by $index&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;
+&#x3C;script src=&#x22;/scripts/all.js&#x22;&#x3E;&#x3C;/script&#x3E;
+&#x3C;/body&#x3E;
+&#x3C;/html&#x3E;
+{% endhighlight %}
 
 And for testing the plain JavaScript array I used the same markup with the `immutable` attribute removed. I changed the parameters of these test cases to:
 
