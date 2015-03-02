@@ -101,5 +101,139 @@ app.controller('SampleCtrl', SampleCtrl);
 
 ### Result:
 
+* false
+* &nbsp;
+* &nbsp;
+* 3
+* 5
+* 0
+* &nbsp;
+* [object Object]
+* 3
+
+Not exactly what we wanted, right? What Immutable.js does it to wrap the plain JavaScript collection. So using the code above we don't iterate over the collection's elements but over the Immutable.js object properties instead. Each immutable collection has a method called `toJS`, which returns the JavaScript representation of the immutable data structure.
+
+What we can do now? Well, we can simply watch `$scope.list.toJS()` instead of only `$scope.list`. Anyway, this will be far from effective:
+
+```javascript
+let list = Immutable.List([1, 2, 3]);
+let jsList = list.toJS();
+list.toJS() === jsList // false
 ```
+
+This mean that Immutable.js creates a new JavaScript object for each call. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:
+
+```javascript
+$scope.$watchCollection(function () {
+  return $scope.list._tail.array;
+}, function (val) {
+  // do something with the changed value
+});
 ```
+
+Each time you watch a private property a kitty, somewhere, suffer! There are two reasons this is a bad choice:
+
+* This is a private property...The underlaying implementation may change so your code will break.
+* This is a private property...There's different property for each immutable data collection.
+
+So we need to definitely watch the immutable collection, this way we will:
+
+* Take advantage of its immutability by checking whether it has changed with a constant complexity
+* Use the public API, so we won't make any kitties suffer!
+
+## Angular Immutable
+
+In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It's called `angular-immutable` and could be found in my [GitHub account](https://github.com/mgechev/angular-immutable).
+
+Lets take a look at the code example, which uses `angular-immutable`:
+
+```javascript
+var app = angular.module('sampleApp', ['immutable']);
+
+let SampleCtrl = ($scope) => {
+  $scope.list = Immutable.List([1, 2, 3]);
+};
+
+app.controller('SampleCtrl', SampleCtrl);
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+  <ul>
+    <li immutable="list" ng-repeat="item in list" ng-bind="item"></li>
+  </ul>
+</body>
+</html>
+```
+
+### Result:
+
+* 1
+* 2
+* 3
+
+With only two slight changes we made it work! All we did was:
+
+* Including the module `immutable` as dependency
+* Adding the directive `immutable="list"`, which points the immutable data structure used.
+
+## Angular Immutable Implementation
+
+Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` directive's implementation:
+
+```javascript
+/* global angular */
+
+var immutableDirective = () => {
+  let priority = 2000;
+  let scope = true;
+  let link = (scope, el, attrs) => {
+    var expr = attrs.immutable;
+    if (!(/^[a-zA-Z0-9_$]+$/).test(expr)) {
+      return;
+    }
+    if (!scope[expr]) {
+      console.warn('No ' + expr + ' property found.');
+    }
+    scope.$watch(() => {
+      return scope.$parent[expr];
+    }, (val) => {
+      scope[expr] = val.toJS();
+    });
+  };
+  return { priority, scope, link };
+};
+
+angular.module('immutable', [])
+  .directive('immutable', immutableDirective);
+```
+
+`immutableDirective` is a directive, which has higher priority than `ng-repeat`. It creates a new scope, which prototypically inherits from the parent scope and defines a link function. Inside the link function, we make sure the value of the `immutable` attribute is a simple property (no expressions allowed), if it is we simply add a watcher to the `$parent`'s immutable property. Once the reference change we set the value of the property of the current state, named the same way as the parent's immutable one.
+
+This way we:
+
+* Take advantage of the immutability of the property by improving the runtime of the `$watch` function
+* Do not change the implementation of already existing software (do not change `ng-repeat` neither Immutable.js), so we follow the Open-Closed principle
+* We don't use any private properties
+
+This approach has some limitations. For example, if the immutable value is result of some complex expression we watch we can't do anything.
+
+## Benchmarks
+
+![/images/unicorn.jpg]()
+
+Using immutable data structures seems exciting and amazing! Anyway, it has some drawbacks. The `$watch` expressions became extremely fast but there's a big overhead of creating a new data structure once we add or remove items. This gets even slower when we have a complex nested composition.
+
+So we have:
+
+- Fast change detection
+- Slow insertions and deletions
+
+Definitely, this approach will be useful when we have a lot of watchers for a huge data-structure, which rarely changes. But how huge and how fast it can get?
+
+In the benchmarks bellow I tried to find these answers:
