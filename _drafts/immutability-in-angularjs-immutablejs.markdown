@@ -240,7 +240,7 @@ In the benchmarks bellow I tried to find these answers.
 
 ## Test cases
 
-I tried total 24 test cases - 12 for using immutable list and 12 for using plain JavaScript array. Since the biggest factors in this benchmark are the bindings count and the collection size I did a cross product between:
+I run 24 tests - 12 using immutable list and 12 using plain JavaScript array. Since the biggest factors in this benchmark are the number of bindings and the collection size I did a cross product between:
 
 #### Bindings
 - 1
@@ -254,7 +254,51 @@ I tried total 24 test cases - 12 for using immutable list and 12 for using plain
 - 1k
 - 10k
 
-### Plain JavaScript array
+The code I run is:
+
+```javascript
+function SampleCtrl2($scope, $timeout) {
+  'use strict';
+  // Total runs
+  var runs = 0;
+  // Defines the amount of changes of the array
+  var TOTAL = 500;
+  var start = Date.now();
+  $scope.$watchCollection('list', function () {});
+
+  // Generates a random collection
+  $scope.list = buildCollection(SIZE);
+  function changeCollection() {
+    if (runs >= TOTAL) {
+      console.log('%cDone!',
+          'font-size: 50px; color: blue;' +
+          'font-weight: bold; font-family: impact;');
+      console.log('%c' + ((Date.now() - start) / 1000) +
+          ' seconds required.', 'font-size: 30px; color: red;');
+      return;
+    }
+    $timeout(function () {
+      // Changes random index of the array
+      var idx = Math.round(Math.random() * SIZE) - 1;
+      $scope.list[idx] = Math.random();
+      runs += 1;
+      changeCollection();
+    }, 0);
+  }
+  changeCollection();
+}
+```
+
+The code for Immutable.js is similar except that the body of `$timeout` looks like:
+
+```javascript
+var idx = Math.random() * SIZE - 1;
+$scope.list = $scope.list.set(idx, Math.random());
+```
+
+### Results
+
+#### Plain JavaScript array
 
 Here are the results I got from running the benchmark with plain JavaScript array:
 
@@ -264,18 +308,19 @@ Here are the results I got from running the benchmark with plain JavaScript arra
 | 1000  | 2.555 | 2.675 | 2.747 | 2.853 |
 | 10000 | 2.861 | 4.025 | 7.736 | 15.68 |
 
-As you see when the collection gets bigger everything gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations.
+As you see when the collection gets bigger the test case running time gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations.
 
-### Immutable JavaScript list
+#### Immutable JavaScript list
 
-These are the results running the same code with immutable data structure:
+Here are the results running the same code with immutable list:
 
 |       | 1     | 5     | 10    | 20    |
 |-------|-------|-------|-------|-------|
-| 100   | 2.81  | 2.675 | 2.899 | 2.658 |
-| 1000  | 2.688 | 2.673 | 2.795 | 2.667 |
-| 10000 | 2.864 | 2.676 | 2.92  | 2.708 |
+| 100   | 2.696 | 2.507 | 2.562 | 2.569 |
+| 1000  | 2.715 | 2.54  | 2.569 | 2.49  |
+| 10000 | 2.832 | 2.538 | 2.599 | 2.708 |
 
-Here the amount of bindings almost doesn't affects the performance of our application, since the complexity grow depends on the binding size, compared to the previous case where it depends on the both parameters.
 
-The only expensive operation here is copying the immutable data structure on change.
+### Conclusion
+
+The running time of both test cases depends on both - number of bindings and collection size.
