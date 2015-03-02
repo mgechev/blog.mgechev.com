@@ -236,4 +236,46 @@ So we have:
 
 Definitely, this approach will be useful when we have a lot of watchers for a huge data-structure, which rarely changes. But how huge and how fast it can get?
 
-In the benchmarks bellow I tried to find these answers:
+In the benchmarks bellow I tried to find these answers.
+
+## Test cases
+
+I tried total 24 test cases - 12 for using immutable list and 12 for using plain JavaScript array. Since the biggest factors in this benchmark are the bindings count and the collection size I did a cross product between:
+
+#### Bindings
+- 1
+- 5
+- 10
+- 20
+
+#### Collection Size
+
+- 100
+- 1k
+- 10k
+
+### Plain JavaScript array
+
+Here are the results I got from running the benchmark with plain JavaScript array:
+
+|       | 1     | 5     | 10    | 20    |
+|-------|-------|-------|-------|-------|
+| 100   | 2.517 | 2.56  | 2.573 | 2.58  |
+| 1000  | 2.555 | 2.675 | 2.747 | 2.853 |
+| 10000 | 2.861 | 4.025 | 7.736 | 15.68 |
+
+As you see when the collection gets bigger everything gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations.
+
+### Immutable JavaScript list
+
+These are the results running the same code with immutable data structure:
+
+|       | 1     | 5     | 10    | 20    |
+|-------|-------|-------|-------|-------|
+| 100   | 2.81  | 2.675 | 2.899 | 2.658 |
+| 1000  | 2.688 | 2.673 | 2.795 | 2.667 |
+| 10000 | 2.864 | 2.676 | 2.92  | 2.708 |
+
+Here the amount of bindings almost doesn't affects the performance of our application, since the complexity grow depends on the binding size, compared to the previous case where it depends on the both parameters.
+
+The only expensive operation here is copying the immutable data structure on change.
