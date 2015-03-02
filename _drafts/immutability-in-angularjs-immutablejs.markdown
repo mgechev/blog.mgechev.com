@@ -296,6 +296,21 @@ var idx = Math.random() * SIZE - 1;
 $scope.list = $scope.list.set(idx, Math.random());
 ```
 
+And here is the markup, which I used:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+<script src="/scripts/all.js"></script>
+</body>
+</html>
+```
+
 ### Results
 
 #### Plain JavaScript array
@@ -321,11 +336,70 @@ Here are the results running the same code with immutable list:
 | 10000 | 2.832 | 2.538 | 2.599 | 2.708 |
 
 
-### Conclusion
+We see how much better performance the Immutable.js collection has. Once we increase the collection size and number of watchers the running time of the `Plain JavaScript array` test case grows exponentially.
 
-The running time of both test cases depends on both - number of bindings and collection size.
+On the other hand, since when using immutable list the watcher runs with a constant complexity we have only a simple overhead caused by creating a new data-structure on each change.
 
-# TODO
+### DOM rendering
 
-- Add more statistics, which include rendering
-- Add conclusion
+Lets explore what will happen if we render the collection. For testing the immutable list I used this markup:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+<ul>
+  <li immutable="list" ng-repeat="item in list track by $index" ng-bind="item"></li>
+</ul>
+<script src="/scripts/all.js"></script>
+</body>
+</html>
+```
+
+And for testing the plain JavaScript array I used the same markup with the `immutable` attribute removed. I changed the parameters of these test cases to:
+
+### Conclusion Size
+
+- 10k
+
+#### Bindings count
+
+- 1
+- 5
+- 15
+- 25
+- 30
+
+As here I don't count the watcher added by `ng-repeat`.
+
+And here are the results:
+
+|           | 1      | 5      | 15     | 25     | 30     |
+|-----------|--------|--------|--------|--------|--------|
+| Immutable | 14.714 | 14.296 | 14.8   | 14.489 | 14.331 |
+| Plain     | 13.308 | 15.689 | 23.415 | 19.986 | 27.526 |
+
+
+Here is a chart for better understanding of the benchmark:
+
+![/images/immutable-angular/immutable-angular-1.png]()
+
+Initially the plain JavaScript array does better but once we increase the number of bindings the performance decrease dramatically.
+
+But lets go a little bit further...Lets do some CPU profiling when using immutable collection with 30 bindings:
+
+![/images/immutable-angular/cpu-profile.png]()
+
+The biggest slowdown comes from the watcher added inside `ng-repeat`. Lets dig into AngularJS's source code and change that watcher to a simple `$watch` instead of `$watchCollection` (**do not do this in AngularJS copy you are going to use in production otherwise `ng-repeat`'s binding will not work with mutable data structures**) and see what will happen...
+
+![/images/immutable-angular/immutable-watch.png]()
+
+After running the 30 bindings benchmark with the immutable list by changing `ng-repeat`'s implementation we got almost a second improvement!
+
+## Conclusion
+
+
