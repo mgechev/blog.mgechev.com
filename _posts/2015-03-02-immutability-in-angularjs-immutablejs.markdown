@@ -224,7 +224,7 @@ This approach has some limitations. For example, if the immutable value is resul
 
 ## Benchmarks
 
-![/images/unicorn.jpg]()
+![](/images/unicorn.jpg)
 
 Using immutable data structures seems exciting and amazing! Anyway, it has some drawbacks. The `$watch` expressions became extremely fast but there's a big overhead of creating a new data structure once we add or remove items. This gets even slower when we have a complex nested composition.
 
@@ -386,17 +386,17 @@ And here are the results:
 
 Here is a chart for better understanding of the benchmark:
 
-![/images/immutable-angular/immutable-angular-1.png]()
+![](/images/immutable-angular/immutable-angular-1.png)
 
 Initially the plain JavaScript array does better but once we increase the number of bindings the performance decreases dramatically.
 
 But lets go a little bit further...Lets do CPU profiling for the test cases, which runs with immutable collection and 30 watchers.
 
-![/images/immutable-angular/cpu-profile.png]()
+![](/images/immutable-angular/cpu-profile.png)
 
 The biggest slowdown comes from the watcher added by `ng-repeat`. Lets dig into AngularJS's source code and change that watcher to a simple `$watch` instead of `$watchCollection` (**do not do this in AngularJS copy you are going to use in production otherwise `ng-repeat`'s binding will not work with mutable data structures**) and see what will happen...
 
-![/images/immutable-angular/immutable-watch.png]()
+![](/images/immutable-angular/immutable-watch.png)
 
 After running the 30 bindings benchmark with the immutable list with changed `ng-repeat`'s implementation, we got almost 1 second improvement!
 
@@ -406,11 +406,11 @@ In order to make this performance test complete, lets profile the memory usage!
 
 When running the Chrome DevTools Heap Profiler, in the test case with 30 watchers and plain JavaScript object, we get pretty low memory usage:
 
-![/images/immutable-angular/plain-memory.png]()
+![](/images/immutable-angular/plain-memory.png)
 
 As expected, when using Immutable.js the memory usage is a bit higher because of the overhead of creating new data structure on change.
 
-![/images/immutable-angular/immutable-memory.png]()
+![](/images/immutable-angular/immutable-memory.png)
 
 ## Conclusion
 
