@@ -62,7 +62,7 @@ Now imagine we have a few watchers of the same collection - in a directive, serv
 
 At least `n` times for `n` bindings.
 
-## How Immutable.js can help?
+## How can Immutable.js help?
 
 Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of `$watch` to `O(1)`, since now we don't need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:
 
