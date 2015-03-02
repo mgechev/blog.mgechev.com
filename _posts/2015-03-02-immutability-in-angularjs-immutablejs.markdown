@@ -157,17 +157,17 @@ app.controller('SampleCtrl', SampleCtrl);
 {% endhighlight %}
 
 {% highlight html %}
-&#x3C;!DOCTYPE html&#x3E;
-&#x3C;html lang=&#x22;en&#x22;&#x3E;
-&#x3C;head&#x3E;
-  &#x3C;title&#x3E;&#x3C;/title&#x3E;
-&#x3C;/head&#x3E;
-&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
-  &#x3C;ul&#x3E;
-    &#x3C;li immutable=&#x22;list&#x22; ng-repeat=&#x22;item in list&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
-  &#x3C;/ul&#x3E;
-&#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+  <ul>
+    <li immutable="list" ng-repeat="item in list" ng-bind="item"></li>
+  </ul>
+</body>
+</html>
 {% endhighlight %}
 
 ### Result:
@@ -299,16 +299,16 @@ $scope.list = $scope.list.set(idx, Math.random());
 And here is the markup, which I used:
 
 {% highlight html %}
-&#x3C;!DOCTYPE html&#x3E;
-&#x3C;html lang=&#x22;en&#x22;&#x3E;
-&#x3C;head&#x3E;
-  &#x3C;meta charset=&#x22;UTF-8&#x22;&#x3E;
-  &#x3C;title&#x3E;&#x3C;/title&#x3E;
-&#x3C;/head&#x3E;
-&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
-&#x3C;script src=&#x22;/scripts/all.js&#x22;&#x3E;&#x3C;/script&#x3E;
-&#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+<script src="/scripts/all.js"></script>
+</body>
+</html>
 {% endhighlight %}
 
 ### Results
@@ -345,19 +345,19 @@ On the other hand, since when using immutable list, the watcher runs with a cons
 Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:
 
 {% highlight html %}
-&#x3C;!DOCTYPE html&#x3E;
-&#x3C;html lang=&#x22;en&#x22;&#x3E;
-&#x3C;head&#x3E;
-  &#x3C;meta charset=&#x22;UTF-8&#x22;&#x3E;
-  &#x3C;title&#x3E;&#x3C;/title&#x3E;
-&#x3C;/head&#x3E;
-&#x3C;body ng-app=&#x22;sampleApp&#x22; ng-controller=&#x22;SampleCtrl&#x22;&#x3E;
-&#x3C;ul&#x3E;
-  &#x3C;li immutable=&#x22;list&#x22; ng-repeat=&#x22;item in list track by $index&#x22; ng-bind=&#x22;item&#x22;&#x3E;&#x3C;/li&#x3E;
-&#x3C;/ul&#x3E;
-&#x3C;script src=&#x22;/scripts/all.js&#x22;&#x3E;&#x3C;/script&#x3E;
-&#x3C;/body&#x3E;
-&#x3C;/html&#x3E;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body ng-app="sampleApp" ng-controller="SampleCtrl">
+<ul>
+  <li immutable="list" ng-repeat="item in list track by $index" ng-bind="item"></li>
+</ul>
+<script src="/scripts/all.js"></script>
+</body>
+</html>
 {% endhighlight %}
 
 And for testing the plain JavaScript array I used the same markup with the `immutable` attribute removed. I changed the parameters of these test cases to:
