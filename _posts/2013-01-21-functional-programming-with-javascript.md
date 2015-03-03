@@ -86,7 +86,7 @@ lz.memo = function (fn) {
             return cache[key];
         }
         return cache[key] = fn.apply(this, arguments);
-    };              
+    };
 };
 {% endhighlight %}
 
@@ -124,7 +124,7 @@ Let&#8217;s look at memo again. We have variable called cache which is defined i
             return articles;
         },
         setArticles: function (articleList) {
-           articles = articleList; 
+           articles = articleList;
            softArticles();
         }
     };
@@ -159,7 +159,7 @@ Above there&#8217;s a basic example which shows implementation of factorial usin
 
 ## Managing the state (Monads)
 
-Of course, as we saw in the example with memorization, JavaScript is not purely functional language (probably that&#8217;s one of the reasons that the language is so popular&#8230;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here&#8217;s one by Douglas Crockford:
+Of course, as we saw in the example with memoization, JavaScript is not purely functional language (probably that&#8217;s one of the reasons that the language is so popular&#8230;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here&#8217;s one by Douglas Crockford:
 
 {% highlight JavaScript %}/* Code by Douglas Crockford */
 function MONAD(modifier) {
