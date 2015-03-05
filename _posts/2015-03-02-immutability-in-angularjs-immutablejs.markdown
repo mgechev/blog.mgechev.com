@@ -124,7 +124,7 @@ This mean that Immutable.js creates a new JavaScript object for each call of `to
 
 {% highlight JavaScript %}
 $scope.$watchCollection(function () {
-  return $scope.list.\_tail.array;
+  return $scope.list._tail.array;
 }, function (val) {
   // do something with the changed value
 });
