@@ -1,0 +1,146 @@
+---
+title: State Persistence of ReactJS Component
+author: minko_gechev
+layout: post
+categories:
+  - JavaScript
+  - ReactJS
+  - Persistence
+tags:
+  - localStorage
+  - ReactJS
+  - JavaScript
+---
+
+ReactJS is a framework, by facebook, which puts some well known concepts into the practice. Usually each UI could be represented with a state machine but when the state of this state machine could be changed from a lot of places everything gets quite messy. Given view may be rendered differently with the same model passed as parameter if it depends on some global data. A properly implemented ReactJS component, will be rendered the same way when the same "input parameters" are passed to it. This is based on the well known idea of the [pure functions](https://en.wikipedia.org/wiki/Pure_function).
+
+## State
+
+Each ReactJS component may have a state. It also accept properties passed by its parent. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:
+
+{% highlight javascript %}
+class Ticker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ticks: 0
+    };
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({
+        ticks: this.state.ticks + 1
+      });
+    }, 1000);
+  }
+  render() {
+    return (
+      <span>{this.state.ticks}</span>
+    );
+  }
+}
+{% endhighlight %}
+
+The `Ticker` has state, which represents the number of ticks. The ticks count is being incremented each second and rendered into a span element.
+If we want to use this component somewhere onto the page we can:
+
+{% highlight javascript %}
+React.render(<Ticker></Ticker>, document.getElementById('container'));
+{% endhighlight %}
+
+Once the component has been rendered the ticking will begin.
+
+Another example for a component state might be the position (left and top) of a dialog, boolean flag, which indicates whether given dialog is open or closed, etc.
+
+## Persistence
+
+The state of each component is a JavaScript object, which is stored into the main memory. This means that each component's state may mutate until page refresh/close of the browser. After that, on later page load the component will be initialized with its initial state (in our `Ticker` example this state will be `{ ticks: 0 }`).
+
+But what if we want our `Ticker` to keep ticking from the same value, which it reached before the page refresh? Or if we want the dialog to remain on the same page position as it was before the page was closed?
+
+We have one "correct" way to do this - we can use the [Flux]() architecture and save each component's state into a Store. We can then save the Store's value into a persistent storage. So now, on each mousemove event we are going to go through the whole flux process of saving data...We can do better by saving the data on specific events, for example in our drag & drop case we can save the dialog's position on mouseup.
+
+But do we have to create a new database entry for each drop of the dialog? Isn't it much more suitable to keep this state data into cookies or `localStorage`? Yes, it is.
+
+So what we can do is:
+
+{% highlight javascript %}
+class Ticker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ticks: JSON.parse(localStorage.getItem('ticker') || '0')
+    };
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({
+        ticks: this.state.ticks + 1
+      });
+      localStorage.setItem('ticker', this.state.ticks);
+    }, 1000);
+  }
+  render() {
+    return (
+      <span>{this.state.ticks}</span>
+    );
+  }
+}
+{% endhighlight %}
+
+Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...
+
+## Mixins
+
+ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality, which could be plugged into given module. This is something in-between inheritance and delegation. Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes).
+
+So we can simple implement the `localStorage.setItem` and `localStorage.getItem` thing into a mixin. But we won't have a big value by this...What about if we want to have different types of persistent storages as well? We want to dynamically change the storage from cookies to `localStorage` or why not even a RESTful API? If we want to make RESTful calls we need to better have asynchronous API, although `localStorage` accesses the disk syncrhnously. So obviously we need an [Adapter]().
+
+## react-pstate
+
+A few days ago I wrote the `react-pstate` module, which does exactly this - it allows persistence of the state of ReactJS components, through pluggable storage. For example lets take a look at the following example:
+
+{% highlight javascript %}
+class Ticker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.setPStorage(this.localStorage);
+    this.setPId('ticker');
+    this.restorePState();
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.setPState({
+        ticks: this.state.ticks + 1
+      });
+    }, 1000);
+  }
+  render() {
+    return (
+      <span>{this.state.ticks}</span>
+    );
+  }
+}
+{% endhighlight %}
+
+This code looks a little bit simpler. We don't use any globals but only instance methods instead. The magic happens in these three lines of code:
+
+{% highlight javascript %}
+this.setPStorage(this.localStorage);
+this.setPId('ticker');
+this.restorePState();
+{% endhighlight %}
+
+Initially we set the persistence storage we are going to use by `this.setPState(this.localStorage)`, later we set a unique identifier of the component `this.setPId('ticker')` and after that we restore the component's state if there is such by calling `this.restorePState`.
+
+In order to save the component's state persistently you can use `this.setPState`, which has exactly the same interface as `this.setState`, as first argument it accepts the new state and as second a callback, which will be invoked once the state is set.
+
+But how to change the storage from `localStorage` to XHR for example? We simple need to pass to `setPStorage` an object, which implements the following interface:
+
+- `get(id) : Promise`
+- `set(id, state) : Promise`
+- `remove(id) : Promise`
+
+Since we want to have stantartized interface for each storage and using asynchronous APIs is a good thing, each of these methods should return an ECMAScript 6 promise object.
+
+You can find this module at my [GitHub account](https://github.com/mgechev/react-pstate).
