@@ -95,7 +95,7 @@ class Ticker extends React.Component {
 }
 {% endhighlight %}
 
-Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...
+Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...There are also some issues with the "transactional" behavior. What about the `localStorage` is full and it throws an error? We won't have the state saved persistently so we will have inconsistency.
 
 ## Mixins
 
