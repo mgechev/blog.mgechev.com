@@ -124,7 +124,7 @@ This mean that Immutable.js creates a new JavaScript object for each call of `to
 
 {% highlight JavaScript %}
 $scope.$watchCollection(function () {
-  return $scope.list._tail.array;
+  return $scope.list.\_tail.array;
 }, function (val) {
   // do something with the changed value
 });
@@ -142,7 +142,7 @@ So we definitely need to watch the immutable collection, this way we will:
 
 ## Angular Immutable
 
-In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It's called `angular-immutable` and could be found in my [GitHub account](https://github.com/mgechev/angular-immutable) (also published as a bower module `angular-immutable`).
+In order to deal with this issue, I created a simple filter, which allows binding to Immutable.js collections. It's called `angular-immutable` and could be found in my [GitHub account](https://github.com/mgechev/angular-immutable) (also published as a bower module `angular-immutable`).
 
 Lets take a look at the code example, which uses `angular-immutable`:
 
@@ -164,7 +164,7 @@ app.controller('SampleCtrl', SampleCtrl);
 </head>
 <body ng-app="sampleApp" ng-controller="SampleCtrl">
   <ul>
-    <li immutable="list" ng-repeat="item in list" ng-bind="item"></li>
+    <li ng-repeat="item in list | immutable" ng-bind="item"></li>
   </ul>
 </body>
 </html>
@@ -179,40 +179,29 @@ app.controller('SampleCtrl', SampleCtrl);
 With only two slight changes we made it work! All we did was:
 
 * Include the module `immutable` as dependency
-* Add the directive `immutable="list"`, which points the immutable data structure
+* Add the filter `immutable`, which provides `ng-repeat` a plain JavaScript collection
 
 ## Angular Immutable Implementation
 
-Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` directive's source code:
+Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` filter's source code:
 
 {% highlight JavaScript %}
-/* global angular */
+/* global angular, Immutable */
 
-var immutableDirective = () => {
-  let priority = 2000;
-  let scope = true;
-  let link = (scope, el, attrs) => {
-    let { immutable } = attrs;
-    if (!(/^[a-zA-Z0-9_$]+$/).test(immutable)) {
-      return;
+var immutableFilter = () => {
+  return (val) => {
+    if (val instanceof Immutable.Collection) {
+      return val.toJS();
     }
-    if (!scope[immutable]) {
-      console.warn(`No ${immutable} property found.`);
-    }
-    scope.$watch(() => {
-      return scope.$parent[immutable];
-    }, (val) => {
-      scope[immutable] = val.toJS();
-    });
+    return val;
   };
-  return { priority, scope, link };
 };
 
 angular.module('immutable', [])
-  .directive('immutable', immutableDirective);
+  .filter('immutable', immutableFilter);
 {% endhighlight %}
 
-`immutableDirective` is a directive, which has higher priority than `ng-repeat`. It creates a new scope, which prototypically inherits from the parent scope and defines a link function. Inside the link function, we make sure the value of the `immutable` attribute is a property name (no expressions allowed), if it is we simply add a watcher to the `$parent`'s immutable property. Once the reference change, we set the value of the property of the current scope, named the same way as the parent's immutable one.
+`immutableFilter` simply checks if the input is an instance of `Immutable.Collection` (an "abstract class", base for all immutable collections in Immutable.js). If the input is an immutable collection it returns its JavaScript representation, otherwise it returns the input itself.
 
 This way we:
 
@@ -422,7 +411,7 @@ On the other hand, we noticed that we have a little overhead by the creation of 
 
 ### Place for improvement
 
-In the package [`angular-immutable`](https://github.com/mgechev/angular-immutable) I implemented a directive, which allows iterating over immutable data structures and binding to them (using `ng-repeat`, `ng-bind`, for example). Unfortunately, this directive allows only one-way data-binding. Two places for improvements are:
+In the package [`angular-immutable`](https://github.com/mgechev/angular-immutable) I implemented a filter, which allows iterating over immutable data structures and binding to them (using `ng-repeat`, `ng-bind`, for example). Unfortunately, this filter allows only one-way data-binding. Two places for improvements are:
 
 - Allow two-way data-binding to immutable data
 - Implement optimized version of `ng-repeat`, which uses `$watch` instead of `$watchCollection`, for increasing the watcher's speed.
