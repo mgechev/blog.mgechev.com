@@ -105,6 +105,7 @@ A few days ago I wrote the `react-pstate` mixin, which does exactly this - it al
 
 {% highlight javascript %}
 var Ticker = React.createClass({
+  mixins: [ReactPersistentState],
   getInitialState: function () {
     return { ticks: 0 };
   },
