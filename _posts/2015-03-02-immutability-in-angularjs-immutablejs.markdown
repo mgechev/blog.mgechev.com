@@ -1,5 +1,5 @@
 ---
-title: Boost the Performance of AngularJS Application Using Immutable Data
+title: Boost the Performance of an AngularJS Application Using Immutable Data
 author: minko_gechev
 layout: post
 categories:
