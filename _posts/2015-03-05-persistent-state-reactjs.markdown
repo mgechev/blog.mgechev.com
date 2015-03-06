@@ -1,5 +1,5 @@
 ---
-title: Persistent State of a ReactJS Component
+title: Persistent State of ReactJS Component
 author: minko_gechev
 layout: post
 categories:
