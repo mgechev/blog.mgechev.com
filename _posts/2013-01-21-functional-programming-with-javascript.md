@@ -98,7 +98,7 @@ Imagine we have this case:
 function bar(baz) {
     return baz + foo;
 }
-var cached = lz.memo(foo);
+var cached = lz.memo(bar);
 cached(1); //2
 foo += 1;
 cached(1); //2
