@@ -18,7 +18,7 @@ The code from this article could be found [at GitHub](https://github.com/mgechev
 
 ## State
 
-Each ReactJS component may have a state. It also accept properties passed by its ancestors. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:
+Each ReactJS component may have a state. It also accepts properties passed by its ancestors. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:
 
 {% highlight javascript %}
 class Ticker extends React.Component {
@@ -50,13 +50,13 @@ If we want to use this component somewhere onto the page we can:
 React.render(<Ticker></Ticker>, document.getElementById('container'));
 {% endhighlight %}
 
-Once the component has been rendered the ticking will begin.
+The snippet above will render the component in a container with id `container`. Once the `Ticker` has been rendered the ticking will begin.
 
 Another example for component state could be the position (left and top) of a dialog on the screen, boolean flag, which indicates whether given dialog is open or closed, etc.
 
 ## Persistence
 
-The state of each component is a JavaScript object, which is stored into the main memory. This means that each component's state may mutate until page refresh/close of the browser. After that, on later page load the component will be initialized with its initial state (in our `Ticker` example this state will be `{ ticks: 0 }`).
+The state of each component is a JavaScript object, which is stored into the main memory. This means that each component's state may mutate until page refresh/close of the browser. After that, on page load the component will be initialized with its initial state (in our `Ticker` example this state will be `{ ticks: 0 }`).
 
 But what if we want our `Ticker` to keep ticking from the same value, which it reached before the page refresh? Or if we want the dialog to remain on the same page position as it was before the page was closed?
 
