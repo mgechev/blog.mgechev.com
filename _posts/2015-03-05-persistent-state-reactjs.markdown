@@ -12,7 +12,7 @@ tags:
   - JavaScript
 ---
 
-ReactJS is a framework, by facebook, which puts some well known concepts into the UI development. Usually each UI could be represented as a state machine but when the state of this state machine could be changed from a lot of places everything gets quite messy, complexy and buggy. Given view may be rendered differently with the same model passed as parameter if it depends on some global data. A properly implemented ReactJS component, will be rendered the same way when the same "input parameters" are passed to it. This is based on the well known idea of the [pure functions](https://en.wikipedia.org/wiki/Pure_function) (to be more precise the idea is similar but not the same, because each component may have its own state, which can change).
+ReactJS is a framework, by facebook, which puts some well known concepts into the UI development. Usually each UI could be represented as a state machine but when the state of this state machine could be changed from a lot of places everything gets quite messy, complex and buggy. Given view may be rendered differently with the same model passed as parameter if it depends on some global data. A properly implemented ReactJS component, will be rendered the same way when the same "input parameters" are passed to it. This is based on the well known idea of the [pure functions](https://en.wikipedia.org/wiki/Pure_function) (to be more precise the idea is similar but not the same, because each component may have its own state, which can change).
 
 The code from this article could be found [at GitHub](https://github.com/mgechev/react-pstate).
 
