@@ -62,14 +62,14 @@ But what if we want our `Ticker` to keep ticking from the same value, which it r
 
 We have one "correct" way to do this - we can use the [Flux](https://facebook.github.io/flux/docs/overview.html) architecture and save each component's state into a Store. We can then save the Store's value into a persistent storage. So now, on each `mousemove` event we are going to go through the whole flux process of saving data...We can do better by saving the data on specific events, for example in our drag & drop case we can save the dialog's position on `mouseup`.
 
-But do we have to create a new database entry for each drop of the dialog? Isn't it much more suitable to keep this state data into cookies or `localStorage`? Yes, it is. So now we should have two types of stores:
+But do we have to create a new database entry for each drop of the dialog? Isn't it much more suitable to keep this state object into cookies or `localStorage`? Yes, it is! So now we should have two types of stores:
 
 - Persistent Stores
-- Cookie Stores
+- Cookie/Local storage Stores
 
 Doesn't it gets a bit messy? There is easier way of doing this which doesn't violates the component's "pureness" that much.
 
-So what we can do is:
+What we can do is:
 
 {% highlight javascript %}
 class Ticker extends React.Component {
@@ -95,13 +95,13 @@ class Ticker extends React.Component {
 }
 {% endhighlight %}
 
-Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...There are also some issues with the "transactional" behavior. What about the `localStorage` is full and it throws an error? We won't have the state saved persistently so we will have inconsistency.
+Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...There are also some issues with the "transactional" behavior. What if the `localStorage` is full and it throws an error? We won't have the state saved persistently so we will have inconsistency between the state in the RAM memory and the one on the disk
 
 ## Mixins
 
-ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality and could be plugged into a component (class, package, component, whatever...). This is something in-between inheritance and delegation. We can't state that component using given mixin is a subclass of the mixin but it can be considered as subtype of it, since it implements it's interface (we can think of duck typing here - "When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck."). Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes).
+ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality and could be plugged into a component (class, package, component, whatever...). This is something in-between inheritance and delegation. We can't state that component using given mixin is a subclass of the mixin but it can be considered as subtype of it, since it implements it's interface (we can think of duck typing here - "When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck."). Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes or [interfaces in Java 8](https://kerflyn.wordpress.com/2012/07/09/java-8-now-you-have-mixins/)).
 
-So we can implement the `localStorage.setItem` and `localStorage.getItem` thing into a mixin. But we won't have a big value by this...What about if we want to have different types of persistent storages? We want to dynamically change the storage from cookies to `localStorage` or why not even a RESTful API? If we want to make RESTful calls we need to better have asynchronous API, although `localStorage` accesses the disk synchronously. So obviously we need an [Adapter](https://en.wikipedia.org/wiki/Adapter_pattern).
+So we can implement the `localStorage.setItem` and `localStorage.getItem` thing into a mixin. But we won't have a big value by this...What about if we want to have different types of persistent storages? We want to dynamically change the storage from cookies to `localStorage` or why not even a RESTful API? If we want to make RESTful calls we need to better have asynchronous API, although `localStorage` accesses the disk synchronously. So obviously we need an [adapter](https://en.wikipedia.org/wiki/Adapter_pattern).
 
 ## react-pstate
 
@@ -138,21 +138,20 @@ this.setPId('ticker');
 this.restorePState();
 {% endhighlight %}
 
-Initially we set the persistence storage we are going to use by `this.setPState(this.localStorage)`, later we set a unique identifier of the component `this.setPId('ticker')` and after that we restore the component's state if there is such by calling `this.restorePState`.
+Initially we set the persistent storage we are going to use by `this.setPState(this.localStorage)`, later we set a unique identifier of the component `this.setPId('ticker')` and after that we restore the component's state if there is such by calling `this.restorePState`.
 
 In order to save the component's state persistently you can use `this.setPState`, which has exactly the same interface as `this.setState`, as first argument it accepts the new state and as second a callback, which will be invoked once the state is set.
 
-But how to change the storage from `localStorage` to XHR for example? We simple need to pass to `setPStorage` an object, which implements the following interface:
+But how to change the storage from `localStorage` to XHR for example? We simply need to pass to `setPStorage` an object, which implements the following interface:
 
 - `get(id) : Promise`
 - `set(id, state) : Promise`
 - `remove(id) : Promise`
 
-Since we want to have standardized interface for each storage and having asynchronous APIs, each of these methods should return an ECMAScript 6 promise object. Since not all browsers support it you can use the [polyfill by Jake Archibald](https://github.com/jakearchibald/es6-promise).
+Since we want to have standardized interface for each storage and having asynchronous APIs of the stores, each of these methods should return an ECMAScript 6 promise object. Since not all browsers support it you can use the [polyfill by Jake Archibald](https://github.com/jakearchibald/es6-promise).
 
 You can find this module at my [GitHub account](https://github.com/mgechev/react-pstate).
 
 ## Conclusion
 
-The mixin seems quite useful. However, it doesn't solve all the problems you might have. For example saving the state persistently of a dialog, which is dragged around isn't the best thing you can do. This will lead to disk access/HTTP request each few milliseconds. In this case a better way of using `react-pstate` is by saving it on drag stop.
-
+The mixin seems quite useful. However, it doesn't solve all the problems you might have for persistently storing the state of a component. For example saving the state of a dialog on `mousemove`, isn't the best thing you can do. This will lead to disk access/HTTP request each few milliseconds. In this case a better way of using `react-pstate` is by saving it on drag stop. However, it provides you primitives which prevent having code duplication.
