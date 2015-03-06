@@ -21,26 +21,24 @@ The code from this article could be found [at GitHub](https://github.com/mgechev
 Each ReactJS component may have a state. It also accepts properties passed by its ancestors. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:
 
 {% highlight javascript %}
-class Ticker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ticks: 0
-    };
-  }
-  componentDidMount() {
-    setInterval(() => {
-      this.setState({
-        ticks: this.state.ticks + 1
+var Ticker = React.createClass({
+  componentDidMount: function () {
+    var self = this;
+    setInterval(function () {
+      self.setState({
+        ticks: self.state.ticks + 1
       });
     }, 1000);
-  }
-  render() {
+  },
+  getInitialState: function () {
+    return { ticks: 0 };
+  },
+  render: function () {
     return (
       <span>{this.state.ticks}</span>
     );
   }
-}
+});
 {% endhighlight %}
 
 The `Ticker` has a state, which represents the number of ticks passed. The ticks count is being incremented each second and rendered into a span element.
@@ -72,27 +70,25 @@ Doesn't it gets a bit messy? There is easier way of doing this which doesn't vio
 What we can do is:
 
 {% highlight javascript %}
-class Ticker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      ticks: JSON.parse(localStorage.getItem('ticker') || '0')
-    };
-  }
-  componentDidMount() {
-    setInterval(() => {
+var Ticker = React.createClass({
+  getInitialState: function () {
+    return JSON.parse(localStorage.getItem('ticker') || '{}');
+  },
+  componentDidMount: function () {
+    var self = this;
+    setInterval(function () {
       this.setState({
         ticks: this.state.ticks + 1
       });
-      localStorage.setItem('ticker', this.state.ticks);
+      localStorage.setItem('ticker', JSON.stringify(this.state));
     }, 1000);
-  }
-  render() {
+  },
+  render: function () {
     return (
       <span>{this.state.ticks}</span>
     );
   }
-}
+});
 {% endhighlight %}
 
 Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save...There are also some issues with the "transactional" behavior. What if the `localStorage` is full and it throws an error? We won't have the state saved persistently so we will have inconsistency between the state in the RAM memory and the one on the disk
@@ -108,26 +104,27 @@ So we can implement the `localStorage.setItem` and `localStorage.getItem` thing 
 A few days ago I wrote the `react-pstate` mixin, which does exactly this - it allows persistence of the state of ReactJS components, through pluggable storage. For example lets take a look at the following example:
 
 {% highlight javascript %}
-class Ticker extends React.Component {
-  constructor(props) {
-    super(props);
+var Ticker = React.createClass({
+  getInitialState: function () {
+    return { ticks: 0 };
+  },
+  componentDidMount: function () {
     this.setPStorage(this.localStorage);
     this.setPId('ticker');
     this.restorePState();
-  }
-  componentDidMount() {
-    setInterval(() => {
+    var self = this;
+    setInterval(function () {
       this.setPState({
         ticks: this.state.ticks + 1
       });
     }, 1000);
-  }
-  render() {
+  },
+  render: function () {
     return (
       <span>{this.state.ticks}</span>
     );
   }
-}
+});
 {% endhighlight %}
 
 This code looks a little bit simpler. We don't use any globals but only instance methods instead. The magic happens in these three lines of code:
