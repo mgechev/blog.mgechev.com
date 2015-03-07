@@ -12,14 +12,14 @@ tags:
   - JavaScript
 ---
 
-My experience proofs that there are two good ways to learn a new technology:
+My experience proofed that there are two good ways to learn a new technology:
 
-- Build it by your own
+- Re-implement it by your own
 - See how the concepts you already know fit in it
 
 In some cases the first approach is too big overhead. For instance, if you want to understand how the kernel works it is far too complex to re-implement it. It might work to implement a light version of it (a model), which abstracts components, which are not interesting for your learning purposes.
 
-The second approach works pretty good, especially if you have previous experience with similar technologies. A proof for this is the paper I wrote - "AngularJS in Patterns". It seems that it is a good introduction to the framework for experienced developers.
+The second approach works pretty good, especially if you have previous experience with similar technologies. A proof for this is the paper I wrote - ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns). It seems that it is great introduction to the framework for experienced developers.
 
 However, building something from scratch and understanding the core underlying principles is always better. In the case of AngularJS some of the main selling points are:
 
@@ -32,6 +32,8 @@ Although the whole framework is above 20k lines of code, we can abstract the com
 - Simplifying the API
 - Removing components, which are not essential for our understanding of the core concepts
 
-This is what I did in my "Lightweight AngularJS" implementation, which is [hosted on GitHub](https://github.com/mgechev/light-angularjs). The code is with **only learn purpose and should not be used in production** otherwise a kitty somewhere will suffer.
+This is what I did in my "Lightweight AngularJS" implementation, which is [hosted on GitHub](https://github.com/mgechev/light-angularjs). The code is with **only learn purpose and should not be used in production** otherwise a kitty somewhere will suffer. I used this method of explaining AngularJS in classes I taught in [HackBulgaria](http://hackbulgaria.com) and [Sofia University](http://fmi.uni-sofia.bg/en). You can also find slides from my talk "Lightweight AngularJS" in the bottom of the blog post.
 
 So lets begin with our implementation!
+
+## Main Components
