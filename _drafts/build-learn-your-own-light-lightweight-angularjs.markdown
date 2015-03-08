@@ -285,3 +285,19 @@ Provider.invoke(ctrl);
 {% endhighlight %}
 
 Pretty cool, ah? And that's how we have 1/4 of our Lightweight AngularJS implementation!
+
+### DOMCompiler
+
+The main responsibility of the `DOMCompiler` is to:
+
+- Compile the DOM
+  - Traverse the DOM tree
+  - Finds registered services
+  - Invoke the logic associated with them
+  - Manages the scope
+
+The following API is enough:
+
+- `bootstra()` - bootstraps the application (similar to `angular.bootstrap` but always uses the root HTML element).
+- `compile(el, scope)` - invokes the logic of all directives associated to given element (`el`) and calls itself recursively for each child element of the given element. We need to have scope associated with the current element. Since each directive may create different scope, we need to pass the current scope in the recursive call.
+
