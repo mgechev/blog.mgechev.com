@@ -54,12 +54,12 @@ This is how the relation between `Provider`, `Scope` and `DOMCompiler` will look
 
 ### Provider
 
-As mentioned above, our provider will union two components from the framework:
+As mentioned above, our provider will union two components from the original framework:
 
 - `$provide`
 - `$injector`
 
-Its main responsibilities will be to:
+It will be a singleton with the following responsibilities:
 
 - Register components (directives, services and controllers)
 - Resolve components' dependencies
@@ -67,7 +67,7 @@ Its main responsibilities will be to:
 
 ### DOMCompiler
 
-The `DOMCompiler` will traverse the DOM tree and find directives. We will support only directive, which could be defined as attributes. Once it finds given directive it will provide scope management (since given directive may require a new scope) and invoke the logic associated with it (in our case the `link` function). So the main responsibilities of this component will be:
+The `DOMCompiler` is a singleton, which will traverse the DOM tree and find directives. We will support only directive, which could be used as attributes. Once the `DOMCompiler` finds given directive it will provide scope management functionality (since given directive may require a new scope) and invoke the logic associated to it (in our case the `link` function). So the main responsibilities of this component will be:
 
 - Compile the DOM
   - Traverse the DOM tree
@@ -77,11 +77,11 @@ The `DOMCompiler` will traverse the DOM tree and find directives. We will suppor
 
 ### Scope
 
-And the last main component in our Lightweight AngularJS, will be the scope. In order to implement the data-binding logic we need to have `$scope` to attach properties to and add observers (watchers), which watch these properties or expressions, composed by composition of the properties.
+And the last major component in our Lightweight AngularJS, will be the scope. In order to implement the data-binding logic we need to have `$scope` to attach properties. We can compose these properties into expressions and watch them. When we discover that the value of given expression has changed we can simply invoke the watcher (observer) associated with the expression.
 
-Responsibilities:
+Responsibilities of the scope:
 
-- Watches the expressions
+- Watches expressions
 - Evaluates all watched expressions on each `$digest` loop, until stable
 - Invokes all the observers, which are associated with the watched expression
 
