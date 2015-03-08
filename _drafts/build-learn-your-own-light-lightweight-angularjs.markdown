@@ -91,7 +91,7 @@ In order to have better understanding of the implementation, we need to dig a bi
 
 First of all, what actually graphs are? We can think of given graph as pair of two sets: `G = { V, E }, E ⊆ V x V`. This seems quite abstract, I believe. Lets make it a bit more understandable. We can think of the set `V` as different Tinder users and the set `E` as their matches. For example, if we have the users `V = (A, B, C, D)` and we have matches between `E = ((A, B), (A, C), (A, D), (B, D))`, this means not only that `A` swipes right everyone but also that the edges inside our graph are these matches. We have something like:
 
-![](/images/lightweight-ng/main-components.png)
+![](/images/lightweight-ng/tinder-graph.png)
 
 This is an example for undirected graph, since both users like each other. If we have partial match (only one of the users like the other one), we have directed graph. In the case of directed graph, the connections between the nodes will be arrows, to show the direction (i.e. which is the user who is interested in the other one).
 
