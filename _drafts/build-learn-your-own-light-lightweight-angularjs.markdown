@@ -71,7 +71,7 @@ The `DOMCompiler` will traverse the DOM tree and find directives. We will suppor
 
 - Compile the DOM
   - Traverse the DOM tree
-  - Finds registered services
+  - Finds registered directives, used as attributes
   - Invoke the logic associated with them
   - Manages the scope
 
@@ -292,7 +292,7 @@ The main responsibility of the `DOMCompiler` is to:
 
 - Compile the DOM
   - Traverse the DOM tree
-  - Finds registered services
+  - Finds registered directives, used as attributes
   - Invoke the logic associated with them
   - Manages the scope
 
@@ -301,3 +301,71 @@ The following API is enough:
 - `bootstra()` - bootstraps the application (similar to `angular.bootstrap` but always uses the root HTML element).
 - `compile(el, scope)` - invokes the logic of all directives associated to given element (`el`) and calls itself recursively for each child element of the given element. We need to have scope associated with the current element. Since each directive may create different scope, we need to pass the current scope in the recursive call.
 
+And here is the implementation:
+
+{% highlight javascript %}
+```javascript
+var DOMCompiler = {
+  bootstrap: function () {
+    this.compile(document.children[0],
+      Provider.get('$rootScope'));
+  },
+  compile: function (el, scope) {
+    var dirs = this._getElDirectives(el);
+    var dir;
+    var scopeCreated;
+    dirs.forEach(function (d) {
+      dir = Provider.get(d.name + Provider.DIRECTIVES_SUFFIX);
+      if (dir.scope && !scopeCreated) {
+        scope = scope.$new();
+        scopeCreated = true;
+      }
+      dir.link(el, scope, d.value);
+    });
+    var children = Array.prototype.slice.call(el.children).map(function (c) {
+      return c;
+    });
+    children.forEach(function (c) {
+      this.compile(c, scope);
+    }, this);
+  },
+  // ...
+};
+
+```
+{% endhighlight %}
+
+The implementation of `bootstrap` is trivial. It delegates its call to `compile` with the root HTML element. What happens in `compile` is far more interesting.
+Initially we use a helper method, which gets all directives associated to the given element. We will take a look at `_getElDirectives` later. Once we have the list of all directives we loop over them and get the provider for each directive. After that we check whether the given directive requires creation of a new scope, if it does and we haven't already instantiated any other scope for the given element we simply invoke `scope.$new()`, which creates a new scope, which prototypically inherits from the current `scope`. After that we simply invoke the link function of the directive, with the appropriate parameters. What follows after that is the recursive call. Since `el.children` is a `NodeList` we cast it to an array by using `Array.prototype.slice.call`, which is followed by recursive call with the child element and the current scope. What does this algorithm reminds you of? Doesn't it look just like DFS - yes, that's what it is. So here the graphs came handy as well!
+
+Now lets take a quick look at `_getElDirectives`:
+
+
+{% highlight javascript %}
+```javascript
+  // ...
+  _getElDirectives: function (el) {
+    'use strict';
+    var attrs = el.attributes,
+        result = [];
+    for (var i = 0; i < attrs.length; i += 1) {
+      if (Provider.get(attrs[i].name + Provider.DIRECTIVES_SUFFIX)) {
+        result.push({
+          name: attrs[i].name,
+          value: attrs[i].value
+        });
+      }
+    }
+    return result;
+  }
+  // ...
+```
+{% endhighlight %}
+
+This method iterates over all attributes of `el`, once it finds an attribute, which is already registered as directive it pushes its name and value in the result list.
+
+Alright! We're done with the `DOMCompiler`. Lets go to our last component:
+
+### Scope
+
+This might be the trickiest part of the implementation because of the dirty checking functionality.
