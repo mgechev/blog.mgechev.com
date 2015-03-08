@@ -588,3 +588,21 @@ We need a new scope for each controller, so that's why the value for `scope` in 
 #### ngl-click
 
 This is the last directive we are going to take a look at, before we're able to implement a "useful" todo application.
+
+{% highlight javascript %}
+```javascript
+Provider.directive('ngl-click', function () {
+  return {
+    scope: false,
+    link: function (el, scope, exp) {
+      el.onclick = function () {
+        scope.$eval(exp);
+        scope.$digest();
+      };
+    }
+  };
+});
+```
+{% endhighlight %}
+
+We don't need a new scope here. All we need is to evaluate an expression and update the digest loop once the user clicks a button.
