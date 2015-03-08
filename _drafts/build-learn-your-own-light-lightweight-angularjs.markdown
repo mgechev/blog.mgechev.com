@@ -89,7 +89,7 @@ Responsibilities of the scope:
 
 In order to have better understanding of the implementation, we need to dig a bit in theory. I'm doing this mostly for completeness, since we will need only basic graph algorithms. If you're familiar with the basic graph traversal algorithms (Depth-First Search and Breath-First Search) feel free to skip this section.
 
-First of all, what actually graphs are? We can think of given graph as pair of two sets: `G = { V, E }, E ⊆ V x V`. This seems quite abstract, I believe. Lets make it a bit more understandable. We can think of the set `V` as different Tinder users and the set `E` as their matches. For example, if we have the users `V = (A, B, C, D)` and we have matches between `E = ((A, B), (A, C), (A, D), (B, D))`, this means not only that `A` swipes right everyone but also that the edges inside our graph are these matches. We have something like:
+First of all, what actually graphs are? We can think of given graph as pair of two sets: `G = { V, E }, E ⊆ V x V`. This seems quite abstract, I believe. Lets make it a bit more understandable. We can think of the set `V` as different Tinder users and the set `E` as their matches. For example, if we have the users `V = (A, B, C, D)` and we have matches between `E = ((A, B), (A, C), (A, D), (B, D))`, this means not only that `A` swipes right everyone but also that the edges inside our graph are these matches. Our "social graph" will look like this:
 
 ![](/images/lightweight-ng/tinder-graph.png)
 
@@ -118,7 +118,7 @@ into a tree, we will get:
 
 ![](/images/lightweight-ng/dom-tree.png)
 
-For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the [depth-first search algorithm](https://en.wikipedia.org/wiki/Depth-first_search):
+For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the [depth-first search algorithm](https://en.wikipedia.org/wiki/Depth-first_search), which is used in AngularJS:
 
 {% highlight %}
 1  procedure DFS(G,v):
@@ -176,7 +176,7 @@ Provider.CONTROLLERS_SUFFIX = 'Controller';
 ```
 {% endhighlight %}
 
-The code above provides a simple implementation for registration of components. We define the "private" object called `_providers`, which contains all constructor functions of the registered directives, controllers and services. We also define the methods `directive`, `service` and `controller`, which simple delegate their call to `_register`. In `controller` we wrap the passed controller inside a function for simplicity, since we want to be able to invoke the controller multiple times, without caching the value it returns. The only methods left are:
+The code above provides a simple implementation for registration of components. We define the "private" object called `_providers`, which contains all factory methods of the registered directives, controllers and services. We also define the methods `directive`, `service` and `controller`, which delegate their call to `_register`. In `controller` we wrap the passed controller inside a function for simplicity, since we want to be able to invoke the controller multiple times, without caching the value it returns after being invoked. The method `controller` will get more obvious after we review the `get` method and the `ngl-controller` directive. The only methods left are:
 
 - `invoke`
 - `get`
@@ -219,7 +219,7 @@ var Provider = {
 ```
 {% endhighlight %}
 
-We have have a little bit more logic here so lets start with `get`. In `get` we initially check whether we have this component already cached in the `_cache` object. If it is cached we simply return it (see [singleton](https://github.com/mgechev/angularjs-in-patterns/#singleton)). `$rootScope` is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don't find the component in the cache we get its provider (factory) and invoke it using the `invoke` method, by passing its provider and local dependencies.
+We have have a little bit more logic here so lets start with `get`. In `get` we initially check whether we already have this component cached in the `_cache` object. If it is cached we simply return it (see [singleton](https://github.com/mgechev/angularjs-in-patterns/#singleton)). `$rootScope` is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don't find the component in the cache we get its provider (factory) and invoke it using the `invoke` method, by passing its provider and local dependencies.
 
 In `invoke` the first thing we do is to assign an empty object to `locals` if there are no local dependencies. What are the local dependencies?
 
@@ -230,44 +230,46 @@ In AngularJS we can think of two types of dependencies:
 - Local dependencies
 - Global dependencies
 
-The global dependencies are all the components we register using `factory`, `service`, `filter` etc. They are accessible by each other component in the application. But how about the `$scope`? For each controller we want a new scope, the `$scope` object is not a global dependency registered the same way as lets say `$http` or `$resource`. The same for `$delegate` when we create a decorator. `$scope` and `$delegate` are local dependencies, specific for given component.
+The global dependencies are all the components we register using `factory`, `service`, `filter` etc. They are accessible by each other component in the application. But how about the `$scope`? For each controller we want a different scope, the `$scope` object is not a global dependency registered the same way as lets say `$http` or `$resource`. The same for `$delegate` when we create a decorator. `$scope` and `$delegate` are local dependencies, specific for given component.
 
-Lets go back to the `invoke` implementation. After taking care of `null` or `undefined` for `locals` value, we get the names of all dependencies of the current component. Note that we support only resolving dependency names, defined as property names:
+Lets go back to the `invoke` implementation. After taking care of `null` or `undefined` for `locals` value, we get the names of all dependencies of the current component. Note that our implementation will support resolving of dependencies only declared as parameter names:
 
 {% highlight javascript %}
 ```javascript
 function Controller($scope, $http) {
   // ...
 }
+angular.controller('Controller', Controller);
 ```
 {% endhighlight %}
 
-Once we turn `Controller` into string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies names using the regular expression defined in `annotate`. But what if we have comments in the `Controller`'s definition:
+Once we cast `Controller` into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies' names using the regular expression in `annotate`. But what if we have comments in the `Controller`'s definition:
 
 {% highlight javascript %}
 ```javascript
 function Controller($scope /* only local scope, for the component */, $http) {
   // ...
 }
+angular.controller('Controller', Controller);
 ```
 {% endhighlight %}
 
-Using simple regular expression will break, because invoking `Controller.toString()` will return the comments as well, so that's why we initially strip them by using `.replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')`.
+A simple regular expression will not work here, because invoking `Controller.toString()` will return the comments as well, so that's why we initially strip them by using `.replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')`.
 
-Once we get the names of all dependencies we need to instantiate them so that's why we have the `map`, which loops over all the dependencies and calls `this.get`. Do you notice a problem here? What if we have component `A`, which depends on `B` and `C` and lets say `C` depends on `A`? In this case we are going to have infinite loop or so called `Circular dependency`. In this implementation we don't handle such problems but you can simply take care of them using [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) or marking the visited "nodes" (dependencies).
+Once we get the names of all dependencies we need to instantiate them so that's why we have the `map`, which loops over all the strings in the array and calls `this.get`. Do you notice a problem here? What if we have component `A`, which depends on `B` and `C` and lets say `C` depends on `A`? In this case we are going to have infinite loop or so called `circular dependency`. In this implementation we don't handle such problems but you can take care of them by using [topological sort](https://en.wikipedia.org/wiki/Topological_sorting) or keeping track of the visited "nodes" (dependencies).
 
 And that's our provider's implementation! Now we can register components like this:
 
 {% highlight javascript %}
 ```javascript
-Provider.service('RestfulService', function () {
+Provider.service('RESTfulService', function () {
   return function (url) {
     // make restful call & return promise
   };
 });
 
-Provider.controller('MainCtrl', function (RestfulService) {
-  RestfulService(url)
+Provider.controller('MainCtrl', function (RESTfulService) {
+  RESTfulService(url)
   .then(function (data) {
     alert(data);
   });
@@ -298,8 +300,8 @@ The main responsibility of the `DOMCompiler` is to:
 
 The following API is enough:
 
-- `bootstra()` - bootstraps the application (similar to `angular.bootstrap` but always uses the root HTML element).
-- `compile(el, scope)` - invokes the logic of all directives associated to given element (`el`) and calls itself recursively for each child element of the given element. We need to have scope associated with the current element. Since each directive may create different scope, we need to pass the current scope in the recursive call.
+- `bootstrap()` - bootstraps the application (similar to `angular.bootstrap` but always uses the root HTML element as root of the application).
+- `compile(el, scope)` - invokes the logic of all directives associated with given element (`el`) and calls itself recursively for each child element of `el`. We need to have a scope associated with the current element because that's how the data-binding is achieved. Since each directive may create different scope, we need to pass the current scope in the recursive call.
 
 And here is the implementation:
 
@@ -336,18 +338,16 @@ var DOMCompiler = {
 {% endhighlight %}
 
 The implementation of `bootstrap` is trivial. It delegates its call to `compile` with the root HTML element. What happens in `compile` is far more interesting.
-Initially we use a helper method, which gets all directives associated to the given element. We will take a look at `_getElDirectives` later. Once we have the list of all directives we loop over them and get the provider for each directive. After that we check whether the given directive requires creation of a new scope, if it does and we haven't already instantiated any other scope for the given element we simply invoke `scope.$new()`, which creates a new scope, which prototypically inherits from the current `scope`. After that we simply invoke the link function of the directive, with the appropriate parameters. What follows after that is the recursive call. Since `el.children` is a `NodeList` we cast it to an array by using `Array.prototype.slice.call`, which is followed by recursive call with the child element and the current scope. What does this algorithm reminds you of? Doesn't it look just like DFS - yes, that's what it is. So here the graphs came handy as well!
+Initially we use a helper method, which gets all directives associated to the given element. We will take a look at `_getElDirectives` later. Once we have the list of all directives we loop over them and get the provider for each directive. After that we check whether the given directive requires creation of a new scope, if it does and we haven't already instantiated any other scope for the given element we invoke `scope.$new()`, which creates a new scope, which prototypically inherits from the current `scope`. After that we invoke the link function of the directive, with the appropriate parameters. What follows after that is the recursive call. Since `el.children` is a `NodeList` we cast it to an array by using `Array.prototype.slice.call`, which is followed by recursive call with the child element and the current scope. What does this algorithm reminds you of? Doesn't it look just like DFS - yes, that's what it is. So here the graphs came handy as well!
 
 Now lets take a quick look at `_getElDirectives`:
-
 
 {% highlight javascript %}
 ```javascript
   // ...
   _getElDirectives: function (el) {
-    'use strict';
-    var attrs = el.attributes,
-        result = [];
+    var attrs = el.attributes;
+    var result = [];
     for (var i = 0; i < attrs.length; i += 1) {
       if (Provider.get(attrs[i].name + Provider.DIRECTIVES_SUFFIX)) {
         result.push({
@@ -364,15 +364,15 @@ Now lets take a quick look at `_getElDirectives`:
 
 This method iterates over all attributes of `el`, once it finds an attribute, which is already registered as directive it pushes its name and value in the result list.
 
-Alright! We're done with the `DOMCompiler`. Lets go to our last component:
+Alright! We're done with the `DOMCompiler`. Lets go to our last major component:
 
 ### Scope
 
-This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called `$digest` loop. Basically the whole data-binding mechanism happens because of watched expressions, which the `$digest` loop evaluates. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression's evaluation. If AngularJS finds that they are not equal, it invokes all the watchers associated to the given expression. A watcher could be a function, which receives the new value of the expression and sets it as `innerHTML` of given element for example (what `ng-bind` does).
+This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called `$digest` loop. Basically the whole data-binding mechanism happens because of watched expressions, which are getting evaluated in the `$digest` loop. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression's evaluation. If AngularJS finds that they are not equal, it invokes the watcher associated with the given expression. An example for a watcher is a function, which receives the new value of the expression and sets it as `innerHTML` of given element for example (a simplified version of what `ng-bind` does).
 
 The scope in our implementation has the following methods:
 
-- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` with the new value.
+- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` (the watcher) with the new value.
 - `$destroy()` - removes the current scope.
 - `$eval(expr)` - evaluates the expression `expr` in the context of the current scope.
 - `$new()` - creates a new scope, which prototypically inherits from the target of the call.
@@ -571,7 +571,6 @@ We add `onkeyup` listener to the input. Once we detect a change we call the `$di
 {% highlight javascript %}
 ```javascript
 Provider.directive('ngl-controller', function () {
-  'use strict';
   return {
     scope: true,
     link: function (el, scope, exp) {
