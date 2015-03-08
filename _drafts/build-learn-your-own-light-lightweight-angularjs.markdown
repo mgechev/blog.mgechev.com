@@ -368,4 +368,93 @@ Alright! We're done with the `DOMCompiler`. Lets go to our last component:
 
 ### Scope
 
-This might be the trickiest part of the implementation because of the dirty checking functionality.
+This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called `$digest` loop. Basically the whole data-binding mechanism happens because of watched expressions, which the `$digest` loop evaluates. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression's evaluation. If AngularJS finds that they are not equal, it invokes all the watchers associated to the given expression. A watcher could be a function, which receives the new value of the expression and sets it as `innerHTML` of given element for example (what `ng-bind` does).
+
+The scope in our implementation has the following methods:
+
+- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` with the new value.
+- `$destroy()` - removes the current scope.
+- `$eval(expr)` - evaluates the expression `expr` in the context of the current scope.
+- `$new()` - creates a new scope, which prototypically inherits from the target of the call.
+- `$digest()` - runs the dirty checking loop.
+
+So lets dig deeper the scope's implementation:
+
+
+{% highlight javascript %}
+```javascript
+function Scope(parent, id) {
+  this.$$watchers = [];
+  this.$$children = [];
+  this.$parent = parent;
+  this.$id = id || 0;
+}
+Scope.counter = 0;
+```
+{% endhighlight %}
+
+We simplify the scope significantly. What we have is a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the "static" property counter only in order to keep track of the last scope created and provide a unique identifier of the next scope we create.
+
+Lets add the `$watch` method:
+
+{% highlight javascript %}
+```javascript
+Scope.prototype.$watch = function (exp, fn) {
+  this.$$watchers.push({
+    exp: exp,
+    fn: fn,
+    last: Utils.clone(this.$eval(exp))
+  });
+};
+```
+{% endhighlight %}
+
+In the `$watch` method all we do is to append a new element to the `$$watchers` list. The new element contains a watched expression, a watcher (observer or callback) and the last value of the expression. Since the returned value by `this.$eval` could be an object (referent type) we need to clone it.
+
+Now lets see how we create and destroy scopes!
+
+{% highlight javascript %}
+```javascript
+Scope.prototype.$new = function () {
+  Scope.counter += 1;
+  var obj = new Scope(this, Scope.counter);
+  Object.setPrototypeOf(obj, this);
+  this.$$children.push(obj);
+  return obj;
+};
+
+Scope.prototype.$destroy = function () {
+  var pc = this.$parent.$$children;
+  pc.splice(pc.indexOf(this), 1);
+};
+```
+{% endhighlight %}
+
+What we do in `$new` is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, what we do is to remove the current scope from the list of its parent's children.
+
+Now lets take a look at the legendary `$digest`:
+
+{% highlight javascript %}
+```javascript
+Scope.prototype.$digest = function () {
+  'use strict';
+  var dirty = false,
+      watcher, current, i;
+  do {
+    dirty = false;
+    for (i = 0; i < this.$$watchers.length; i += 1) {
+      watcher = this.$$watchers[i];
+      current = this.$eval(watcher.exp);
+      if (!Utils.equals(watcher.last, current)) {
+        watcher.last = Utils.clone(current);
+        dirty = true;
+        watcher.fn(current);
+      }
+    }
+  } while (dirty);
+  for (i = 0; i < this.$$children.length; i += 1) {
+    this.$$children[i].$digest();
+  }
+};
+```
+{% endhighlight %}
