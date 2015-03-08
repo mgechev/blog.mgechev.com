@@ -437,9 +437,7 @@ Now lets take a look at the legendary `$digest`:
 {% highlight javascript %}
 ```javascript
 Scope.prototype.$digest = function () {
-  'use strict';
-  var dirty = false,
-      watcher, current, i;
+  var dirty, watcher, current, i;
   do {
     dirty = false;
     for (i = 0; i < this.$$watchers.length; i += 1) {
@@ -458,3 +456,135 @@ Scope.prototype.$digest = function () {
 };
 ```
 {% endhighlight %}
+
+Basically we run our loop until it is dirty and by default it is not. The loop "gets dirty" only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such "a dirty" expression we run over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the `$digest` loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the watcher associated to the expression, update the `last` value and mark the loop as `dirty`.
+
+Once we're done we invoke `$digest` recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! How awesome is that! One thing to note here is that we may still have circular dependency, so we should be aware of that! Imagine we have:
+
+
+{% highlight javascript %}
+```javascript
+function Controller($scope) {
+  $scope.i = $scope.j = 0;
+  $scope.$watch('i', function (val) {
+    $scope.j += 1;
+  });
+  $scope.$watch('j', function (val) {
+    $scope.i += 1;
+  });
+  $scope.i += 1;
+  $scope.$digest();
+}
+```
+{% endhighlight %}
+
+In this case we will see:
+
+![](/images/lightweight-ng/snap.png)
+
+at given moment...
+
+And the last (and super hacky) method is `$eval`. Please **do not do that in production**, this is a hack for preventing the need of creating our custom interpreter of expressions:
+
+
+{% highlight javascript %}
+```javascript
+// In the complete implementation there're
+// lexer, parser and interpreter.
+// Note that this implementation is pretty evil!
+// It uses two dangerouse features:
+// - eval
+// - with
+// The reason the 'use strict' statement is
+// omitted is because of `with`
+Scope.prototype.$eval = function (exp) {
+  var val;
+  if (typeof exp === 'function') {
+    val = exp.call(this);
+  } else {
+    try {
+      with (this) {
+        val = eval(exp);
+      }
+    } catch (e) {
+      val = undefined;
+    }
+  }
+  return val;
+};
+
+```
+{% endhighlight %}
+
+What we do here is to check whether the watched expression is a function, if it is we simply call it in the context of the current scope. Otherwise we change the context of execution, using `with` and later run `eval` for evaluating the expression. This allows us to run expressions like: `foo + bar * baz()`, or even more complex JavaScript expressions. Of course, we won't support filters, since they are extension added by AngularJS.
+
+### Directives
+
+So far we can't do a lot of useful things without implementation. In order to make it real we need to add a few directives and services. Lets implement `ngl-bind` (called `ng-bind` in AngularJS), `ngl-model` (`ng-model`), `ngl-controller` (`ng-controller`) and `ngl-click` (`ng-click`)
+
+#### ngl-bind
+
+{% highlight javascript %}
+```javascript
+Provider.directive('ngl-bind', function () {
+  return {
+    scope: false,
+    link: function (el, scope, exp) {
+      el.innerHTML = scope.$eval(exp);
+      scope.$watch(exp, function (val) {
+        el.innerHTML = val;
+      });
+    }
+  };
+});
+```
+{% endhighlight %}
+
+`ngl-bind` doesn't require a new scope. It only adds a single watcher for the expression used as value of the `ngl-value` attribute. In the callback, when we `$digest` detects a change, we set the `innerHTML` of the element.
+
+#### ngl-model
+
+Our alternative of `ng-model` will work only with text inputs. So here is how it looks like:
+
+{% highlight javascript %}
+```javascript
+Provider.directive('ngl-model', function () {
+  return {
+    link:  function (el, scope, exp) {
+      el.onkeyup = function () {
+        scope[exp] = el.value;
+        scope.$digest();
+      };
+      scope.$watch(exp, function (val) {
+        el.value = val;
+      });
+    }
+  };
+});
+```
+{% endhighlight %}
+
+We add `onkeyup` listener to the input. Once we detect a change we call the `$digest` method of the current scope, in order to make sure we will detect the change in the value of all expressions, which use the watched one (usually the watched expression by `ngl-model` should be a single property - `ngl-model="item"`). On change of the watched value we set the element's value.
+
+#### ngl-controller
+
+{% highlight javascript %}
+```javascript
+Provider.directive('ngl-controller', function () {
+  'use strict';
+  return {
+    scope: true,
+    link: function (el, scope, exp) {
+      var ctrl = Provider.get(exp + Provider.CONTROLLERS_SUFFIX);
+      Provider.invoke(ctrl, { $scope: scope });
+    }
+  };
+});
+```
+{% endhighlight %}
+
+We need a new scope for each controller, so that's why the value for `scope` in `ngl-controller` is true. This is one of the places where the magic of AngularJS (more accurately our model of AngularJS) happens. We get the required controller by using `Provider.get`, later we invoke it by passing the current scope. Inside the controller we can add properties to the scope. We can bind to these properties by using `ngl-bind`/`ngl-model`. Once we change the properties' values we need to make sure we've invoked `$digest` in order the watchers associated with `ngl-bind` and `ngl-model` to be invoked.
+
+#### ngl-click
+
+This is the last directive we are going to take a look at, before we're able to implement a "useful" todo application.
