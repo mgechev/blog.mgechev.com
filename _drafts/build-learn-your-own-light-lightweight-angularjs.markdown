@@ -157,7 +157,6 @@ So it will has the following interface:
 #### Registration of components
 
 {% highlight javascript %}
-```javascript
 var Provider = {
   _providers: {},
   directive: function (name, fn) {
@@ -178,7 +177,6 @@ var Provider = {
 };
 Provider.DIRECTIVES_SUFFIX = 'Directive';
 Provider.CONTROLLERS_SUFFIX = 'Controller';
-```
 {% endhighlight %}
 
 The code above provides a simple implementation for registration of components. We define the "private" object called `_providers`, which contains all factory methods of the registered directives, controllers and services. We also define the methods `directive`, `service` and `controller`, which delegate their call to `_register`. In `controller` we wrap the passed controller inside a function for simplicity, since we want to be able to invoke the controller multiple times, without caching the value it returns after being invoked. The method `controller` will get more obvious after we review the `get` method and the `ngl-controller` directive. The only methods left are:
@@ -188,7 +186,6 @@ The code above provides a simple implementation for registration of components. 
 - `annotate`
 
 {% highlight javascript %}
-```javascript
 var Provider = {
   // ...
   get: function (name, locals) {
@@ -221,7 +218,6 @@ var Provider = {
   },
   _cache: { $rootScope: new Scope() }
 };
-```
 {% endhighlight %}
 
 We have have a little bit more logic here so lets start with `get`. In `get` we initially check whether we already have this component cached in the `_cache` object. If it is cached we simply return it (see [singleton](https://github.com/mgechev/angularjs-in-patterns/#singleton)). `$rootScope` is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don't find the component in the cache we get its provider (factory) and invoke it using the `invoke` method, by passing its provider and local dependencies.
@@ -240,23 +236,19 @@ The global dependencies are all the components we register using `factory`, `ser
 Lets go back to the `invoke` implementation. After taking care of `null` or `undefined` for `locals` value, we get the names of all dependencies of the current component. Note that our implementation will support resolving of dependencies only declared as parameter names:
 
 {% highlight javascript %}
-```javascript
 function Controller($scope, $http) {
   // ...
 }
 angular.controller('Controller', Controller);
-```
 {% endhighlight %}
 
 Once we cast `Controller` into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies' names using the regular expression in `annotate`. But what if we have comments in the `Controller`'s definition:
 
 {% highlight javascript %}
-```javascript
 function Controller($scope /* only local scope, for the component */, $http) {
   // ...
 }
 angular.controller('Controller', Controller);
-```
 {% endhighlight %}
 
 A simple regular expression will not work here, because invoking `Controller.toString()` will return the comments as well, so that's why we initially strip them by using `.replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')`.
@@ -266,7 +258,6 @@ Once we get the names of all dependencies we need to instantiate them so that's 
 And that's our provider's implementation! Now we can register components like this:
 
 {% highlight javascript %}
-```javascript
 Provider.service('RESTfulService', function () {
   return function (url) {
     // make restful call & return promise
@@ -279,16 +270,13 @@ Provider.controller('MainCtrl', function (RESTfulService) {
     alert(data);
   });
 });
-```
 {% endhighlight %}
 
 And later we can invoke `MainCtrl` by:
 
 {% highlight javascript %}
-```
 var ctrl = Provider.get('MainCtrl' + Provider.CONTROLLERS_SUFFIX);
 Provider.invoke(ctrl);
-```
 {% endhighlight %}
 
 Pretty cool, ah? And that's how we have 1/4 of our Lightweight AngularJS implementation!
@@ -311,7 +299,6 @@ The following API is enough:
 And here is the implementation:
 
 {% highlight javascript %}
-```javascript
 var DOMCompiler = {
   bootstrap: function () {
     this.compile(document.children[0],
@@ -339,7 +326,6 @@ var DOMCompiler = {
   // ...
 };
 
-```
 {% endhighlight %}
 
 The implementation of `bootstrap` is trivial. It delegates its call to `compile` with the root HTML element. What happens in `compile` is far more interesting.
@@ -348,23 +334,21 @@ Initially we use a helper method, which gets all directives associated to the gi
 Now lets take a quick look at `_getElDirectives`:
 
 {% highlight javascript %}
-```javascript
-  // ...
-  _getElDirectives: function (el) {
-    var attrs = el.attributes;
-    var result = [];
-    for (var i = 0; i < attrs.length; i += 1) {
-      if (Provider.get(attrs[i].name + Provider.DIRECTIVES_SUFFIX)) {
-        result.push({
-          name: attrs[i].name,
-          value: attrs[i].value
-        });
-      }
+// ...
+_getElDirectives: function (el) {
+  var attrs = el.attributes;
+  var result = [];
+  for (var i = 0; i < attrs.length; i += 1) {
+    if (Provider.get(attrs[i].name + Provider.DIRECTIVES_SUFFIX)) {
+      result.push({
+        name: attrs[i].name,
+        value: attrs[i].value
+      });
     }
-    return result;
   }
-  // ...
-```
+  return result;
+}
+// ...
 {% endhighlight %}
 
 This method iterates over all attributes of `el`, once it finds an attribute, which is already registered as directive it pushes its name and value in the result list.
@@ -386,7 +370,6 @@ The scope in our implementation has the following methods:
 So lets dig deeper the scope's implementation:
 
 {% highlight javascript %}
-```javascript
 function Scope(parent, id) {
   this.$$watchers = [];
   this.$$children = [];
@@ -394,7 +377,6 @@ function Scope(parent, id) {
   this.$id = id || 0;
 }
 Scope.counter = 0;
-```
 {% endhighlight %}
 
 We simplify the AngularJS' scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the "static" property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.
@@ -402,7 +384,6 @@ We simplify the AngularJS' scope significantly. We will only have a list of watc
 Lets add the `$watch` method:
 
 {% highlight javascript %}
-```javascript
 Scope.prototype.$watch = function (exp, fn) {
   this.$$watchers.push({
     exp: exp,
@@ -410,7 +391,6 @@ Scope.prototype.$watch = function (exp, fn) {
     last: Utils.clone(this.$eval(exp))
   });
 };
-```
 {% endhighlight %}
 
 In the `$watch` method all we do is to append a new element to the `$$watchers` list. The new element contains a watched expression, a callback (observer) and the `last` result of the expression's evaluation. Since the returned value by `this.$eval` could be a reference to something, we need to clone it.
@@ -418,7 +398,6 @@ In the `$watch` method all we do is to append a new element to the `$$watchers` 
 Now lets see how we create and destroy scopes!
 
 {% highlight javascript %}
-```javascript
 Scope.prototype.$new = function () {
   Scope.counter += 1;
   var obj = new Scope(this, Scope.counter);
@@ -431,7 +410,6 @@ Scope.prototype.$destroy = function () {
   var pc = this.$parent.$$children;
   pc.splice(pc.indexOf(this), 1);
 };
-```
 {% endhighlight %}
 
 What we do in `$new` is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, we remove the current scope from the list of its parent's children.
@@ -439,7 +417,6 @@ What we do in `$new` is to create a new scope, with unique identifier and set it
 Now lets take a look at the legendary `$digest`:
 
 {% highlight javascript %}
-```javascript
 Scope.prototype.$digest = function () {
   var dirty, watcher, current, i;
   do {
@@ -458,7 +435,6 @@ Scope.prototype.$digest = function () {
     this.$$children[i].$digest();
   }
 };
-```
 {% endhighlight %}
 
 Basically we run our loop until it is dirty and by default it is clean. The loop "gets dirty" only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such "a dirty" expression we run a loop over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the `$digest` loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the callback associated to the expression, update the `last` value and mark the loop as `dirty`.
@@ -466,7 +442,6 @@ Basically we run our loop until it is dirty and by default it is clean. The loop
 Once we're done we invoke `$digest` recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! One thing to note here is that we may still have circular dependency (a cycle in the graph), so we should be aware of that! Imagine we have:
 
 {% highlight javascript %}
-```javascript
 function Controller($scope) {
   $scope.i = $scope.j = 0;
   $scope.$watch('i', function (val) {
@@ -478,7 +453,6 @@ function Controller($scope) {
   $scope.i += 1;
   $scope.$digest();
 }
-```
 {% endhighlight %}
 
 In this case we will see:
@@ -490,7 +464,6 @@ at given moment...
 And the last (and super hacky) method is `$eval`. Please **do not do that in production**, this is a hack for preventing the need of creating our custom interpreter of expressions:
 
 {% highlight javascript %}
-```javascript
 // In the complete implementation there're
 // lexer, parser and interpreter.
 // Note that this implementation is pretty evil!
@@ -514,8 +487,6 @@ Scope.prototype.$eval = function (exp) {
   }
   return val;
 };
-
-```
 {% endhighlight %}
 
 We check whether the watched expression is a function, if it is we call it in the context of the current scope. Otherwise we change the context of execution, using `with` and later run `eval` for getting the result of the expression. This allows us to evaluate expressions like: `foo + bar * baz()`, or even more complex JavaScript expressions. Of course, we won't support filters, since they are extension added by AngularJS.
@@ -527,7 +498,6 @@ So far we can't anything useful with the primitives we have. In order to make it
 #### ngl-bind
 
 {% highlight javascript %}
-```javascript
 Provider.directive('ngl-bind', function () {
   return {
     scope: false,
@@ -539,7 +509,6 @@ Provider.directive('ngl-bind', function () {
     }
   };
 });
-```
 {% endhighlight %}
 
 `ngl-bind` doesn't require a new scope. It only adds a single watcher for the expression used as value of the `ngl-value` attribute. In the callback, when `$digest` detects a change, we set the `innerHTML` of the element.
@@ -549,7 +518,6 @@ Provider.directive('ngl-bind', function () {
 Our alternative of `ng-model` will work only with text inputs. So here is how it looks like:
 
 {% highlight javascript %}
-```javascript
 Provider.directive('ngl-model', function () {
   return {
     link:  function (el, scope, exp) {
@@ -563,7 +531,6 @@ Provider.directive('ngl-model', function () {
     }
   };
 });
-```
 {% endhighlight %}
 
 We add `onkeyup` listener to the input. Once the value of the input is changed we call the `$digest` method of the current scope, in order to make sure that the change in the property will reflect all other watched expressions, which have the given property as dependency. On change of the watched value we set the element's value.
@@ -571,7 +538,6 @@ We add `onkeyup` listener to the input. Once the value of the input is changed w
 #### ngl-controller
 
 {% highlight javascript %}
-```javascript
 Provider.directive('ngl-controller', function () {
   return {
     scope: true,
@@ -581,7 +547,6 @@ Provider.directive('ngl-controller', function () {
     }
   };
 });
-```
 {% endhighlight %}
 
 We need a new scope for each controller, so that's why the value for `scope` in `ngl-controller` is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using `Provider.get`, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using `ngl-bind`/`ngl-model`. Once we change the properties' values we need to make sure we've invoked `$digest` in order the watchers associated with `ngl-bind` and `ngl-model` to be invoked.
@@ -591,7 +556,6 @@ We need a new scope for each controller, so that's why the value for `scope` in 
 This is the last directive we are going to take a look at, before we're able to implement a "useful" todo application.
 
 {% highlight javascript %}
-```javascript
 Provider.directive('ngl-click', function () {
   return {
     scope: false,
@@ -603,7 +567,6 @@ Provider.directive('ngl-click', function () {
     }
   };
 });
-```
 {% endhighlight %}
 
 We don't need a new scope here. All we need is to evaluate an expression and invoke the `$digest` loop once the user clicks a button.
@@ -613,7 +576,6 @@ We don't need a new scope here. All we need is to evaluate an expression and inv
 In order to make sure we understand how the data-binding works, lets take a look at the following example:
 
 {% highlight html %}
-```javascript
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -623,18 +585,15 @@ In order to make sure we understand how the data-binding works, lets take a look
   <button ngl-click="foo()">Increment</button>
 </body>
 </html>
-```
 {% endhighlight %}
 
-{% highlight html %}
-```javascript
+{% highlight javascript %}
 Provider.controller('MainCtrl', function ($scope) {
   $scope.bar = 0;
   $scope.foo = function () {
     $scope.bar += 1;
   };
 });
-```
 {% endhighlight %}
 
 Lets follow what is going on in using the following diagram:
