@@ -372,14 +372,13 @@ This might be the trickiest part of the implementation because of the dirty chec
 
 The scope in our implementation has the following methods:
 
-- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` (the watcher) with the new value.
-- `$destroy()` - removes the current scope.
-- `$eval(expr)` - evaluates the expression `expr` in the context of the current scope.
-- `$new()` - creates a new scope, which prototypically inherits from the target of the call.
-- `$digest()` - runs the dirty checking loop.
+- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` (the watcher) with the new value
+- `$destroy()` - destroys the current scope
+- `$eval(expr)` - evaluates the expression `expr` in the context of the current scope
+- `$new()` - creates a new scope, which prototypically inherits from the target of the call
+- `$digest()` - runs the dirty checking loop
 
 So lets dig deeper the scope's implementation:
-
 
 {% highlight javascript %}
 ```javascript
@@ -393,7 +392,7 @@ Scope.counter = 0;
 ```
 {% endhighlight %}
 
-We simplify the scope significantly. What we have is a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the "static" property counter only in order to keep track of the last scope created and provide a unique identifier of the next scope we create.
+We simplify the AngularJS' scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the "static" property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.
 
 Lets add the `$watch` method:
 
@@ -409,7 +408,7 @@ Scope.prototype.$watch = function (exp, fn) {
 ```
 {% endhighlight %}
 
-In the `$watch` method all we do is to append a new element to the `$$watchers` list. The new element contains a watched expression, a watcher (observer or callback) and the last value of the expression. Since the returned value by `this.$eval` could be an object (referent type) we need to clone it.
+In the `$watch` method all we do is to append a new element to the `$$watchers` list. The new element contains a watched expression, a callback (observer) and the `last` result of the expression's evaluation. Since the returned value by `this.$eval` could be a reference to something, we need to clone it.
 
 Now lets see how we create and destroy scopes!
 
@@ -430,7 +429,7 @@ Scope.prototype.$destroy = function () {
 ```
 {% endhighlight %}
 
-What we do in `$new` is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, what we do is to remove the current scope from the list of its parent's children.
+What we do in `$new` is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, we remove the current scope from the list of its parent's children.
 
 Now lets take a look at the legendary `$digest`:
 
@@ -457,10 +456,9 @@ Scope.prototype.$digest = function () {
 ```
 {% endhighlight %}
 
-Basically we run our loop until it is dirty and by default it is not. The loop "gets dirty" only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such "a dirty" expression we run over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the `$digest` loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the watcher associated to the expression, update the `last` value and mark the loop as `dirty`.
+Basically we run our loop until it is dirty and by default it is clean. The loop "gets dirty" only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such "a dirty" expression we run a loop over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the `$digest` loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the callback associated to the expression, update the `last` value and mark the loop as `dirty`.
 
-Once we're done we invoke `$digest` recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! How awesome is that! One thing to note here is that we may still have circular dependency, so we should be aware of that! Imagine we have:
-
+Once we're done we invoke `$digest` recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! One thing to note here is that we may still have circular dependency (a cycle in the graph), so we should be aware of that! Imagine we have:
 
 {% highlight javascript %}
 ```javascript
@@ -485,7 +483,6 @@ In this case we will see:
 at given moment...
 
 And the last (and super hacky) method is `$eval`. Please **do not do that in production**, this is a hack for preventing the need of creating our custom interpreter of expressions:
-
 
 {% highlight javascript %}
 ```javascript
@@ -516,11 +513,11 @@ Scope.prototype.$eval = function (exp) {
 ```
 {% endhighlight %}
 
-What we do here is to check whether the watched expression is a function, if it is we simply call it in the context of the current scope. Otherwise we change the context of execution, using `with` and later run `eval` for evaluating the expression. This allows us to run expressions like: `foo + bar * baz()`, or even more complex JavaScript expressions. Of course, we won't support filters, since they are extension added by AngularJS.
+We check whether the watched expression is a function, if it is we call it in the context of the current scope. Otherwise we change the context of execution, using `with` and later run `eval` for getting the result of the expression. This allows us to evaluate expressions like: `foo + bar * baz()`, or even more complex JavaScript expressions. Of course, we won't support filters, since they are extension added by AngularJS.
 
 ### Directives
 
-So far we can't do a lot of useful things without implementation. In order to make it real we need to add a few directives and services. Lets implement `ngl-bind` (called `ng-bind` in AngularJS), `ngl-model` (`ng-model`), `ngl-controller` (`ng-controller`) and `ngl-click` (`ng-click`)
+So far we can't anything useful with the primitives we have. In order to make it rocks we need to add a few directives and services. Lets implement `ngl-bind` (called `ng-bind` in AngularJS), `ngl-model` (`ng-model`), `ngl-controller` (`ng-controller`) and `ngl-click` (`ng-click`)
 
 #### ngl-bind
 
@@ -540,7 +537,7 @@ Provider.directive('ngl-bind', function () {
 ```
 {% endhighlight %}
 
-`ngl-bind` doesn't require a new scope. It only adds a single watcher for the expression used as value of the `ngl-value` attribute. In the callback, when we `$digest` detects a change, we set the `innerHTML` of the element.
+`ngl-bind` doesn't require a new scope. It only adds a single watcher for the expression used as value of the `ngl-value` attribute. In the callback, when `$digest` detects a change, we set the `innerHTML` of the element.
 
 #### ngl-model
 
@@ -564,7 +561,7 @@ Provider.directive('ngl-model', function () {
 ```
 {% endhighlight %}
 
-We add `onkeyup` listener to the input. Once we detect a change we call the `$digest` method of the current scope, in order to make sure we will detect the change in the value of all expressions, which use the watched one (usually the watched expression by `ngl-model` should be a single property - `ngl-model="item"`). On change of the watched value we set the element's value.
+We add `onkeyup` listener to the input. Once the value of the input is changed we call the `$digest` method of the current scope, in order to make sure that the change in the property will reflect all other watched expressions, which have the given property as dependency. On change of the watched value we set the element's value.
 
 #### ngl-controller
 
@@ -582,7 +579,7 @@ Provider.directive('ngl-controller', function () {
 ```
 {% endhighlight %}
 
-We need a new scope for each controller, so that's why the value for `scope` in `ngl-controller` is true. This is one of the places where the magic of AngularJS (more accurately our model of AngularJS) happens. We get the required controller by using `Provider.get`, later we invoke it by passing the current scope. Inside the controller we can add properties to the scope. We can bind to these properties by using `ngl-bind`/`ngl-model`. Once we change the properties' values we need to make sure we've invoked `$digest` in order the watchers associated with `ngl-bind` and `ngl-model` to be invoked.
+We need a new scope for each controller, so that's why the value for `scope` in `ngl-controller` is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using `Provider.get`, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using `ngl-bind`/`ngl-model`. Once we change the properties' values we need to make sure we've invoked `$digest` in order the watchers associated with `ngl-bind` and `ngl-model` to be invoked.
 
 #### ngl-click
 
@@ -604,4 +601,43 @@ Provider.directive('ngl-click', function () {
 ```
 {% endhighlight %}
 
-We don't need a new scope here. All we need is to evaluate an expression and update the digest loop once the user clicks a button.
+We don't need a new scope here. All we need is to evaluate an expression and invoke the `$digest` loop once the user clicks a button.
+
+## Wiring Everything Together
+
+In order to make sure we understand how the data-binding works, lets take a look at the following example:
+
+{% highlight html %}
+```javascript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body ngl-controller="MainCtrl">
+  <span ngl-bind="bar"></span>
+  <button ngl-click="foo()">Increment</button>
+</body>
+</html>
+```
+{% endhighlight %}
+
+{% highlight html %}
+```javascript
+Provider.controller('MainCtrl', function ($scope) {
+  $scope.bar = 0;
+  $scope.foo = function () {
+    $scope.bar += 1;
+  };
+});
+```
+{% endhighlight %}
+
+Lets follow what is going on in using the following diagram:
+
+![](/images/lightweight-ng/lifecycle-overview.png)
+
+Initially the `ngl-controller` directive is found by the `DOMCompiler`. The `link` function of this directive creates a new `scope` and pass it to the controller's function. We add `bar` property, which is equals to `0` and a method called `foo`, which increments `bar`. The `DOMCompiler` finds `ngl-bind` and adds a watcher for the `bar` property. It also finds `ngl-click` and adds `click` event handler to the button.
+
+Once the user click on the button, the `foo` method is being evaluated by calling `$scope.$eval`. The `$scope` used is the same on, passed as value to `MainCtrl`. Right after that, `ngl-click` invokes `$scope.$digest`. `$digest` loops over all watchers and detects change in the value of the expression `bar`. Since we have associated callback for it (the one added for `ngl-bind`) we invoke it and update the value of the `span` element.
+
+## Conclusion
