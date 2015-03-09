@@ -43,7 +43,7 @@ So lets begin with our implementation!
 
 ## Main Components
 
-Since we are not following the AngularJS implementation completely we will define a set of components and make references to their &&&&&&&& in the original implementation. Although we will not have 100% compatible implementation we will implement most of our framework in the same fashion as it is implemented in AngularJS but with simplified interface and a few missing features.
+Since we are not following the AngularJS implementation completely we will define a set of components and make references to their sources from the original implementation. Although we will not have 100% compatible implementation we will implement most of our framework in the same fashion as it is implemented in AngularJS but with simplified interface and a few missing features.
 
 The AngularJS components we are going to be able to use are:
 
