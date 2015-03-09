@@ -125,7 +125,7 @@ into a tree, we will get:
 
 For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the [depth-first search algorithm](https://en.wikipedia.org/wiki/Depth-first_search), which is used in AngularJS:
 
-{% highlight %}
+{% highlight text %}
 1  procedure DFS(G,v):
 2      label v as discovered
 3      for all edges from v to w in G.adjacentEdges(v) do
