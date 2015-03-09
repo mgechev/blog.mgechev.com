@@ -23,7 +23,7 @@ The second approach works pretty good, especially if you have previous experienc
 
 However, building something from scratch and understanding the core underlying principles is always better. The whole AngularJS framework is above 20k lines of code and parts of it are quite tricky. Very smart developers have worked with months over it and building everything from an empty file is very ambitious task. However, in order to understand the core of the framework and the main design principles we can simplify the things a little bit - we can build a "model".
 
-> Scientific modelling is a scientific activity, the aim of which is to make a particular part or feature of the world easier to understand, define, quantify, visualize, or simulate by referencing it to existing and usually commonly accepted knowledge. It requires selecting and identifying relevant aspects
+> Scientific modelling is a scientific activity, the aim of which is to make a particular part or feature of the world easier to understand, define, quantify, visualize, or simulate by referencing it to existing and usually commonly accepted knowledge. It requires selecting and identifying relevant aspects...
 
 We can achieve this simplification by:
 
