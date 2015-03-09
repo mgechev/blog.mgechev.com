@@ -36,8 +36,8 @@ Before reading the rest of the article I strongly recommend you first to get fam
 
 Here are some links with code snippets/demos for the following article:
 
-- [Lightweight AngularJS Source Code](https://github.com/mgechev/light-angularjs)
-- [Very Simple TODO Application Built with Lightweight AngularJS](https://mgechev.github.io/light-angularjs/)
+- [Lightweight AngularJS source code](https://github.com/mgechev/light-angularjs)
+- [Very simple todo application built with Lightweight AngularJS](https://mgechev.github.io/light-angularjs/)
 
 So lets begin with our implementation!
 
