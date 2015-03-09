@@ -65,20 +65,3 @@ $(document).ready(function() {
     mainClass: 'mfp-fade'
   });
 });
-
-$(function () {
-  function isTouchDevice() {
-    try {
-      document.createEvent('TouchEvent');
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  if (isTouchDevice()) {
-    $('#gh-ribbon').css({
-      position: 'absolute'
-    });
-  }
-});
