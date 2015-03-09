@@ -82,7 +82,7 @@ The `DOMCompiler` is a singleton, which will traverse the DOM tree and find dire
 
 ### Scope
 
-And the last major component in our Lightweight AngularJS, will be the scope. In order to implement the data-binding logic we need to have `$scope` to attach properties. We can compose these properties into expressions and watch them. When we discover that the value of given expression has changed we can simply invoke the watcher (observer) associated with the expression.
+And the last major component in our Lightweight AngularJS, will be the scope. In order to implement the data-binding logic we need to have `$scope` to attach properties. We can compose these properties into expressions and watch them. When we discover that the value of given expression has changed we can simply invoke a callback (observer) associated with the expression.
 
 Responsibilities of the scope:
 
@@ -357,11 +357,11 @@ Alright! We're done with the `DOMCompiler`. Lets go to our last major component:
 
 ### Scope
 
-This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called `$digest` loop. Basically the whole data-binding mechanism happens because of watched expressions, which are getting evaluated in the `$digest` loop. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression's evaluation. If AngularJS finds that they are not equal, it invokes the watcher associated with the given expression. An example for a watcher is a function, which receives the new value of the expression and sets it as `innerHTML` of given element for example (a simplified version of what `ng-bind` does).
+This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called `$digest` loop. Basically the whole data-binding mechanism happens because of watched expressions, which are getting evaluated in the `$digest` loop. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression's evaluation. If AngularJS finds that they are not equal, it invokes the callback associated with the given expression. An example for a watcher is an object `{ expr, fn, last }`, where `expr` is the watched expression, `fn` is the function, which should be called once the expression has changed and `last` is the last known value of the expression. For instance, we can watch the expression `foo` with a callback, which on change is being invoked with the expression's value and sets the `innerHTML` of given element (a simplified version of what `ng-bind` does).
 
 The scope in our implementation has the following methods:
 
-- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` (the watcher) with the new value
+- `$watch(expr, fn)` - watches the expression `expr`. Once we detect change in the `expr` value we invoke `fn` (the callback) with the new value
 - `$destroy()` - destroys the current scope
 - `$eval(expr)` - evaluates the expression `expr` in the context of the current scope
 - `$new()` - creates a new scope, which prototypically inherits from the target of the call
