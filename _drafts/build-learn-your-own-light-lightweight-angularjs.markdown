@@ -55,7 +55,7 @@ In order to achieve this functionality we will need to implement the `$compile` 
 
 This is how the relation between `Provider`, `Scope` and `DOMCompiler` will look like:
 
-![](/images/lightweight-ng/main-components.png)
+[![](/images/lightweight-ng/main-components.png)](/images/lightweight-ng/main-components.png)
 
 ### Provider
 
@@ -96,7 +96,7 @@ In order to have better understanding of the implementation, we need to dig a bi
 
 First of all, what actually graphs are? We can think of given graph as pair of two sets: `G = { V, E }, E ⊆ V x V`. This seems quite abstract, I believe. Lets make it a bit more understandable. We can think of the set `V` as different Tinder users and the set `E` as their matches. For example, if we have the users `V = (A, B, C, D)` and we have matches between `E = ((A, B), (A, C), (A, D), (B, D))`, this means not only that `A` swipes right everyone but also that the edges inside our graph are these matches. Our "social graph" will look like this:
 
-![](/images/lightweight-ng/tinder-graph.png)
+[![](/images/lightweight-ng/tinder-graph.png)](/images/lightweight-ng/tinder-graph.png)
 
 This is an example for undirected graph, since both users like each other. If we have partial match (only one of the users like the other one), we have directed graph. In the case of directed graph, the connections between the nodes will be arrows, to show the direction (i.e. which is the user who is interested in the other one).
 
@@ -104,7 +104,7 @@ This is an example for undirected graph, since both users like each other. If we
 
 But how we can apply graph theory in our AngularJS implementation? In AngularJS instead of users we have components (services, controllers, directives, filters). Each component may depend (use) another component. So the nodes in our AngularJS graph are the different components and the edges are the relations between them. For example, the graph of the dependencies of the `$resource` service, will look something like:
 
-![](/images/lightweight-ng/resource-graph.png)
+[![](/images/lightweight-ng/resource-graph.png)](/images/lightweight-ng/resource-graph.png)
 
 There are two more places we are going to use graphs - the DOM tree and the scope hierarchy. For example, if we turn the following HTML:
 
@@ -121,7 +121,7 @@ There are two more places we are going to use graphs - the DOM tree and the scop
 
 into a tree, we will get:
 
-![](/images/lightweight-ng/dom-tree.png)
+[![](/images/lightweight-ng/dom-tree.png)](/images/lightweight-ng/dom-tree.png)
 
 For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the [depth-first search algorithm](https://en.wikipedia.org/wiki/Depth-first_search), which is used in AngularJS:
 
@@ -483,7 +483,7 @@ function Controller($scope) {
 
 In this case we will see:
 
-![](/images/lightweight-ng/snap.png)
+[![](/images/lightweight-ng/snap.png)](/images/lightweight-ng/snap.png)
 
 at given moment...
 
@@ -639,7 +639,7 @@ Provider.controller('MainCtrl', function ($scope) {
 
 Lets follow what is going on in using the following diagram:
 
-![](/images/lightweight-ng/lifecycle-overview.png)
+[![](/images/lightweight-ng/lifecycle-overview.png)](/images/lightweight-ng/lifecycle-overview.png)
 
 Initially the `ngl-controller` directive is found by the `DOMCompiler`. The `link` function of this directive creates a new `scope` and pass it to the controller's function. We add `bar` property, which is equals to `0` and a method called `foo`, which increments `bar`. The `DOMCompiler` finds `ngl-bind` and adds a watcher for the `bar` property. It also finds `ngl-click` and adds `click` event handler to the button.
 
@@ -657,7 +657,7 @@ work in a similar way they do in AngularJS. This helps understanding AngularJS i
 
 But still you should not forget to **not use this code in production**, much better would be to just `bower install angular` and enjoy!
 
-![](/images/no-production.gif)
+[![](/images/no-production.gif)](/images/no-production.gif)
 
 And here are the slides from my talk "Lightweight AngularJS" as promised:
 
