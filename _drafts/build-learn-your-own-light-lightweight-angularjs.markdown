@@ -641,3 +641,19 @@ Initially the `ngl-controller` directive is found by the `DOMCompiler`. The `lin
 Once the user click on the button, the `foo` method is being evaluated by calling `$scope.$eval`. The `$scope` used is the same on, passed as value to `MainCtrl`. Right after that, `ngl-click` invokes `$scope.$digest`. `$digest` loops over all watchers and detects change in the value of the expression `bar`. Since we have associated callback for it (the one added for `ngl-bind`) we invoke it and update the value of the `span` element.
 
 ## Conclusion
+
+The framework we just built is far from a usable into production one, however some of its features:
+
+- Data-binding
+- Dependency Injection
+- Separation of Concerns
+
+work in a similar way they do in AngularJS. This helps understanding AngularJS in deep much easier.
+
+But still you should not forget to **not use this code in production**, much better would be to just `bower install angular` and enjoy!
+
+![](/images/no-production.gif)
+
+And here are the slides from my talk "Lightweight AngularJS" as promised:
+
+<script async class="speakerdeck-embed" data-id="a8ae722059f30132eac53e5908420f0a" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
