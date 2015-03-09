@@ -34,6 +34,11 @@ This is what I did in my "Lightweight AngularJS" implementation, which is [hoste
 
 Before reading the rest of the article I strongly recommend you first to get familiar with the basics of AngularJS. A good start could be this [short overview of AngularJS](http://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/).
 
+Here are some links with code snippets/demos for the following article:
+
+- [Lightweight AngularJS Source Code](https://github.com/mgechev/light-angularjs)
+- [Very Simple TODO Application Built with Lightweight AngularJS](https://mgechev.github.io/light-angularjs/)
+
 So lets begin with our implementation!
 
 ## Main Components
