@@ -25,6 +25,7 @@ Some of the projects I've developed are:
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
 - [angular-transitions](http://angular-transitions.mgechev.com/)
 - [ng-tutorial](http://ng-tutorial.mgechev.com/)
+- [angular-webrtc](https://github.com/mgechev/angular-webrtc)
 
 ## ReactJS
 
@@ -42,8 +43,15 @@ Some of the projects I've developed are:
 - [movement.js](https://github.com/mgechev/movement.js)
 
 <br>
+
 [And many, many others...](https://github.com/mgechev)
 
-To contact me use my e-mail: **mgechev at gmail**
+<br>
+
+I also like talking about software development. Some of my talks could be found at my [SpeakerDeck account](https://speakerdeck.com/mgechev), and the HTML5 ones at my [GitHub](https://github.com/mgechev).
+
+<br>
+
+If you want to contact me you can use my e-mail: **mgechev at gmail**
 
  [1]: https://github.com/mgechev
