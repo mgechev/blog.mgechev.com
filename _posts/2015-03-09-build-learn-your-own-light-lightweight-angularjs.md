@@ -1,5 +1,5 @@
 ---
-title: Build Your Own Simplified AngularJS in 200 Lines of JavaScript
+title: Build Your own Simplified AngularJS in 200 Lines of JavaScript
 author: minko_gechev
 layout: post
 categories:
