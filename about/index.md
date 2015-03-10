@@ -21,7 +21,6 @@ Some of the projects I've developed are:
 
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
-- [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [A framework for Aspect-Oriented Programming with AngularAOP](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
 - [angular-transitions](http://angular-transitions.mgechev.com/)
@@ -35,12 +34,14 @@ Some of the projects I've developed are:
 ## Others
 
 - [plainvm](http://plainvm.mgechev.com/)
+- [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [BlobReader - a simplified interface for reading Blobs](https://github.com/mgechev/blobreader)
-- [DistrElang a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [VNC plugin for Chrome DevTools](https://github.com/mgechev/devtools-vnc)
 - [mk.js](https://github.com/mgechev/mk.js)
+- [DistrElang a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [movement.js](https://github.com/mgechev/movement.js)
 
+<br>
 [And many, many others...](https://github.com/mgechev)
 
 To contact me use my e-mail: **mgechev at gmail**
