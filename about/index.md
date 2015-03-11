@@ -54,15 +54,15 @@ Some of the projects I've developed are:
 
 I also like talking about software development. Some of my talks:
 
-- ["AngularJS in Patterns"](https://speakerdeck.com/mgechev/angularjs-in-patterns-lightning-talk), AngularJS-SF user group (25th of February, 2015)
-- ["Taking the web apps offline"](https://speakerdeck.com/mgechev/taking-the-web-apps-offline), talk I did in ICN (27th of January, 2015)
-- ["Lightweight AngularJS"](https://speakerdeck.com/mgechev/lightweight-angularjs), SoftServe's IT Weekend (29th of November, 2014). Blog post on this topic could be [found here](https://github.com/mgechev/light-angularjs)
-- ["Introduction to JavaScript's MVW with Backbone.js"](https://speakerdeck.com/mgechev/introduction-to-mvw-in-javascript), HackBulgaria (31st of July, 2014)
-- ["Introduction to WebRTC"](https://github.com/mgechev/webrtc-slides-jsnext), JSNext, (24th of November, 2014)
-- ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns-slides-plovdev), PlovDev (18th of October, 2014)
-- ["What can JavaScript do?"](https://github.com/mgechev/what-js-can-do-slides), HackBulgaria (31st of October, 2014)
-- ["Aspect-Oriented Programming with AngularJS"](https://github.com/mgechev/angular-aop-talk), AngularJS-SF user group (5th of May, 2014)
-- ["JavaScript Patterns" (BG)](https://www.youtube.com/watch?v=a23oYdqQVvM), Telerik (22nd of April, 2013)
+- ["AngularJS in Patterns"](https://speakerdeck.com/mgechev/angularjs-in-patterns-lightning-talk), AngularJS-SF user group (San Francisco, USA, 25th of February, 2015)
+- ["Taking the web apps offline"](https://speakerdeck.com/mgechev/taking-the-web-apps-offline), talk I did in ICN (Sofia, Bulgaria, 27th of January, 2015)
+- ["Lightweight AngularJS"](https://speakerdeck.com/mgechev/lightweight-angularjs), SoftServe's IT Weekend (Sofia, Bulgaria, 29th of November, 2014). Blog post on this topic could be [found here](https://github.com/mgechev/light-angularjs)
+- ["Introduction to JavaScript's MVW with Backbone.js"](https://speakerdeck.com/mgechev/introduction-to-mvw-in-javascript), HackBulgaria (Sofia, Bulgaria, 31st of July, 2014)
+- ["Introduction to WebRTC"](https://github.com/mgechev/webrtc-slides-jsnext), JSNext, (Sofia, Bulgaria, 24th of November, 2014)
+- ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns-slides-plovdev), PlovDev (Plovdiv, Bulgaria, 18th of October, 2014)
+- ["What can JavaScript do?"](https://github.com/mgechev/what-js-can-do-slides), HackBulgaria (Sofia, Bulgaria, 31st of October, 2014)
+- ["Aspect-Oriented Programming with AngularJS"](https://github.com/mgechev/angular-aop-talk), AngularJS-SF user group (San Francisco, USA, 5th of May, 2014)
+- ["JavaScript Patterns" (BG)](https://www.youtube.com/watch?v=a23oYdqQVvM), Telerik (Sofia, Bulgaria, 22nd of April, 2013)
 
 And a few others, which could be found at my [GitHub account](https://github.com/mgechev).
 
