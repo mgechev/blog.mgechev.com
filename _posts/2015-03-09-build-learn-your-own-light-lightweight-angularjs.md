@@ -150,7 +150,7 @@ So it will has the following interface:
 - `get(name, locals)` - returns service by its name and local dependencies
 - `invoke(fn, locals)` - initializes service by its factory and local dependencies
 - `directive(name, fn)` - registers a directive by name and factory
-- `controller(name, fn)` - registers a controller by name and factory. Note that controllers are not part of the AngularJS' core. They are implemented through the `$controller` service. Note that controllers are not part of the AngularJS' core. They are implemented through the `$controller` service.
+- `controller(name, fn)` - registers a controller by name and factory. Note that controllers are not part of the AngularJS' core. They are implemented through the `$controller` service.
 - `service(name, fn)` - registers a service by name and factory
 - `annotate(fn)` - returns an array of the names of the dependencies of given service
 
