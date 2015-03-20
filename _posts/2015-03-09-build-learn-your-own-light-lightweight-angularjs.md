@@ -316,10 +316,7 @@ var DOMCompiler = {
       }
       dir.link(el, scope, d.value);
     });
-    var children = Array.prototype.slice.call(el.children).map(function (c) {
-      return c;
-    });
-    children.forEach(function (c) {
+    Array.prototype.slice.call(el.children).forEach(function (c) {
       this.compile(c, scope);
     }, this);
   },
