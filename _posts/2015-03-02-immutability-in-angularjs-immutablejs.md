@@ -268,7 +268,7 @@ function SampleCtrl($scope, $timeout) {
     }
     $timeout(function () {
       // Changes random index of the array
-      var idx = Math.round(Math.random() * SIZE) - 1;
+      var idx = Math.floor(Math.random() * (SIZE - 1));
       $scope.list[idx] = Math.random();
       runs += 1;
       changeCollection();
@@ -281,7 +281,7 @@ function SampleCtrl($scope, $timeout) {
 The code for Immutable.js is similar except that the body of `$timeout` looks like:
 
 {% highlight JavaScript %}
-var idx = Math.random() * SIZE - 1;
+var idx = Math.floor(Math.random() * (SIZE - 1));
 $scope.list = $scope.list.set(idx, Math.random());
 {% endhighlight %}
 
