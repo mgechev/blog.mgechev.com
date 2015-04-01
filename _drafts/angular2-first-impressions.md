@@ -59,3 +59,55 @@ In the core of AngularJS 2.0 are embedded the web standards. The "new directives
 During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's now way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
 
 This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That's one of the things I've always dreamed of and I'm kind of disappointed it is added at this late stage.
+
+## No more $scope
+
+There are a lot of statements the `$scope` was tricky for explanation concept of the AngularJS application to beginners in the framework. Well, I had harder times explaining the module system, anyway, `$scope` now do not exists! Yeah, we have no scope anymore. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
+
+For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
+
+```javascript
+@Component({
+  selector: 'sample-app',
+  componentServices: [
+    NameList
+  ]
+})
+@Template({
+  url: './templates/sample-app.html',
+  directives: [Foreach]
+})
+class SampleApp {
+  constructor() {
+    this.names = NameList.get();
+    this.newName = '';
+  }
+  addName(newname) {
+    this.names.push(newname.value);
+    newname.value = '';
+  }
+}
+```
+We can directly bind to `this.names` inside our template, like this:
+
+```html
+...
+<ul>
+  <li *foreach="#name in names">{{name}}</li>
+</ul>
+...
+```
+No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop? How are we going to do this now? Well, we cant.
+
+## No more $scope.$apply
+
+But how then AngularJS knows that anything outside it's execution concept has taken a place? Lets think where the changes might come from:
+
+- `setTimeout`
+- `setInterval`
+- `prompt` (yeah, there are people who still use it...)
+- `XMLHttpRequest`
+- `WebSockets`
+- ...
+
+Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of the browsers' APIs? **Well...we can monkey patch all of them!**
