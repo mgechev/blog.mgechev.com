@@ -110,4 +110,23 @@ But how then AngularJS knows that anything outside it's execution concept has ta
 - `WebSockets`
 - ...
 
-Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of the browsers' APIs? **Well...we can monkey patch all of them!**
+Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of the browsers' APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
+
+I bet now you're thinking - "Oh God! Why I'd use something, which monkey patches all the browser APIs? This is just not right!". But why it isn't?
+
+- Might create additional bugs of the methods are not patched properly. Very smart people work on making Zone.js patch the APIs without any issues and it has [solid amount of tests](https://github.com/angular/zone.js/tree/master/test).
+- May slowdown the method executions. It turned out it is not such a big issue if you wrap a function execution inside another function. --------------
+
+## Errors in the Template Expressions
+
+Another thing I didn't really like in AngularJS 1.x was the lack of errors when you make a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in AngularJS 2.0 you will get runtime errors in such cases.
+
+## Ultra Fast Change Detection
+
+It is still not clarified how the change detection will be actually implemented. The AngularJS team is still making tests and running benchmarks in order to decide what are the appropriate change detection strategies in specific cases. Another completely innovative idea I found, digging inside their source code was inside the `JITChangeDetector`. Since, mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:
+
+```javascript
+this.value === oldValue;
+```
+
+The AngularJS team decided that they can generate JavaScript classes, which implement this change detection behavior, instead of using method calls (take a look [at these benchmarks](http://jsperf.com/object-observe-polyfill-sandbox)).
