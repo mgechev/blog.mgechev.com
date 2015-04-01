@@ -34,4 +34,28 @@ And here are some of the main advantages:
 
 ## AngularJS 2.0 has No Controllers
 
-It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS.
+It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added three different types of directives:
+
+- Components - which are supposed to be high-level UI components, which include some business logic as well (i.e. directive + controller). In order to make your transition from 1.x to 2.0 there are [some suggestions](http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/) of using directives, which simulate the behavior of the components, instead of using controllers.
+- Viewports
+- ---------
+
+## Now Two-Way data-binding
+
+One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped in v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing. Removing the two-way data-binding leads to:
+
+- More explicit data-flow
+- No circular dependencies between bindings (so no TTL of the `$digest`)
+- Performance
+  - The digest loop could be run only once
+  - We can create apps, which are friendly to immutable data, which allows us to make further optimizations (for more information take a look at my talk at `ng-vegas`)
+
+## WebComponents
+
+In the core of AngularJS 2.0 are embedded the web standards. The "new directives" have their own shadow-root. I'm one of the fens of the Shadow DOM, mostly because of the encapsulation it provides.
+
+## Real Modules
+
+During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's now way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
+
+This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That's one of the things I've always dreamed of and I'm kind of disappointed it is added at this late stage.
