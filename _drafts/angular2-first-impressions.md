@@ -32,9 +32,18 @@ And here are some of the main advantages using TypeScript as statically typed la
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
   - TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.
 
-Does the run-time type checking lead to slower execution of your application? Probably yes, but you can disable it when you plan to deploy your app in production.
+### Quick FAQ:
 
-## AngularJS 2.0 has No Controllers
+*Does the run-time type checking lead to slower execution of your application?*<br>
+Probably yes, but you can disable it when you plan to deploy your app in production.
+
+*Shold I use TypeScript for my AngularJS 2.0 application?*<br>
+It is not necessary but I'd recommend you to do so, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you to do so.
+
+*How can I take advantage of it? Should I use Visual Studio or something?*<br>
+No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)).
+
+## AngularJS 2.0 has no Controllers
 
 It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added three different types of directives:
 
@@ -42,19 +51,42 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 - Viewports
 - ---------
 
+### Quick FAQ:
+
+*Similar to React? Does that mean that we have to inline our markup inside the directives we define?*<br>
+You can but you don't have to. You can use inline templates or external files (just like using `template` and `templateUrl` in AngularJS 1.x.x).
+
+*Does that mean that I need to change the design of the whole app, i.e. turn each controller to a directive of type component?*<br>
+No, you don't have to change the design of your app. In order to make the transition even smoother you can use the ["Container component pattern"](http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/)
+
+*Do I have to rewrite everything I already have?*<br>
+Very likely, but if you've structured your application properly (i.e. followed my style guide), you'd be able to completely reuse at least your services.
+
 ## Now Two-Way data-binding
 
-One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped in v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing. Removing the two-way data-binding leads to:
+One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped in v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing, do not be heartbroken. Removing the two-way data-binding leads to:
 
 - More explicit data-flow
 - No circular dependencies between bindings (so no TTL of the `$digest`)
-- Performance
+- Better performance
   - The digest loop could be run only once
-  - We can create apps, which are friendly to immutable data, which allows us to make further optimizations (for more information take a look at my talk at `ng-vegas`)
+  - We can create apps, which are friendly to immutable/observable models, which allows us to make further optimizations (for more information about immutable data take a look at [my talk at `ng-vegas`](http://www.ng-vegas.org/) or this great [post by Victor Savkin](http://victorsavkin.com/post/110170125256/change-detection-in-angular-2), a core member of the AngularJS team)
+
+### Quick FAQ:
+
+*Does that mean that we'll do a lot of manual work building forms?*<br>
+No. AngularJS 2.0 has a great [forms module](http://angularjs.blogspot.com/2015/03/forms-in-angular-2.html).
+
+*So AngularJS 2.0 is basically ReactJS implemented by Google?*<br>
+No. The binding mechanism is completely different, it provides wider functionality than React (AngularJS 2.0 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should drop using React and wait for AngularJS 2.0, for example in a project I started a few weeks ago I choose to use ReactJS instead. It completely depends on the application you are going to build and the business goals you have.
+
+*Single directional data flow...We can use Flux then?*<br>
+Yes you can! I'd even recommend to use Flux! Here is one more [great post by Victor Savkin about using Flux with AngularJS](http://victorsavkin.com/post/99998937651/building-angular-apps-using-flux-architecture).
 
 ## WebComponents
 
-In the core of AngularJS 2.0 are embedded the web standards. The "new directives" have their own shadow-root. I'm one of the fens of the Shadow DOM, mostly because of the encapsulation it provides.
+<blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn&#39;t seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## Real Modules
 
