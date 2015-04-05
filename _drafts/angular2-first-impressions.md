@@ -247,3 +247,13 @@ The API of AngularJS 2.0 is still under development. There are a lot of things, 
 AngularJS 2.0 will be a new framework, which is not backward compatible with AngularJS 1.x. It is implemented in AtScript (superset of TypeScript) but you don't have to use it, if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [Flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
 
 Should I use it in production? **No**, but you can experiment with it.
+
+## Resources
+
+- [Official Website](http://angular.io)
+- [The official AngularJS 2.0 repository](https://github.com/angular/angular)
+- [Change detection design doc](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit)
+- ["Ultra Fast Change Detection](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web)
+- [Localization and internationalization](https://www.youtube.com/watch?v=iBBkCA1M-mc)
+- [angular2-seed](https://github.com/mgechev/angular2-seed)
+- [Flux architecture](https://facebook.github.io/flux/)
