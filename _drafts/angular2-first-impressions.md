@@ -21,6 +21,8 @@ In this blog post I'll share my first impressions of the framework and I'll try 
 
 As Microsoft already published, [AngularJS 2.0 is written in extended version of TypeScript, called AtScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
 
+----------------------------------------------------- VEN DIAGRAM FOR LANGUAGES INTERSECTION --------------------------------------------
+
 And here are some of the main advantages using TypeScript as statically typed language:
 
 - Using statically typed language:
@@ -88,15 +90,28 @@ Yes you can! I'd even recommend to use Flux! Here is one more [great post by Vic
 <blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn&#39;t seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
+What exactly is framework and what is a library? Lets take a look at AngularJS' docs:
+
+>The impedance mismatch between dynamic applications and static documents is often solved with:
+>a library - a collection of functions which are useful when writing web apps. Your code is in charge and it calls into the library when it sees fit. E.g., jQuery.
+>frameworks - a particular implementation of a web application, where your code fills in the details. The framework is in charge and it calls into your code when it needs something app specific. E.g., durandal, ember, etc.
+
+I wouldn't call AngularJS 2.0 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage of other things web components provide like custom elements, etc.
+
+### Quick FAQ:
+
+*So I can't use AngularJS 2.0 in IE and any other browser which doesn't support Web Components?*<br>
+You can. There are a lot of [polyfills](http://webcomponents.org/polyfills/), which handle the lack of support.
+
 ## Real Modules
 
-During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's now way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
+During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's no way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
 
 This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That's one of the things I've always dreamed of and I'm kind of disappointed it is added at this late stage.
 
 ## No more $scope
 
-There are a lot of statements the `$scope` was tricky for explanation concept of the AngularJS application to beginners in the framework. Well, I had harder times explaining the module system, anyway, `$scope` now do not exists! Yeah, we have no scope anymore. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
+There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in AngularJS 2.0! There is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
 
 For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
@@ -131,11 +146,14 @@ We can directly bind to `this.names` inside our template, like this:
 </ul>
 ...
 ```
-No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop? How are we going to do this now? Well, we cant.
+No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop and perform dirty checking? How are we going to do this now? Well, we cant.
+
+*I like the scope, I was able to explicitly state what I want to expose to my templates. Are there any advantages removing the scope except of "hard to explain to beginners"?*<br>
+Some of the biggest memory leaks I've ever had were caused by forgetting to destroy the `$scope` of given directive. Removing scope leads to less AngularJS components, so less bugs, lower complexity. A lot of people were doing things which sometimes looked like workarounds, when inheriting the scope (thinking they've inherited the controller), doing complex publish/subscribe messaging between parent and child scopes etc. All these things will not be required anymore.
 
 ## No more $scope.$apply
 
-But how then AngularJS knows that anything outside it's execution concept has taken a place? Lets think where the changes might come from:
+But how then AngularJS knows that anything outside it's execution context has taken a place? Lets think where the changes might come from:
 
 - `setTimeout`
 - `setInterval`
@@ -144,7 +162,9 @@ But how then AngularJS knows that anything outside it's execution concept has ta
 - `WebSockets`
 - ...
 
-Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of the browsers' APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
+-------------------------------------- MONKEY PATCH THEM ALL IMAGE -------------------------------------------
+
+Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of these APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
 
 I bet now you're thinking - "Oh God! Why I'd use something, which monkey patches all the browser APIs? This is just not right!". But why it isn't?
 
