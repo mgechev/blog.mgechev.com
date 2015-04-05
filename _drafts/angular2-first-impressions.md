@@ -21,7 +21,9 @@ In this blog post I'll share my first impressions of the framework and I'll try 
 
 As Microsoft already published, [AngularJS 2.0 is written in extended version of TypeScript, called AtScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
 
+<center>
 ![JavaScript Dialects](/images/js-dialects-ven.png)
+</center>
 
 And here are some of the main advantages using TypeScript as statically typed language:
 
@@ -162,7 +164,9 @@ But how then AngularJS knows that anything outside it's execution context has ta
 - `WebSockets`
 - ...
 
+<center>
 ![All The Things](/images/monkey-patch-all-the-things.png)
+</center>
 
 Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of these APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
 
