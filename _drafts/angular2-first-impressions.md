@@ -47,11 +47,24 @@ No. You can use the [traceur compiler](https://github.com/google/traceur-compile
 
 ## AngularJS 2.0 has no Controllers
 
-It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added three different types of directives:
+It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added...
 
-- Components - which are supposed to be high-level UI components, which include some business logic as well (i.e. directive + controller). In order to make your transition from 1.x to 2.0 there are [some suggestions](http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/) of using directives, which simulate the behavior of the components, instead of using controllers.
-- Viewports
-- ---------
+## three different types of directives:
+
+> - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
+>   - Only one component can be present per DOM element.
+>   - Component's CSS selectors usually trigger on element names. (Best practice)
+>   - Component has its own shadow view which is attached to the element as a Shadow DOM.
+>   - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
+> - Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
+>   - Viewports can only be placed on <template> elements (or the short hand version which uses <element template> attribute.)
+>   - Only one viewport can be present per DOM template element.
+>   - The viewport is created over the template element. This is known as the ViewContainer.
+> Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
+> - Decorator. According to the AngularJS docs (still incomplete) decorators are the simplest kind of directive is a decorator. Directives are usefull for encapsulating behavior.
+>   - Multiple decorators can be placed on a single element.
+>   - Decorators do not introduce new evaluation context.
+>   - Decorators are registered through the @Decorator meta-data annotation.
 
 ### Quick FAQ:
 
@@ -221,13 +234,13 @@ We trust AngularJS that it is going to be implemented well and we won't need to 
 *Will it lead to any debugging complications (for example entering the change detection, generated class because of a breakpoint we're in)?*<br>
 If you use your debugger properly you should not have any issues. Take a look at the [slides of Addy Osmani on the state of DevTools, 2015, jQuery London meetup](https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109).
 
-## It is not production ready
-
-The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
-
 ### Further reading
 
 For more information you can take a look at the design docs ([here](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web) and [here](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web)) and the [AngularJS' source code](https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection).
+
+## It is not production ready
+
+The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
 
 ## Conclusion
 
