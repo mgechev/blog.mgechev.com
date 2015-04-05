@@ -168,8 +168,13 @@ Basically a lot of browsers' APIs. How we can be notified when the user invokes 
 
 I bet now you're thinking - "Oh God! Why I'd use something, which monkey patches all the browser APIs? This is just not right!". But why it isn't?
 
-- Might create additional bugs of the methods are not patched properly. Very smart people work on making Zone.js patch the APIs without any issues and it has [solid amount of tests](https://github.com/angular/zone.js/tree/master/test).
-- May slowdown the method executions. It turned out it is not such a big issue if you wrap a function execution inside another function. --------------
+### Quick FAQ:
+
+*Will patching the browser's APIs lead to huge amount of bugs?*<br>
+Very smart people, who know what they are doing, work on making Zone.js patch the APIs without any issues. It also has [solid amount of tests](https://github.com/angular/zone.js/tree/master/test).
+
+*Will using Zone.js slowdown the method executions?*<br>
+According to the talk about [Zone.js](https://www.youtube.com/watch?v=3IqtmUscE_U), this is not the case.
 
 ## Errors in the Template Expressions
 
@@ -177,10 +182,42 @@ Another thing I didn't really like in AngularJS 1.x was the lack of errors when 
 
 ## Ultra Fast Change Detection
 
-It is still not clarified how the change detection will be actually implemented. The AngularJS team is still making tests and running benchmarks in order to decide what are the appropriate change detection strategies in specific cases. Another completely innovative idea I found, digging inside their source code was inside the `JITChangeDetector`. Since, mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:
+**There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will implement what is best possible way based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.**
+
+Another completely innovative idea I found, digging inside AngularJS' source code was inside the `JITChangeDetector`. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:
 
 ```javascript
 this.value === oldValue;
 ```
 
-The AngularJS team decided that they can generate JavaScript classes, which implement this change detection behavior, instead of using method calls (take a look [at these benchmarks](http://jsperf.com/object-observe-polyfill-sandbox)).
+The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look [at these benchmarks](http://jsperf.com/object-observe-polyfill-sandbox)). How does it work? According to my quick research:
+
+- AngularJS tokenizes the registered ("watched") expressions
+- AngularJS builds [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+- Using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern) AngularJS ...
+- [Based on a template](https://github.com/angular/angular/blob/master/modules/angular2/src/change_detection/change_detection_jit_generator.es6), AngularJS implements the "dummy" change detection for a specific component.
+
+### Quick FAQ:
+
+*Does it mean that the generation of source code will slowdown the execution of my app?*<br>
+It is done when the bindings change, lazily. Probably it will perform better in most scenarios.
+
+*Is it going to be hard for debugging?*<br>
+We trust AngularJS that it is going to be implemented well and we won't need to touch it!
+
+*Will it lead to any debugging complications (for example entering the change detection, generated class because of a breakpoint we're in)?*<br>
+If you use your debugger properly you should not have any issues. Take a look at the [slides of Addy Osmani on the state of DevTools, 2015, jQuery London meetup](https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109).
+
+### Further reading
+
+For more information you can take a look at the design docs ([here](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web) and [here](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web)) and the [AngularJS' source code](https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection).
+
+## It is not production ready
+
+The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
+
+## Conclusion
+
+AngularJS 2.0 will be a new framework, which is not backward compatible with AngularJS 1.x. It is implemented in AtScript (superset of TypeScript) but you don't have to use it, if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [Flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
+
+Should I use it in production? *No*, but you can experiment with it.
