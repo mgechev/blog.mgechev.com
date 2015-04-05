@@ -33,6 +33,7 @@ Some of the open source projects I've developed are:
 
 ### ReactJS
 
+- [ReactJS Sortable Component (react-reorderable)](https://github.com/mgechev/react-reorderable)
 - [ReactJS Draggable (up to date fork of react-draggable)](https://github.com/mgechev/react-drag)
 - [Mixin for Persistent State in ReactJS Components](https://github.com/mgechev/react-pstate)
 
