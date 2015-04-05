@@ -182,9 +182,9 @@ Another thing I didn't really like in AngularJS 1.x was the lack of errors when 
 
 ## i18n
 
-`angular-translate` was the default choice when it used to come up to internationalization and localization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using  filters and directives, depending on the selected language. The language files were loaded on demand.
+`angular-translate` was the default choice when it used to came to internationalization and localization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using filters and directives. You are able to define different translations of these strings, using multiple json files for the languages you need. The language files are loaded on demand.
 
-Since the AngularJS team has slightly broader vision of the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the loading time of your applications. AngularJS 1.4 has support for plurals and gender, in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
+Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time of your applications since you won't need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition), in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
 
