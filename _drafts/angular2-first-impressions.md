@@ -188,6 +188,11 @@ Since the AngularJS team has slightly broader vision for the way the i18n should
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
 
+### Quick FAQ:
+
+*Will `angular-translate` be still compatible with AngularJS 2.0?*<br>
+Most likely, no. I'm not aware whether the `angular-translate` team have plans to port it to the new version of the framework.
+
 ## Ultra Fast Change Detection
 
 **There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will implement what is best possible way based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.**
