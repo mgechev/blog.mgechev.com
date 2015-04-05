@@ -21,9 +21,7 @@ In this blog post I'll share my first impressions of the framework and I'll try 
 
 As Microsoft already published, [AngularJS 2.0 is written in extended version of TypeScript, called AtScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
 
-<center>
 ![JavaScript Dialects](/images/js-dialects-ven.png)
-</center>
 
 And here are some of the main advantages using TypeScript as statically typed language:
 
@@ -164,9 +162,7 @@ But how then AngularJS knows that anything outside it's execution context has ta
 - `WebSockets`
 - ...
 
-<center>
 ![All The Things](/images/monkey-patch-all-the-things.png)
-</center>
 
 Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of these APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
 
@@ -183,6 +179,14 @@ According to the talk about [Zone.js](https://www.youtube.com/watch?v=3IqtmUscE_
 ## Errors in the Template Expressions
 
 Another thing I didn't really like in AngularJS 1.x was the lack of errors when you make a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in AngularJS 2.0 you will get runtime errors in such cases.
+
+## i18n
+
+`angular-translate` was the default choice when it used to come up to internationalization and localization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using  filters and directives, depending on the selected language. The language files were loaded on demand.
+
+Since the AngularJS team has slightly broader vision of the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the loading time of your applications. AngularJS 1.4 has support for plurals and gender, in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
 
 ## Ultra Fast Change Detection
 
@@ -212,13 +216,13 @@ We trust AngularJS that it is going to be implemented well and we won't need to 
 *Will it lead to any debugging complications (for example entering the change detection, generated class because of a breakpoint we're in)?*<br>
 If you use your debugger properly you should not have any issues. Take a look at the [slides of Addy Osmani on the state of DevTools, 2015, jQuery London meetup](https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109).
 
-### Further reading
-
-For more information you can take a look at the design docs ([here](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web) and [here](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web)) and the [AngularJS' source code](https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection).
-
 ## It is not production ready
 
 The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
+
+### Further reading
+
+For more information you can take a look at the design docs ([here](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web) and [here](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web)) and the [AngularJS' source code](https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection).
 
 ## Conclusion
 
