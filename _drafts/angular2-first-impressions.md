@@ -45,6 +45,10 @@ It is not necessary but I'd recommend you to do so, because of all the benefits 
 *How can I take advantage of it? Should I use Visual Studio or something?*<br>
 No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)).
 
+### Further reading
+
+Since I wasn't complete enough in my explanation of AtScript because this isn't the goal of this article, you can [read more about the language here.](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit)
+
 ## AngularJS 2.0 has no Controllers
 
 It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added...
