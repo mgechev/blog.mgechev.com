@@ -86,7 +86,7 @@ No, you don't have to change the design of your app. In order to make the transi
 *Do I have to rewrite everything I already have?*<br>
 Very likely, but if you've structured your application properly (i.e. followed my style guide), you'd be able to completely reuse at least your services.
 
-## Now Two-Way data-binding
+## No Two-Way data-binding
 
 One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped in v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing, do not be heartbroken. Removing the two-way data-binding leads to:
 
