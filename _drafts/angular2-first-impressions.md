@@ -275,8 +275,8 @@ The AngularJS team decided that they can generate JavaScript classes, which impl
 
 - AngularJS tokenizes the registered ("watched") expressions
 - AngularJS builds [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
-- Using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern) AngularJS ...
-- [Based on a template](https://github.com/angular/angular/blob/master/modules/angular2/src/change_detection/change_detection_jit_generator.es6), AngularJS implements the "dummy" change detection for a specific component.
+- Using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern) AngularJS' creates the so-called "ProtoRecords" list.
+- [Based on a template](https://github.com/angular/angular/blob/master/modules/angular2/src/change_detection/change_detection_jit_generator.es6) and the ProtoRecords, AngularJS implements the "dummy" change detection for a specific component.
 
 ### Quick FAQ:
 
