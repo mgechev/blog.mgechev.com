@@ -327,7 +327,9 @@ export class Fridge {
 
 ## Conclusion
 
-AngularJS 2.0 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in AtScript (superset of TypeScript) but you don't have to use it, if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
+AngularJS 2.0 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don't have to use it if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
+
+You can use some of the libraries used for the development of AngularJS 2.0 (like [DI](https://github.com/angular/di.js), [rtts_assert](https://www.npmjs.com/package/rtts_assert), [router](https://github.com/angular/router), [benchpress](https://www.npmjs.com/package/benchpress)) in your current AngularJS and non-AngularJS projects.
 
 Should I use it in production now? **No**, but you can experiment with it. If you are planning to start a new project with AngularJS, better use AngularJS 1.x instead. Following some practices mentioned above will make your transition easier.
 
