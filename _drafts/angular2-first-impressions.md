@@ -27,12 +27,14 @@ And here are some of the main advantages using TypeScript as statically typed la
 
 - Using statically typed language:
   - You get type errors **compile-time** and run-time. This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case AngularJS 2.0) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
-  - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with EMACS and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions based on the AST of your code, now it'll be much less tricky).
+  - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it'll be much less tricky).
   - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better run-time optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
 - About TypeScript:
   - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). AngularJS 2.0 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
   - TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.
+
+In the past I've actively considered using a language with static type system, for building my single-page apps. I was thinking mostly about Dart, the fact that the types there are optional wasn't a concern, because in the critical areas of your code you would be able to use them and you'll get all the benefits a statically typed language provides. TypeScript seemed like a nice language but I've never thought it is going to shine the way it does now. Anyway, TypeScript seems like a better option because of its syntax - much easier to learn given it is superset of ES6.
 
 ### Quick FAQ:
 
@@ -52,7 +54,7 @@ No. You can use the [traceur compiler](https://github.com/google/traceur-compile
 
 ### Further reading
 
-You can read further details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax) [here](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit).
+You can read more details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax in TypeScript that time) [here](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit).
 
 ## AngularJS 2.0 has no Controllers
 
@@ -77,14 +79,17 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 
 ### Quick FAQ:
 
-*Similar to React? Does that mean that we have to inline our markup inside the directives we define?*<br>
-You can but you don't have to. You can use inline templates or external files (just like using `template` and `templateUrl` in AngularJS 1.x.x).
+*Doesn't removal of the controllers violates the separation of concerns principle advocated by AngularJS?*<br>
+Great question, Minko, thanks for asking! How given AngularJS application looks like? We have a view (a template), which is a composition of directives. These directives should handle the **whole** DOM logic. We also have services - they are responsible for encapsulating all the business logic. And we have controllers. The controllers are mostly user input handlers, they also add some properties to the scope. The best practices state that we need to keep the controllers as lean as possible. Let's think of what we will lose if we move the user input handling and adding properties to the scope to our directive instead to the controllers. Can we reduce the code reuse? If we don't create highly coherent directives - probably, if we couple the directives with the business logic this may happen (i.e. use domain specific service inside our dialog directive, for example). But what if we create a higher level directive, which is one or a fewer levels of abstraction above the primitives, which form our template? This way we handle the user input independently from our primitive UI components, so they are still completely reusable but we also remove one more component, which only makes the framework harder for learning.
 
-*Does that mean that I need to change the design of the whole app, i.e. turn each controller to a directive of type component?*<br>
-No, you don't have to change the design of your app. In order to make the transition even smoother you can use the ["Container component pattern"](http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/)
+*Similar to React? Does that mean that we have to inline our markup inside the directives we define?*<br>
+You can but you don't have to. You can use inline templates or external files (just like using `template` and `templateUrl` in AngularJS 1.x).
+
+*Does that mean that I need to change the design of the whole app, i.e. turn each controller into a directive of type component?*<br>
+No, you don't have to change the design of your app. In order to make the transition even smoother you can use the ["container component pattern"](http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/) but also keep in mind that the new router.
 
 *Do I have to rewrite everything I already have?*<br>
-Very likely, but if you've structured your application properly (i.e. followed my style guide), you'd be able to completely reuse at least your services.
+Very likely to rewrite big parts of your application, but if you've structured your application properly (i.e. followed my style guide), you'd be able to completely reuse at least your services.
 
 ## No Two-Way data-binding
 
