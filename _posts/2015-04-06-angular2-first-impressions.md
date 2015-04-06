@@ -26,9 +26,9 @@ As Microsoft already published, [AngularJS 2.0 is written in TypeScript](http://
 And here are some of the main advantages using TypeScript as statically typed language:
 
 - Using statically typed language:
-  - You get type errors **compile-time** and run-time. This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case AngularJS 2.0) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
+  - You get type errors **compile-time** and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see bellow the sample `gulp-traceur` config) . This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case AngularJS 2.0) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
   - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it'll be much less tricky).
-  - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better run-time optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
+  - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better runtime optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
 - About TypeScript:
   - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). AngularJS 2.0 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
@@ -38,7 +38,7 @@ In the past I've actively considered using a language with static type system, f
 
 ### Quick FAQ:
 
-*Does the run-time type checking lead to slower execution of your application?*<br>
+*Does the runtime type checking lead to slower execution of your application?*<br>
 Probably yes, but you can disable it when you plan to deploy your app in production.
 
 *Shold I use TypeScript for my AngularJS 2.0 application?*<br>
