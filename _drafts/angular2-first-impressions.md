@@ -118,7 +118,7 @@ You can. There are a lot of [polyfills](http://webcomponents.org/polyfills/), wh
 
 ## New Router
 
-[Brian Ford gave a talk about the new router of AngularJS](https://www.youtube.com/watch?v=vecg70fPDFw). I'm not saying "the new router of AngularJS 2.0" because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old `ngRoute` and with AngularJS 2.0 in mind unlike `uiRouter`.
+[Brian Ford gave a talk about the new router of AngularJS](https://www.youtube.com/watch?v=vecg70fPDFw). I'm not saying "the new router of AngularJS 2.0" because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old `ngRoute` and with AngularJS 2.0 in mind unlike `uiRouter`. Probably it is the only component, which got more complex to use (given the increased amount of features it has) but most likely it won't be part of the core of the framework (similarly to `ngRoute`), given it is hosted in different repo.
 
 You can use the new router inside your AngularJS 1.x app if you "emulate" the AngularJS 2.0 component directive with the legacy controllers and templates.
 
@@ -262,9 +262,9 @@ Right now, it seems AngularJS 2.0 will has the concept of filters (called format
 
 ## Conclusion
 
-AngularJS 2.0 will be a new framework, which is not backward compatible with AngularJS 1.x. It is implemented in AtScript (superset of TypeScript) but you don't have to use it, if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [Flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
+AngularJS 2.0 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in AtScript (superset of TypeScript) but you don't have to use it, if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
 
-Should I use it in production? **No**, but you can experiment with it.
+Should I use it in production now? **No**, but you can experiment with it. If you are planning to start a new project with AngularJS, better use AngularJS 1.x instead. Following some practices mentioned above will make your transition easier.
 
 ## Resources
 
