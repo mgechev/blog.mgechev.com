@@ -44,6 +44,11 @@ Probably yes, but you can disable it when you plan to deploy your app in product
 *Shold I use TypeScript for my AngularJS 2.0 application?*<br>
 It is not necessary but I'd recommend you to do so, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you to do so.
 
+*Alright, if I do use TypeScript...how can I debug it inside my browser?*<br>
+Traceur will generate source maps for you, so you will debug the code you've already written, not the result of the transpilation.
+
+![TypeScript source maps](/images/surcemaps-typescript.png)
+
 *How can I take advantage of it? Should I use Visual Studio or something?*<br>
 No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)). The actual type checking should be implemented inside external "assertion" library. For example, AngularJS 2.0 uses the [rtts_assert module](https://www.npmjs.com/package/rtts_assert).
 
