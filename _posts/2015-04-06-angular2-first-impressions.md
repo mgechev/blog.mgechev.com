@@ -181,7 +181,7 @@ There are a lot of statements the `$scope` was a tricky for explanation concept 
 
 For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
-```javascript
+{% highlight javascript %}
 @Component({
   selector: 'sample-app',
   componentServices: [
@@ -202,16 +202,18 @@ class SampleApp {
     newname.value = '';
   }
 }
-```
+{% endhighlight %}
+
 We can directly bind to `this.names` inside our template, like this:
 
-```html
+{% highlight html %}
 ...
 <ul>
   <li *foreach="#name in names">{{name}}</li>
 </ul>
 ...
-```
+{% endhighlight %}
+
 No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop and perform dirty checking? How are we going to do this now? Well, we cant.
 
 ### Quick FAQ:
