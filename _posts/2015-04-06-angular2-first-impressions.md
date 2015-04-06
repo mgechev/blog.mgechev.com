@@ -1,5 +1,5 @@
 ---
-title: AngularJS 2: First Impressions
+title: AngularJS 2 - First Impressions
 author: minko_gechev
 layout: post
 categories:
