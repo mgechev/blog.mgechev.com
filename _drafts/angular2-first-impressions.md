@@ -116,6 +116,20 @@ I wouldn't call AngularJS 2.0 a library but it is much closer to library rather 
 *So I can't use AngularJS 2.0 in IE and any other browser which doesn't support Web Components?*<br>
 You can. There are a lot of [polyfills](http://webcomponents.org/polyfills/), which handle the lack of support.
 
+## New Router
+
+[Brian Ford gave a talk about the new router of AngularJS](https://www.youtube.com/watch?v=vecg70fPDFw). I'm not saying "the new router of AngularJS 2.0" because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old `ngRoute` and with AngularJS 2.0 in mind unlike `uiRouter`.
+
+You can use the new router inside your AngularJS 1.x app if you "emulate" the AngularJS 2.0 component directive with the legacy controllers and templates.
+
+### Quick FAQ:
+
+*How I can try the new router?*<br>
+You can use [this repo](https://github.com/angular/router).
+
+*Should I start my new project with the old router or the new one instead?*<br>
+[Use the new router.](https://youtu.be/vecg70fPDFw?t=12m9s)
+
 ## Real Modules
 
 During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's no way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
@@ -241,6 +255,10 @@ For more information you can take a look at the design docs ([here](https://docs
 ## It is not production ready
 
 The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
+
+## What else we have left?
+
+Right now, it seems AngularJS 2.0 will has the concept of filters (called formatters) and Dependency Injection, which were some of the great feature.
 
 ## Conclusion
 
