@@ -45,7 +45,30 @@ Probably yes, but you can disable it when you plan to deploy your app in product
 It is not necessary but I'd recommend you to do so, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you to do so.
 
 *How can I take advantage of it? Should I use Visual Studio or something?*<br>
-No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)).
+No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)). The actual type checking should be implemented inside external "assertion" library. For example, AngularJS 2.0 uses the [rtts_assert module](https://www.npmjs.com/package/rtts_assert).
+
+Here is a sample configuration of `gulp-traceur`, using type assertion:
+
+{% highlight javascript %}
+gulp.task('build', ['copy'], function () {
+  'use strict';
+  return gulp.src([
+      // some files here
+      traceur.RUNTIME_PATH
+    ])
+    // some other plugins
+    .pipe(traceur({
+      modules: 'instantiate',
+      sourceMaps: 'inline',
+      annotations: true,
+      memberVariables: true,
+      typeAssertions: true,
+      typeAssertionModule: 'node_modules/rtts-assert/src/rtts_assert',
+      types: true
+    }))
+    .pipe(gulp.dest('./dist/'));
+});
+{% endhighlight %}
 
 *What is this thing called AtScript I've heard of?*<br>
 
@@ -93,7 +116,7 @@ Very likely to rewrite big parts of your application, but if you've structured y
 
 ## No Two-Way data-binding
 
-One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped in v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing, do not be heartbroken. Removing the two-way data-binding leads to:
+One of the things AngularJS 1.x was loved about was the two-way data-binding using `ng-model`. Well, it is dropped from v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing, do not be heartbroken. Removing the two-way data-binding leads to:
 
 - More explicit data-flow
 - No circular dependencies between bindings (so no TTL of the `$digest`)
@@ -106,11 +129,11 @@ One of the things AngularJS 1.x was loved about was the two-way data-binding usi
 *Does that mean that we'll do a lot of manual work building forms?*<br>
 No. AngularJS 2.0 has a great [forms module](http://angularjs.blogspot.com/2015/03/forms-in-angular-2.html).
 
-*So AngularJS 2.0 is basically ReactJS implemented by Google?*<br>
-No. The binding mechanism is completely different, it provides wider functionality than React (AngularJS 2.0 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should drop using React and wait for AngularJS 2.0, for example in a project I started a few weeks ago I choose to use ReactJS instead. It completely depends on the application you are going to build and the business goals you have.
-
 *Single directional data flow...We can use Flux then?*<br>
 Yes you can! I'd even recommend to use Flux! Here is one more [great post by Victor Savkin about using Flux with AngularJS](http://victorsavkin.com/post/99998937651/building-angular-apps-using-flux-architecture).
+
+*So AngularJS 2.0 is basically ReactJS implemented by Google?*<br>
+No. The binding mechanism is completely different, it provides wider functionality than React (AngularJS 2.0 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for AngularJS 2.0, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to AngularJS 2.0 if you haven't coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.
 
 ## WebComponents
 
@@ -123,7 +146,7 @@ What exactly is framework and what is a library? Lets take a look at AngularJS' 
 >a library - a collection of functions which are useful when writing web apps. Your code is in charge and it calls into the library when it sees fit. E.g., jQuery.
 >frameworks - a particular implementation of a web application, where your code fills in the details. The framework is in charge and it calls into your code when it needs something app specific. E.g., durandal, ember, etc.
 
-I wouldn't call AngularJS 2.0 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage of other things web components provide like custom elements, etc.
+I wouldn't call AngularJS 2.0 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage custom elements, etc.
 
 ### Quick FAQ:
 
@@ -150,9 +173,11 @@ During the AngularJS classes I led I had troubles explaining why AngularJS has m
 
 This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That's one of the things I've always dreamed of and I'm kind of disappointed it is added at this late stage.
 
+**PS**: [Here is a proposal concerning AngularJS 1.5](https://github.com/angular/angular.js/issues/11015), which allows asynchronously loading of components.
+
 ## No more $scope
 
-There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in AngularJS 2.0! There is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
+There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in AngularJS 2.0! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
 
 For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
@@ -189,6 +214,8 @@ We can directly bind to `this.names` inside our template, like this:
 ```
 No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop and perform dirty checking? How are we going to do this now? Well, we cant.
 
+### Quick FAQ:
+
 *I like the scope, I was able to explicitly state what I want to expose to my templates. Are there any advantages removing the scope except of "hard to explain to beginners"?*<br>
 Some of the biggest memory leaks I've ever had were caused by forgetting to destroy the `$scope` of given directive. Removing scope leads to less AngularJS components, so less bugs, lower complexity. A lot of people were doing things which sometimes looked like workarounds, when inheriting the scope (thinking they've inherited the controller), doing complex publish/subscribe messaging between parent and child scopes etc. All these things will not be required anymore.
 
@@ -207,7 +234,7 @@ But how then AngularJS knows that anything outside it's execution context has ta
 
 Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of these APIs? **Well...we can monkey patch all of them!** That's what Brian Ford explained in his [talk about `Zone.js` in ng-conf 2014](https://www.youtube.com/watch?v=3IqtmUscE_U).
 
-I bet now you're thinking - "Oh God! Why I'd use something, which monkey patches all the browser APIs? This is just not right!". But why it isn't?
+I bet now you're thinking - "Oh God! Why I'd use something, which monkey patches all the browser APIs? This is just not right!". Why it isn't?
 
 ### Quick FAQ:
 
@@ -219,13 +246,13 @@ According to the talk about [Zone.js](https://www.youtube.com/watch?v=3IqtmUscE_
 
 ## Errors in the Template Expressions
 
-Another thing I didn't really like in AngularJS 1.x was the lack of errors when you make a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in AngularJS 2.0 you will get runtime errors in such cases.
+Another thing I didn't really like in AngularJS 1.x was the lack of errors when you had a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in AngularJS 2.0 you will get runtime errors in such cases.
 
 ## i18n
 
-`angular-translate` was the default choice when it used to came to internationalization and localization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using filters and directives. You are able to define different translations of these strings, using multiple json files for the languages you need. The language files are loaded on demand.
+`angular-translate` was the default choice when it used to came to internationalization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using filters and directives. You are able to define different translations of these strings, using multiple json files for the languages you need. The language files are usually loaded on demand.
 
-Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time of your applications since you won't need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition), in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
+Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time since you won't need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition from 1.x to 2.0), in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
 
@@ -236,13 +263,13 @@ Most likely, no. I'm not aware whether the `angular-translate` team have plans t
 
 ## Ultra Fast Change Detection
 
-**There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will implement what is best possible way based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.**
+**There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will do the best based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.**
 
 Another completely innovative idea I found, digging inside AngularJS' source code was inside the `JITChangeDetector`. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:
 
-```javascript
+{% highlight javascript %}
 this.value === oldValue;
-```
+{% endhighlight %}
 
 The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look [at these benchmarks](http://jsperf.com/object-observe-polyfill-sandbox)). How does it work? According to my quick research:
 
@@ -272,7 +299,29 @@ The API of AngularJS 2.0 is still under development. There are a lot of things, 
 
 ## What else we have left?
 
-Right now, it seems AngularJS 2.0 will has the concept of filters (called formatters) and Dependency Injection, which were some of the great feature.
+### Filters
+
+According to the documentation, AngularJS 2.0 will have formatters, which are equivalent to the filters, well known from version 1.x.
+
+### Improved DI
+
+The dependency injection mechanism will be used with the annotations syntax provided by TypeScript. You can take a look at the source code [here](https://github.com/angular/di.js). Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of `di.js`:
+
+{% highlight javascript %}
+import {Inject} from 'di';
+import {Electricity} from './electricity';
+
+@Inject(Electricity)
+export class Fridge {
+  constructor(electricity) {
+    this.electricity = electricity;
+  }
+
+  getEggs() {
+    return '3 eggs';
+  }
+}
+{% endhighlight %}
 
 ## Conclusion
 
