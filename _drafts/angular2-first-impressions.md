@@ -19,7 +19,7 @@ In this blog post I'll share my first impressions of the framework and I'll try 
 
 ## Written in TypeScript
 
-As Microsoft already published, [AngularJS 2.0 is written in extended version of TypeScript, called AtScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
+As Microsoft already published, [AngularJS 2.0 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
 
 ![JavaScript Dialects](/images/js-dialects-ven.png)
 
@@ -30,7 +30,7 @@ And here are some of the main advantages using TypeScript as statically typed la
   - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with EMACS and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions based on the AST of your code, now it'll be much less tricky).
   - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better run-time optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
 - About TypeScript:
-  - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript ⊆ AtScript). AngularJS 2.0 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript or AtScript (of course if you chose ES6, TypeScript or AtScript your code should go through a process of compilation in order to be transpiled).
+  - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). AngularJS 2.0 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
   - TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.
 
@@ -45,9 +45,14 @@ It is not necessary but I'd recommend you to do so, because of all the benefits 
 *How can I take advantage of it? Should I use Visual Studio or something?*<br>
 No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)).
 
+*What is this thing called AtScript I've heard of?*<br>
+
+<blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 ### Further reading
 
-Since I wasn't complete enough in my explanation of AtScript because this isn't the goal of this article, you can [read more about the language here.](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit)
+You can read further details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax) [here](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit).
 
 ## AngularJS 2.0 has no Controllers
 
