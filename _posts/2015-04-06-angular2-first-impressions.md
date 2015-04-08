@@ -1,36 +1,36 @@
 ---
-title: AngularJS 2 - First Impressions
+title: Angular2 - First Impressions
 author: minko_gechev
 layout: post
 categories:
   - JavaScript
   - AngularJS
-  - AngularJS 2
+  - Angular2
   - Introduction
 tags:
   - AngularJS
-  - AngularJS 2
+  - Angular2
   - JavaScript
 ---
 
-[On 18th of September 2014](https://github.com/angular/angular/commits/master?page=24) was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS' 2.0 [website](https://angular.io/) and gave a couple of talks on [ng-conf](https://www.youtube.com/watch?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7&v=QHulaj5ZxbI) about their new router, change detection, templating, etc. I'm passionate about AngularJS since its early versions so I decided give it a try using the [quick start](https://angular.io/docs/js/latest/quickstart.html). In the meantime I and also created an [angular2-seed project](https://github.com/mgechev/angular2-seed) for my test, dummy projects. In order to have a better understanding of what is going on (and handle the lack of documentation) I dug inside their source code. I had great time doing this, what I saw was one of the most well written and smartest pieces of software I've ever read. Soon I'm planning to expand my paper ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns) with design patterns used inside AngularJS 2.0.
+[On 18th of September 2014](https://github.com/angular/angular/commits/master?page=24) was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS' 2.0 [website](https://angular.io/) and gave a couple of talks on [ng-conf](https://www.youtube.com/watch?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7&v=QHulaj5ZxbI) about their new router, change detection, templating, etc. I'm passionate about AngularJS since its early versions so I decided give it a try using the [quick start](https://angular.io/docs/js/latest/quickstart.html). In the meantime I and also created an [angular2-seed project](https://github.com/mgechev/angular2-seed) for my test, dummy projects. In order to have a better understanding of what is going on (and handle the lack of documentation) I dug inside their source code. I had great time doing this, what I saw was one of the most well written and smartest pieces of software I've ever read. Soon I'm planning to expand my paper ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns) with design patterns used inside Angular2.
 
 In this blog post I'll share my first impressions of the framework and I'll try to keep them as less subjective as possible, although my affinity to AngularJS. I'll start with the general changes and after that keep going into details.
 
 ## Written in TypeScript
 
-As Microsoft already published, [AngularJS 2.0 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
+As Microsoft already published, [Angular2 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
 
 ![JavaScript Dialects](/images/js-dialects-ven.png)
 
 And here are some of the main advantages using TypeScript as statically typed language:
 
 - Using statically typed language:
-  - You get type errors **compile-time** and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see bellow the sample `gulp-traceur` config) . This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case AngularJS 2.0) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
+  - You get type errors **compile-time** and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see bellow the sample `gulp-traceur` config) . This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case Angular2) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
   - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it'll be much less tricky).
   - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better runtime optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
 - About TypeScript:
-  - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). AngularJS 2.0 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).
+  - TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). Angular2 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
   - TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.
 
@@ -41,7 +41,7 @@ In the past I've actively considered using a language with static type system, f
 *Does the runtime type checking lead to slower execution of your application?*<br>
 Probably yes, but you can disable it when you plan to deploy your app in production.
 
-*Shold I use TypeScript for my AngularJS 2.0 application?*<br>
+*Shold I use TypeScript for my Angular2 application?*<br>
 It is not necessary but I'd recommend you to do so, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you to do so.
 
 *Alright, if I do use TypeScript...how can I debug it when my browser supports only ES5? Should I debug the generated code?*<br>
@@ -50,7 +50,7 @@ Traceur will create source maps for you. You will debug the code you've already 
 ![TypeScript source maps](/images/surcemaps-typescript.png)
 
 *How can I take advantage of it? Should I use Visual Studio or something?*<br>
-No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)). The actual type checking should be implemented inside external "assertion" library. For example, AngularJS 2.0 uses the [rtts_assert module](https://www.npmjs.com/package/rtts_assert).
+No. You can use the [traceur compiler](https://github.com/google/traceur-compiler) and a task runner, like gulp or grunt, with the corresponding plugins ([here](https://github.com/sindresorhus/gulp-traceur) and [here](https://github.com/aaronfrost/grunt-traceur)). The actual type checking should be implemented inside external "assertion" library. For example, Angular2 uses the [rtts_assert module](https://www.npmjs.com/package/rtts_assert).
 
 Here is a sample configuration of `gulp-traceur`, using type assertion:
 
@@ -84,9 +84,9 @@ gulp.task('build', ['copy'], function () {
 
 You can read more details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax in TypeScript that time) [here](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit).
 
-## AngularJS 2.0 has no Controllers
+## Angular2 has no Controllers
 
-It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, AngularJS 2.0 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added...
+It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, Angular2 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added...
 
 ## three different types of directives:
 
@@ -132,13 +132,13 @@ One of the things AngularJS 1.x was loved about was the two-way data-binding usi
 ### Quick FAQ:
 
 *Does that mean that we'll do a lot of manual work building forms?*<br>
-No. AngularJS 2.0 has a great [forms module](http://angularjs.blogspot.com/2015/03/forms-in-angular-2.html).
+No. Angular2 has a great [forms module](http://angularjs.blogspot.com/2015/03/forms-in-angular-2.html).
 
 *Single directional data flow...We can use Flux then?*<br>
 Yes you can! I'd even recommend to use Flux! Here is one more [great post by Victor Savkin about using Flux with AngularJS](http://victorsavkin.com/post/99998937651/building-angular-apps-using-flux-architecture).
 
-*So AngularJS 2.0 is basically ReactJS implemented by Google?*<br>
-No. The binding mechanism is completely different, it provides wider functionality than React (AngularJS 2.0 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for AngularJS 2.0, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to AngularJS 2.0 if you haven't coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.
+*So Angular2 is basically ReactJS implemented by Google?*<br>
+No. The binding mechanism is completely different, it provides wider functionality than React (Angular2 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for Angular2, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to Angular2 if you haven't coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.
 
 ## WebComponents
 
@@ -151,18 +151,18 @@ What exactly is framework and what is a library? Lets take a look at AngularJS' 
 >a library - a collection of functions which are useful when writing web apps. Your code is in charge and it calls into the library when it sees fit. E.g., jQuery.
 >frameworks - a particular implementation of a web application, where your code fills in the details. The framework is in charge and it calls into your code when it needs something app specific. E.g., durandal, ember, etc.
 
-I wouldn't call AngularJS 2.0 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage custom elements, etc.
+I wouldn't call Angular2 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage custom elements, etc.
 
 ### Quick FAQ:
 
-*So I can't use AngularJS 2.0 in IE and any other browser which doesn't support Web Components?*<br>
+*So I can't use Angular2 in IE and any other browser which doesn't support Web Components?*<br>
 You can. There are a lot of [polyfills](http://webcomponents.org/polyfills/), which handle the lack of support.
 
 ## New Router
 
-[Brian Ford gave a talk about the new router of AngularJS](https://www.youtube.com/watch?v=vecg70fPDFw). I'm not saying "the new router of AngularJS 2.0" because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old `ngRoute` and with AngularJS 2.0 in mind unlike `uiRouter`. Probably it is the only component, which got more complex to use (given the increased amount of features it has) but most likely it won't be part of the core of the framework (similarly to `ngRoute`), given it is hosted in different repo.
+[Brian Ford gave a talk about the new router of AngularJS](https://www.youtube.com/watch?v=vecg70fPDFw). I'm not saying "the new router of Angular2" because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old `ngRoute` and with Angular2 in mind unlike `uiRouter`. Probably it is the only component, which got more complex to use (given the increased amount of features it has) but most likely it won't be part of the core of the framework (similarly to `ngRoute`), given it is hosted in different repo.
 
-You can use the new router inside your AngularJS 1.x app if you "emulate" the AngularJS 2.0 component directive with the legacy controllers and templates.
+You can use the new router inside your AngularJS 1.x app if you "emulate" the Angular2 component directive with the legacy controllers and templates.
 
 ### Quick FAQ:
 
@@ -174,7 +174,7 @@ You can use [this repo](https://github.com/angular/router).
 
 ## Real Modules
 
-During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's no way to load them asynchronously, without hacky solutions. Well, AngularJS 2.0 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
+During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there's no way to load them asynchronously, without hacky solutions. Well, Angular2 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to [SystemJS](https://github.com/systemjs/systemjs) and [ES6-module loader](https://github.com/ModuleLoader/es6-module-loader/), or transpile them to AMD, CommonJS or whatever you find [suitable for yourself](https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules).
 
 This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That's one of the things I've always dreamed of and I'm kind of disappointed it is added at this late stage.
 
@@ -182,7 +182,7 @@ This allows creating bundles with the modules, which are required during the ini
 
 ## No more $scope
 
-There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in AngularJS 2.0! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
+There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in Angular2! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
 
 For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
@@ -253,19 +253,19 @@ According to the talk about [Zone.js](https://www.youtube.com/watch?v=3IqtmUscE_
 
 ## Errors in the Template Expressions
 
-Another thing I didn't really like in AngularJS 1.x was the lack of errors when you had a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in AngularJS 2.0 you will get runtime errors in such cases.
+Another thing I didn't really like in AngularJS 1.x was the lack of errors when you had a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren't aware that your code actually doesn't work. Well, in Angular2 you will get runtime errors in such cases.
 
 ## i18n
 
 `angular-translate` was the default choice when it used to came to internationalization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using filters and directives. You are able to define different translations of these strings, using multiple json files for the languages you need. The language files are usually loaded on demand.
 
-Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time since you won't need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition from 1.x to 2.0), in AngularJS 2 will be implemented the string interpolation. For further information on the topic take a look at this video:
+Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time since you won't need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition from 1.x to 2.0), in Angular2 will be implemented the string interpolation. For further information on the topic take a look at this video:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
 
 ### Quick FAQ:
 
-*Will `angular-translate` be still compatible with AngularJS 2.0?*<br>
+*Will `angular-translate` be still compatible with Angular2?*<br>
 Most likely, no. I'm not aware whether the `angular-translate` team have plans to port it to the new version of the framework.
 
 ## Ultra Fast Change Detection
@@ -302,13 +302,13 @@ For more information you can take a look at the design docs ([here](https://docs
 
 ## It is not production ready
 
-The API of AngularJS 2.0 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
+The API of Angular2 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the [quick start](https://angular.io/docs/js/latest/quickstart.html) or [my seed project](https://github.com/mgechev/angular2-seed)
 
 ## What else we have left?
 
 ### Filters
 
-According to the documentation, AngularJS 2.0 will have formatters, which are equivalent to the filters, well known from version 1.x.
+According to the documentation, Angular2 will have formatters, which are equivalent to the filters, well known from version 1.x.
 
 ### Improved DI
 
@@ -332,16 +332,16 @@ export class Fridge {
 
 ## Conclusion
 
-AngularJS 2.0 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don't have to use it if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
+Angular2 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don't have to use it if you don't want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the [flux architecture](https://facebook.github.io/react/docs/flux-overview.html). It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).
 
-You can use some of the libraries used for the development of AngularJS 2.0 (like [DI](https://github.com/angular/di.js), [rtts_assert](https://www.npmjs.com/package/rtts_assert), [router](https://github.com/angular/router), [benchpress](https://www.npmjs.com/package/benchpress)) in your current AngularJS and non-AngularJS projects.
+You can use some of the libraries used for the development of Angular2 (like [DI](https://github.com/angular/di.js), [rtts_assert](https://www.npmjs.com/package/rtts_assert), [router](https://github.com/angular/router), [benchpress](https://www.npmjs.com/package/benchpress)) in your current AngularJS and non-AngularJS projects.
 
 Should I use it in production now? **No**, but you can experiment with it. If you are planning to start a new project with AngularJS, better use AngularJS 1.x instead. Following some practices mentioned above will make your transition easier.
 
 ## Resources
 
 - [Official Website](http://angular.io)
-- [The official AngularJS 2.0 repository](https://github.com/angular/angular)
+- [The official Angular2 repository](https://github.com/angular/angular)
 - [Change detection design doc](https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit)
 - ["Ultra Fast Change Detection](https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web)
 - [Localization and internationalization](https://www.youtube.com/watch?v=iBBkCA1M-mc)
