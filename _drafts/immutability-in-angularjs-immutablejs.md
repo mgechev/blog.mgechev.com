@@ -25,3 +25,61 @@ On ng-conf 2015, [Jeff Cross, gave a talk about Benchpress](https://www.youtube.
 - `scriptTime` - the execution time of your script
 - `gcTime` - time required for garbage collection of given sample
 
+Benchpress can render the output of the bencharks as table, printed onto the `stdout` or save it into json files.
+
+
+## Benchmarks
+
+With collections you can have the following primitive operations:
+
+- **C**reate a data collection
+- **R**ead collection
+- **U**pdate collection
+- **D**elete collection
+
+We can read the collection inside JavaScript or render it inside the templates. If we get new collection each time we need to perform an action over the stored data, we have immutable collection. We need to compare the current reference with the previous reference. If the references are not equal this means the collection has changed.
+### Side note
+
+*But what if we have:
+
+{% highlight javascript %}
+
+var a = [1, 2, 3];
+function changeA() {
+  a = [1, 2, 3];
+}
+var oldA = a;
+changeA();
+console.log(a === oldA); // false
+console.log(angular.equals(a, oldA)); // true
+
+{% endhighlight %}
+
+So, if we strictly want to perform given action **only** when the structure of the collection or the data inside it have changed (not only the reference) we will need to loop over both collections (old one and new one) and check whether they contains the same data.*
+
+If we delete, update or create additional entries inside the collection, this is considered as update. If we use immutable data, a new collection will be returned on each such manipulation:
+
+{% highlight javascript %}
+let list = Immutable.List([1, 2, 3]);
+
+// update
+let list1 = list.set(1, 42);
+console.log(list === list1); // false
+console.log(list.toJS()); // [ 1, 2, 3 ]
+console.log(list1.toJS()); // [ 1, 42, 3 ]
+
+// remove
+let list2 = list.delete(0);
+console.log(list === list2); // false
+console.log(list.toJS()); // [ 1, 2, 3 ]
+console.log(list2.toJS()); // [ 2, 3 ]
+
+// insert (create entry)
+let list3 = list.push(4);
+console.log(list === list3); // false
+console.log(list.toJS()); // [ 1, 2, 3 ]
+console.log(list3.toJS()); // [ 1, 2, 3, 4 ]
+
+{% endhighlight %}
+
+
