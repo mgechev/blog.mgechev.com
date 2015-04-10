@@ -16,31 +16,37 @@ tags:
   - Benchpress
 ---
 
-A few weeks ago I posted the article ["Boost the Performance of an AngularJS Application Using Immutable Data"](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/). It shows how to speedup your AngularJS application when you have bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from `O(n)` to `O(1)`.
+A few weeks ago I posted the article ["Boost the Performance of an AngularJS Application Using Immutable Data"](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/). It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from `O(n)` to `O(1)`.
 
 In the post I did simple profiling using `Date` but it didn't give enough information in exactly which cases it is more suitable to use immutable data and when you should bet on the standard collections. It also didn't include any information about the garbage collection, although we know that using immutable collections will eventually lead to highly intensive memory management.
 
-On ng-conf 2015, [Jeff Cross, gave a talk about Benchpress](https://www.youtube.com/watch?v=x1PJn5qMUT4), which fits perfectly for my profiling purposes. Basically, benchpress uses the WebDriver for Selenium, through protractor to profile your application. It can runs multiple samples in order to take the mean and give you a meaningful result. It also includes a few output values, most useful in my case were:
+On ng-conf 2015, [Jeff Cross, gave a talk about Benchpress](https://www.youtube.com/watch?v=x1PJn5qMUT4), which fits perfectly in my profiling purposes. Basically, benchpress uses the [WebDriver](http://www.seleniumhq.org/projects/webdriver/) for [Selenium](http://www.seleniumhq.org/), through [`protractor`](https://github.com/angular/protractor) to profile your application. It can run multiple samples the code you want to profile in order to take the mean and give you a meaningful result. It also includes a few output values, most useful in our case are:
 
 - `scriptTime` - the execution time of your script
 - `gcTime` - time required for garbage collection of given sample
 
 Benchpress can render the output of the bencharks as table, printed onto the `stdout` or save it into json files.
 
-
 ## Benchmarks
 
-With collections you can have the following primitive operations:
+With every collection you can have the following primitive operations:
 
-- **C**reate a data collection
+- **C**reate collection
 - **R**ead collection
 - **U**pdate collection
 - **D**elete collection
 
-We can read the collection inside JavaScript or render it inside the templates. If we get new collection each time we need to perform an action over the stored data, we have immutable collection. We need to compare the current reference with the previous reference. If the references are not equal this means the collection has changed.
+We can read given collection in JavaScript or render it inside a template. If we get a new collection each time we change (update) the current one, we have an immutable collection. This means that if we want to check if the collection have changed since we've seen it for last time we simply need to compare the current reference of the collection with the previous one (before the change was made):
+
+{% highlight JavaScript %}
+let list = Immutable.List([1, 2, 3]);
+let changed = list.set(1, 3);
+console.log(list === changed); // false
+{% endhighlight %}
+
 ### Side note
 
-*But what if we have:
+*But what if:
 
 {% highlight javascript %}
 
@@ -81,12 +87,6 @@ console.log(list.toJS()); // [ 1, 2, 3 ]
 console.log(list3.toJS()); // [ 1, 2, 3, 4 ]
 
 {% endhighlight %}
-
-In these benchmarks, there are three main variables:
-
-- type of the collection (mutable, immutable)
-- size of the collection
-- bindings count to the collection
 
 That said, we can build a sample script, which will be used for profiling. Initially we will create a single collection and attach watchers to it. Once this is done, `protractor` will start clicking a button, which will update a random element of the collection. Here is our `SampleCtrl`, which is responsible for initialization and handling the update requests:
 
@@ -227,15 +227,23 @@ And the template...
 </html>
 {% endhighlight %}
 
+There are three main variables, which has the strongest impact over such benchmark in AngularJS:
+
+- type of the collection (mutable, immutable)
+- size of the collection
+- bindings count to the collection
+
 In order to get clear understanding of what bindings count and collection size should make us prefer `Immutable.js` over the standard collections, I run the benchmarks with the following collections' sizes: `5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 100000` and bindings count: `5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100`.
 
-## Result Representation
+## Results Representation
 
-So far so good. The only thing left is to configure benchpress but it is a pretty much straightforward process. You can find my configuration scripts [here](https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks) and Jeff's [here](https://github.com/jeffbcross/benchpress-tree). Note that it is not required to use benchpress with Angular, you can use it with or without any other framework.
+So far so good. The only thing left is to configure benchpress but this is pretty much a straightforward process. You can find my configuration scripts [here](https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks) and Jeff's [here](https://github.com/jeffbcross/benchpress-tree). Note that it is not required to use benchpress with Angular, you can use it with any other framework or even without one.
 
-After we run the benchmarks and set the output directory, all the logs will be saved in there in json format. What we can do is to aggregate the raw results and output them in another file or in `stdout`. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with [`node-canvas`](https://github.com/Automattic/node-canvas). Later I saw that there's a ["hacked" version of Chart.js, which could be run in node](https://www.npmjs.com/package/nchart). The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and like something, which might get in use so next couple of weeks I may publish it as npm module.
+After we run the benchmarks and set the output directory, all the logs will be saved in there, in json format. What we can do is to aggregate the raw results (for example get the mean) and output them in another file or print them on the screen. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with [`node-canvas`](https://github.com/Automattic/node-canvas). Later I found that there's a ["hacked" version of Chart.js, which could be run in node](https://www.npmjs.com/package/nchart). The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and it may get handy to anyone else, so next couple of weeks I may publish it as npm module.
 
 ## Exploring the Results
+
+The results contains script running time and garbage collection time, mostly because of the immutable data.
 
 ### Script Time
 
