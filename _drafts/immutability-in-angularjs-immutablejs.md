@@ -285,11 +285,25 @@ It is interesting that the information we got from the benchmarks doesn't imply 
 
 I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you're welcome to drop a line as a comment or reach me over e-mail (take a look at the [About](http://blog.mgechev.com/about/) section above).
 
+#### 5 entries
+
 ![](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)
+
+#### 50 entries
+
 ![](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)
+
+#### 100 entries
+
 ![](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)
+
+#### 500 entries
+
 ![](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)
-![](/images/boost-angularjs-immutable-data/gctime-data-size-1000.png)
+
+#### 10000 entries
+
+![](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png)
 
 ## Conclusion
 
