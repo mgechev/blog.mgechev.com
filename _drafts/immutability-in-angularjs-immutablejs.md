@@ -280,6 +280,25 @@ After 20 bindings the running time of the script using standard array gets crazy
 
 ### Garbage Collection Time
 
-This metrics indicates the time required for garbage collection.
+This metric indicates the time required for garbage collection. I'm exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection running time on her experience using our application.
+It is interesting that the information we got from the benchmarks doesn't imply any significant advantage of the standard array compared to the immutable list.
+
+I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you're welcome to drop a line as a comment or reach me over e-mail (take a look at the [About](http://blog.mgechev.com/about/) section above).
+
+![](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)
+![](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)
+![](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)
+![](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)
+![](/images/boost-angularjs-immutable-data/gctime-data-size-1000.png)
 
 ## Conclusion
+
+The ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the [two parts of this blog post on using immutable data with AngularJS](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/), immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I'd recommend usage of standard arrays.
+
+The immutable data helps us speedup the watchers from `O(n)` (looping over the whole data structure) to `O(1)` (comparing only references, since on change a new immutable data structure will be created) but it also has its drawbacks:
+
+- overhead of the creation of the new data structure on change
+- overhead of the performed garbage collection (which wasn't such a big issue, as show above)
+
+But can't we build something, which takes the best of both worlds? Can't we build a specialized data structure used for super fast data binding, which doesn't require creation of new instance on change but still allows `O(1)` check for change? This is what I'm going to explore in the last blog post of this series.
+
