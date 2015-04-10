@@ -235,6 +235,21 @@ So far so good. The only thing left is to configure benchpress but it is a prett
 
 After we run the benchmarks and set the output directory, all the logs will be saved in there in json format. What we can do is to aggregate the raw results and output them in another file or in `stdout`. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with [`node-canvas`](https://github.com/Automattic/node-canvas). Later I saw that there's a ["hacked" version of Chart.js, which could be run in node](https://www.npmjs.com/package/nchart). The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and like something, which might get in use so next couple of weeks I may publish it as npm module.
 
-## Exploring the results
+## Exploring the Results
+
+### Script Time
+
+This metric will impact the user's performance at most, since the script time is single threaded. On the charts bellow are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).
+
+#### 5 entries
+
+When having a collection with 5 entries the running time of the script using immutable list is almost double the running time of a standard array. When the bindings counts get bigger there are no significant changes in the time required for running the scripts (both immutable and standard array).
+Basically when we have 100 bindings (+1 with the watcher added by `ng-repeat`) the AngularJS change detection mechanism needs to perform 5 * 100 iterations (in the worst case) in order to verify that the current value of the array is equals to the previous one for the standard array and a 100 comparisons (one for each binding using `===`) in order to detect changes in the immutable data. Since we have overhead caused by the creation of new immutable list on change, the running time of the script using immutable data is bigger.
+
+![](../images/boost-angularjs-immutable-data/scripttime-data-size-5.png)
+
+### Garbage Collection Time
+
+This metrics indicates the time required for garbage collection.
 
 ## Conclusion
