@@ -19,7 +19,7 @@ In this blog post I'll share my first impressions of the framework and I'll try 
 
 ## Written in TypeScript
 
-As Microsoft already published, [Angular2 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added annotations (similar to the annotations in Java).
+As Microsoft already published, [Angular2 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added <strike>annotations</strike>decorators (its syntax looks similar to the annotations in Java).
 
 ![JavaScript Dialects](/images/js-dialects-ven.png)
 
@@ -312,7 +312,7 @@ According to the documentation, Angular2 will have formatters, which are equival
 
 ### Improved DI
 
-The dependency injection mechanism will be used with the annotations syntax provided by TypeScript. You can take a look at the source code [here](https://github.com/angular/di.js). Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of `di.js`:
+The dependency injection mechanism will be used with the decorators syntax provided by TypeScript. You can take a look at the source code [here](https://github.com/angular/di.js). Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of `di.js`:
 
 {% highlight javascript %}
 import {Inject} from 'di';
