@@ -82,4 +82,159 @@ console.log(list3.toJS()); // [ 1, 2, 3, 4 ]
 
 {% endhighlight %}
 
+In these benchmarks, there are three main variables:
 
+- type of the collection (mutable, immutable)
+- size of the collection
+- bindings count to the collection
+
+That said, we can build a sample script, which will be used for profiling. Initially we will create a single collection and attach watchers to it. Once this is done, `protractor` will start clicking a button, which will update a random element of the collection. Here is our `SampleCtrl`, which is responsible for initialization and handling the update requests:
+
+{% highlight javascript %}
+var benchmarks = angular.module('benchmarks', ['immutable']);
+
+function SampleCtrl($scope, $location) {
+  'use strict';
+  var dataSize = parseInt($location.search().dataSize, 10);
+  var bindingsCount = parseInt($location.search().bindingsCount || 0);
+  var watchers = {
+    immutable: [],
+    standard: []
+  };
+
+  function addWatchers(expr, count, collection) {
+    for (var i = 0; i < count; i += 1) {
+      collection.push($scope.$watch(function () {
+        return $scope[expr];
+      }, function () {
+      }, false));
+    }
+  }
+
+  function addCollectionWatchers(expr, count, collection) {
+    for (var i = 0; i < count; i += 1) {
+      collection.push($scope.$watchCollection(expr, function () {
+      }));
+    }
+  }
+
+  function clearWatchers(watchers) {
+    var listeners = watchers || [];
+    listeners.forEach(function (l) {
+      l();
+    });
+  }
+
+  function generateRandomIndx(length) {
+    return Math.floor(Math.random() * (length - 1));
+  }
+
+  // Updates the current value of the `standard` collection
+  $scope.updateStandard = function () {
+    if (!$scope.standard) {
+      $scope.standard = generateData(dataSize);
+    } else {
+      var idx = generateRandomIndx(dataSize);
+      $scope.standard[idx] = Math.random();
+    }
+  };
+
+  // Updates the current value of the `immutable` collection
+  $scope.updateImmutable = function () {
+    if (!$scope.immutable) {
+      $scope.immutable = Immutable.List(generateData(dataSize));
+    } else {
+      // We can cache the plain collection here
+      var idx = generateRandomIndx(dataSize);
+      $scope.immutable = $scope.immutable.set(idx, Math.random());
+    }
+  };
+
+  // In case we are running benchmark, which changes the array
+  if ($location.search().testType === 'update') {
+    var dataType = $location.search().dataType;
+    switch (dataType) {
+      case 'immutable':
+        addWatchers(dataType, bindingsCount, watchers.immutable);
+        break;
+      default:
+        addCollectionWatchers(dataType, bindingsCount, watchers.standard);
+    }
+  }
+
+  // Clears the `immutable` collection and removes all
+  // listeners attached to it (except ng-repeat in the template).
+  function clearImmutable() {
+    $scope.immutable = null;
+    clearWatchers(watchers.immutable);
+    watchers.immutable = [];
+  }
+
+  // Clears the `standard` collection and removes all
+  // listeners attached to it (except ng-repeat in the template).
+  function clearStandard() {
+    $scope.standard = null;
+    clearWatchers(watchers.standard);
+    watchers.standard = [];
+  }
+
+  // Clears the both collections and all attached listeners to them.
+  $scope.clear = function () {
+    clearStandard();
+    clearImmutable();
+  };
+}
+
+benchmarks
+  .controller('SampleCtrl', SampleCtrl)
+
+{% endhighlight %}
+
+And the template...
+
+{% highlight html %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body data-ng-app="benchmarks" data-ng-controller="SampleCtrl">
+<section>
+  <button id="clear-btn" data-ng-click="clear()">Clear</button>
+  <button id="update-immutable-btn" data-ng-click="updateImmutable()">
+    Update Immutable
+  </button>
+  <button id="update-standard-btn" data-ng-click="updateStandard()">
+    Update Standard
+  </button>
+</section>
+<section>
+  <ul>
+    <li data-ng-repeat="item in immutable | immutable track by $index" data-ng-bind="item"></li>
+  </ul>
+</section>
+<section>
+  <ul>
+    <li data-ng-repeat="item in standard track by $index" data-ng-bind="item"></li>
+  </ul>
+</section>
+<script src="/node_modules/angular/angular.js"></script>
+<script src="/node_modules/immutable/dist/immutable.js"></script>
+<script src="/node_modules/angular-immutable/dist/immutable.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
+{% endhighlight %}
+
+In order to get clear understanding of what bindings count and collection size should make us prefer `Immutable.js` over the standard collections, I run the benchmarks with the following collections' sizes: `5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 100000` and bindings count: `5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100`.
+
+## Result Representation
+
+So far so good. The only thing left is to configure benchpress but it is a pretty much straightforward process. You can find my configuration scripts [here](https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks) and Jeff's [here](https://github.com/jeffbcross/benchpress-tree). Note that it is not required to use benchpress with Angular, you can use it with or without any other framework.
+
+After we run the benchmarks and set the output directory, all the logs will be saved in there in json format. What we can do is to aggregate the raw results and output them in another file or in `stdout`. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with [`node-canvas`](https://github.com/Automattic/node-canvas). Later I saw that there's a ["hacked" version of Chart.js, which could be run in node](https://www.npmjs.com/package/nchart). The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and like something, which might get in use so next couple of weeks I may publish it as npm module.
+
+## Exploring the results
+
+## Conclusion
