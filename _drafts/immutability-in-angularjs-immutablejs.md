@@ -289,6 +289,8 @@ After 20 bindings the running time of the script using standard array gets crazy
 
 ### Garbage Collection Time
 
+![](/images/one-does-not-simply-profile-the-script-running-time.png)
+
 This metric indicates the time required for garbage collection. I'm exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection time during her experience using our application.
 It is interesting that the information we got from the benchmarks doesn't imply any significant advantage of the standard array compared to the immutable list.
 
