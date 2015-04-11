@@ -244,84 +244,84 @@ After we run the benchmarks and set the output directory, all the logs will be s
 
 ## Exploring the Results
 
-The results contains script running time and garbage collection time, mostly because of the immutable data.
+The results contain the script running time and the garbage collection time, mostly because of the immutable data.
 
 ### Script Time
 
-This metric will impact the user's performance at most, since the script time is single threaded. On the charts bellow are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).
+This metric will have the strongest impact on the application's performance, since the script time is single threaded. On the charts bellow are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).
 
 #### 5 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-5.png)
+![5 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-5.png)
 
 When having a collection with 5 entries the running time of the script using immutable list is almost double the running time of a standard array. When the bindings counts get bigger there are no significant changes in the time required for running the scripts (both immutable and standard array).
 Basically when we have 100 bindings (+1 with the watcher added by `ng-repeat`) the AngularJS change detection mechanism needs to perform 5 * 100 iterations (in the worst case) in order to verify that the current value of the array is equals to the previous one for the standard array and a 100 comparisons (one for each binding using `===`) in order to detect changes in the immutable data. Since we have overhead caused by the creation of new immutable list on change, the running time of the script using immutable data is bigger.
 
 #### 20 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-20.png)
+![20 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-20.png)
 
-There are no significant changes in the results of the benchmark, which runs script with array/list with 20 entries. The only noticeable difference here is that the running time of the script using standard array gets significantly bigger when we increase the bindings count. Again, when we have 100 bindings and 20 element array we get 20 * 100 iterations in order to detect change.
+There are no significant changes in the results of the benchmark, which runs script with array/list with 20 entries. The only noticeable difference here is that the running time of the script using standard array gets significantly bigger when we increase the bindings count. Again, when we have 100 bindings and 20 element array we get 20 * 100 iterations in order to detect change, compared to 20 * 5 with only 5 bindings.
 
 #### 50 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-50.png)
+![50 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-50.png)
 
-This is the first benchmark, which results shows better performance of the immutable list compared to the standard one. In case of 100 bindings we get better the immutable list wins!
+This is the first benchmark, which results show better performance of the immutable list compared to the standard one. In case of 100 bindings the immutable list wins!
 
 #### 100 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-100.png)
+![100 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-100.png)
 
 Here the competition gets ruthless! We see how much bigger the running time of the script using standard array gets when we have large amount of bindings. Anyway, still the standard array looks like the winner.
 
 #### 500 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-500.png)
+![500 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-500.png)
 
 It looks like the supreme champion in this benchmark is the immutable array! You still have to watch out whether you have only a few bindings to the collection but definitely if you have more than 10 you should consider using immutable data.
 
 #### 10,000 entries
 
-![](/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png)
+![10,000 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png)
 
-After 20 bindings the running time of the script using standard array gets crazy! You can see how it gets bigger and bigger with every next binding, although the running time of the script using immutable list stays constant. I'd definitely recommend you to use immutable data with such big collections.
+After 20 bindings the running time of the script using standard array gets crazy big! You can see how it gets bigger and bigger with every next binding, although the running time of the script using immutable list stays constant. I'd definitely recommend you to use immutable data with such big collections.
 
 ### Garbage Collection Time
 
-This metric indicates the time required for garbage collection. I'm exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection running time on her experience using our application.
+This metric indicates the time required for garbage collection. I'm exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection time during her experience using our application.
 It is interesting that the information we got from the benchmarks doesn't imply any significant advantage of the standard array compared to the immutable list.
 
 I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you're welcome to drop a line as a comment or reach me over e-mail (take a look at the [About](http://blog.mgechev.com/about/) section above).
 
 #### 5 entries
 
-![](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)
+![5 entries](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)
 
 #### 50 entries
 
-![](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)
+![50 entries](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)
 
 #### 100 entries
 
-![](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)
+![100 entries](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)
 
 #### 500 entries
 
-![](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)
+![500 entries](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)
 
-#### 10000 entries
+#### 1,0000 entries
 
-![](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png)
+![1,000 entries](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png)
 
 ## Conclusion
 
-The ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the [two parts of this blog post on using immutable data with AngularJS](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/), immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I'd recommend usage of standard arrays.
+Some of the ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the [two parts of this blog post on using immutable data with AngularJS](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/), immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I'd recommend usage of standard arrays.
 
 The immutable data helps us speedup the watchers from `O(n)` (looping over the whole data structure) to `O(1)` (comparing only references, since on change a new immutable data structure will be created) but it also has its drawbacks:
 
 - overhead of the creation of the new data structure on change
-- overhead of the performed garbage collection (which wasn't such a big issue, as show above)
+- overhead of the performed garbage collection (which wasn't such a big deal, as show above)
 
 But can't we build something, which takes the best of both worlds? Can't we build a specialized data structure used for super fast data binding, which doesn't require creation of new instance on change but still allows `O(1)` check for change? This is what I'm going to explore in the last blog post of this series.
 
