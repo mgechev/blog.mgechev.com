@@ -240,6 +240,10 @@ In order to get clear understanding of what bindings count and collection size s
 
 So far so good. The only thing left is to configure benchpress but this is pretty much a straightforward process. You can find my configuration scripts [here](https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks) and Jeff's [here](https://github.com/jeffbcross/benchpress-tree). Note that it is not required to use benchpress with Angular, you can use it with any other framework or even without one.
 
+After you've successfully configured benchpress and start protractor you should see something like:
+
+![](/images/boost-angularjs-immutable-data/protractor-running.gif)
+
 After we run the benchmarks and set the output directory, all the logs will be saved in there, in json format. What we can do is to aggregate the raw results (for example get the mean) and output them in another file or print them on the screen. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with [`node-canvas`](https://github.com/Automattic/node-canvas). Later I found that there's a ["hacked" version of Chart.js, which could be run in node](https://www.npmjs.com/package/nchart). The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and it may get handy to anyone else, so next couple of weeks I may publish it as npm module.
 
 ## Exploring the Results
