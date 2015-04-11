@@ -256,38 +256,38 @@ This metric will have the strongest impact on the application's performance, sin
 
 #### 5 entries
 
-![5 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-5.png)
+[![5 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-5.png)](![5 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-5.png))
 
 When having a collection with 5 entries the running time of the script using immutable list is almost double the running time of a standard array. When the bindings counts get bigger there are no significant changes in the time required for running the scripts (both immutable and standard array).
 Basically when we have 100 bindings (+1 with the watcher added by `ng-repeat`) the AngularJS change detection mechanism needs to perform 5 * 100 iterations (in the worst case) in order to verify that the current value of the array is equals to the previous one for the standard array and a 100 comparisons (one for each binding using `===`) in order to detect changes in the immutable data. Since we have overhead caused by the creation of new immutable list on change, the running time of the script using immutable data is bigger.
 
 #### 20 entries
 
-![20 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-20.png)
+[![20 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-20.png)](![20 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-20.png))
 
 There are no significant changes in the results of the benchmark, which runs script with array/list with 20 entries. The only noticeable difference here is that the running time of the script using standard array gets significantly bigger when we increase the bindings count. Again, when we have 100 bindings and 20 element array we get 20 * 100 iterations in order to detect change, compared to 20 * 5 with only 5 bindings.
 
 #### 50 entries
 
-![50 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-50.png)
+[![50 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-50.png)](![50 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-50.png))
 
 This is the first benchmark, which results show better performance of the immutable list compared to the standard one. In case of 100 bindings the immutable list wins!
 
 #### 100 entries
 
-![100 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-100.png)
+[![100 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-100.png)](![100 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-100.png))
 
 Here the competition gets ruthless! We see how much bigger the running time of the script using standard array gets when we have large amount of bindings. Anyway, still the standard array looks like the winner.
 
 #### 500 entries
 
-![500 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-500.png)
+[![500 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-500.png)](![500 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-500.png))
 
 It looks like the supreme champion in this benchmark is the immutable array! You still have to watch out whether you have only a few bindings to the collection but definitely if you have more than 10 you should consider using immutable data.
 
 #### 10,000 entries
 
-![10,000 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png)
+[![10,000 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png)](![10,000 entries](/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png))
 
 After 20 bindings the running time of the script using standard array gets crazy big! You can see how it gets bigger and bigger with every next binding, although the running time of the script using immutable list stays constant. I'd definitely recommend you to use immutable data with such big collections.
 
@@ -302,23 +302,23 @@ I will not provide further explanation for the following sections because I thin
 
 #### 5 entries
 
-![5 entries](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)
+[![5 entries](/images/boost-angularjs-immutable-data/gctime-data-size-5.png)](![5 entries](/images/boost-angularjs-immutable-data/gctime-data-size-5.png))
 
 #### 50 entries
 
-![50 entries](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)
+[![50 entries](/images/boost-angularjs-immutable-data/gctime-data-size-50.png)](![50 entries](/images/boost-angularjs-immutable-data/gctime-data-size-50.png))
 
 #### 100 entries
 
-![100 entries](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)
+[![100 entries](/images/boost-angularjs-immutable-data/gctime-data-size-100.png)](![100 entries](/images/boost-angularjs-immutable-data/gctime-data-size-100.png))
 
 #### 500 entries
 
-![500 entries](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)
+[![500 entries](/images/boost-angularjs-immutable-data/gctime-data-size-500.png)](![500 entries](/images/boost-angularjs-immutable-data/gctime-data-size-500.png))
 
 #### 1,0000 entries
 
-![1,000 entries](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png)
+[![1,000 entries](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png)](![1,000 entries](/images/boost-angularjs-immutable-data/gctime-data-size-10000.png))
 
 ## Conclusion
 
