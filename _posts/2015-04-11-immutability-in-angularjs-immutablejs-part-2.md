@@ -236,6 +236,8 @@ There are three main variables, which has the strongest impact over such benchma
 
 In order to get clear understanding of what bindings count and collection size should make us prefer `Immutable.js` over the standard collections, I run the benchmarks with the following collections' sizes: `5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 100000` and bindings count: `5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100`.
 
+**Application with 100 bindings might sounds not realistic to you but keep in mind that AngularJS adds bindings for (almost) all directives in your templates (`ng-hide`, `ng-show`, `ng-bind`, `ng-repeat`, `ng-class`, `ng-model`, etc.). Each `$digest` loop will lead to traversal of your data structures. For more information on this topic review the AngularJS source code or watch ["Sasqwatch is Real" by William Scott Moss](https://www.youtube.com/watch?v=wbcJfg-d5nI).**
+
 ## Results Representation
 
 So far so good. The only thing left is to configure benchpress but this is pretty much a straightforward process. You can find my configuration scripts [here](https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks) and Jeff's [here](https://github.com/jeffbcross/benchpress-tree). Note that it is not required to use benchpress with Angular, you can use it with any other framework or even without one.
