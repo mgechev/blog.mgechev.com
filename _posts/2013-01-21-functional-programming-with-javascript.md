@@ -125,7 +125,7 @@ Let&#8217;s look at memo again. We have variable called cache which is defined i
         },
         setArticles: function (articleList) {
            articles = articleList;
-           softArticles();
+           sortArticles();
         }
     };
 }());
