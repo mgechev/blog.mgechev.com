@@ -155,3 +155,33 @@ There are two main parts of the snippet above:
 - The way we update the version of the list once it has mutated
 
 The update method does not have to do something complex, it can only update the version property.
+
+## Benchmark Results
+
+I compared the performance of `VersionableList` versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:
+
+- Collection Size
+- Bindings Count
+
+We can explore the results in the following sections. The x-axis shows the bindings count and the y-axis shows the running time.
+
+### 5 entries
+
+![](../images/faster-collections/data-size-5.png)
+
+### 10 entries
+
+![](../images/faster-collections/data-size-10.png)
+
+### 100 entries
+
+![](../images/faster-collections/data-size-100.png)
+
+### 1,000 entries
+
+![](../images/faster-collections/data-size-1000.png)
+
+### 10,000 entries
+
+![](../images/faster-collections/data-size-10000.png)
+
