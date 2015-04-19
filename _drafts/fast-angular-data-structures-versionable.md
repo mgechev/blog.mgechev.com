@@ -203,3 +203,5 @@ There's no way to go much further without making any optimizations in the Angula
 
 ## Conclusion
 
+Using Immutable data we can gain performance improvements in the running time of our AngularJS application. By workarounding the biggest drawback of using immutable data - copying the entire data structure on change, we can reduce the running time even further. In both cases we should keep in mind that Immutable.js and VersionableCollections are both only wrappers around the standard collections. If you make any change in the collection items, AngularJS will not detect any change in the collection, which on their other hand won't force update of your view.
+
