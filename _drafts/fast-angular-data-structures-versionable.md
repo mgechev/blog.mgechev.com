@@ -17,12 +17,12 @@ tags:
 ---
 
 This is the last post of the series "Boost the Performance of an AngularJS Application Using Immutable Data". I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
 
 ## Introduction
 
-Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the `$digest` loop. How immutability could help? Immutable data cannot change after being created. The execution of each operation, which changes the collection (add, delete, set) will create of a new data structure but will leave the initial data unchanged. This way we know that a watched expression, which evaluation results a collection, have changed if and only if its current reference differs from the previous one. This speeds up the change detection of the expression from `O(n)` to `O(1)`, i.e. instead of watching collection with `$watchCollection(expr, fn)`, we can afford `$watch(expr, fn, false)`, instead.
+Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the `$digest` loop. How immutability could help? Immutable data cannot change after being created. The execution of each operation, which changes the immutable collection (add, delete, set) will create of a new data structure but will leave the initial data unchanged. This way we know that a watched expression, which evaluation results a collection, have changed if and only if its current reference differs from the previous one. This speeds up the change detection of the expression from `O(n)` to `O(1)`, i.e. instead of watching collection with `$watchCollection(expr, fn)`, we can afford `$watch(expr, fn, false)`, instead.
 
 So far so good, but creation of a new data structure will have two major performance impacts:
 
@@ -41,7 +41,7 @@ In order to reduce the complexity of the code, which dirty checks the expression
 
 ### $watch
 
-The only way to take advantage of the first option is by having a new reference to the data structure once it changes. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:
+The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:
 
 {% highlight javascript %}
 let primitive = [1, 2, 3];
@@ -63,9 +63,9 @@ Keeping the same reference to the primitive list in both collection will cause c
 
 ### $watchCollection
 
-How we can reduce the keys over which AngularJS' dirty checker iterates over? If we have a collection with 100,000,000 items, how to make AngularJS iterate only over a few of them in order to know whether the collection has changed? We will definitely need a wrapper but how to do the optimization?
+How we can reduce the keys over which AngularJS' dirty checker iterates? If we have a collection with 100,000,000 items, how to make AngularJS iterates only over a few of them in order to detect if the collection has changes? We will definitely need a wrapper but how to do the optimization?
 
-AngularJS does not need to iterate over the entire collection but only over a control flag, which shows the change in the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the `$digest` loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.
+AngularJS does not need to iterate over the entire collection but only needs to check a control flag, which shows the change in the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the `$digest` loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.
 
 But how we can limit AngularJS to watch **only** the control flag? We can do something like:
 
@@ -77,7 +77,7 @@ $watch(() => {
 
 There are three drawbacks of this approach:
 
-- We expose underlaying implementation details to the user of our collection.
+- We expose underlaying implementation details to the user of our library.
 - AngularJS needs to reset the `isChanged` flag once it detects a change. This requires changes in the AngularJS watch mechanism.
 - We can change `isChanged` outside the collection.
 
@@ -107,9 +107,9 @@ for (key in newValue) {
 // ...
 {% endhighlight %}
 
-This is the part of the implementation, which is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using `for key in value`. In order to achieve complexity around `O(1)`, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag.
+This part of the implementation is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using `for-in`. In order to achieve complexity around `O(1)`, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag as only key of the collection' instances.
 
-Here is how we achieve this result:
+Here is how we achieve behavior result:
 
 {% highlight javascript %}
 function defineProperty(obj, name, descriptor) {
@@ -148,13 +148,13 @@ defineMethod(VersionableList.prototype, 'set', function (idx, val) {
 });
 {% endhighlight %}
 
-There are two main parts of the snippet above:
+There are three main parts of the snippet above:
 
 - The way we take advantage of non-enumerable properties
 - The enumerable `_version` property
 - The way we update the version of the list once it has mutated
 
-The update method does not have to do something complex, it can only update the version property.
+The update method does not have to do something complex, it can only increment the version property.
 
 ## Benchmark Results
 
@@ -163,7 +163,7 @@ I compared the performance of `VersionableList` versus Immutable.js list and the
 - Collection Size
 - Bindings Count
 
-For running the benchmarks and visualizing the results in charts, [benchpress](https://github.com/angular/angular/tree/master/modules/benchpress) with a custom data formatter are used. The code for the benchmarks could be found [here](https://github.com/mgechev/benchpress-angularjs-immutable).
+For running the benchmarks and visualizing the results in charts, I used [benchpress](https://github.com/angular/angular/tree/master/modules/benchpress) with a custom data formatter. The code for the benchmarks could be found [here](https://github.com/mgechev/benchpress-angularjs-immutable).
 
 We can explore the results in the following sections. The x-axis shows the bindings count and the y-axis shows the running time.
 
@@ -171,7 +171,7 @@ We can explore the results in the following sections. The x-axis shows the bindi
 
 ![](../images/faster-collections/data-size-5.png)
 
-The big two big competitors in this benchmark are the versionable list and the native JavaScript array. As we see the built-in JavaScript list performs just a little bit better than `VersionableList`. Immutable.js list is slower because of the overhead caused by copying the entire data structure on change.
+The two big competitors in this benchmark are the `VersionableList` and the native JavaScript array. As we see the built-in JavaScript list performs just a little bit better than `VersionableList`. Immutable.js list is slower because of the overhead caused by copying the entire data structure on change.
 
 ### 10 entries
 
@@ -189,7 +189,7 @@ The kicking-ass winner in this benchmark is the `VersionableList`. With higher a
 
 ![](../images/faster-collections/data-size-1000.png)
 
-With 1k collection size the immutable list performs better than the built-in JavaScript array, with almost constant running time (the bindings almost don't impact the running time, since they have constant complexity). The `VersionableList` performs even better.
+With 1k collection size the immutable list performs better than the built-in JavaScript array and is with almost constant running time (the bindings almost don't impact the running time, since they have constant complexity). The `VersionableList` performs even better since it doesn't require copying of the collection on change.
 
 ### 10,000 entries
 
@@ -199,7 +199,7 @@ The supreme champion is the `VersionableList`. The interesting fact here is that
 
 ## Further Optimization
 
-There's no way to go much further without making any optimizations in the AngularJS' change detection. We may gain slight performance improvement if AngularJS doesn't invoke `hasOwnProperty` in the `$watchCollection` dirty checking strategy, since the poor performance of the method. This will require us to change `VersionableList` to something "array-like" in order to enter [the second case of `$watchCollection`'s interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601).
+There's no way to go much further without making any optimizations in the AngularJS' internal change detection. We may gain slight performance improvement if AngularJS doesn't invoke `hasOwnProperty` in the `$watchCollection` dirty checking strategy, since the poor performance of the method. This will require us to change `VersionableList` to something "array-like" in order to enter [the second case of `$watchCollection`'s interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601).
 
 ## Conclusion
 
