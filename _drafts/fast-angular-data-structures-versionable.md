@@ -160,7 +160,7 @@ The update method does not have to do something complex, it can only increment t
 
 ## Benchmark Results
 
-I compared the performance of `VersionableList` versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:
+I compared the performance of [`VersionableList`](https://github.com/mgechev/versionable-collections/blob/master/lib/versionable-list.js) versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:
 
 - Collection Size
 - Bindings Count
@@ -205,8 +205,9 @@ There's no way to go much further without making any optimizations in the Angula
 
 ## Conclusion
 
-Using Immutable data we can gain performance improvements in the running time of our AngularJS application. By workarounding the biggest drawback of using immutable data - copying the entire data structure on change, we can reduce the running time even further. In both cases we should keep in mind that Immutable.js and VersionableCollections are both only wrappers around the standard collections. If you make any change in the collection items, AngularJS will not detect any change in the collection, which on their other hand won't force update of your view.
+Using Immutable data we can gain performance improvements in the running time of our AngularJS applications. By workarounding the biggest drawback of using immutable data - copying the entire data structure on change, we can reduce the running time even further. In both cases we should keep in mind that Immutable.js and VersionableCollections are both only wrappers around the standard collections. If you make any change in the collection items, AngularJS will not detect any change in the collection, which on their other hand won't force update of your view.
 
+As I suggested in the previous blog post, before performing any of the optimization listed do application specific benchmarks using the data, which your application will process. Sample benchpress configurations could be found [here](https://github.com/mgechev/benchpress-angularjs-immutable) and [here](https://github.com/jeffbcross/karma-benchpress).
 
 ## References
 
