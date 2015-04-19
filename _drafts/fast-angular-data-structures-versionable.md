@@ -163,25 +163,43 @@ I compared the performance of `VersionableList` versus Immutable.js list and the
 - Collection Size
 - Bindings Count
 
+For running the benchmarks and visualizing the results in charts, [benchpress](https://github.com/angular/angular/tree/master/modules/benchpress) with a custom data formatter are used. The code for the benchmarks could be found [here](https://github.com/mgechev/benchpress-angularjs-immutable).
+
 We can explore the results in the following sections. The x-axis shows the bindings count and the y-axis shows the running time.
 
 ### 5 entries
 
 ![](../images/faster-collections/data-size-5.png)
 
+The big two big competitors in this benchmark are the versionable list and the native JavaScript array. As we see the built-in JavaScript list performs just a little bit better than `VersionableList`. Immutable.js list is slower because of the overhead caused by copying the entire data structure on change.
+
 ### 10 entries
 
 ![](../images/faster-collections/data-size-10.png)
+
+When having a data structure with 10 items the built-in JavaScript array and `VersionableList` have almost the same performance.
 
 ### 100 entries
 
 ![](../images/faster-collections/data-size-100.png)
 
+The kicking-ass winner in this benchmark is the `VersionableList`. With higher amount of bindings, the immutable list performs better than the built-in JavaScript array.
+
 ### 1,000 entries
 
 ![](../images/faster-collections/data-size-1000.png)
 
+With 1k collection size the immutable list performs better than the built-in JavaScript array, with almost constant running time (the bindings almost don't impact the running time, since they have constant complexity). The `VersionableList` performs even better.
+
 ### 10,000 entries
 
 ![](../images/faster-collections/data-size-10000.png)
+
+The supreme champion is the `VersionableList`. The interesting fact here is that the immutable list performs just slightly worst than the `VersionableList` list, although on each change a new collection with 10,000 items is created.
+
+## Further Optimization
+
+There's no way to go much further without making any optimizations in the AngularJS' change detection. We may gain slight performance improvement if AngularJS doesn't invoke `hasOwnProperty` in the `$watchCollection` dirty checking strategy, since the poor performance of the method. This will require us to change `VersionableList` to something "array-like" in order to enter [the second case of `$watchCollection`'s interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601).
+
+## Conclusion
 
