@@ -31,6 +31,8 @@ So far so good, but creation of a new data structure will have two major perform
 
 As we saw from "[Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)", the second is not such a big concern but copying the entire data structure slows us down significantly.
 
+The data structure described in this blog post could be [found at my GitHub profile](https://github.com/mgechev/versionable-collections).
+
 
 ## Optimization Options
 
