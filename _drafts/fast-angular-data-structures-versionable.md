@@ -65,4 +65,93 @@ Keeping the same reference to the primitive list in both collection will cause c
 
 How we can reduce the keys over which AngularJS' dirty checker iterates over? If we have a collection with 100,000,000 items, how to make AngularJS iterate only over a few of them in order to know whether the collection has changed? We will definitely need a wrapper but how to do the optimization?
 
-AngularJS does not need to iterate over the entire collection but only over a control flag, which shows the change in the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value.
+AngularJS does not need to iterate over the entire collection but only over a control flag, which shows the change in the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the `$digest` loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.
+
+But how we can limit AngularJS to watch **only** the control flag? We can do something like:
+
+{% highlight javascript %}
+$watch(() => {
+  return collection.isChanged;
+}, cb, false);
+{% endhighlight %}
+
+There are three drawbacks of this approach:
+
+- We expose underlaying implementation details to the user of our collection.
+- AngularJS needs to reset the `isChanged` flag once it detects a change. This requires changes in the AngularJS watch mechanism.
+- We can change `isChanged` outside the collection.
+
+Lets take a look at AngularJS' `$watchCollection` implementation:
+
+{% highlight javascript %}
+// ...
+for (key in newValue) {
+  if (newValue.hasOwnProperty(key)) {
+    newLength++;
+    newItem = newValue[key];
+    oldItem = oldValue[key];
+
+    if (key in oldValue) {
+      bothNaN = (oldItem !== oldItem) && (newItem !== newItem);
+      if (!bothNaN && (oldItem !== newItem)) {
+        changeDetected++;
+        oldValue[key] = newItem;
+      }
+    } else {
+      oldLength++;
+      oldValue[key] = newItem;
+      changeDetected++;
+    }
+  }
+}
+// ...
+{% endhighlight %}
+
+This is the part of the implementation, which is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using `for key in value`. In order to achieve complexity around `O(1)`, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag.
+
+Here is how we achieve this result:
+
+{% highlight javascript %}
+function defineProperty(obj, name, descriptor) {
+  'use strict’;
+  Object.defineProperty(obj, name, descriptor);
+}
+
+function defineMethod(obj, name, method) {
+  'use strict’;
+  defineProperty(obj, name, {
+    enumerable: false,
+    value: method
+  });
+}
+
+function VersionableList(list) {
+  'use strict’;
+  this._version = 0;
+  Object.defineProperty(this, '_data', {
+    enumerable: false,
+    value: list || []
+  });
+}
+
+'push pop shift unshift'.split(' ')
+.forEach(function (key) {
+  'use strict';
+  defineMethod(VersionableList.prototype, key, function () {
+    this._data[key].apply(this._data, arguments);
+    this._updateVersion();
+  });
+});
+defineMethod(VersionableList.prototype, 'set', function (idx, val) {
+  this._data[idx] = val;
+  this._updateVersion();
+});
+{% endhighlight %}
+
+There are two main parts of the snippet above:
+
+- The way we take advantage of non-enumerable properties
+- The enumerable `_version` property
+- The way we update the version of the list once it has mutated
+
+The update method does not have to do something complex, it can only update the version property.
