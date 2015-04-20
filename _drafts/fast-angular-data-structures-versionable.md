@@ -240,3 +240,5 @@ As I suggested in the previous blog post, before performing any of the optimizat
 - [Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
 - [VersionableCollection](https://github.com/mgechev/versionable-collections)
 - [AngularJS' watchCollection interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L563-L641)
+- [Image in the introduction section](https://www.flickr.com/photos/ryechess/6645151473/)
+- [Image in the benchmarks section](https://www.flickr.com/photos/thebritishbafoon/12228264015/)
