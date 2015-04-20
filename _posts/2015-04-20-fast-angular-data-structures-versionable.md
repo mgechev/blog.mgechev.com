@@ -118,12 +118,12 @@ Here is how we achieve behavior result:
 
 {% highlight javascript %}
 function defineProperty(obj, name, descriptor) {
-  'use strict’;
+  'use strict';
   Object.defineProperty(obj, name, descriptor);
 }
 
 function defineMethod(obj, name, method) {
-  'use strict’;
+  'use strict';
   defineProperty(obj, name, {
     enumerable: false,
     value: method
@@ -131,7 +131,7 @@ function defineMethod(obj, name, method) {
 }
 
 function VersionableList(list) {
-  'use strict’;
+  'use strict';
   this._version = 0;
   Object.defineProperty(this, '_data', {
     enumerable: false,
@@ -196,31 +196,31 @@ We can explore the results in the following sections. The x-axis shows the bindi
 
 ### 5 entries
 
-![](../images/faster-collections/data-size-5.png)
+![](/images/faster-collections/data-size-5.png)
 
 The two big competitors in this benchmark are the `VersionableList` and the native JavaScript array. As we see the built-in JavaScript list performs just a little bit better than `VersionableList`. Immutable.js list is slower because of the overhead caused by copying the entire data structure on change.
 
 ### 10 entries
 
-![](../images/faster-collections/data-size-10.png)
+![](/images/faster-collections/data-size-10.png)
 
 When having a data structure with 10 items the built-in JavaScript array and `VersionableList` have almost the same performance.
 
 ### 100 entries
 
-![](../images/faster-collections/data-size-100.png)
+![](/images/faster-collections/data-size-100.png)
 
 The kicking-ass winner in this benchmark is the `VersionableList`. With higher amount of bindings, the immutable list performs better than the built-in JavaScript array.
 
 ### 1,000 entries
 
-![](../images/faster-collections/data-size-1000.png)
+![](/images/faster-collections/data-size-1000.png)
 
 With 1k collection size the immutable list performs better than the built-in JavaScript array and is with almost constant running time (the bindings almost don't impact the running time, since they have constant complexity). The `VersionableList` performs even better since it doesn't require copying of the collection on change.
 
 ### 10,000 entries
 
-![](../images/faster-collections/data-size-10000.png)
+![](/images/faster-collections/data-size-10000.png)
 
 The supreme champion is the `VersionableList`. The interesting fact here is that the immutable list performs just slightly worst than the `VersionableList` list, although on each change a new collection with 10,000 items is created.
 
