@@ -22,6 +22,8 @@ This is the last post of the series "Boost the Performance of an AngularJS Appli
 
 ## Introduction
 
+![](/images/superman-batman-lego.jpg)
+
 Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the `$digest` loop. How immutability could help? Immutable data cannot change after being created. The execution of each operation, which changes the immutable collection (add, delete, set) will create of a new data structure but will leave the initial data unchanged. This way we know that a watched expression, which evaluation results a collection, have changed if and only if its current reference differs from the previous one. This speeds up the change detection of the expression from `O(n)` to `O(1)`, i.e. instead of watching collection with `$watchCollection(expr, fn)`, we can afford `$watch(expr, fn, false)`, instead.
 
 So far so good, but creation of a new data structure will have two major performance impacts:
