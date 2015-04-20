@@ -49,11 +49,7 @@ Some of the open source projects I've developed are:
 - [DistrElang - a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [movement.js](https://github.com/mgechev/movement.js) [demo here](http://movement.mgechev.com)
 
-<br>
-
 [And many, many others...](https://github.com/mgechev)
-
-<br>
 
 ## Talks
 
