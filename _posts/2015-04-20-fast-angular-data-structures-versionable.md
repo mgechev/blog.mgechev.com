@@ -44,7 +44,7 @@ In order to reduce the complexity of the code, which dirty checks the expression
 
 ### $watch
 
------ DIRTY HACK IMAGE -------
+![](/images/papi-lego.jpg)
 
 The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:
 
@@ -241,4 +241,5 @@ As I suggested in the previous blog post, before performing any of the optimizat
 - [VersionableCollection](https://github.com/mgechev/versionable-collections)
 - [AngularJS' watchCollection interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L563-L641)
 - [Image in the introduction section](https://www.flickr.com/photos/ryechess/6645151473/)
+- [Image in the $watch section](https://www.flickr.com/photos/126429057@N06/14549507589/)
 - [Image in the benchmarks section](https://www.flickr.com/photos/thebritishbafoon/12228264015/)
