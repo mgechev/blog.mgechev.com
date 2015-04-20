@@ -29,10 +29,9 @@ So far so good, but creation of a new data structure will have two major perform
 - Copying the initial collection and making the change, before "freezing it".
 - <strike>More work for the garbage collector.</strike>
 
-As we saw from "[Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)", the second is not such a big concern but copying the entire data structure slows us down significantly.
+In "[Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)"we saw that the second point is not such a big concern but copying the entire data structure slows us down significantly.
 
-The data structure described in this blog post could be [found at my GitHub profile](https://github.com/mgechev/versionable-collections).
-
+The data structure described in this blog post could be [found at my GitHub profile](https://github.com/mgechev/versionable-collections), it does further optimizations for even faster collection data bindings..
 
 ## Optimization Options
 
@@ -42,6 +41,8 @@ In order to reduce the complexity of the code, which dirty checks the expression
 - Use `$watchCollection(expr, fn)` but reduce its running time. This means that we need to decrease the elements over which `$watchCollection` iterates.
 
 ### $watch
+
+----- DIRTY HACK IMAGE -------
 
 The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:
 
@@ -54,20 +55,20 @@ console.log(primitive === changedList); // false
 console.log(primitive); // [1, 2, 3, 4]
 {% endhighlight %}
 
-But this will also have one more side effect:
+But this will also have one important side effect:
 
 {% highlight javascript %}
 console.log(list.toJS()); // [ 1, 2, 3, 4]
 console.log(changedList.toJS()); // [ 1, 2, 3, 4]
 {% endhighlight %}
 
-Keeping the same reference to the primitive list in both collection will cause change inside the underlaying data in both collections. This solution looks like a dirty hack.
+Keeping the same reference to the primitive list in both collections will cause change inside the underlaying data in both collections, once we perform a mutation operation. This solution looks like a dirty hack.
 
 ### $watchCollection
 
 How we can reduce the keys over which AngularJS' dirty checker iterates? If we have a collection with 100,000,000 items, how to make AngularJS iterates only over a few of them in order to detect if the collection has changes? We will definitely need a wrapper but how to do the optimization?
 
-AngularJS does not need to iterate over the entire collection but only needs to check a control flag, which shows the change in the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the `$digest` loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.
+AngularJS does not need to iterate over the entire collection but only need to check a control flag, which shows the change of the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the `$digest` loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.
 
 But how we can limit AngularJS to watch **only** the control flag? We can do something like:
 
@@ -158,7 +159,29 @@ There are three main parts of the snippet above:
 
 The update method does not have to do something complex, it can only increment the version property.
 
+Here is sample usage of `VersionableList`:
+
+{% highlight javascript %}
+let list = new VersionableList([1, 2]);
+
+console.log(list.valueOf()); // [1, 2]
+console.log(list._version); // 0
+
+list.push(3);
+
+console.log(list.valueOf()); // [1, 2, 3]
+console.log(list._version); // 1
+{% endhighlight %}
+
+And here are the keys over which AngularJS will iterate:
+
+{% highlight javascript %}
+Object.keys(list); // ['_version']
+{% endhighlight %}
+
 ## Benchmark Results
+
+![](/images/batman-superman-robbin-lego.jpg)
 
 I compared the performance of [`VersionableList`](https://github.com/mgechev/versionable-collections/blob/master/lib/versionable-list.js) versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:
 
