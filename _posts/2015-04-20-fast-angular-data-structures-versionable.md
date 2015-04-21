@@ -1,5 +1,5 @@
 ---
-title: Even Faster AngularJS Data Structures
+title: Even Faster Data Structures for AngularJS
 author: minko_gechev
 layout: post
 categories:
