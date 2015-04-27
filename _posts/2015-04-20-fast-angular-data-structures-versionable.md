@@ -222,7 +222,7 @@ With 1k collection size the immutable list performs better than the built-in Jav
 
 ![](/images/faster-collections/data-size-10000.png)
 
-The supreme champion is the `VersionableList`. The interesting fact here is that the immutable list performs just slightly worst than the `VersionableList` list, although on each change <strike>a new collection with 10,000 items is created</strike> a lot of operations for maintaining the persistent data structure are performed.
+The supreme champion is the `VersionableList`. The interesting fact here is that the immutable list performs just slightly worst than the `VersionableList` list, although on each change <strike>a new collection with 10,000 items is created</strike> a lot of operations for maintaining the [persistent data structure](https://en.wikipedia.org/wiki/Persistent_data_structure) are performed.
 
 ## Further Optimization
 
