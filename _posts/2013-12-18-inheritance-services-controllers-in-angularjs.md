@@ -18,7 +18,7 @@ Since AngularJS does not provide any built-in features for using inheritance, in
 
 ## Controllers inheritance
 
-First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller. This is the case because by implementation the scope in the child controller will inherit prototypically from the scope of its parent. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
+First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you're using the controller as syntax, see bellow). This is the case because by implementation the scope in the child controller will inherit prototypically from the scope of its parent. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
 
 {% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.parentMethod = function () {
@@ -48,9 +48,9 @@ myModule.controller('ChildCtrl', function ($scope) {
 });
 {% endhighlight %}
 
-I&#8217;m providing this snippet only informative, if you need to call children methods from your parent controller there might be something wrong in your code.
+I&#8217;m providing this snippet with only informative purpose, if you need to call children methods from your parent controller, you might be doing something wrong.
 
-OK, but now let&#8217;s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which to encapsulate the common logic, and two children controllers which to inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:
+OK, but now let&#8217;s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which encapsulates the common logic, and two children controllers which inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:
 
 {% highlight javascript %}function BaseCtrl($scope, $location, ...) {
   $scope.commonScopeMethod = function () {
@@ -86,19 +86,42 @@ myModule.controller('ChildCtrl1', ChildCtrl1);
 {% endhighlight %}
 
 As you see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
+### Controllers as syntax
+
+AngularJS 1.2 added the controller's as syntax. Basically it allows us to create aliases for our controllers, for example using the `ng-controller` directive we can:
+
+{% highlight html %}
+<div ng-controller="MainCtrl as main">
+  {{ main.name }}
+  <button ng-click="main.clicked()">Click</button>
+</div>
+{% endhighlight %}
+
+with the following controller:
+
+{% highlight javascript %}
+function MainCtrl() {
+  this.name = 'Foobar';
+}
+MainCtrl.prototype.clicked = function () {
+  alert('You clicked me!');
+};
+{% endhighlight %}
+
+There are [number of benefits, which come along with this syntax](https://github.com/mgechev/angularjs-style-guide#controllers) one of them is the way we can take advantage of the "klassical" JavaScript inheritance.
 
 ## Services inheritance
 
 As you know there are two ways to create injectable (through DI) AngularJS services:
 
-*   module.factory(name, factoryFn)
-*   module.service(name, factoryFn)
+* module.factory(name, factoryFn)
+* module.service(name, factoryFn)
 
 ### module.factory
 
-In `module.factory` the `factoryFn` returns object literal which is the actual service. Behind the scene AngularJS calls the `factory` function called inside the [injector definition][2]
+In `module.factory` the `factoryFn` returns object literal which is the actual service. Behind the scene AngularJS calls the `factory` function inside the [injector definition][2]
 
-If you need inheritance between services which are instantiated through `module.factory` the prototype inheritance pattern through `Object.create` fits just great!
+If you need inheritance in services which are instantiated through `module.factory` the prototype inheritance pattern through `Object.create` fits just great!
 
 Lets create the base service:
 
@@ -134,7 +157,7 @@ Now you can inject `ChildService` in different component and reuse the inherited
 }
 {% endhighlight %}
 
-You can check example [right here][3].
+You can find an example [right here][3].
 
 #### Inject the parent {#inject-the-parent}
 
@@ -155,13 +178,13 @@ module.factory('ChildService', function (ParentService, $sce) {
 });
 {% endhighlight %}
 
-This pattern is definitely much more useful when you need to inject some dependencies to the parent service.
+This pattern is definitely much more useful when you need to inject some dependencies to the parent service before inheriting it.
 
 ### module.service
 
-Usually I call the variables attached to my scope View Models and some special services &#8211; Models. I implement these services with something close to the [Active Record Pattern][4]. My models are usually responsible for talking to the server, sometimes directly but usually through a [Gateway][5]. For the creation of these models I prefer to use `module.service` method. Internally these services are created through the `instantiate` [method][6].
+Usually I call the variables attached to my scope View Models and the special services, which encapsulate the business logic &#8211; Models. I implement these services with something close to the [Active Record Pattern][4]. My models are usually responsible for talking to the server, sometimes directly but usually through a [Gateway][5]. For the creation of these models I prefer to use `module.service` method. Internally these services are created through the `instantiate` [method][6].
 
-Why I prefer using service instead of factory? Well, may be I&#8217;m a confused developer who don&#8217;t understand the true power of the prototypal inheritance used with pure object literals but I prefer to use the classical style for my models. By using it I can create a set of constructor functions which model my domain pretty well. Who knows for large project I may decide to use MDD and generate all my models from some fancy UML diagrams&#8230;
+Why I prefer using service instead of factory? Well, may be I&#8217;m a confused developer who doesn&#8217;t understand the true power of the prototypal inheritance used with object literals, however I prefer to use the classical one for my models. By using it I can create a set of constructor functions which model my domain pretty well. One day I may decide to use MDD and generate all my models from some fancy UML diagrams&#8230;
 
 Here is an example of how you can take advantage of the Klassical inheritance pattern for AngularJS services created with `module.service`:
 
@@ -192,7 +215,7 @@ angular.module('demo').value('AbilitiesCollection', ['C++', 'JavaScript']);
 You can check this related [exercise from ng-tutorial][7].
 
  [1]: http://jsbin.com/oLawajuL/2/edit
- [2]: https://github.com/angular/angular.js/blob/master/src/auto/injector.js#L654
+ [2]: https://github.com/angular/angular.js/blob/v1.4.0-rc.0/src/auto/injector.js#L686-L690
  [3]: http://jsbin.com/idIVAWO/2/edit
  [4]: http://www.martinfowler.com/eaaCatalog/activeRecord.html
  [5]: http://www.martinfowler.com/eaaCatalog/gateway.html
