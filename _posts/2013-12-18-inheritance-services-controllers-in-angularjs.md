@@ -86,6 +86,7 @@ myModule.controller('ChildCtrl1', ChildCtrl1);
 {% endhighlight %}
 
 As you see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
+
 ### Controllers as syntax
 
 AngularJS 1.2 added the controller's as syntax. Basically it allows us to create aliases for our controllers, for example using the `ng-controller` directive we can:
