@@ -18,7 +18,7 @@ Since AngularJS does not provide any built-in features for using inheritance, in
 
 ## Controllers inheritance
 
-First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you're using the controller as syntax, see bellow). This is the case because by implementation the scope in the child controller will inherit prototypically from the scope of its parent. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
+First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you're using the controller as syntax, see bellow). This is the case because by implementation the scope in the child controller will inherit prototypically from its parent scope. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
 
 {% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.parentMethod = function () {
@@ -31,7 +31,7 @@ myModule.controller('ChildCtrl', function ($scope) {
 });
 {% endhighlight %}
 
-Of course, the inheritance creates very strong coupling but only in single direction (i.e. the child is strongly coupled to its parent), so you can&#8217;t directly call children methods from your parent controller. For doing this you need to use event dispatching:
+Of course, the inheritance creates very strong coupling but only in a single direction (i.e. the child is strongly coupled to its parent), so you can&#8217;t directly call children methods from your parent controller. For doing this you need to use event dispatching:
 
 {% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.$broadcast('event', args);
@@ -71,6 +71,7 @@ Now the children controllers can easily inherit from the base controller by:
 {% highlight javascript %}function ChildCtrl1($scope, $location, ...) {
   BaseCtrl.call(this, $scope, $location, ...);
   $scope.childScopeMethod = function () {
+    this.commonMethod2();
   };
 }
 
@@ -85,11 +86,11 @@ myModule.controller('ChildCtrl1', ChildCtrl1);
 
 {% endhighlight %}
 
-As you see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
+As you can see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
 
-### Controllers as syntax
+### Controller as syntax
 
-AngularJS 1.2 added the controller's as syntax. Basically it allows us to create aliases for our controllers, for example using the `ng-controller` directive we can:
+AngularJS 1.2 added the controller as syntax. Basically it allows us to create aliases for our controllers, for example using the `ng-controller` directive we can:
 
 {% highlight html %}
 <div ng-controller="MainCtrl as main">
@@ -109,7 +110,42 @@ MainCtrl.prototype.clicked = function () {
 };
 {% endhighlight %}
 
-There are [number of benefits, which come along with this syntax](https://github.com/mgechev/angularjs-style-guide#controllers) one of them is the way we can take advantage of the "klassical" JavaScript inheritance.
+There are [number of benefits, which come along with this syntax](https://github.com/mgechev/angularjs-style-guide#controllers) one of them is the way we can take advantage of the "klassical" JavaScript inheritance:
+
+{% highlight javascript %}
+function BaseCtrl() {
+  this.name = 'foobar';
+}
+BaseCtrl.prototype.parentMethod = function () {
+  //body
+};
+
+function ChildCtrl() {
+  BaseCtrl.call(this);
+  this.name = 'baz';
+}
+ChildCtrl.prototype = Object.create(BaseCtrl.prototype);
+ChildCtrl.prototype.childMethod = function () {
+  this.parentMethod();
+  //body
+};
+
+app.controller('BaseCtrl', BaseCtrl);
+app.controller('ChildCtrl', ChildCtrl);
+{% endhighlight %}
+
+which can be used with the following markup:
+
+{% highlight html %}
+<div ng-controller="BaseCtrl as base">
+  <button ng-click="base.method()">Invoke parent</button>
+  <div ng-controller="ChildCtrl as child">
+    <button ng-click="child.childMethod()">Invoke child</button>
+  </div>
+</div>
+{% endhighlight %}
+
+When the user press the button with label "Invoke parent" the `parentMethod` defined in `BaseCtrl` will be invoked. If the user press "Invoke child" the `childMethod` will be invoked. Notice that in its body it invokes `parentMethod` as well.
 
 ## Services inheritance
 
