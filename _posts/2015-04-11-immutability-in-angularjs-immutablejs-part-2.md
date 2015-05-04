@@ -333,3 +333,9 @@ The immutable data helps us speedup the watchers from `O(n)` (looping over the w
 
 But can't we build something, which takes the best of both worlds? Can't we build a specialized data structure used for super fast data binding, which doesn't require creation of new instance on change but still allows `O(1)` check for change? This is what I'm going to explore in the last blog post of this series.
 
+## Parts of the series:
+
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+

@@ -244,3 +244,10 @@ As I suggested in the previous blog post, before performing any of the optimizat
 - [Image in the introduction section](https://www.flickr.com/photos/ryechess/6645151473/)
 - [Image in the $watch section](https://www.flickr.com/photos/126429057@N06/14549507589/)
 - [Image in the benchmarks section](https://www.flickr.com/photos/thebritishbafoon/12228264015/)
+
+## Parts of the series:
+
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+

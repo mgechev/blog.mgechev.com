@@ -415,3 +415,10 @@ In the package [`angular-immutable`](https://github.com/mgechev/angular-immutabl
 
 - Allow two-way data-binding to immutable data
 - Implement optimized version of `ng-repeat`, which uses `$watch` instead of `$watchCollection`, for increasing the watcher's speed.
+
+## Parts of the series:
+
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+
