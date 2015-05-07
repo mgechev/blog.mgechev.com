@@ -55,6 +55,7 @@ Some of the open source projects I've developed are:
 
 I also like talking about software development. Some of my talks:
 
+- ["Bringing Immutability to Angular"](https://www.youtube.com/watch?v=zeChCjj-tbY), ng-vegas (Las Vegas, USA, 7th of May, 2015)
 - ["AngularJS in Patterns"](https://speakerdeck.com/mgechev/angularjs-in-patterns-lightning-talk), AngularJS-SF user group (San Francisco, USA, 25th of February, 2015)
 - ["Taking the web apps offline"](https://speakerdeck.com/mgechev/taking-the-web-apps-offline), talk I did in ICN (Sofia, Bulgaria, 27th of January, 2015)
 - ["Lightweight AngularJS"](https://speakerdeck.com/mgechev/lightweight-angularjs), SoftServe's IT Weekend (Sofia, Bulgaria, 29th of November, 2014). Blog post on this topic could be [found here](https://github.com/mgechev/light-angularjs)
