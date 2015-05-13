@@ -161,5 +161,35 @@ In the previous section we took depth-first approach. We dug deeper in component
 
 ![High-Level Overview](../images/overview-pure-components/flux-overview.png)
 
-In the diagram above we have a few
+Lets describe what the boxes and the arrows above mean:
 
+### View
+
+The view is simply [composition of components](https://en.wikipedia.org/wiki/Composite_pattern). They might be stateless or stateful. We will talk more about components in the next sections. How exactly we need to compose them and on what level of granularity they should be completely depends on the UI of our application. Usually we have higher level components which abstract components of lower level and pass the data, which should be rendered by them or their configuration as properties.
+
+### Store
+
+The store is *not necessary* the model of our application. The store simply contains the *state* of the UI. When we use stateful components parts of the state could be stored in them but we need to be careful with that.
+
+What state could be kept in the store? We can think of two types of store:
+
+- Model - domain specific logic. For example, the todo items in our todo application.
+- UI state - the state of our view, which is not relevant to the model. For example, which dialog is opened right now.
+
+The store *should not be aware* of its representation and it is better to be unaware of the way our application communicates with the back-end services! The store knows only of the existence of:
+
+### Dispatcher
+
+A few years ago, Nicholas Zakas published his [large scale application architecture](https://www.youtube.com/watch?v=vXjVFPosQHw). In the core of the architecture there is a sandbox, which implements the publish/subscribe pattern. Publish/subscribe is nothing more than the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern) but since we have first-class functions in JavaScript, we can use them inside of observers and we can use the publish/subscribe object as an event bus (which could be considered more or less as [mediator](https://en.wikipedia.org/wiki/Mediator_pattern)).
+
+Okay, so I said this only in order to tell you that the Dispatcher is simply an event bus. It is a singleton, which owns a map of key-value pairs. The keys in this map are event names and the values are lists of callbacks. The dispatcher has a method called `dispatch`, which once called with event name, iterates over all callbacks associated with the passed event name and invokes them. Thats it. You can take a look at sample [implementation here](https://github.com/facebook/flux/blob/master/src/Dispatcher.js). In my projects I usually use this implementation, so far I haven't needed anything it doesn't provide.
+
+### Action
+
+Actions are even simpler than the dispatcher. What they do is to define methods, which will be called by the view. These methods accept arguments, which contain further instructions on how the view wants to change the model. All these methods do is to delegate their call to the Dispatcher's `dispatch` method. This might seems like unecessary level of indirection? Why would we need to call action from the view, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view?
+
+---------------
+- the view should not be aware of the store's structure
+  - combining a few modifications of the view
+  - the views should not be aware of the type of change which happened (the actions know it since they use special constant for indicating the exact change)
+---------------
