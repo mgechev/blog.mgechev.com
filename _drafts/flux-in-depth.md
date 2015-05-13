@@ -1,5 +1,5 @@
 ---
-title: Flux in Depth
+title: Flux in Depth - Part 1
 author: minko_gechev
 layout: post
 categories:
