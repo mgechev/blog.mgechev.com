@@ -1,5 +1,5 @@
 ---
-title: Flux in Depth - Part 1
+title: Flux in Depth. Overview and Pure Components.
 author: minko_gechev
 layout: post
 categories:
@@ -18,7 +18,11 @@ tags:
   - MVW
 ---
 
-Flux is micro-architecture with unidirectional data flow for application development. It sounds quite abstract but thats what it is. It is technology agnostic, which means that it doesn't depend on ReactJS, although it was initially introduced by facebook. It is not coupled to a specific place in the stack where it should be used - you can build isomorphic JavaScript applications with flux, like Reza Akhavan [pointed out during one JavaScript breakfast](https://docs.google.com/presentation/d/1LdTKrxw0MdvH_VCkpWG2q5hS3pKvIA1IzbL3d3cZ1Ok/edit#slide=id.p). Flux is not even coupled to JavaScript. It just solves a few problems, which are common for MVC.
+This is the first blog post of the series "Flux in Depth". Yet the another flux tutorial? What I have seen so far, while researching flux, were mostly "how-to" tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between all these components. This is definitely useful for making a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration. In this series of posts I will try to wire theory with practice and state *my own solutions* of problem I face on daily basis. Since these solutions might not be perfect, I'd really appreciate discussing in the comments bellow.
+
+## Introduction
+
+Flux is micro-architecture with unidirectional data flow for application development. It sounds quite abstract but thats what it is. It is technology agnostic, which means that it doesn't depend on ReactJS, although it was initially introduced by facebook. It is not coupled to a specific place in the stack where it should be used - you can build isomorphic JavaScript applications with flux, like Reza Akhavan [pointed out during one JavaScript breakfast](https://docs.google.com/presentation/d/1LdTKrxw0MdvH_VCkpWG2q5hS3pKvIA1IzbL3d3cZ1Ok/edit#slide=id.p). Flux is not even coupled to JavaScript. It just solves a few problems, which are common for MVC. Important characteristics of the flux application are:
 
 ### Unidirectional Data Flow
 
@@ -150,3 +154,12 @@ What we can do is to:
 - Deep freeze our data
 
 Is it necessary to use immutable data? It is not, it may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things!
+
+## Flux High-Level Overview
+
+In the previous section we took depth-first approach. We dug deeper in components before even stating how the flux architecture looks like by illustrating it with boxes and arrows. I believe it is important to get the idea of the "pure components" before getting any further. Since we are already done with that - lets begin with the high-level overview!
+
+![High-Level Overview]()
+
+
+
