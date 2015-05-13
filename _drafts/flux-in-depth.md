@@ -38,11 +38,11 @@ In flux the user interface is a composition of **stateless** UI components. The 
 
 It is much easier to think of a function as a black box, which accepts in input and gives an output:
 
-![Pure function]()
+![Pure function](/images/overview-pure-components/pure-function.png)
 
 Rather than as something, which does its job by using external (may be) global mutable resources in order to return its output:
 
-![Impure function]()
+![Impure function](/images/overview-pure-components/impure-function.png)
 
 I won't add any examples here, you can find plenty of them if you Google that.
 
@@ -54,7 +54,7 @@ According to Wikipedia a pure function is:
 
 How we can make our components pure? Definitely they should not use any global variables because their result (rendered component), should not depend on anything else except the properties it accepts. But that's not all. If the data passed to the components in the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:
 
-![Component tree]()
+![Component tree](/images/overview-pure-components/component-tree.png)
 
 And the following data applied to it:
 
@@ -79,7 +79,7 @@ And the following data applied to it:
 
 If we call the root object `user`, in a flux-like architecture the data will be distributed across the components in the following way:
 
-![Flux data distribution]()
+![Flux data distribution](/images/overview-pure-components/flux-like-data-distribution.png)
 
 In the `User` component we can have the following code:
 
@@ -123,15 +123,15 @@ In the snippet above we can notice that:
 
 It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js' list as a thin wrapper around the standard JavaScript array:
 
-![Immutable data structure with mutable items]()
+![Immutable data structure with mutable items](/images/overview-pure-components/immutable-collection-mutable-items.png)
 
 We can simply access any of the mutable items inside the immutable data structure...:
 
-![Access mutable item]()
+![Access mutable item](/images/overview-pure-components/touch-mutable-item.png)
 
 ...and change it:
 
-![Change mutable item]()
+![Change mutable item](../images/overview-pure-components/change-mutable-item.png)
 
 Which is not cool. In order to fix this behavior we can use `Object.freeze`.
 
@@ -159,7 +159,7 @@ Is it necessary to use immutable data? It is not, it may eventually lead to some
 
 In the previous section we took depth-first approach. We dug deeper in components before even stating how the flux architecture looks like by illustrating it with boxes and arrows. I believe it is important to get the idea of the "pure components" before getting any further. Since we are already done with that - lets begin with the high-level overview!
 
-![High-Level Overview]()
+![High-Level Overview](../images/overview-pure-components/flux-overview.png)
 
-
+In the diagram above we have a few
 
