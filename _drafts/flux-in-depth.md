@@ -18,11 +18,50 @@ tags:
   - MVW
 ---
 
-This is the first blog post of the series "Flux in Depth". Yet the another flux tutorial? What I have seen so far, while researching flux, were mostly "how-to" tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between all these components. This is definitely useful for making a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration. In this series of posts I will try to wire theory with practice and state *my own solutions* of problem I face on daily basis. Since these solutions might not be perfect, I'd really appreciate discussing in the comments bellow.
+This is the first blog post of the series "Flux in Depth". Is this "yet the another flux tutorial"? What I have seen so far, while researching flux, were mostly "how-to" tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between them. This is definitely useful for making a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration. In this series of posts I will try to wire theory with practice and state *my own solutions* of problem I face on daily basis. Since these solutions might not be perfect, I'd really appreciate discussing in the comments bellow.
 
 ## Introduction
 
-Flux is micro-architecture with unidirectional data flow for application development. It sounds quite abstract but thats what it is. It is technology agnostic, which means that it doesn't depend on ReactJS, although it was initially introduced by facebook. It is not coupled to a specific place in the stack where it should be used - you can build isomorphic JavaScript applications with flux, like Reza Akhavan [pointed out during one JavaScript breakfast](https://docs.google.com/presentation/d/1LdTKrxw0MdvH_VCkpWG2q5hS3pKvIA1IzbL3d3cZ1Ok/edit#slide=id.p). Flux is not even coupled to JavaScript. It just solves a few problems, which are common for MVC. Important characteristics of the flux application are:
+Flux is micro-architecture for software application with unidirectional data flow. It sounds quite abstract but thats what it is. It is technology agnostic, which means that it doesn't depend on ReactJS, although it was initially introduced by facebook. It is not coupled to a specific place in the stack where it should be used - you can build isomorphic JavaScript applications with flux, like Reza Akhavan [pointed out during one JavaScript breakfast](https://docs.google.com/presentation/d/1LdTKrxw0MdvH_VCkpWG2q5hS3pKvIA1IzbL3d3cZ1Ok/edit#slide=id.p). Flux is not even coupled to JavaScript. It just solves a few problems, which are common for MVC.
+
+Lets take a look at a diagram, which illustrates the data flow in a flux application:
+
+## Flux High-Level Overview
+
+![High-Level Overview](../images/overview-pure-components/flux-overview.png)
+
+Lets describe what the boxes and the arrows above mean:
+
+### View
+
+The view is simply [composition of components](https://en.wikipedia.org/wiki/Composite_pattern). They might be stateless or stateful. We will talk more about components in the next sections. How exactly we need to compose them and on what level of granularity they should be completely depends on the UI of our application. Usually we have higher level components, which abstract lower level components by composing them. The data is passed from the root component to all its child components, which recursively pass the data used by their children and so on.
+
+### Store
+
+The store is *not necessary* the model of our application. The store simply contains the *state* of the UI. When we use stateful components parts of the state could be stored in them but we need to be careful with that.
+
+What state could be kept in the store? We can think of two types of store:
+
+- Model - domain specific data. For example, the todo items in our todo application.
+- UI state - the state of our view, which is not relevant to the model. For example, which dialog is opened right now.
+
+One common thing between MVC and flux is that the store *should not be aware* of its representation and it is better to be unaware of the way our application communicates with the back-end services! However, the store in flux is not equals to the model in MVC. The store knows only of the existence of:
+
+### Dispatcher
+
+A few years ago, Nicholas Zakas published his [large scale application architecture](https://www.youtube.com/watch?v=vXjVFPosQHw). In the core of the architecture there is a sandbox, which implements the publish/subscribe pattern. Publish/subscribe is nothing more than the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern) but since we have first-class functions in JavaScript, we can use them instead of observers. We can think of the publish/subscribe object as an event bus (which could be considered more or less as [mediator](https://en.wikipedia.org/wiki/Mediator_pattern)). The main difference between observer and publish/subscribe is that in the latest, it is not responsibility of the subject to keep list of observers, unlike in the classical observer pattern.
+
+Okay, so I said this only in order to tell you that the Dispatcher is simply an event bus. It is a singleton, which owns a map of key-value pairs. The keys in this map are event (action) names and the values are lists of callbacks. The dispatcher has a method called `dispatch`, which once called with an event name, iterates over all callbacks associated with it and invokes them. Thats it. You can take a look at sample [implementation here](https://github.com/facebook/flux/blob/master/src/Dispatcher.js). In my projects I usually use this implementation as base class for my custom Dispatcher. So far I haven't needed anything it doesn't provide.
+
+### Action
+
+Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their call to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection? Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view?
+
+- The View should not be aware of the store's structure
+  - The views should not be aware of the type of the change which happened (the actions know it since they use special constant for indicating the exact change)
+  - Combining a few modifications of the view
+
+So from the diagram above we can notice that important characteristic of flux is the:
 
 ### Unidirectional Data Flow
 
@@ -155,41 +194,3 @@ What we can do is to:
 
 Is it necessary to use immutable data? It is not, it may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things!
 
-## Flux High-Level Overview
-
-In the previous section we took depth-first approach. We dug deeper in components before even stating how the flux architecture looks like by illustrating it with boxes and arrows. I believe it is important to get the idea of the "pure components" before getting any further. Since we are already done with that - lets begin with the high-level overview!
-
-![High-Level Overview](../images/overview-pure-components/flux-overview.png)
-
-Lets describe what the boxes and the arrows above mean:
-
-### View
-
-The view is simply [composition of components](https://en.wikipedia.org/wiki/Composite_pattern). They might be stateless or stateful. We will talk more about components in the next sections. How exactly we need to compose them and on what level of granularity they should be completely depends on the UI of our application. Usually we have higher level components which abstract components of lower level and pass the data, which should be rendered by them or their configuration as properties.
-
-### Store
-
-The store is *not necessary* the model of our application. The store simply contains the *state* of the UI. When we use stateful components parts of the state could be stored in them but we need to be careful with that.
-
-What state could be kept in the store? We can think of two types of store:
-
-- Model - domain specific logic. For example, the todo items in our todo application.
-- UI state - the state of our view, which is not relevant to the model. For example, which dialog is opened right now.
-
-The store *should not be aware* of its representation and it is better to be unaware of the way our application communicates with the back-end services! The store knows only of the existence of:
-
-### Dispatcher
-
-A few years ago, Nicholas Zakas published his [large scale application architecture](https://www.youtube.com/watch?v=vXjVFPosQHw). In the core of the architecture there is a sandbox, which implements the publish/subscribe pattern. Publish/subscribe is nothing more than the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern) but since we have first-class functions in JavaScript, we can use them inside of observers and we can use the publish/subscribe object as an event bus (which could be considered more or less as [mediator](https://en.wikipedia.org/wiki/Mediator_pattern)).
-
-Okay, so I said this only in order to tell you that the Dispatcher is simply an event bus. It is a singleton, which owns a map of key-value pairs. The keys in this map are event names and the values are lists of callbacks. The dispatcher has a method called `dispatch`, which once called with event name, iterates over all callbacks associated with the passed event name and invokes them. Thats it. You can take a look at sample [implementation here](https://github.com/facebook/flux/blob/master/src/Dispatcher.js). In my projects I usually use this implementation, so far I haven't needed anything it doesn't provide.
-
-### Action
-
-Actions are even simpler than the dispatcher. What they do is to define methods, which will be called by the view. These methods accept arguments, which contain further instructions on how the view wants to change the model. All these methods do is to delegate their call to the Dispatcher's `dispatch` method. This might seems like unecessary level of indirection? Why would we need to call action from the view, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view?
-
----------------
-- the view should not be aware of the store's structure
-  - combining a few modifications of the view
-  - the views should not be aware of the type of change which happened (the actions know it since they use special constant for indicating the exact change)
----------------
