@@ -57,33 +57,29 @@ Okay, so I said this only in order to tell you that the Dispatcher is simply an 
 
 Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their call to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection? Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view?
 
-- The View should not be aware of the store's structure
-  - The views should not be aware of the type of the change which happened (the actions know it since they use special constant for indicating the exact change)
-  - Combining a few modifications of the view
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 So from the diagram above we can notice that important characteristic of flux is the:
 
 ### Unidirectional Data Flow
 
-Building MVW applications helps us to better structure our client-side code, make it more coherent and less coupled. We can easily isolate our business logic from the view, making our models independent from their representation. This decoupling is achieved using the observer pattern, which is quite handy; it helps us dispatch events in both directions - view to model and vice versa.
+Building MVW applications help us to better structure our client-side code, make it more coherent and less coupled. We can easily isolate our business logic from the view, making our models independent from their representation. This decoupling is achieved using the observer pattern, which is quite handy; it helps us dispatch events in both directions - view to model and vice versa.
 
-However, in complex single-page applications dispatching events in both directions may lead to cascading events, which introduces a tangled weave of data flow and unpredictable results. The flux architecture, initially described by facebook, helps us deal with the issues of MVW and allows us to build highly scalable single-page applications.
+However, in complex single-page applications dispatching events in both directions may lead to cascading events, which introduces a tangled weave of data flow and unpredictable results. Flux helps us deal with the issues of MVW and allows us to build highly scalable single-page applications.
 
-Following the unidirectional data flow is much easier since we know exactly where the data comes from and to which components it needs to be redirected next. But this is not the main benefit, according to me:
+It is much easier to follow the unidirectional data flow since we know exactly where the data comes from and to which components it needs to be redirected next. This definitely makes our applications easier for understanding but there is one more feature, which help us deal with complexity:
 
 ### Stateless Components
 
-In flux the user interface is a composition of **stateless** UI components. The components do not depend on any external mutable state. The user interface they produce is entirely determined by the input they receive by their parent component. Although (like most things) it seems like a brand new innovative idea, this is well known concept, which comes from the world of the functional programming.
+In flux the user interface is a composition of **stateless** UI components (they may keep some component-specific state but we will talk about this in a bit). The components do not depend on any external mutable state. The user interface they render is entirely determined by the received input by their parent component. May be it seems like a brand new, innovative idea, however it is a well known concept, which comes from the world of the functional programming.
 
-It is much easier to think of a function as a black box, which accepts in input and gives an output:
+It is much easier to think of the functions as black boxes, which accept input and return output:
 
 ![Pure function](/images/overview-pure-components/pure-function.png)
 
-Rather than as something, which does its job by using external (may be) global mutable resources in order to return its output:
+Rather than as something, which does its job by depending on external (may be) global mutable resources:
 
 ![Impure function](/images/overview-pure-components/impure-function.png)
-
-I won't add any examples here, you can find plenty of them if you Google that.
 
 According to Wikipedia a pure function is:
 
@@ -91,7 +87,7 @@ According to Wikipedia a pure function is:
 >1. The function always evaluates the same result value given the same argument value(s). The function result value cannot depend on any hidden information or state that may change as program execution proceeds or between different executions of the program, nor can it depend on any external input from I/O devices (usually—see below).
 >2. Evaluation of the result does not cause any semantically observable side effect or output, such as mutation of mutable objects or output to I/O devices (usually—see below).
 
-How we can make our components pure? Definitely they should not use any global variables because their result (rendered component), should not depend on anything else except the properties it accepts. But that's not all. If the data passed to the components in the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:
+How we can make our components pure? Definitely they should not use any global variables because their result (rendered UI), should not depend on anything else except the properties they accept. But that's not all. If the data passed to the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:
 
 ![Component tree](/images/overview-pure-components/component-tree.png)
 
@@ -116,17 +112,17 @@ And the following data applied to it:
 }
 {% endhighlight %}
 
-If we call the root object `user`, in a flux-like architecture the data will be distributed across the components in the following way:
+If we call the object above `user`, in a flux-like architecture the data will be distributed across the components in the following way:
 
 ![Flux data distribution](/images/overview-pure-components/flux-like-data-distribution.png)
 
-In the `User` component we can have the following code:
+If the `User` component needs to display the number of pending todo items, we may have the following snippet in its implementation:
 
 {% highlight javascript %}
 user.todos = user.todos.filter(u => !u.completed);
 {% endhighlight %}
 
-It definitely looks elegant, because we're applying the high-order function `filter` on the user's todo items. However, we're making completely impure component since it produces side-effect, i.e. changes data, which is used by another component.
+It definitely looks elegant, we're applying the high-order function `filter` over the user's todo items. However, this way we're creating an impure component since it produces side-effect, i.e. changes data, which is used by another component.
 
 #### Immutable Data
 
@@ -134,12 +130,13 @@ How we can deal with such side effects? We can use something called immutable da
 
 >In object-oriented and functional programming, an immutable object is an object whose state cannot be modified after it is created.
 
-You can checkout my talk on using immutable data in Angular [here](https://www.youtube.com/watch?v=zeChCjj-tbY).
+You can check out my talk on using immutable data in Angular [here](https://www.youtube.com/watch?v=zeChCjj-tbY).
 
-In order to produce introduce the immutability in our application we have two options:
+In order to introduce the immutability in our application we have three options:
 
-- Use wrappers around the standard JavaScript primitives, which makes the data immutable (for example with library like Immutable.js)
+- Use wrappers around the standard JavaScript primitives, which makes the data immutable (for example with library like [Immutable.js](https://facebook.github.io/immutable-js/))
 - Use ES5 `Object.freeze`
+- Combination between both approaches
 
 Lets create an immutable list using Immutable.js:
 
@@ -185,12 +182,13 @@ foo.bar.baz = 'foobar';
 console.log(foo.bar.baz); // 'foobar'
 {% endhighlight %}
 
-Which means that `Object.freeze` doesn't do deep freeze of the object.
+Which means that `Object.freeze` doesn't do deep freeze of the objects.
 
 What we can do is to:
 
-- Use Immutable.js for a nice, fancy wrapper around the standard mutable collections (+ implementation of a few more very handy collections)
+- Use Immutable.js for our data structures
 - Deep freeze our data
 
-Is it necessary to use immutable data? It is not, it may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things!
+Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
 
+#### Stateful vs Stateless
