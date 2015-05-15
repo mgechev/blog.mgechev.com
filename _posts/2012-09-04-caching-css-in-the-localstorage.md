@@ -21,7 +21,7 @@ Since HTML5 became wide supported the most popular aspects I hear about were it&
 
 Here comes the topic about the inline and referential CSS. As you know the inline CSS prevents you from many HTTP requests to the server but also prevents from caching. Which is the &#8220;bigger evil&#8221;? It depends on how big is your website, CSS and JavaScript. For bigger websites it&#8217;s not recommended to inline your CSS because you throw away the browser&#8217;s caching which very often is your biggest friend (when you&#8217;re looking for performance).
 
-But what happens when the browser cache is empty, all your content isn&#8217;t cached and everything should be downloaded again? Well definitely an impact on the performance. How can be prevented? As you will see the localStorage is a sample solution. Of course you&#8217;ve got to be careful with the impact of the slower hard drives (slower than the memory) so you have to take as much data as possible with a single localStorage.getItem &#8220;request&#8221;. Browser&#8217;s cache is cleverer than our use of the localStorage but anyway. But how much can this feature of HTML5 can improve our performance? The line chart bellow is shows the time required for downloading all resources from an empty page with just six CSS files included.
+But what happens when the browser cache is empty, all your content isn&#8217;t cached and everything should be downloaded again? Well definitely an impact on the performance. How can be prevented? As you will see the localStorage is a sample solution. Of course you&#8217;ve got to be careful with the impact of the slower hard drives (slower than the memory) so you have to take as much data as possible with a single localStorage.getItem &#8220;request&#8221;. Browser&#8217;s cache is cleverer than our use of the localStorage but anyway. But how much can this feature of HTML5 can improve our performance? The line chart below is shows the time required for downloading all resources from an empty page with just six CSS files included.
 
 The test is made using Google Chrome Version 20.0.1132.57.
 
@@ -37,7 +37,7 @@ As you see the difference is big enough. The average time required to load the p
 
 The most critical stage for our local storage caching is when the page is loaded for first time. There&#8217;s a big overhead because of the XMLHttp requests which get the CSS.
 
-This is just the half of the most exiting part. The impact on the time required for onload event to be fired is shown on the chart bellow.
+This is just the half of the most exiting part. The impact on the time required for onload event to be fired is shown on the chart below.
 
 The X-axis is the test ID and the Y-axis is the time required in ms. As you see here the browser&#8217;s caching wins. The average score for the localStorage is 42.19 versus 29.81.
 
