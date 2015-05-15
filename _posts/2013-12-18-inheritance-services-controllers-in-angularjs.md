@@ -18,7 +18,7 @@ Since AngularJS does not provide any built-in features for using inheritance, in
 
 ## Controllers inheritance
 
-First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you're using the controller as syntax, see bellow). This is the case because by implementation the scope in the child controller will inherit prototypically from its parent scope. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
+First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you're using the controller as syntax, see below). This is the case because by implementation the scope in the child controller will inherit prototypically from its parent scope. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:
 
 {% highlight javascript %}myModule.controller('ParentCtrl', function ($scope) {
   $scope.parentMethod = function () {

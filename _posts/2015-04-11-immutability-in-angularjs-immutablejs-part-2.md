@@ -254,7 +254,7 @@ The results contain the script running time and the garbage collection time, mos
 
 ### Script Time
 
-This metric will have the strongest impact on the application's performance, since the script time is single threaded. On the charts bellow are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).
+This metric will have the strongest impact on the application's performance, since the script time is single threaded. On the charts below are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).
 
 #### 5 entries
 

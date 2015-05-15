@@ -82,7 +82,7 @@ to this one:
 
 {% highlight JavaScript %}xmlHttp.send(data);{% endhighlight %}
 
-This data have to be structured like url. You can the function bellow:
+This data have to be structured like url. You can the function below:
 
 {% highlight JavaScript %}function insinfo(sendForm) {
    var dataArray = [];

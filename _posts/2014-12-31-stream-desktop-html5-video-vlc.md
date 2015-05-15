@@ -23,7 +23,7 @@ Open VLC and select *"Open Capture Device"*:
 !["VLC option"](/images/desktop-stream-html5-video/capture-vlc.png)
 
 
-As next step chose *"Capture"* and from the drop down bellow select *"Screen"*. Adjust the frame rate and mark the checkbox *"Streaming/Saving:"*
+As next step chose *"Capture"* and from the drop down below select *"Screen"*. Adjust the frame rate and mark the checkbox *"Streaming/Saving:"*
 
 !["VLC capture config"](/images/desktop-stream-html5-video/capture-config-vlc.png)
 

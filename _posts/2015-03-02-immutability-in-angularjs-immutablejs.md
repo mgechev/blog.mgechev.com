@@ -224,7 +224,7 @@ So we have:
 
 Definitely, this approach will be useful when we have a lot of watchers for a huge data-structure, which rarely changes. But how huge and how fast it can get?
 
-In the benchmarks bellow I tried to find these answers.
+In the benchmarks below I tried to find these answers.
 
 ## Test cases
 

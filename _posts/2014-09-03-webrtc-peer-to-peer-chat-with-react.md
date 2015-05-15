@@ -52,7 +52,7 @@ The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channe
 
 #### Low-level overview
 
-In the beginning of the blog post I mentioned that React.js application contains a finite amount of React.js components composed together. In this subsection I'll illustrate, which are the different components of our application and how they are composed together. The diagram bellow isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
+In the beginning of the blog post I mentioned that React.js application contains a finite amount of React.js components composed together. In this subsection I'll illustrate, which are the different components of our application and how they are composed together. The diagram below isn't following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.
 
 ![Micro-architecture](/images/react-p2p.png "Micro-architecture")
 
