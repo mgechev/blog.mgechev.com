@@ -229,7 +229,7 @@ class Dialog extends React.Component {
   render() {
     let classNames = 'dialog';
     if (this.state.hidden) {
-      this.classNames += ' hidden';
+      classNames += ' hidden';
     }
     return (
       <div className={classNames}>
@@ -353,4 +353,22 @@ All our components are going to have global access to a mutable object and throu
 
 ##### Solution
 
-We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store.
+We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:
+
+```javascript
+class Dialog extends React.Component {
+  render() {
+    let classNames = 'dialog';
+    if (this.props.hidden) {
+      classNames += ' hidden';
+    }
+    return (
+      <div className={classNames}>
+        <header>{{this.props.title}}</header>
+        <content>{{this.props.content}}</content>
+      </div>
+    );
+  }
+}
+```
+It should not has its own opinion on the topic!
