@@ -197,7 +197,7 @@ Is it necessary to use immutable data? No. It may eventually lead to some perfor
 
 It is recommended your flux components to be stateless, completely stateless! For example take look at the following mocks:
 
-<img src="/images/flux-depth/page-chat.png" alt="Page Chat">
+<img src="/images/flux-depth/page-chat.png" alt="Page Chat" style="float: left;">
 <img src="/images/flux-depth/page-profile.png" alt="Page Profile">
 
 This is front page of "Stunning SPA inc."...The user has four buttons in the left-hand side of the screen:
