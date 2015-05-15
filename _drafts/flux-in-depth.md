@@ -197,23 +197,23 @@ Is it necessary to use immutable data? No. It may eventually lead to some perfor
 
 #### Stateful vs Stateless
 
-It is recommended your flux components to be stateless, completely stateless! For example, look at the following mocks:
+It is recommended your flux components to be stateless, completely stateless! For example take look at the following mocks:
 
 <img src="/images/flux-depth/page-chat.png" alt="Page Chat">
 <img src="/images/flux-depth/page-profile.png" alt="Page Profile">
 
-Obviously, this is front page of "Stunning SPA inc."...The user has four buttons in the left hand side:
+This is front page of "Stunning SPA inc."...The user has four buttons in the left-hand side of the screen:
 
-- chat
-- profile
-- help
-- exit
+- Chat
+- Profile
+- Help
+- Exit
 
 Once the chat button is pressed all opened dialogs should be closed and the chat dialog should be opened in the middle area of the page. Once the profile button is pressed all opened dialogs should be closed and the "Edit profile dialog" should be opened. Pretty straight forward scenario.
 
-Lets think how we would implement our dialog component:
+Lets implement the `Dialog` component in ReactJS:
 
-```javascript
+{% highlight javascript %}
 class Dialog extends React.Component {
   constructor() {
     this.state = {};
@@ -242,11 +242,11 @@ class Dialog extends React.Component {
     );
   }
 }
-```
+{% endhighlight %}
 
 ...and we can use it like:
 
-```javascript
+{% highlight javascript %}
 class App extends React.Component {
 
   openDialog(dialog) {
@@ -274,11 +274,11 @@ class App extends React.Component {
     );
   }
 }
-```
+{% endhighlight %}
 
-This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user's profile, etc. In such case we should take advantage of the components composability and create different components for our right and left sections. So our `App` component will look something like this:
+This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user's profile, etc. In such case we should take advantage of the components' composability and decompose our `App` into a few simple components. So our `App` component will look something like this:
 
-```javascript
+{% highlight javascript %}
 class App extends React.Component {
   render() {
     return (
@@ -293,10 +293,11 @@ class App extends React.Component {
     );
   }
 }
-```
+{% endhighlight %}
+
 Okay...but how the `Navigation` component will tell the `App` component when to open any of the dialogs? Remember our `ProfileManagement` component needs to be able to open the `profile` dialog as well...? We can workaround this issue by pass callbacks:
 
-```javascript
+{% highlight javascript %}
 class App extends React.Component {
   openDialog(dialog) {
     for (let d in dialogs) {
@@ -317,48 +318,49 @@ class App extends React.Component {
     );
   }
 }
-```
+{% endhighlight %}
+
 Now inside the `Navigation` and `ProfileManagement` components we can invoke:
 
-```javascript
+{% highlight javascript %}
 this.props.openDialog('chat'); // open the chat dialog
 this.props.openDialog('profile'); // open the edit profile dialog
-```
+{% endhighlight %}
 
-It started getting kind of messy, didn't it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component. For example in the picture bellow, component `E` needs to change the state of component `B`:
+It started getting kind of messy, didn't it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component `E` needs to change the state of component `B`:
 
-![](/images/flux-depth/sample-state-change.png)
+![Subtree state change](/images/flux-depth/sample-state-change.png)
 
 This is not much different from our "Stunning SPA inc" app, where the `ProfileManagement` component needs to be able to change the state of the dialog components:
 
-![](/images/flux-depth/example-real-life.png)
+![Real-life subtree state change](/images/flux-depth/example-real-life.png)
 
 We solved the issue there by passing callbacks, so in our example application it will look something like this:
 
-![](/images/flux-depth/sample-state-change-callbacks.png)
+![Subtree state change callbacks](/images/flux-depth/sample-state-change-callbacks.png)
 
 Since we have data flow only from parent components to successors, we need to pass two callbacks here:
 - One to component `B`
 - One to component `E`
 
-Once component `E` needs to change the state of component `B`, it will invoke the callback passed to it, which will invoke the callback passed to `B`, which will somehow change the component state. Yeah, it is messy. It gets even messier if we need to have more components communicating between each other and their common ancestor is the root node.
+Once component `E` needs to change the state of component `B`, it will invoke the callback passed to it, which will invoke the callback passed to `B`, which will somehow change the component state. Yeah, it is confusing. It gets even messier if we need to have more components communicating between each other and their common ancestor is the root node. Imagine what an explosion of callbacks and tangled logic will be...
 
 What else can we do? Can't we make `E` and `B` communicating directly? Yeah...I guess...:
 
-![](/images/flux-depth/sample-state-change-events.png)
+![Subtree state change events](/images/flux-depth/sample-state-change-events.png)
 
-We can use custom event system. Implementing the publish/subscribe pattern and allowing global access to our pubsub object will fix this issue. This is [actually the recommendation by facebook](https://facebook.github.io/react/tips/communicate-between-components.html). But do you see something wrong here? This violates everything we said so far...we just buried all the positives we got from flux so far...
+We can use custom event system. Implementing the publish/subscribe pattern and allowing global access to our pubsub object will fix this issue. This is [actually the recommendation by facebook](https://facebook.github.io/react/tips/communicate-between-components.html). But do you see something wrong here? This violates everything we believe in...we just buried all the positives we got from flux so far...
 
 - Pure components
 - Unidirectional data flow
 
-All our components are going to have global access to a mutable object and through this object they are going to achieve bidirectional data flow...A second inattention and you're going to regret all life! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!
+All our components are going to have access to a global mutable object and through this object they are going to achieve bidirectional data flow...plenty of dirty words in a single sentence! Did you see how only a second inattention may cause you regrets during your entire life...! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!
 
 ##### Solution
 
 We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:
 
-```javascript
+{% highlight javascript %}
 class Dialog extends React.Component {
   render() {
     let classNames = 'dialog';
@@ -373,23 +375,24 @@ class Dialog extends React.Component {
     );
   }
 }
-```
-It should not has its own opinion on the topic! Okay, so how we should proceed if we want to open a dialog? I will explain it with the declaimer that it might sounds like a huge overhead but I promise that its worth it! In the following use case in casual format you can read the exact steps the user and the app should perform:
+{% endhighlight %}
+
+It should not has its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the declaimer that it might sounds like a huge overhead but I promise that it's worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:
 
 - The user clicks the "Chat" button
 - The button `onClick` handler is being invoked
-- The handler delegate its call to an Action, `UIActions.openChat`
+- The handler delegate its call to an Action (for example `UIActions.openChat`)
 - `UIActions.openChat` delegates its call to the `Dispatcher` by providing further information about the type of the event (whether it is server or an UI event) and the event name
 - The `Store` handles the event thrown by the `Dispatcher` and changes the flags `UIState.chatDialogOpen` to `true` and `UIState.profileDialogOpen` to `false`
 - The `Store` throws new change event
-- The `App` component catches the change event and passes the `Store` down through the tree
+- The `App` component catches the change event and propagates the `Store` down through the tree
 
-This is how we took advantage of all our flux components! Yeah, it sounds complex I believe but you'll get used to it and you'll love it! All new ideas are hard to gasp initially but once you find value in them you just can't live without them!
+This is how we took advantage of all our flux components! Yeah, it sounds complex, I believe, but you'll get used to it and you'll love it! All new ideas are hard to gasp initially but once you find value in them you just can't live without them!
 
 ##### ...but what about stateful components...
 
-We said that we may also have statful components in some rare cases...Here is an example - your dialogs could be dragged, you can keep the component's coordinates in their state. People can argue with me about this and they will have their point. For example [`react-dnd`](https://github.com/gaearon) externalize the component's coordinates inside store as well. However, in most cases I think we can violate the rule about stateless components and just keep this state inside them. If another component needs to change state by given component we should definitely externalize it and apply flux (just like in the scenario above).
+We said that we may also have stateful components in some rare cases...Here is an example - your dialogs are draggable, you can keep the component's coordinates in their state. People can argue with me about this and they will have their point. For example [`react-dnd`](https://github.com/gaearon) externalize the component's coordinates in the `Store` as well. However, in most cases I think we can violate the rule about stateless components and just keep the component specific state inside itself. However, *if another component needs to change state of given component we should definitely externalize it* and apply flux (just like in the scenario above).
 
 But how we can keep such state persistent if we need to? A few weeks ago I wrote a mixin called `react-pstate`, which allows you to persist your component's state. You can take a look at the module [here](https://github.com/mgechev/react-pstate).
 
-For now, I think we can stop our flux journey here and keep talking about store and communication with external services in the next post of the series.
+For now we can stop our flux journey here and keep talking about store and communication with external services in the next post of the series.
