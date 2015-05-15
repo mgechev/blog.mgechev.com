@@ -1,5 +1,5 @@
 ---
-title: Flux in Depth. Overview and Pure Components.
+title: Flux in Depth. Overview and Components.
 author: minko_gechev
 layout: post
 categories:
