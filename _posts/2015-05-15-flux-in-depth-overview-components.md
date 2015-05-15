@@ -28,7 +28,7 @@ Lets take a look at a diagram, which illustrates the data flow in a flux applica
 
 ## Flux High-Level Overview
 
-![High-Level Overview](/images/overview-pure-components/flux-overview.png)
+![High-Level Overview](/images/overview-components/flux-overview.png)
 
 Lets describe what the boxes and the arrows above mean and later we will dig into the data flow:
 
@@ -77,11 +77,11 @@ In flux the user interface is a composition of **stateless** UI components (they
 
 It is much easier to think of the functions as black boxes, which accept input and return output:
 
-![Pure function](/images/overview-pure-components/pure-function.png)
+![Pure function](/images/overview-components/pure-function.png)
 
 Rather than as something, which does its job by depending on external mutable resources:
 
-![Impure function](/images/overview-pure-components/impure-function.png)
+![Impure function](/images/overview-components/impure-function.png)
 
 According to Wikipedia a pure function is:
 
@@ -91,7 +91,7 @@ According to Wikipedia a pure function is:
 
 How we can make our components pure? Definitely they should not use any global variables because their result (rendered UI), should not depend on anything else except the properties they accept. But that's not all. If the data passed to the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:
 
-![Component tree](/images/overview-pure-components/component-tree.png)
+![Component tree](/images/overview-components/component-tree.png)
 
 And the following data applied to it:
 
@@ -116,7 +116,7 @@ And the following data applied to it:
 
 If we call the object above `user`, in a flux-like architecture the data will be distributed across the components in the following way:
 
-![Flux data distribution](/images/overview-pure-components/flux-like-data-distribution.png)
+![Flux data distribution](/images/overview-components/flux-like-data-distribution.png)
 
 If the `User` component needs to display the number of pending todo items, we may have the following snippet in its implementation:
 
@@ -161,15 +161,15 @@ In the snippet above we can notice that:
 
 It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js' list as a thin wrapper around the standard JavaScript array:
 
-![Immutable data structure with mutable items](/images/overview-pure-components/immutable-collection-mutable-items.png)
+![Immutable data structure with mutable items](/images/overview-components/immutable-collection-mutable-items.png)
 
 We can simply access any of the mutable items inside the immutable data structure...:
 
-![Access mutable item](/images/overview-pure-components/touch-mutable-item.png)
+![Access mutable item](/images/overview-components/touch-mutable-item.png)
 
 ...and change it:
 
-![Change mutable item](/images/overview-pure-components/change-mutable-item.png)
+![Change mutable item](/images/overview-components/change-mutable-item.png)
 
 Which is not cool. In order to fix this behavior we can use `Object.freeze`.
 
@@ -197,8 +197,8 @@ Is it necessary to use immutable data? No. It may eventually lead to some perfor
 
 It is recommended your flux components to be stateless, completely stateless! For example take look at the following mocks:
 
-<img src="/images/flux-depth/page-chat.png" alt="Page Chat" style="float: left;">
-<img src="/images/flux-depth/page-profile.png" alt="Page Profile">
+<img src="/images/overview-components/page-chat.png" alt="Page Chat" style="float: left;">
+<img src="/images/overview-components/page-profile.png" alt="Page Profile">
 
 This is front page of "Stunning SPA inc."...The user has four buttons in the left-hand side of the screen:
 
@@ -327,15 +327,15 @@ this.props.openDialog('profile'); // open the edit profile dialog
 
 It started getting kind of messy, didn't it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component `E` needs to change the state of component `B`:
 
-![Subtree state change](/images/flux-depth/sample-state-change.png)
+![Subtree state change](/images/overview-components/sample-state-change.png)
 
 This is not much different from our "Stunning SPA inc" app, where the `ProfileManagement` component needs to be able to change the state of the dialog components:
 
-![Real-life subtree state change](/images/flux-depth/example-real-life.png)
+![Real-life subtree state change](/images/overview-components/example-real-life.png)
 
 We solved the issue there by passing callbacks, so in our example application it will look something like this:
 
-![Subtree state change callbacks](/images/flux-depth/sample-state-change-callbacks.png)
+![Subtree state change callbacks](/images/overview-components/sample-state-change-callbacks.png)
 
 Since we have data flow only from parent components to successors, we need to pass two callbacks here:
 - One to component `B`
@@ -345,7 +345,7 @@ Once component `E` needs to change the state of component `B`, it will invoke th
 
 What else can we do? Can't we make `E` and `B` communicating directly? Yeah...I guess...:
 
-![Subtree state change events](/images/flux-depth/sample-state-change-events.png)
+![Subtree state change events](/images/overview-components/sample-state-change-events.png)
 
 We can use custom event system. Implementing the publish/subscribe pattern and allowing global access to our pubsub object will fix this issue. This is [actually the recommendation by facebook](https://facebook.github.io/react/tips/communicate-between-components.html). But do you see something wrong here? This violates everything we believe in...we just buried all the positives we got from flux so far...
 
