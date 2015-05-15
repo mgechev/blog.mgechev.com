@@ -198,3 +198,159 @@ It is recommended your flux components to be stateless, completely stateless! Fo
 
 <img src="/images/flux-depth/page-chat.png" alt="Page Chat">
 <img src="/images/flux-depth/page-profile.png" alt="Page Profile">
+
+Obviously, this is front page of "Stunning SPA inc."...The user has four buttons in the left hand side:
+
+- chat
+- profile
+- help
+- exit
+
+Once the chat button is pressed all opened dialogs should be closed and the chat dialog should be opened in the middle area of the page. Once the profile button is pressed all opened dialogs should be closed and the "Edit profile dialog" should be opened. Pretty straight forward scenario.
+
+Lets think how we would implement our dialog component:
+
+```javascript
+class Dialog extends React.Component {
+  constructor() {
+    this.state = {};
+    this.state.hidden = true;
+  }
+  open() {
+    this.setState({
+      hidden: false
+    });
+  }
+  close() {
+    this.setState({
+      hidden: true
+    });
+  }
+  render() {
+    let classNames = 'dialog';
+    if (this.state.hidden) {
+      this.classNames += ' hidden';
+    }
+    return (
+      <div className={classNames}>
+        <header>{{this.props.title}}</header>
+        <content>{{this.props.content}}</content>
+      </div>
+    );
+  }
+}
+```
+
+...and we can use it like:
+
+```javascript
+class App extends React.Component {
+
+  openDialog(dialog) {
+    for (let d in dialogs) {
+      this.refs[d].close();
+    }
+    this.refs[dialg].open();
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="left-sidebar">
+          <button onClick={this.openDialog.bind(this, 'chat')}>Chat</button>
+          <button onClick={this.openDialog.bind(this, 'profile')}>Profile</button>
+        </div>
+        <div className="main-area">
+          <Dialog ref="chat" title="Chat" content={some_content}></Dialog>
+          <Dialog ref="profile" title="Chat" content={some_content}></Dialog>
+        </div>
+        <div className="right-sidebar">
+          <Avatar profile={this.user}></Avatar>
+        </div>
+      </div>
+    );
+  }
+}
+```
+
+This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user's profile, etc. In such case we should take advantage of the components composability and create different components for our right and left sections. So our `App` component will look something like this:
+
+```javascript
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <Navigation></Navigation>
+        <div className="main-area">
+          <Dialog ref="chat" title="Chat" content={some_content}></Dialog>
+          <Dialog ref="profile" title="Chat" content={some_content}></Dialog>
+        </div>
+        <ProfileManagement></ProfileManagement>
+      </div>
+    );
+  }
+}
+```
+Okay...but how the `Navigation` component will tell the `App` component when to open any of the dialogs? Remember our `ProfileManagement` component needs to be able to open the `profile` dialog as well...? We can workaround this issue by pass callbacks:
+
+```javascript
+class App extends React.Component {
+  openDialog(dialog) {
+    for (let d in dialogs) {
+      this.refs[d].close();
+    }
+    this.refs[dialg].open();
+  }
+  render() {
+    return (
+      <div>
+        <Navigation openDialog={this.openDialog.bind(this)}></Navigation>
+        <div className="main-area">
+          <Dialog ref="dialog" title="Chat" content={some_content}></Dialog>
+          <Dialog ref="dialog" title="Chat" content={some_content}></Dialog>
+        </div>
+        <ProfileManagement openDialog={this.openDialog.bind(this)}></ProfileManagement>
+      </div>
+    );
+  }
+}
+```
+Now inside the `Navigation` and `ProfileManagement` components we can invoke:
+
+```javascript
+this.props.openDialog('chat'); // open the chat dialog
+this.props.openDialog('profile'); // open the edit profile dialog
+```
+
+It started getting kind of messy, didn't it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component. For example in the picture bellow, component `E` needs to change the state of component `B`:
+
+![](/images/flux-depth/sample-state-change.png)
+
+This is not much different from our "Stunning SPA inc" app, where the `ProfileManagement` component needs to be able to change the state of the dialog components:
+
+![](/images/flux-depth/example-real-life.png)
+
+We solved the issue there by passing callbacks, so in our example application it will look something like this:
+
+![](/images/flux-depth/sample-state-change-callbacks.png)
+
+Since we have data flow only from parent components to successors, we need to pass two callbacks here:
+- One to component `B`
+- One to component `E`
+
+Once component `E` needs to change the state of component `B`, it will invoke the callback passed to it, which will invoke the callback passed to `B`, which will somehow change the component state. Yeah, it is messy. It gets even messier if we need to have more components communicating between each other and their common ancestor is the root node.
+
+What else can we do? Can't we make `E` and `B` communicating directly? Yeah...I guess...:
+
+![](/images/flux-depth/sample-state-change-events.png)
+
+We can use custom event system. Implementing the publish/subscribe pattern and allowing global access to our pubsub object will fix this issue. This is [actually the recommendation by facebook](https://facebook.github.io/react/tips/communicate-between-components.html). But do you see something wrong here? This violates everything we said so far...we just buried all the positives we got from flux so far...
+
+- Pure components
+- Unidirectional data flow
+
+All our components are going to have global access to a mutable object and through this object they are going to achieve bidirectional data flow...A second inattention and you're going to regret all life! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!
+
+##### Solution
+
+We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store.
