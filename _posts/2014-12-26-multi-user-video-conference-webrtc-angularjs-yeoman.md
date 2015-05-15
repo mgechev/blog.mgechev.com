@@ -65,7 +65,7 @@ In the sequence diagram above we're following how `Alice` establishes peer conne
 2. Through a push notification the application server tells `Bob` that `Alice` is calling him. The `Web App` may use WebSockets and send a notification to `Bob` about `Alice`'s call.
 3. `Bob` response to the push notification and states that he wants to talk with `Alice`.
 4. The `Web App` redirects `Bob`'s response to `Alice`.
-5. Once `Alice` knows that `Bob` accepted her call, she starts the `ICE candidates gathering process`. We'll take a further look at it in the section bellow.
+5. Once `Alice` knows that `Bob` accepted her call, she starts the `ICE candidates gathering process`. We'll take a further look at it in the section below.
 6. Once `Alice` has a set of ICE candidates (we can think of them as pairs - host:port, for example 127.0.0.1:5545, 192.168.0.112:6642, 94.23.24.56:6655, more accurately `a=candidate:1 1 UDP 2130706431 192.168.1.102 1816 typ host`), she prepares a SDP offer, which includes the ICE candidates and some additional information (like supported video/audio codecs, etc.). `Alice` sends this offer to `Bob`, via the `Web App`.
 7. The `Web App` redirects `Alice`'s offer to `Bob`.
 8. `Bob` gathers his own ICE candidates.
@@ -931,7 +931,7 @@ In this tutorial we used custom JSON protocol for signaling. Better choice will 
 
 ### More
 
-There are a plenty of other topics we didn't cover but they are unfortunately outside the scope of this tutorial. If you're interested in further reading you can check out the resources bellow or ping me for additional information.
+There are a plenty of other topics we didn't cover but they are unfortunately outside the scope of this tutorial. If you're interested in further reading you can check out the resources below or ping me for additional information.
 
 ## Resources
 
