@@ -29,7 +29,7 @@ A few days ago, I&#8217;ve created a <a title="Algorithms implemented in JavaScr
 
 {% highlight javascript %}function sort() { [native code] }{% endhighlight %}
 
-That&#8217;s why I&#8217;ve wrote not optimized version of mergesort and I&#8217;ve run it with generated array with 500k elements. I waited&#8230;waited&#8230;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I&#8217;ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google&#8217;s V8 engine</a>). After merge sort I&#8217;ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I&#8217;ve generated another array with 500k elements using a simple perl script. The result was very interesting&#8230;In the chart bellow you can see mergesort compared to heapsort for array with 50k elements.
+That&#8217;s why I&#8217;ve wrote not optimized version of mergesort and I&#8217;ve run it with generated array with 500k elements. I waited&#8230;waited&#8230;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I&#8217;ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google&#8217;s V8 engine</a>). After merge sort I&#8217;ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I&#8217;ve generated another array with 500k elements using a simple perl script. The result was very interesting&#8230;In the chart below you can see mergesort compared to heapsort for array with 50k elements.
 
 <div id="attachment_237" style="width: 683px" class="wp-caption alignnone">
   <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="http://blog.mgechev.com/wp-content/uploads/2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -305,7 +305,7 @@ So let me tell you few words about the script because not everyone is familiar w
 });{% endhighlight %}
 
 Let start&#8230;
-In the charts bellow there&#8217;s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
+In the charts below there&#8217;s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
 
 <div id="attachment_240" style="width: 683px" class="wp-caption alignnone">
   <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/100-all.png"><img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/100-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
