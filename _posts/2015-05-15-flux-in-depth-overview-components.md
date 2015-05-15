@@ -28,7 +28,7 @@ Lets take a look at a diagram, which illustrates the data flow in a flux applica
 
 ## Flux High-Level Overview
 
-![High-Level Overview](../images/overview-pure-components/flux-overview.png)
+![High-Level Overview](/images/overview-pure-components/flux-overview.png)
 
 Lets describe what the boxes and the arrows above mean and later we will dig into the data flow:
 
@@ -95,7 +95,7 @@ How we can make our components pure? Definitely they should not use any global v
 
 And the following data applied to it:
 
-{% highlight json %}
+{% highlight javascript %}
 {
   photoUrl: "photo.png",
   firstName: "Foo",
@@ -169,7 +169,7 @@ We can simply access any of the mutable items inside the immutable data structur
 
 ...and change it:
 
-![Change mutable item](../images/overview-pure-components/change-mutable-item.png)
+![Change mutable item](/images/overview-pure-components/change-mutable-item.png)
 
 Which is not cool. In order to fix this behavior we can use `Object.freeze`.
 
