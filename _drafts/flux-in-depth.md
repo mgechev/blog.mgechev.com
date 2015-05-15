@@ -67,7 +67,7 @@ So from the diagram above we can notice that the arrows are in only a single dir
 
 ### Unidirectional Data Flow
 
-Building MVW applications help us to better structure our client-side code, make it more coherent and less coupled. We can easily isolate our business logic from the view, making our models independent from their representation. This decoupling is achieved using the observer pattern, which is quite handy; it helps us dispatch events in both directions - view to model and vice versa.
+Building MVW applications help us to better structure our client-side code, make it more coherent and less coupled. We can easily isolate our business logic from the view, making our models independent from their representation. This decoupling is achieved using the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern), which is quite handy; it helps us dispatch events in both directions - view to model and vice versa.
 
 However, in complex single-page applications dispatching events in both directions may lead to cascading events, which introduces a tangled weave of data flow and unpredictable results. Flux helps us deal with the issues of MVW and allows us to build highly scalable single-page applications.
 
@@ -75,13 +75,13 @@ It is much easier to follow the unidirectional data flow since we know exactly w
 
 ### Stateless Components
 
-In flux the user interface is a composition of **stateless** UI components (they may keep some component-specific state but we will talk about this in a bit). The components do not depend on any external mutable state. The user interface they render is entirely determined by the received input by their parent component. May be it seems like a brand new, innovative idea, however it is a well known concept, which comes from the world of the functional programming.
+In flux the user interface is a composition of **stateless** UI components (they may keep some component-specific state but we will talk about this in a bit). The components do not depend on any external mutable state. The user interface they render is entirely determined by the received input by their parent component. May be it seems like a brand new, innovative idea, however it is a well known concept, which comes from the world of functional programming.
 
 It is much easier to think of the functions as black boxes, which accept input and return output:
 
 ![Pure function](/images/overview-pure-components/pure-function.png)
 
-Rather than as something, which does its job by depending on external (may be) global mutable resources:
+Rather than as something, which does its job by depending on external mutable resources:
 
 ![Impure function](/images/overview-pure-components/impure-function.png)
 
@@ -126,7 +126,7 @@ If the `User` component needs to display the number of pending todo items, we ma
 user.todos = user.todos.filter(u => !u.completed);
 {% endhighlight %}
 
-It definitely looks elegant, we're applying the high-order function `filter` over the user's todo items. However, this way we're creating an impure component since it produces side-effect, i.e. changes data, which is used by another component.
+It definitely looks elegant, we're applying the high-order function `filter` over the user's todo items. However, this way we're creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in `user.todos` will introduce an issue - the `Todos` component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.
 
 #### Immutable Data
 
@@ -191,9 +191,9 @@ Which means that `Object.freeze` doesn't do deep freeze of the objects.
 What we can do is to:
 
 - Use Immutable.js for our data structures
-- Deep freeze our data
+- Deep freeze our data items
 
-Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
+Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns ([or](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/) [no](https://facebook.github.io/react/docs/advanced-performance.html)) but it will make your debugging experience even easier since your components won't produce any side effects, in case you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
 
 #### Stateful vs Stateless
 
