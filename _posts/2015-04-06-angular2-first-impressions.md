@@ -26,7 +26,7 @@ As Microsoft already published, [Angular2 is written in TypeScript](http://blogs
 And here are some of the main advantages using TypeScript as statically typed language:
 
 - Using statically typed language:
-  - You get type errors **compile-time** and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see bellow the sample `gulp-traceur` config) . This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case Angular2) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
+  - You get type errors **compile-time** and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see below the sample `gulp-traceur` config) . This way it'll be easier to debug your code and you will be more secure that what you've developed (in this case Angular2) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.
   - You get better auto-completion by the text editors and IDEs. [WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules](https://www.jetbrains.com/webstorm/whatsnew/). For vim you can use the [typescript-tools](https://github.com/clausreinke/typescript-tools), which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it'll be much less tricky).
   - The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better runtime optimizations ([for instance](https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches)).
 - About TypeScript:
@@ -184,7 +184,7 @@ This allows creating bundles with the modules, which are required during the ini
 
 There are a lot of statements the `$scope` was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there's no such thing as `$scope` in Angular2! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our "components".
 
-For example, the component bellow has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
+For example, the component below has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
 {% highlight javascript %}
 @Component({
