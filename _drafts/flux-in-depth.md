@@ -371,4 +371,18 @@ class Dialog extends React.Component {
   }
 }
 ```
-It should not has its own opinion on the topic!
+It should not has its own opinion on the topic! Okay, so how we should proceed if we want to open a dialog? I will explain it with the declaimer that it might sounds like a huge overhead but I promise that its worth it! In the following use case in casual format you can read the exact steps the user and the app should perform:
+
+- The user clicks the "Chat" button
+- The button `onClick` handler is being invoked
+- The handler delegate its call to an Action, `UIActions.openChat`
+- `UIActions.openChat` delegates its call to the `Dispatcher` by providing further information about the type of the event (whether it is server or an UI event) and the event name
+- The `Store` handles the event thrown by the `Dispatcher` and changes the flags `UIState.chatDialogOpen` to `true` and `UIState.profileDialogOpen` to `false`
+- The `Store` throws new change event
+- The `App` component catches the change event and passes the `Store` down through the tree
+
+This is how we took advantage of all our flux components! Yeah, it sounds complex I believe but you'll get used to it and you'll love it! All new ideas are hard to gasp initially but once you find value in them you just can't live without them!
+
+##### ...but what about stateful components...
+
+We said that we may also have statful components in some rare cases...
