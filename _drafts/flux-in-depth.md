@@ -45,7 +45,8 @@ What state could be kept in the store? We can think of two types of store:
 - Model - domain specific data. For example, the todo items in our todo application.
 - UI state - the state of our view, which is not relevant to the model. For example, which dialog is opened right now.
 
-One common thing between MVC and flux is that the store *should not be aware* of its representation and it is better to be unaware of the way our application communicates with the back-end services! However, the store in flux is not equals to the model in MVC. The store knows only of the existence of:
+One common thing between MVC and flux is that the store *should not be aware* of its representation and it is better to be unaware of the way our application communicates with the back-end services! However, the store in flux is not equals to the model in MVC. Making the UI state external for the components help us create "pure components" (see bellow) and force the separation of concerns even further. Why this is so awesome? Well, our store is nothing more than a JavaScript object, which could be easily persisted! Imagine the world where you can make a "snapshot" of your UI and save it somewhere (database, localStorage, wherever). Later you can restore this "snapshot" quite easily!
+The store knows only of the existence of:
 
 ### Dispatcher
 
@@ -192,3 +193,8 @@ What we can do is to:
 Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns but it will make your debugging experience even easier since your components won't produce any side effect if you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
 
 #### Stateful vs Stateless
+
+It is recommended your flux components to be stateless, completely stateless! For example, look at the following mocks:
+
+<img src="/images/flux-depth/page-chat.png" alt="Page Chat">
+<img src="/images/flux-depth/page-profile.png" alt="Page Profile">
