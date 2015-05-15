@@ -385,4 +385,8 @@ This is how we took advantage of all our flux components! Yeah, it sounds comple
 
 ##### ...but what about stateful components...
 
-We said that we may also have statful components in some rare cases...
+We said that we may also have statful components in some rare cases...Here is an example - your dialogs could be dragged, you can keep the component's coordinates in their state. People can argue with me about this and they will have their point. For example [`react-dnd`](https://github.com/gaearon) externalize the component's coordinates inside store as well. However, in most cases I think we can violate the rule about stateless components and just keep this state inside them. If another component needs to change state by given component we should definitely externalize it and apply flux (just like in the scenario above).
+
+But how we can keep such state persistent if we need to? A few weeks ago I wrote a mixin called `react-pstate`, which allows you to persist your component's state. You can take a look at the module [here](https://github.com/mgechev/react-pstate).
+
+For now, I think we can stop our flux journey here and keep talking about store and communication with external services in the next post of the series.
