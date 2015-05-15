@@ -253,7 +253,7 @@ You can lookup the whole API of the library [here](https://github.com/mgechev/bl
 
 ### Reducing the latency
 
-So far, we improved the protocol processing by using WebSockets instead of HTTP, we transfer binary instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram bellow:
+So far, we improved the protocol processing by using WebSockets instead of HTTP, we transfer binary instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram below:
 
 ![](/images/binary-protocol-processing/client-proxy-server.png)
 
