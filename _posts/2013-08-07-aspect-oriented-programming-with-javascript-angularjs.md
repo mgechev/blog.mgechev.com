@@ -201,7 +201,7 @@ We can achieve the same effect as in the code above just by applying Authorizati
     methodPattern: /Special|getArticleById/
 }));{% endhighlight %}
 
-This code will invoke the Authorization service before executing the methods which match the pattern: /Special|getArticleById/ when an Error is thrown the Logger will log it with detailed information. Notice that onThrowOf, before and all the methods listed bellow return object with the same methods so chaining is possible. We can also match the methods not only by their names but also by their arguments:
+This code will invoke the Authorization service before executing the methods which match the pattern: /Special|getArticleById/ when an Error is thrown the Logger will log it with detailed information. Notice that onThrowOf, before and all the methods listed below return object with the same methods so chaining is possible. We can also match the methods not only by their names but also by their arguments:
 
 {% highlight javascript %}return execute(Logger).onThrowOf(execute(Authorization).before(api, {
     methodPattern: /Special|getArticleById/,

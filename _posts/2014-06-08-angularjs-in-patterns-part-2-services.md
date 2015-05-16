@@ -42,7 +42,7 @@ Note: Some of the described patterns are used in other components as well but th
 
 >The singleton pattern is a design pattern that restricts the instantiation of a class to one object. This is useful when exactly one object is needed to coordinate actions across the system. The concept is sometimes generalized to systems that operate more efficiently when only one object exists, or that restrict the instantiation to a certain number of objects.
 
-In the UML diagram bellow is illustrated the singleton design pattern.
+In the UML diagram below is illustrated the singleton design pattern.
 
 ![Singleton](/wp-content/uploads/patterns/singleton.png "Fig. 1")
 
@@ -295,7 +295,7 @@ We can distinguish three different types of proxy:
 
 In this sub-chapter we are going to take a look at AngularJS' implementation of Virtual Proxy.
 
-In the snippet bellow, there is a call to the `get` method of `$resource` instance, called `User`:
+In the snippet below, there is a call to the `get` method of `$resource` instance, called `User`:
 
 {% highlight javascript %}
 var User = $resource('/users/:id'),
