@@ -30,7 +30,7 @@ Lets take a look at a diagram, which illustrates the data flow in a flux applica
 
 ![High-Level Overview](/images/overview-components/flux-overview.png)
 
-Lets describe what the boxes and the arrows above mean and later we will dig into the data flow:
+Lets describe what the boxes and the arrows above mean and later we will dig into the data flow. If you're already familiar with flux, feel free to skip this section.
 
 ### View
 
