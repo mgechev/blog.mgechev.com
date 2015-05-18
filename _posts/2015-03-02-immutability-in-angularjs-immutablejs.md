@@ -142,7 +142,7 @@ So we definitely need to watch the immutable collection, this way we will:
 
 ## Angular Immutable
 
-In order to deal with this issue, I created a simple filter, which allows binding to Immutable.js collections. It's called `angular-immutable` and could be found in my [GitHub account](https://github.com/mgechev/angular-immutable) (also published as a bower module `angular-immutable`).
+In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It's called `angular-immutable` and could be found in my [GitHub account](https://github.com/mgechev/angular-immutable) (also published as bower and npm modules `angular-immutable`).
 
 Lets take a look at the code example, which uses `angular-immutable`:
 
@@ -164,7 +164,7 @@ app.controller('SampleCtrl', SampleCtrl);
 </head>
 <body ng-app="sampleApp" ng-controller="SampleCtrl">
   <ul>
-    <li ng-repeat="item in list | immutable" ng-bind="item"></li>
+    <li immutable="list" ng-repeat="item in list" ng-bind="item"></li>
   </ul>
 </body>
 </html>
@@ -179,29 +179,40 @@ app.controller('SampleCtrl', SampleCtrl);
 With only two slight changes we made it work! All we did was:
 
 * Include the module `immutable` as dependency
-* Add the filter `immutable`, which provides `ng-repeat` a plain JavaScript collection
+* Add the directive `immutable` as an attribute, which points to the name of the immutable property of the scope
 
 ## Angular Immutable Implementation
 
-Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` filter's source code:
+Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` directive's source code:
 
 {% highlight JavaScript %}
-/* global angular, Immutable */
+/* global angular */
 
-var immutableFilter = () => {
-  return (val) => {
-    if (val instanceof Immutable.Collection) {
-      return val.toJS();
+var immutableDirective = () => {
+  let priority = 2000;
+  let scope = true;
+  let link = (scope, el, attrs) => {
+    let { immutable } = attrs;
+    if (!(/^[a-zA-Z0-9_$]+$/).test(immutable)) {
+      return;
     }
-    return val;
+    if (!scope[immutable]) {
+      console.warn(`No ${immutable} property found.`);
+    }
+    scope.$watch(() => {
+      return scope.$parent[immutable];
+    }, (val) => {
+      scope[immutable] = val.toJS();
+    });
   };
+  return { priority, scope, link };
 };
 
 angular.module('immutable', [])
-  .filter('immutable', immutableFilter);
+  .directive('immutable', immutableDirective);
 {% endhighlight %}
 
-`immutableFilter` simply checks if the input is an instance of `Immutable.Collection` (an "abstract class", base for all immutable collections in Immutable.js). If the input is an immutable collection it returns its JavaScript representation, otherwise it returns the input itself.
+When the `immutableDirective` is used as an attribute, it accepts as value the name of the immutable property. Later, it adds watcher for this property. Once the immutable data "changes" we get a new reference, so the watcher can perform the check with a constant complexity (only returns `scope.$parent[immutable]`, which returns a reference, so Angular can use `===` for comparison).
 
 This way we:
 
