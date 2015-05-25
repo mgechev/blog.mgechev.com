@@ -12,7 +12,7 @@ tags:
   - JavaScript
 ---
 
-My practice proofed that there are two good/easy ways to learn a new technology:
+My practice proved that there are two good/easy ways to learn a new technology:
 
 - Re-implement it by your own
 - See how the concepts you already know fit in it
