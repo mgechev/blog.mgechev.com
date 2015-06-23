@@ -42,16 +42,16 @@ Note: Some of the described patterns are used in other components as well but th
 
 >The singleton pattern is a design pattern that restricts the instantiation of a class to one object. This is useful when exactly one object is needed to coordinate actions across the system. The concept is sometimes generalized to systems that operate more efficiently when only one object exists, or that restrict the instantiation to a certain number of objects.
 
-In the UML diagram below is illustrated the singleton design pattern.
+In the UML diagram below the singleton design pattern is illustrated.
 
 ![Singleton](/wp-content/uploads/patterns/singleton.png "Fig. 1")
 
 When given dependency is required by any component, AngularJS resolves it using the following algorithm:
 
 - Takes its name and makes a lookup at a hash map, which is defined into a lexical closure (so it has a private visibility).
-- If the dependency exists AngularJS pass it as parameter to the component, which requires it.
-- If the dependency does not exists:
-  - AngularJS instantiate it by calling the factory method of its provider (i.e. `$get`). Note that instantiating the dependency may require recursive call to the same algorithm, for resolving all the dependencies required by the given dependency. This process may lead to circular dependency.
+- If the dependency exists AngularJS passes it as parameter to the component, which requires it.
+- If the dependency does not exist:
+  - AngularJS instantiates it by calling the factory method of its provider (i.e. `$get`). Note that instantiating the dependency may require recursive call to the same algorithm, for resolving all the dependencies required by the given dependency. This process may lead to circular dependency.
   - AngularJS caches it inside the hash map mentioned above.
   - AngularJS passes it as parameter to the component, which requires it.
 
@@ -170,9 +170,9 @@ From the example above we can notice how the `$get` method is actually used:
 instanceInjector.invoke(provider.$get, provider, undefined, servicename)
 {% endhighlight %}
 
-The snippet above calls the `invoke` method of `instanceInjector` with the factory method (i.e. `$get`) of given service, as first argument. Inside `invoke`'s body `annotate` is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is being called: `fn.apply(self, args)`.
+The snippet above calls the `invoke` method of `instanceInjector` with the factory method (i.e. `$get`) of given service, as first argument. Inside `invoke`'s body `annotate` is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is called: `fn.apply(self, args)`.
 
-If we think in terms of the UML diagram above we can call the provider a "ConcreteCreator" and the actual component, which is being created a "Product".
+If we think in terms of the UML diagram above, we can call the provider a "ConcreteCreator" and the actual component, which is being created a "Product".
 
 There are a few benefits of using the factory method pattern in this case, because of the indirection it creates. This way the framework can take care of the boilerplates during the instantiation of new components like:
 
@@ -217,8 +217,8 @@ myModule.config(function ($provide) {
 });
 {% endhighlight %}
 
-The example above defines new service called `foo`. In the `config` callback is called the method `$provide.decorator` with first argument `"foo"`, which is the name of the service, we want to decorate and second argument factory function, which implements the actual decoration. `$delegate` keeps reference to the original service `foo`. Using the dependency injection mechanism of AngularJS, reference to this local dependency is passed as first argument of the constructor function.
-We decorate the service by overriding its method `bar`. The actual decoration is simply extending `bar` by invoking one more `console.log statement` - `console.log('Decorated');` and after that call the original `bar` method with the appropriate context.
+The example above defines new service called `foo`. In the `config` callback the method `$provide.decorator` is called with first argument `"foo"`, which is the name of the service, we want to decorate and second argument factory function, which implements the actual decoration. `$delegate` keeps reference to the original service `foo`. Using the dependency injection mechanism of AngularJS, reference to this local dependency is passed as first argument of the constructor function.
+We decorate the service by overriding its method `bar`. The actual decoration is simply extending `bar` by invoking one more `console.log statement` - `console.log('Decorated');` and after that calls the original `bar` method with the appropriate context.
 
 Using this pattern is especially useful when we need to modify the functionality of third party services. In cases when multiple similar decorations are required (like performance measurement of multiple methods, authorization, logging, etc.), we may have a lot of duplications and violate the DRY principle. In such cases it is useful to use [aspect-oriented programming](http://en.wikipedia.org/wiki/Aspect-oriented_programming). The only AOP framework for AngularJS I'm aware of could be found at [github.com/mgechev/angular-aop](https://github.com/mgechev/angular-aop).
 
@@ -238,7 +238,7 @@ Using this pattern is especially useful when we need to modify the functionality
 
 There are a few facades in AngularJS. Each time you want to provide higher level API to given functionality you practically create a facade.
 
-For example, lets take a look how we can create an `XMLHttpRequest` POST request:
+For example, lets take a look at how we can create an `XMLHttpRequest` POST request:
 
 {% highlight javascript %}
 var http = new XMLHttpRequest(),
@@ -303,7 +303,7 @@ var User = $resource('/users/:id'),
 console.log(user); //{}
 {% endhighlight %}
 
-`console.log` would outputs an empty object. Since the AJAX request, which happens behind the scene, when `User.get` is invoked, is asynchronous, we don't have the actual user when `console.log` is called. Just after `User.get` makes the GET request it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.
+`console.log` would output an empty object. Since the AJAX request, which happens behind the scenes, when `User.get` is invoked, is asynchronous, we don't have the actual user when `console.log` is called. Just after `User.get` makes the GET request, it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.
 
 How does this works with AngularJS? Well, lets consider the following snippet:
 
@@ -317,7 +317,7 @@ function MainCtrl($scope, $resource) {
 {% highlight html %}
 <span ng-bind="user.name"></span>
 {% endhighlight %}
-Initially when the snippet above executes, the property `user` of the `$scope` object will be with value an empty object (`{}`), which means that `user.name` will be undefined and nothing will be rendered. Internally AngularJS will keep reference to this empty object. Once the server returns response for the get request, AngularJS will populate the object with the data, received from the server. During the next `$digest` loop AngularJS will detect change in `$scope.user`, which will lead to update of the view.
+Initially when the snippet above executes, the property `user` of the `$scope` object will be with value equal to an empty object (`{}`), which means that `user.name` will be undefined and nothing will be rendered. Internally AngularJS will keep reference to this empty object. Once the server returns response for the GET request, AngularJS will populate the object with the data, received from the server. During the next `$digest` loop AngularJS will detect change in `$scope.user`, which will lead to update of the view.
 
 #### Active Record
 
@@ -352,7 +352,7 @@ This way we can use the constructor function and its static methods by:
 User.get({ userid: userid });
 {% endhighlight %}
 
-The code above will immediately return an empty object and keep reference to it. Once the response have been successfully returned and parsed, AngularJS will populate this object with the received data (see [proxy](#proxy)).
+The code above will immediately return an empty object and keep reference to it. Once the response has been successfully returned and parsed, AngularJS will populate this object with the received data (see [proxy](#proxy)).
 
 You can find more details for `$resource` [The magic of $resource](http://blog.mgechev.com/2014/02/05/angularjs-resource-active-record-http/) and [AngularJS' documentation](https://docs.angularjs.org/api/ngResource/service/$resource).
 
@@ -360,6 +360,6 @@ Since Martin Fowler states that
 
 > responsibility of the Active Record object is to take care of the communication with the databse in order to create...
 
-`$resource` does not implements exactly the Active Record pattern, since it communicates with RESTful service instead of the database. Anyway, we can consider it as "Active Record like RESTful communication".
+`$resource` does not implement exactly the Active Record pattern, since it communicates with RESTful service instead of the database. Anyway, we can consider it as "Active Record like RESTful communication".
 
 
