@@ -32,7 +32,7 @@ Part one includes only a high level overview of AngularJS, enjoy it.
 
 # AngularJS overview
 
-AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better &#8211; the information and resources should be loaded on demand. Since most of the CRUD applications has common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:
+AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better &#8211; the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:
 
 *   two-way data binding
 *   dependency injection
@@ -97,9 +97,9 @@ All the custom elements, attributes, comments or classes could be recognized as 
 
 ## Scope
 
-In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contains different properties &#8211; primitives, objects or methods. All methods attached to the scope could be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be binded to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
+In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contain different properties &#8211; primitives, objects or methods. All methods attached to the scope can be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
 
-Another important characteristics of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke methods of its parents since they are properties of its direct or indirect prototype.
+Another important characteristic of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke methods of its parents since they are properties of its direct or indirect prototype.
 
 Scope inheritance is illustrated in the following example:
 
@@ -124,7 +124,7 @@ function ChildCtrl($scope) {
 }
 {% endhighlight %}
 
-With div#child is associated ChildCtrl but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl) the method foo is accessible by button#parent-method.
+div#child is associated with ChildCtrl but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl), the method foo is accessible by button#parent-method.
 
 ## Directives
 
@@ -161,7 +161,7 @@ Example:
 {% highlight html %}<alert-button content="42">Click me</alert-button>
 {% endhighlight %}
 
-In the example above the tag <alert-button></alert-button> will be replaced button element. When the user clicks on the button the string 42 will be alerted.
+In the example above the tag <alert-button></alert-button> will be replaced by a button element. When the user clicks on the button, the string 42 will be alerted.
 
 Since the intent of this paper is not to explain the complete API of AngularJS, we will stop with the directives here.
 
