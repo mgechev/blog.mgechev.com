@@ -27,15 +27,15 @@ tags:
   - vnc
 ---
 
-In this quick blog post I&#8217;ll show you how to create a simple VNC client in about 200 lines of JavaScript.  
-For our goal we&#8217;re going to use only HTML5 and JavaScript (client and server side).  
+In this quick blog post I&#8217;ll show you how to create a simple VNC client in about 200 lines of JavaScript.
+For our goal we&#8217;re going to use only HTML5 and JavaScript (client and server side).
 The end result will be something like this:
 
 [<img src="http://blog.mgechev.com/wp-content/uploads/2013/08/js-vnc-1024x946.png" alt="js-vnc" width="600" height="554" class="alignnone size-large wp-image-500" />][1]
 
 So, let&#8217;s begin!
 
-Our application will have very simple architecture &#8211; a proxy server written in Node.js and a client in HTML5 and JavaScript. The Node.js server will stay between the browser and the VNC server. We need it because the client-side JavaScript does not supports TCP sockets so we can&#8217;t connect directly to the VNC server. The HTML5 client will have a canvas on which we will draw the frames we receive from the server.  
+Our application will have very simple architecture &#8211; a proxy server written in Node.js and a client in HTML5 and JavaScript. The Node.js server will stay between the browser and the VNC server. We need it because the client-side JavaScript does not supports TCP sockets so we can&#8217;t connect directly to the VNC server. The HTML5 client will have a canvas on which we will draw the frames we receive from the server.
 For VNC server you can use the free version of [RealVNC][2].
 
 First lets start with the server. Make sure you have node.js installed. We will use four node modules: [rfb2][3], [connect][4], [socket.io][5] and [node-png][6].
@@ -47,14 +47,14 @@ mkdir js-vnc
 cd js-vnc
 npm init{% endhighlight %}
 
-Now you should have folder called &#8220;js-vnc&#8221; with file named &#8220;package.json&#8221; in it.  
+Now you should have folder called &#8220;js-vnc&#8221; with file named &#8220;package.json&#8221; in it.
 Use the following lines of code to install almost all the dependencies:
 
 {% highlight bash %}npm install rfb2 --save
 npm install connect --save
 npm install socket.io --save{% endhighlight %}
 
-Unfortunately node-png is not in the npm registry and we have to build it from source.  
+Unfortunately node-png is not in the npm registry and we have to build it from source.
 Use:
 
 {% highlight bash %}sudo npm install -g node-gyp
@@ -63,7 +63,7 @@ git clone git@github.com:pkrumins/node-png.git
 cd node-png
 node-gyp configure build{% endhighlight %}
 
-and that was all&#8230;Now we can start creating our server.  
+and that was all&#8230;Now we can start creating our server.
 Let&#8217;s include all the required modules and initialize an array which will contains all the connected clients. Create a file called &#8220;server.js&#8221; in your project base directory and add the following content in it:
 
 {% highlight javascript %}var rfb = require('rfb2'),
@@ -89,8 +89,8 @@ node server.js
 
 Now open: <http://localhost:8091/index.html>. If everything went well you should see the text: &#8220;Hello, world!&#8221;.
 
-So far, so good! Now lets create a socket.io server.  
-We want the client to connect to our proxy server and exchange data through socket.io with it. When the client is connected (i.e. the connection is established) it sends &#8220;init&#8221; message which contains the data required for the proxy server to connect to the VNC server &#8211; host, port and password.  
+So far, so good! Now lets create a socket.io server.
+We want the client to connect to our proxy server and exchange data through socket.io with it. When the client is connected (i.e. the connection is established) it sends &#8220;init&#8221; message which contains the data required for the proxy server to connect to the VNC server &#8211; host, port and password.
 So let&#8217;s handle these events:
 
 {% highlight javascript %}socketio.sockets.on('connection', function (socket) {
@@ -143,7 +143,7 @@ In the method &#8220;addEventHandlers&#8221; we add event handlers to the RFB ha
 }
 {% endhighlight %}
 
-When the RFB connection is established we send &#8220;init&#8221; event to the client (our browser) with the size of the screen. For simplicity we won&#8217;t scale the screen in the browser.  
+When the RFB connection is established we send &#8220;init&#8221; event to the client (our browser) with the size of the screen. For simplicity we won&#8217;t scale the screen in the browser.
 After sending the &#8220;init&#8221; event to the browser we add the client to our connected clients and subscribe to the event &#8220;rect&#8221;. The &#8220;rect&#8221; event will trigger when there is a screen update. For extra simplicity we will use raw encoding.
 
 The last method from our Node.js proxy we will look at is the &#8220;handleFrame&#8221; method.
@@ -215,12 +215,12 @@ Edit the content of the file ./static/index.html with the following content:
         <canvas id="screen">
         </canvas>
         <script src="http://localhost:8091/socket.io/socket.io.js"></script>
-        <script src="./js/client.js"></script>
+        <script src="./js/Client.js"></script>
     </body>
 </html>
 {% endhighlight %}
 
-We've added simple bootstrap form and a canvas. Now create sub-directory of our project base directory: "./static/js" and create the file "client.js" in it.
+We've added simple bootstrap form and a canvas. Now create sub-directory of our project base directory: "./static/js" and create the file "Client.js" in it.
 
 We will wrap the whole code in an IIFE to omit any globals. Let's create a simple object which will hold our settings:
 
@@ -273,7 +273,7 @@ It creates new socket.io connection with the server's socket.io server host name
   });
 {% endhighlight %}
 
-As you see we simply delegate the drawing to the screen and pass it the frame as argument.  
+As you see we simply delegate the drawing to the screen and pass it the frame as argument.
 And here is the actual drawing on the canvas:
 
 {% highlight javascript %}Screen.prototype.drawRect = function (rect) {
@@ -290,7 +290,7 @@ And here is the actual drawing on the canvas:
 
 We create new image with the frame's width and height as dimensions and we set image's src to be equal to the frame's base64 image. After that, when the image is loaded we draw it onto the canvas.
 
-The last interesting moment is the handling of the mouse and keyboard events.  
+The last interesting moment is the handling of the mouse and keyboard events.
 Of course we delegate it to the screen object:
 
 {% highlight javascript %}Client.prototype._initEventListeners = function () {
@@ -313,10 +313,10 @@ Of course we delegate it to the screen object:
 
 As you see we add the mouse and keyboard event handlers and in the event callbacks we simply emit new socket.io events, respectively: "mouse" and "keyboard", with their arguments. For simplicity our canvas is absolutely positioned and has coordinates (0, 0).
 
-And...well...thats all! We have ready to go VNC client in just few lines of JavaScript!  
-  
-<span style="font-size: 1.2em;">The <strong><a href="https://github.com/mgechev/js-vnc-demo-project">source code</a></strong> from this article can be found in my <a href="https://github.com/mgechev/js-vnc-demo-project">GitHub account</a></span>.  
-  
+And...well...thats all! We have ready to go VNC client in just few lines of JavaScript!
+
+<span style="font-size: 1.2em;">The <strong><a href="https://github.com/mgechev/js-vnc-demo-project">source code</a></strong> from this article can be found in my <a href="https://github.com/mgechev/js-vnc-demo-project">GitHub account</a></span>.
+
 Quick video demo
 
  [1]: http://blog.mgechev.com/wp-content/uploads/2013/08/js-vnc.png
