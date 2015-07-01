@@ -91,7 +91,7 @@ In the second, JavaScript, example we see that the `template` property of the di
 ![Interpreter](/images/patterns/behavioral/interpreter.svg "Fig. 6")
 
 Behind its `$parse` service, AngularJS provides its own implementation of interpreter of a DSL (Domain Specific Language). The used DSL is simplified and modified version of JavaScript.
-The main differences between the JavaScript expressions and AngularJS expressions that AngularJS expressions:
+The main differences between the JavaScript expressions and AngularJS expressions are that AngularJS expressions:
 
 - may contain filters with UNIX like pipe syntax
 - don't throw any errors
@@ -107,7 +107,7 @@ var Lexer;
 var Parser;
 {% endhighlight %}
 
-Once given expression have been tokenized it is cached internally, because of performance concerns.
+Once given expression has been tokenized it is cached internally, because of performance concerns.
 
 The terminal expressions in the AngularJS DSL are defined as follows:
 
@@ -160,7 +160,7 @@ Few sample AngularJS expressions are:
 
 ![Template View](/images/patterns/peaa/template-view.svg "Fig. 8")
 
-The dynamic page rendering is not that trivial thing. It is connected with a lot of string concatenations, manipulations and frustration. Far easier way to build your dynamic page is to write your markup and embed little expressions inside it, which are lately evaluated in given context and so the whole template is being compiled to its end format. In our case this format is going to be HTML (or even DOM). This is exactly what the template engines do - they take given DSL, evaluate it in the appropriate context and then turn it into its end format.
+The dynamic page rendering is not that trivial thing. It is connected with a lot of string concatenations, manipulations and frustration. Far easier way to build your dynamic page is to write your markup and embed little expressions inside it, which are later evaluated in given context and so the whole template is being compiled to its end format. In our case this format is going to be HTML (or even DOM). This is exactly what the template engines do - they take given DSL, evaluate it in the appropriate context and then turn it into its end format.
 
 Templates are very commonly used especially in the back-end.
 For example, you can embed PHP code inside HTML and create a dynamic page, you can use Smarty or you can use eRuby with Ruby in order to embed Ruby code inside your static pages.
@@ -206,7 +206,7 @@ in the context of the scope:
 $scope.names = ['foo', 'bar', 'baz'];
 {% endhighlight %}
 
-will produce the same result as the one above. The main difference here is that the template is not wrapped inside a `script` tag but is HTML instead.
+will produce the same result as the one above. The main difference here is that the template is not wrapped inside a `script` tag, it is HTML instead.
 
 
 ### Scope
@@ -255,7 +255,7 @@ In the JavaScript community this pattern is better known as publish/subscribe.
 
 As stated above the scopes in an AngularJS application form a hierarchy known as the scope chain. Some of the scopes are "isolated", which means that they don't inherit prototypically by their parent scope, but are connected to it via their `$parent` property.
 
-When `$emit` or `$broadcast` are called we can think of the scope chain as event bus, or even more accurately chain of responsibilities. Once the event is triggered it is emitted downwards or upwards (depending on the method, which was called). Each subsequent scope may:
+When `$emit` or `$broadcast` are called we can think of the scope chain as event bus, or even more accurately - chain of responsibilities. Once the event is triggered it is emitted downwards or upwards (depending on the method, which was called). Each subsequent scope may:
 
 - Handle the event and pass it to the next scope in the chain
 - Handle the event and stop its propagation
@@ -304,11 +304,11 @@ Now each time we change the value of `foo` the inner text of the span will be ch
 <span ng-bind="foo + " " + bar | uppercase"></span>
 {% endhighlight %}
 
-In the example above the value of the span will be the concatenated uppercased value of `foo` and `bar`. What happens behind the scene?
+In the example above the value of the span will be the concatenated uppercased value of `foo` and `bar`. What happens behind the scenes?
 
-Each `$scope` has method called `$watch`. When the AngularJS compiler find the directive `ng-bind` it creates a new watcher of the expression `foo + ' ' + bar | uppercase`, i.e. `$scope.$watch("foo + ' ' + bar | uppercase", function () { /* body */ });`. The callback will be triggered each time the value of the expression change. In the current case the callback will update the value of the span.
+Each `$scope` has method called `$watch`. When the AngularJS compiler finds the directive `ng-bind` it creates a new watcher of the expression `foo + ' ' + bar | uppercase`, i.e. `$scope.$watch("foo + ' ' + bar | uppercase", function () { /* body */ });`. The callback will be triggered each time the value of the expression is changed. In the current case the callback will update the value of the span.
 
-Here are the first a couple of lines of the implementation of `$watch`:
+Here are the first couple of lines of the implementation of `$watch`:
 
 {% highlight javascript %}
 $watch: function(watchExp, listener, objectEquality) {
@@ -325,7 +325,7 @@ $watch: function(watchExp, listener, objectEquality) {
 //...
 {% endhighlight %}
 
-We can think of the `watcher` object as a command. The expression of the command is being evaluated on each [`"$digest"`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) loop. Once AngularJS detects change in the expression, it invokes the `listener` function. The `watcher` command encapsulates the whole information required for watching given expression and delegates the execution of the command to the `listener` (the actual receiver). We can think of the `$scope` as the command's `Client` and the `$digest` loop as the command's `Invoker`.
+We can think of the `watcher` object as a command. The expression of the command is being evaluated on each [`"$digest"`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest) loop. Once AngularJS detects change in the expression, it invokes the `listener` function. The `watcher` command encapsulates all the information required for watching given expression and delegates the execution of the command to the `listener` (the actual receiver). We can think of the `$scope` as the command's `Client` and the `$digest` loop as the command's `Invoker`.
 
 ### Controllers
 
@@ -375,7 +375,7 @@ function ChildCtrl($scope, User) {
 }
 {% endhighlight %}
 
-This example aims to illustrates the most trivial way to reuse logic by using a base controller, anyway in production applications I don't recommend you to put your authorization logic in the controllers. The access to the different routes could be determined on a higher level of abstraction. 
+This example aims to illustrate the most trivial way to reuse logic by using a base controller, anyway in production applications I don't recommend you to put your authorization logic in the controllers. The access to the different routes could be determined on a higher level of abstraction. 
 
 The `ChildCtrl` is responsible for handling actions such as clicking the button with label `"Click"` and exposing the model to the view, by attaching it to the scope.
 
@@ -383,9 +383,9 @@ The `ChildCtrl` is responsible for handling actions such as clicking the button 
 
 #### Module Pattern
 
-This is actually not a design pattern from Gang of Four, neither one from P of EAA. This is a traditional JavaScript pattern, which main goal is to provide encapsulation and privacy.
+This is actually not a design pattern from Gang of Four, neither one from P of EAA. This is a traditional JavaScript pattern, the main goal of which is to provide encapsulation and privacy.
 
-Using the module pattern you can achieve privacy based on the JavaScript's functional lexical scope. Each module may has zero or more private members, which are hidden in the local scope of a function. This function returns an object, which exports the public API of the given module:
+Using the module pattern you can achieve privacy based on the JavaScript's functional lexical scope. Each module may have zero or more private members, which are hidden in the local scope of a function. This function returns an object, which exports the public API of the given module:
 
 {% highlight javascript %}
 var Page = (function () {
@@ -410,7 +410,7 @@ var Page = (function () {
 
 In the example above we have IIFE (Immediately-Invoked Function Expression), which after being called returns an object, with two methods (`setTitle` and `getTitle`). The returned object is being assigned to the `Page` variable.
 
-In this case the user of the `Page` object doesn't has direct access to the `title` variable, which is defined inside the local scope of the IIFE.
+In this case the user of the `Page` object doesn't have direct access to the `title` variable, which is defined inside the local scope of the IIFE.
 
 The module pattern is very useful when defining services in AngularJS. Using this pattern we can simulate (and actually achieve) privacy:
 
