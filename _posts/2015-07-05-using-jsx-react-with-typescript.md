@@ -16,7 +16,7 @@ JavaScript is a weird language although, we love it the way it is. However, I've
 
 Once you have code base above 10-15k lines of code and you decide to do some refactoring...well it gets messy. Although `grep` and `sed` are powerful tools for text manipulation, when you start replacing code with them, you're missing the semantics (or the context) of the snippets you substitute.
 
-Another common problem - you simply misspell a variable or property name and once in a while your code breaks telling you: `undefined is not a function` (alright, we [passed this stage](https://twitter.com/addyosmani/status/569157136137134081)...)
+Another common problem - you simply misspell a variable or property name and once in a while your code breaks telling you: `undefined is not a function` (alright, we [passed these days](https://twitter.com/addyosmani/status/569157136137134081)...)
 
 How we can deal with these problems using our favorite language? Well, writing a lot of tests may help. Testing everything is good but testing everything in order to make our refactoring process slightly smoother and staying away from typos...seems kind of unpractical and workaround.
 
