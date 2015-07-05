@@ -29,8 +29,8 @@ Some of the open source projects I've developed are:
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
-- [angular-transitions](http://angular-transitions.mgechev.com/)
-- [ng-tutorial](http://ng-tutorial.mgechev.com/)
+- [angular-transitions](https://github.com/mgechev/angular-transitions)
+- [ng-tutorial](https://github.com/mgechev/ng-tutorial)
 - [angular-webrtc](https://github.com/mgechev/angular-webrtc)
 
 ### ReactJS
