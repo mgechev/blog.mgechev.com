@@ -75,7 +75,7 @@ cd app
 
 Create a sample file called `test.tsx` (notice the extension **tsx**, it is mandatory) and add the following content:
 
-{% highlight typescript %}
+{% highlight text %}
 /// <reference path="../typing/react.d.ts" />
 
 class DemoProps {
