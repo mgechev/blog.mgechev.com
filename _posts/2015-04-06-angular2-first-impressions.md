@@ -88,8 +88,7 @@ You can read more details about the language constructs added in TypeScript (pre
 
 It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, Angular2 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added components and kept the directives.
 
-<strike>
-## three different types of directives:
+<strike>## three different types of directives:</strike>
 
 > - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
 >   - Only one component can be present per DOM element.
@@ -105,7 +104,6 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 >   - Multiple decorators can be placed on a single element.
 >   - Decorators do not introduce new evaluation context.
 >   - Decorators are registered through the @Decorator meta-data annotation.
-</strike>
 
 ### Quick FAQ:
 
