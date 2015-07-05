@@ -130,5 +130,5 @@ Did you notice the `--jsx` option of the TypeScript compiler? It may accepts two
 
 This is how you can use TypeScript with React and JSX for projects that scale. Support for `tsx` files is already implemented in `atom-typescript`. If you use Atom, you'll see something like this:
 
-![JSX + TypeScript](../images/jsx-typescript.png)
+![JSX + TypeScript](/images/jsx-typescript.png)
 
