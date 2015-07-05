@@ -249,7 +249,9 @@ angular.module('demo').value('name', 'Super Dev');
 angular.module('demo').value('AbilitiesCollection', ['C++', 'JavaScript']);
 {% endhighlight %}
 
-You can check this related [exercise from ng-tutorial][7].
+Here is a talk on this topic I gave on Angular Berlin:
+
+<script async class="speakerdeck-embed" data-id="bb495a56254b4881a2b423c460398b5e" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
  [1]: http://jsbin.com/oLawajuL/2/edit
  [2]: https://github.com/angular/angular.js/blob/v1.4.0-rc.0/src/auto/injector.js#L686-L690
@@ -257,4 +259,3 @@ You can check this related [exercise from ng-tutorial][7].
  [4]: http://www.martinfowler.com/eaaCatalog/activeRecord.html
  [5]: http://www.martinfowler.com/eaaCatalog/gateway.html
  [6]: https://github.com/angular/angular.js/blob/master/src/auto/injector.js#L777
- [7]: http://ng-tutorial.mgechev.com/#?tutorial=controllers-communication&#038;step=invoke-methods
