@@ -126,6 +126,8 @@ Did you notice the `--jsx` option of the TypeScript compiler? It may accepts two
 - `react` - Transpiles JSX to React calls
 - `preserve` - Preserves the JSX the way it was defined in the source file
 
+The JSX support in TypeScript is part of the [roadmap for version 1.6](https://github.com/Microsoft/TypeScript/wiki/Roadmap#16). This means that in the next a couple of weeks you won't have to build TypeScript from scratch but use it with the standard build tools you're used to.
+
 ## Results
 
 This is how you can use TypeScript with React and JSX for projects that scale. Support for `tsx` files is already implemented in `atom-typescript`. If you use Atom, you'll see something like this:
