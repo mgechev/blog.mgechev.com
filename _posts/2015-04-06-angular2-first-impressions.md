@@ -86,8 +86,9 @@ You can read more details about the language constructs added in TypeScript (pre
 
 ## Angular2 has no Controllers
 
-It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, Angular2 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added...
+It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, Angular2 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added components and kept the directives.
 
+<strike>
 ## three different types of directives:
 
 > - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
@@ -104,6 +105,7 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 >   - Multiple decorators can be placed on a single element.
 >   - Decorators do not introduce new evaluation context.
 >   - Decorators are registered through the @Decorator meta-data annotation.
+</strike>
 
 ### Quick FAQ:
 
@@ -308,7 +310,7 @@ The API of Angular2 is still under development. There are a lot of things, which
 
 ### Filters
 
-According to the documentation, Angular2 will have formatters, which are equivalent to the filters, well known from version 1.x.
+According to the documentation, Angular2 will have <strike>formatters</strike> pipes, which are equivalent (a bit more powerful, since allow enhancement of the change detection) to the filters, well known from version 1.x.
 
 ### Improved DI
 
