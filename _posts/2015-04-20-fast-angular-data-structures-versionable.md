@@ -48,14 +48,14 @@ In order to reduce the complexity of the code, which dirty checks the expression
 
 The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:
 
-{% highlight javascript %}
+```javascript
 let primitive = [1, 2, 3];
 let list = new ListWrapper(primitive);
 let changedList = list.append(4);
 console.log(primitive === changedList); // false
 // The primitive collection is changed
 console.log(primitive); // [1, 2, 3, 4]
-{% endhighlight %}
+```
 
 But this will also have one important side effect:
 
