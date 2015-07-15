@@ -42,12 +42,11 @@ The guys from Microsoft, designing TypeScript, were quite smart and took the fir
 
 In [DefinitelyTyped](https://github.com/borisyankov/DefinitelyTyped) you can find up-to-date type definitions for most libraries you may want to use. Once you got, lets say the React type definition, you can simply add a reference to it inside the files you use React like:
 
-{% highlight javascript %}
+```javascript
 /// <reference path="react.d.ts" />
 
 // ... your awesome code here
-{% endhighlight %}
-
+```
 Alright, TypeScript introduced these ambient type definitions. Cool. However, this doesn't solve our JSX problem. What if we want to use JSX inside our TypeScript & React project? Well, for a couple of weeks, I'm following [this GitHub issue](https://github.com/Microsoft/TypeScript/issues/3203), which aims decoupling of TypeScript from JSX. A few days ago a patch was merged into the master branch of TypeScript, which allows to transform your TypeScript to JavaScript and keep your JSX markup or transpile it to React calls instead!
 
 ## How to do That?
@@ -56,7 +55,7 @@ As last step, I'm going to show you how we can take advantage of this feature to
 
 Install TypeScript inside a directory:
 
-{% highlight bash %}
+```bash
 mkdir test-typescript-project
 cd test-typescript-project
 git clone https://github.com/Microsoft/TypeScript.git
@@ -64,18 +63,16 @@ cd TypeScript
 npm install -g jake
 npm install
 jake local
-{% endhighlight %}
-
+```
 Now create an `app` directory and enter it:
 
-{% highlight bash %}
+```bash
 mkdir app
 cd app
-{% endhighlight %}
-
+```
 Create a sample file called `test.tsx` (notice the extension **tsx**, it is mandatory) and add the following content:
 
-{% highlight text %}
+```text
 /// <reference path="../typing/react.d.ts" />
 
 class DemoProps {
@@ -95,31 +92,28 @@ class Demo extends React.Component<DemoProps, any> {
     );
   }
 }
-{% endhighlight %}
-
+```
 In the code above we defined a component called `Demo`. It accepts properties, which are instances of the class `DemoProps` and state, which could be of any kind.
 
 Alright, we're almost there!
 
 Create a directory called `typing` inside the root of your project:
 
-{% highlight bash %}
+```bash
 cd ..
 mkdir typing
 cd typing
-{% endhighlight %}
-
+```
 Now take the React's ambient type declaration from [here](https://github.com/borisyankov/DefinitelyTyped/blob/master/react/react.d.ts) and save it inside `typing`. Make sure the file is called `react.d.ts`. This will prevent us from getting any compile-time errors.
 
 And we're almost there!
 
-{% highlight bash %}
+```bash
 cd ..
 # This line will run the typescript compiler over your `test.tsx` file and
 # output the transpiler content in `./app/test.js`
 node TypeScript/built/local/tsc.js --jsx react ./app/test.tsx
-{% endhighlight %}
-
+```
 Thats it. Now you can check out the content of `./app/test.js`. There you should find the transpiled content.
 Did you notice the `--jsx` option of the TypeScript compiler? It may accepts two different values:
 
@@ -133,4 +127,3 @@ The JSX support in TypeScript is part of the [roadmap for version 1.6](https://g
 This is how you can use TypeScript with React and JSX for projects that scale. Support for `tsx` files is already implemented in `atom-typescript`. If you use Atom, you'll see something like this:
 
 ![JSX + TypeScript](/images/jsx-typescript.png)
-
