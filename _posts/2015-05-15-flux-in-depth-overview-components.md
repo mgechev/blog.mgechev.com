@@ -95,7 +95,7 @@ How we can make our components pure? Definitely they should not use any global v
 
 And the following data applied to it:
 
-{% highlight javascript %}
+```javascript
 {
   photoUrl: "photo.png",
   firstName: "Foo",
@@ -112,7 +112,7 @@ And the following data applied to it:
     completed: false
   }]
 }
-{% endhighlight %}
+```
 
 If we call the object above `user`, in a flux-like architecture the data will be distributed across the components in the following way:
 
@@ -120,9 +120,9 @@ If we call the object above `user`, in a flux-like architecture the data will be
 
 If the `User` component needs to display the number of pending todo items, we may have the following snippet in its implementation:
 
-{% highlight javascript %}
+```javascript
 user.todos = user.todos.filter(u => !u.completed);
-{% endhighlight %}
+```
 
 It definitely looks elegant, we're applying the high-order function `filter` over the user's todo items. However, this way we're creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in `user.todos` will introduce an issue - the `Todos` component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.
 
@@ -142,7 +142,7 @@ In order to introduce the immutability in our application we have three options:
 
 Lets create an immutable list using Immutable.js:
 
-{% highlight javascript %}
+```javascript
 let list = new Immutable.List([1, 2]);
 let foo = {};
 let newList = list.push(foo);
@@ -150,7 +150,7 @@ console.log(list.toString()); // List [ 1, 2 ]
 console.log(newList.toString()); // List [ 1, 2, [object Object] ]
 newList.get(2).baz = 42;
 console.log(foo.baz); // 42
-{% endhighlight %}
+```
 
 In the snippet above we can notice that:
 
@@ -175,14 +175,14 @@ Which is not cool. In order to fix this behavior we can use `Object.freeze`.
 
 If we use `Object.freeze`:
 
-{% highlight javascript %}
+```javascript
 let foo = { bar: {} }
 Object.freeze(foo);
 foo.baz = 'foobar';
 console.log(foo.baz); // undefined
 foo.bar.baz = 'foobar';
 console.log(foo.bar.baz); // 'foobar'
-{% endhighlight %}
+```
 
 Which means that `Object.freeze` doesn't do deep freeze of the objects.
 
@@ -211,7 +211,7 @@ Once the chat button is pressed all opened dialogs should be closed and the chat
 
 Lets implement the `Dialog` component in ReactJS:
 
-{% highlight javascript %}
+```javascript
 class Dialog extends React.Component {
   constructor() {
     this.state = {};
@@ -240,11 +240,11 @@ class Dialog extends React.Component {
     );
   }
 }
-{% endhighlight %}
+```
 
 ...and we can use it like:
 
-{% highlight javascript %}
+```javascript
 class App extends React.Component {
 
   openDialog(dialog) {
@@ -272,11 +272,11 @@ class App extends React.Component {
     );
   }
 }
-{% endhighlight %}
+```
 
 This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user's profile, etc. In such case we should take advantage of the components' composability and decompose our `App` into a few simple components. So our `App` component will look something like this:
 
-{% highlight javascript %}
+```javascript
 class App extends React.Component {
   render() {
     return (
@@ -291,11 +291,11 @@ class App extends React.Component {
     );
   }
 }
-{% endhighlight %}
+```
 
 Okay...but how the `Navigation` component will tell the `App` component when to open any of the dialogs? Remember our `ProfileManagement` component needs to be able to open the `profile` dialog as well...? We can workaround this issue by pass callbacks:
 
-{% highlight javascript %}
+```javascript
 class App extends React.Component {
   openDialog(dialog) {
     for (let d in dialogs) {
@@ -316,14 +316,14 @@ class App extends React.Component {
     );
   }
 }
-{% endhighlight %}
+```
 
 Now inside the `Navigation` and `ProfileManagement` components we can invoke:
 
-{% highlight javascript %}
+```javascript
 this.props.openDialog('chat'); // open the chat dialog
 this.props.openDialog('profile'); // open the edit profile dialog
-{% endhighlight %}
+```
 
 It started getting kind of messy, didn't it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component `E` needs to change the state of component `B`:
 
@@ -358,7 +358,7 @@ All our components are going to have access to a global mutable object and throu
 
 We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:
 
-{% highlight javascript %}
+```javascript
 class Dialog extends React.Component {
   render() {
     let classNames = 'dialog';
@@ -373,7 +373,7 @@ class Dialog extends React.Component {
     );
   }
 }
-{% endhighlight %}
+```
 
 It should not has its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the declaimer that it might sounds like a huge overhead but I promise that it's worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:
 
