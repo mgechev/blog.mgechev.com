@@ -98,7 +98,7 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 >   - Component has its own shadow view which is attached to the element as a Shadow DOM.
 >   - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
 > - Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
->   - Viewports can only be placed on <template> elements (or the short hand version which uses <element template> attribute.)
+>   - Viewports can only be placed on &lt;template&gt; elements (or the short hand version which uses &lt;element template&gt; attribute.)
 >   - Only one viewport can be present per DOM template element.
 >   - The viewport is created over the template element. This is known as the ViewContainer.
 > Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
