@@ -77,9 +77,6 @@ gulp.task('build', ['copy'], function () {
 
 *What is this thing called AtScript I've heard of?*<br>
 
-<blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
 ### Further reading
 
 You can read more details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax in TypeScript that time) [here](https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit).
@@ -92,20 +89,20 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 
 <span style="color: #ccc">
 *out of date*
-- Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
-  - Only one component can be present per DOM element.
-  - Component's CSS selectors usually trigger on element names. (Best practice)
-  - Component has its own shadow view which is attached to the element as a Shadow DOM.
-  - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
-- Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
-  - Viewports can only be placed on <template> elements (or the short hand version which uses <element template> attribute.)
-  - Only one viewport can be present per DOM template element.
-  - The viewport is created over the template element. This is known as the ViewContainer.
-Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
-- Decorator. According to the AngularJS docs (still incomplete) decorators are the simplest kind of directive is a decorator. Directives are usefull for encapsulating behavior.
-  - Multiple decorators can be placed on a single element.
-  - Decorators do not introduce new evaluation context.
-  - Decorators are registered through the @Decorator meta-data annotation.
+> - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
+>   - Only one component can be present per DOM element.
+>   - Component's CSS selectors usually trigger on element names. (Best practice)
+>   - Component has its own shadow view which is attached to the element as a Shadow DOM.
+>   - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
+> - Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
+>   - Viewports can only be placed on <template> elements (or the short hand version which uses <element template> attribute.)
+>   - Only one viewport can be present per DOM template element.
+>   - The viewport is created over the template element. This is known as the ViewContainer.
+> Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
+> - Decorator. According to the AngularJS docs (still incomplete) decorators are the simplest kind of directive is a decorator. Directives are usefull for encapsulating behavior.
+>   - Multiple decorators can be placed on a single element.
+>   - Decorators do not introduce new evaluation context.
+>   - Decorators are registered through the @Decorator meta-data annotation.
 </span>
 
 ### Quick FAQ:
