@@ -54,7 +54,7 @@ No. You can use the [traceur compiler](https://github.com/google/traceur-compile
 
 Here is a sample configuration of `gulp-traceur`, using type assertion:
 
-{% highlight javascript %}
+```javascript
 gulp.task('build', ['copy'], function () {
   'use strict';
   return gulp.src([
@@ -73,9 +73,12 @@ gulp.task('build', ['copy'], function () {
     }))
     .pipe(gulp.dest('./dist/'));
 });
-{% endhighlight %}
+```
 
 *What is this thing called AtScript I've heard of?*<br>
+
+<blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ### Further reading
 
@@ -186,7 +189,7 @@ There are a lot of statements the `$scope` was a tricky for explanation concept 
 
 For example, the component below has selector `sample-app` (i.e. we can use it as `<sample-app></sample-app>`) and template located inside `./templates/sample-app.html` (you can find the whole source code at my [GitHub repository](https://github.com/mgechev/angular2-seed)).
 
-{% highlight javascript %}
+```javascript
 @Component({
   selector: 'sample-app',
   componentServices: [
@@ -207,17 +210,17 @@ class SampleApp {
     newname.value = '';
   }
 }
-{% endhighlight %}
+```
 
 We can directly bind to `this.names` inside our template, like this:
 
-{% highlight html %}
+```html
 ...
 <ul>
   <li *foreach="#name in names">{{name}}</li>
 </ul>
 ...
-{% endhighlight %}
+```
 
 No scope at all! Awesome, isn't it? So far, so good. We do not have scope. But remember, we used to use `$scope.$apply` in order to force execution of the `$digest` loop and perform dirty checking? How are we going to do this now? Well, we cant.
 
@@ -274,9 +277,9 @@ Most likely, no. I'm not aware whether the `angular-translate` team have plans t
 
 Another completely innovative idea I found, digging inside AngularJS' source code was inside the `JITChangeDetector`. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:
 
-{% highlight javascript %}
+```javascript
 this.value === oldValue;
-{% endhighlight %}
+```
 
 The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look [at these benchmarks](http://jsperf.com/object-observe-polyfill-sandbox)). How does it work? According to my quick research:
 
@@ -314,7 +317,7 @@ According to the documentation, Angular2 will have <strike>formatters</strike> p
 
 The dependency injection mechanism will be used with the decorators syntax provided by TypeScript. You can take a look at the source code [here](https://github.com/angular/di.js). Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of `di.js`:
 
-{% highlight javascript %}
+```javascript
 import {Inject} from 'di';
 import {Electricity} from './electricity';
 
@@ -328,7 +331,7 @@ export class Fridge {
     return '3 eggs';
   }
 }
-{% endhighlight %}
+```
 
 ## Conclusion
 
