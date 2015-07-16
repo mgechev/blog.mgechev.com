@@ -91,7 +91,7 @@ It seems it got modern for the JavaScript MVW frameworks to drop controllers fro
 ## <strike>three different types of directives:</strike>
 
 <span style="color: #ccc;">
-*out of date:*
+*out of date*
 > - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
 >   - Only one component can be present per DOM element.
 >   - Component's CSS selectors usually trigger on element names. (Best practice)
