@@ -60,4 +60,55 @@ Or if you're have more enterprise taste, here is the UML class diagram:
 
 ![Chain of Responsibility](/images/patterns/behavioral/chain-of-responsibilities.svg)
 
-Why we need this pattern? Well, basically our store will be a tree of objects, once a property in an internal node in the tree changes, we'll propagate this change to the root. The root component in our view will listen for events at the store object. Once it detects a change it'll set it's state.
+Why we need this pattern? Well, basically our store will be a tree of objects, once a property in an internal node in the tree changes, we'll propagate this change to the root. The root component in our view will listen for events at the store object. Once it detects a change it'll set it's state. I'm sure it sounds weird and obfuscated, lets take a look at a diagram, which illustrates a chat component:
+
+## Store and View
+
+Lets take a look at the following diagram, it illustrates the initial setup of our application:
+
+![Initial Setup](/images/store-services/initial-config.png)
+
+The tree in the left hand-side is our store, which serialized to JSON looks the following way:
+
+```json
+{
+  "users": [
+    { "name": "foo", "id": 1 },
+    { "name": "bar", "id": 2 }
+  ],
+  "messages": [
+    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686},
+    { "text": "Hi bar!", "by": 1, "timestamp": 1437147882686 }
+  ]
+}
+```
+
+The tree in the right hand-side is our component tree. We already described the component trees in the previous part. Here is a snippet, which shows the relation between the `Chat` store and the `ChatBox` component:
+
+```javascript
+import React from 'react';
+import Chat from '../store/Chat';
+
+class ChatBox extends React.Component {
+  constructor(props) {
+    super(props);
+    Chat.on('change', c => {
+      this.setState(c);
+    });
+  }
+  render() {
+    return (
+      <div>
+        <MessagesList messages={this.state.messages}/>
+        <MessageInput/>
+      </div>
+    );
+  }
+}
+```
+
+Basically, the root component (`ChatBox`) is subscribed to the `change` event of the `Chat`. When the `Chat` emit a `change` event, the `ChatBox` set its state to be the current store and passes the store's content down the component tree. That's it.
+
+What happens if something change our store?
+
+![Change of store](/images/store-services/message-change.png)
