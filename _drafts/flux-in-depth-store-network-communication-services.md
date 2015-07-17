@@ -62,7 +62,7 @@ Or if you're have more enterprise taste, here is the UML class diagram:
 
 Why we need this pattern? Well, basically our store will be a tree of objects, once a property in an internal node in the tree changes, we'll propagate this change to the root. The root component in our view will listen for events at the store object. Once it detects a change it'll set it's state. I'm sure it sounds weird and obfuscated, lets take a look at a diagram, which illustrates a chat component:
 
-## Store and View
+## Store to the View
 
 Lets take a look at the following diagram, it illustrates the initial setup of our application:
 
@@ -77,8 +77,7 @@ The tree in the left hand-side is our store, which serialized to JSON looks the 
     { "name": "bar", "id": 2 }
   ],
   "messages": [
-    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686},
-    { "text": "Hi bar!", "by": 1, "timestamp": 1437147882686 }
+    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686}
   ]
 }
 ```
@@ -112,3 +111,9 @@ Basically, the root component (`ChatBox`) is subscribed to the `change` event of
 What happens if something change our store?
 
 ![Change of store](/images/store-services/message-change.png)
+
+On the diagram above something changed the first message in the `Chat` store, lets say the `text` property is changed. Once a property in a `Message` changes, this leads to propagation of the event to the parent (step `1`), the event reach the `Messages` collection, once the `Messages` collection triggers change event it passes the event to the `Chat` (root object, step `2`). The `Chat` object emits a change event, which is being caught by the `ChatBox`, which set its state with the content of the store. That's it...pretty simple, isn't it?
+
+In the next section, we're going to take a look how the view can modify the store using Actions.
+
+## View to the Store
