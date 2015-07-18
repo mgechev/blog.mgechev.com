@@ -223,4 +223,17 @@ Responsible for dispatching commands. There's one more link, which is not repres
 
 The `StoreObserver` is responsible for handling change events of the store. Once it detects change in the store it creates a new command using the `CommandBuilder` and invokes it through the `CommandDispatcher`.
 
-### `CommandDispatcher`
+### `NetworkObserver`
+
+Waits for new messages emitted by the data `Channel`. This component is responsible for parsing the messages and processing them. Once the message has been parsed, based on its content the `NetworkObserver` invokes specific `Action`.
+
+### Quick FAQ:
+
+*Isn't `NetworkObserver` a "God class"?*<br>
+Yep, it is. You can decompose it into a few smaller classes, same for `CommandDispatcher` where you can use the [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern) for dispatching the commands in the appropriate order.
+
+*What are these `ProtocolDecorators`?*<br>
+Since we can create our protocol based on another, already existing protocol ([JSON-RPC](http://www.jsonrpc.org/), [BERT-RPC](http://bert-rpc.org/), etc.), we can process the incoming messages by using a chain of decorators. For example, we can have a basic string, later the `JSONRPCDecorator` can parse it to a valid `JSON-RPC` message and pass it to the next decorator (`YourCustomProtocolDecorator`), etc.
+
+## Conclusion
+
