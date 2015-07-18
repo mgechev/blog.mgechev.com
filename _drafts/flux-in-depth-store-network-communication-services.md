@@ -64,7 +64,7 @@ Or if you're have more enterprise taste, here is the UML class diagram of this d
 
 Why we need it? Well, our store is a tree of objects, once a property in an internal node in the tree changes, we'll propagate this change to the root. The root component in the view will listen for events triggered by the store object. Once it detects a change it'll set its state. I'm sure it sounds weird and obfuscated, lets take a look at a diagram, which illustrates a simple chat application:
 
-## Store to the View
+### From the Store to the View
 
 Lets take a look at the following diagram, it illustrates the initial setup of our application:
 
@@ -118,13 +118,13 @@ On the diagram above something changed the first message in the `Chat` store (le
 
 In the next section, we're going to take a look how the view can modify the store using Actions.
 
-## View to the Store
+### From the View to the Store
 
 Now lets suppose the user enter a message and send it. Inside a send handler, defined in `MessageInput` we invoke the action `addMessage(text, user)` the `MessageActions` object (step 1) (peek at the flux overview diagram above). The `MessageActions` explicitly invokes the `Dispatcher` (step 2), which throws an event. This event is being handled by the `Messages` component (step 3), which adds the message to the list of messages and triggers a `change` event. Now we're going to the previous case - "Store to View". All of this is better illustrated on the following diagram:
 
 ![Component updates store](/images/store-services/component-update-store.png)
 
-## Model vs UI state
+### Model vs UI state
 
 Most likely you're building an application, which works on business data over given domain. For example, in our case we had:
 
@@ -175,7 +175,7 @@ Alright, in the diagram showing the overview of flux we saw that we have a "hang
 
 ![Overview Incoming Action](/images/store-services/flux-overview.png)
 
-### Network to UI
+### From the Network to the UI
 
 We can use this "hanging" action in order to integrate the communication with the external services. Lets take a look at the following picture, in order to visualize basic communication with external service:
 
@@ -183,15 +183,15 @@ We can use this "hanging" action in order to integrate the communication with th
 
 In the following diagram we can trace how a network event is being processed. The cloud is the external service/application. Initially we get a new message, it is being processed by the `Service` object (it is black on the diagram because it is like a black box for us right now, it may get quite complex, depending on your application), later the semantics behind the received message is discovered and based on it, service invokes a `StoreAction`. Now the flow goes exactly the way we described earlier (Store to the View). We're good for now. But what happens if the store changes? Nothing so far.
 
-### UI to Network
+### From the UI to the Network
 
 In order to send network events based on changes of the store of our application we can observe it. Since it extends `EventEmitter` we can simply add `on change` handlers to the store inside the `Service` and this way we can easily handle the changes and process them:
 
 ![Store to Network](/images/store-services/store-to-network.png)
 
-Everything looks good so far. But the `Service` object is still a huge black box. In the next section I'll apply a sample design of this component. If you don't agree with something, have any questions or recommendations, please, leave a comment.
+Everything looks good so far. But the `Service` module is still a huge black box. In the next section I'll apply a sample design of this component. If you don't agree with something, have any questions or recommendations, please, leave a comment.
 
-## The Service
+## The Service Module
 
 I was wondering whether to use UML for showing the components building the `Service` module, however I choose to make a colorful diagram like the one bellow:
 
@@ -237,3 +237,4 @@ Since we can create our protocol based on another, already existing protocol ([J
 
 ## Conclusion
 
+The first part of this post illustrated how we can wire the store with our view. The second part was about the basic idea of network communication with external services. The last section described a sample implementation of the black box responsible for handling server messages, store changes, serializing them and sending them through the network. Although the first two parts were relatively canonical and predefined by flux, the last chapter was completely custom implementation. With it I wanted to imply that the micro-architecture (MVC, MVP, MVVM, flux, whatever) does not provide you the entire project design. It only puts some rules on how you should organize your application and wire the model with your view, however, if we want to build a real-life application, most likely we'll need to put some additional effort - the architecture or the framework won't be able to solve all our concerns.
