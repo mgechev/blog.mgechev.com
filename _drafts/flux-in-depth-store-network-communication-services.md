@@ -149,9 +149,11 @@ However, in most cases, this is not enough. Your application also has a UI state
 }
 ```
 
+I always prefer to have separation between the UI state and the model because the communication with the external services usually require only handling changes in the model.
+
 ### Quick FAQ:
 
-*Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position we should go through the entire data flow you described?*
+*Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position we should go through the entire data flow you described?*<br>
 This doesn't seem like quite a good idea. If you have a big store and huge component tree, rerendering it on mouse move will impact the performance of your application quite a lot! What will be the biggest slowdown? Well, you'll have to serialize the store to POJO (Plain Old JavaScript Object), later you need to pass it to the root component which is responsible for passing it down to its children and so on. And all of this because of two changed numbers? It is completely unnecessary. In such cases I'd recommend adding event listeners in the specific component, which depends on the mouse position.
 
 For example, if you're using `react-dnd` in your application, the drag & drop component has its own state, which don't have to be merged with the store of your application. It can live independently. Let me show you what I mean on a diagram:
@@ -159,3 +161,12 @@ For example, if you're using `react-dnd` in your application, the drag & drop co
 ![](/images/store-services/two-stores.png)
 
 In this example, when the store containing the dialog position updates it does not require update of the entire component tree.
+
+*How should I make my store trigger events?*<br>
+The same way you do that in the dispatcher - use `EventEmitter`. Since we want to implement Chain of Responsibility, you will be required to keep reference to the object's parent in order to propagate the event.
+
+## Remote Services
+
+This is a hot topic. Most of the single-page applications require communication with a services through any transport protocol, in order to fetch and store data. However, in the overview of flux there's no such thing as `TransportChannel`, `RemoteService` or whatever. If there are involved a lot of different protocols (for example I'm working on a application, which communicates with other applications and services through HTTP, WebSocket and WebRTC data channel) it could get a bit hairy if you don't create the proper abstractions.
+
+In this section I'll describe the basics and later, in the FAQ section, we're going to discuss more interesting topics.
