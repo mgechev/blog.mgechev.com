@@ -68,7 +68,7 @@ Why we need it? Well, our store is a tree of objects, once a property in an inte
 
 Lets take a look at the following diagram, it illustrates the initial setup of our application:
 
-![Initial Setup](/images/store-services/initial-config.png)
+![Initial Setup](/images/store-services/initial-setup.png)
 
 The tree on the left hand-side is the store, which serialized to JSON looks the following way:
 
