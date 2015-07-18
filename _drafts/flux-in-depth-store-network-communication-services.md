@@ -123,3 +123,39 @@ In the next section, we're going to take a look how the view can modify the stor
 Now lets suppose the user enter a message and send it. Inside a send handler, defined in `MessageInput` we invoke the action `addMessage(text, user)` the `MessageActions` object (step 1) (peek at the flux overview diagram above). The `MessageActions` explicitly invokes the `Dispatcher` (step 2), which throws an event. This event is being handled by the `Messages` component (step 3), which adds the message to the list of messages and triggers a `change` event. Now we're going to the previous case - "Store to View". All of this is better illustrated on the following diagram:
 
 ![Component updates store](/images/store-services/component-update-store.png)
+
+## Model vs UI state
+
+Most likely you're building an application, which works on business data over given domain. For example, in our case we had:
+
+- Messages
+- Users
+
+However, in most cases, this is not enough. Your application also has a UI state. For example, whether given dialog is opened or no, what is the dialog's position, etc. The data, which defines now your components will be rendered, depends on both - your UI state and the model. This is the reason I create a combined store, which presents both. For example, if we add a few dialogs to our chat application, the JSON representation of the store may look like:
+
+```json
+{
+  "users": [
+    { "name": "foo", "id": 1 },
+    { "name": "bar", "id": 2 }
+  ],
+  "messages": [
+    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686}
+  ],
+  "dialogsOpenStatus": {
+    "nicknameInput": true,
+    "editMessage": false
+  }
+}
+```
+
+### Quick FAQ:
+
+*Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position we should go through the entire data flow you described?*
+This doesn't seem like quite a good idea. If you have a big store and huge component tree, rerendering it on mouse move will impact the performance of your application quite a lot! What will be the biggest slowdown? Well, you'll have to serialize the store to POJO (Plain Old JavaScript Object), later you need to pass it to the root component which is responsible for passing it down to its children and so on. And all of this because of two changed numbers? It is completely unnecessary. In such cases I'd recommend adding event listeners in the specific component, which depends on the mouse position.
+
+For example, if you're using `react-dnd` in your application, the drag & drop component has its own state, which don't have to be merged with the store of your application. It can live independently. Let me show you what I mean on a diagram:
+
+![](/images/store-services/two-stores.png)
+
+In this example, when the store containing the dialog position updates it does not require update of the entire component tree.
