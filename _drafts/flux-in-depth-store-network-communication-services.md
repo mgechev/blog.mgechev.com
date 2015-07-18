@@ -188,3 +188,39 @@ In the following diagram we can trace how a network event is being processed. Th
 In order to send network events based on changes of the store of our application we can observe it. Since it extends `EventEmitter` we can simply add `on change` handlers to the store inside the `Service` and this way we can easily handle the changes and process them:
 
 ![Store to Network](/images/store-services/store-to-network.png)
+
+Everything looks good so far. But the `Service` object is still a huge black box. In the next section I'll apply a sample design of this component. If you don't agree with something, have any questions or recommendations, please, leave a comment.
+
+## The Service
+
+I was wondering whether to use UML for showing the components building the `Service` module, however I choose to make a colorful diagram like the one bellow:
+
+![The Service Module](/images/store-services/service-components.png)
+
+There are a lot of boxes there. The yellow ones are part of the flux architecture. The blue ones are responsible for sending updates from the application to the network, the red ones are responsible for handling network events and the green ones are the intersection between the last two categories. One component could be implemented with a few classes, we're not restricting ourselves, only demonstrating a sample decomposition of the service module. Lets describe the most interesting components one by one.
+
+### `Channel`
+
+Abstract channel. It could be extended by `HTTPChannel`, `WebSocketChannel`, `WebRTCDataChannel`, etc.
+
+### `Package`
+
+The `Package` component represents the packages used by our protocol. There might be a hierarchy of package types, for example if we build our protocol on top of JSON-RPC, we may want to extend the base `Package` class.
+
+### `Command`
+
+Implements the [Command design pattern](https://en.wikipedia.org/wiki/Command_pattern).
+
+### `CommandDispatcher`
+
+Responsible for dispatching commands. There's one more link, which is not represented on the diagram - the `CommandDispatcher` owns reference to the `Channel` component. It checks whether the channel is open before sending the command, if it isn't the `CommandDispatcher` retries after a given timeout. This component is also responsible for buffering commands, invoking their undo actions in case the command's execution fails. The `CommandDispatcher` may implement different dispatching strategies:
+
+- [Sliding window technique](https://en.wikipedia.org/wiki/Sliding_window_protocol)
+- Request/response
+- May build a graph of the dependencies between the command, process a topological sort and invoke the commands in the appropriate order
+
+### `StoreObserver`
+
+The `StoreObserver` is responsible for handling change events of the store. Once it detects change in the store it creates a new command using the `CommandBuilder` and invokes it through the `CommandDispatcher`.
+
+### `CommandDispatcher`
