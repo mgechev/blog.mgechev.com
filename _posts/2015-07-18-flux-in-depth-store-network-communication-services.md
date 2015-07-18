@@ -79,7 +79,7 @@ The tree on the left-hand side is the store, which serialized into JSON looks th
     { "name": "bar", "id": 2 }
   ],
   "messages": [
-    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686}
+    { "text": "Hey foo", "by": 2, "timestamp": 1437147880686 }
   ]
 }
 ```
