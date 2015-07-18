@@ -169,4 +169,22 @@ The same way you do that in the dispatcher - use `EventEmitter`. Since we want t
 
 This is a hot topic. Most of the single-page applications require communication with a services through any transport protocol, in order to fetch and store data. However, in the overview of flux there's no such thing as `TransportChannel`, `RemoteService` or whatever. If there are involved a lot of different protocols (for example I'm working on a application, which communicates with other applications and services through HTTP, WebSocket and WebRTC data channel) it could get a bit hairy if you don't create the proper abstractions.
 
-In this section I'll describe the basics and later, in the FAQ section, we're going to discuss more interesting topics.
+In this section I'll describe the basics and later, in the FAQ section, we're going to discuss more interesting details.
+
+Alright, in the diagram showing the overview of flux we saw that we have a "hanging" action. There's no incoming arrow to one of the actions but there's outgoing one:
+
+![Overview Incoming Action](/images/store-services/flux-overview.png)
+
+### Network to UI
+
+We can use this "hanging" action in order to integrate the communication with the external services. Lets take a look at the following picture, in order to visualize basic communication with external service:
+
+![Basic Service Communication](/images/store-services/basic-service.png)
+
+In the following diagram we can trace how a network event is being processed. The cloud is the external service/application. Initially we get a new message, it is being processed by the `Service` object (it is black on the diagram because it is like a black box for us right now, it may get quite complex, depending on your application), later the semantics behind the received message is discovered and based on it, service invokes a `StoreAction`. Now the flow goes exactly the way we described earlier (Store to the View). We're good for now. But what happens if the store changes? Nothing so far.
+
+### UI to Network
+
+In order to send network events based on changes of the store of our application we can observe it. Since it extends `EventEmitter` we can simply add `on change` handlers to the store inside the `Service` and this way we can easily handle the changes and process them:
+
+![Store to Network](/images/store-services/store-to-network.png)
