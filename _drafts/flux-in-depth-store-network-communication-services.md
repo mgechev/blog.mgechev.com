@@ -119,3 +119,7 @@ On the diagram above something changed the first message in the `Chat` store (le
 In the next section, we're going to take a look how the view can modify the store using Actions.
 
 ## View to the Store
+
+Now lets suppose the user enter a message and send it. Inside the `sendHandler`, defined in `MessageInput` we invoke an action (peek at the flux overview diagram above), which respectively is the `addMessage(text, user)` message in our `MessageActions`. The `MessageActions` explicitly invokes the `Dispatcher`, which throws an event. This event is being handled by the `Messages` component, which adds the message to the list of messages and triggers a `change` event. Now we're going in the previous case - "Store to View". All of this is better illustrated in the following diagram:
+
+![Component updates store](/images/store-services/component-update-store.png)
