@@ -235,6 +235,14 @@ Yep, it is. You can decompose it into a few smaller classes, same for `CommandDi
 *What are these `ProtocolDecorators`?*<br>
 Since we can create our protocol based on another, already existing protocol ([JSON-RPC](http://www.jsonrpc.org/), [BERT-RPC](http://bert-rpc.org/), etc.), we can process the incoming messages by using a chain of decorators. For example, we receive a basic string, next the `JSONRPCDecorator` can parse it to a valid `JSON-RPC` message and pass it to the next decorator (`YourCustomProtocolDecorator`), etc.
 
+*Can't I get cascading updates when update the model? Can't I reach a condition in which the view updates the store, it emits a change event, which is being handled by the `Service` module, which emits an event...etc.?*<br>
+This can happen. There are two simple solutions:
+- emit change event only when the value of given property is actually being changed
+- emit `ui-change` event when update the model from the view and emit `server-change` event when change it from the server. The root component can listen for `/change/` events (yeah, this is a regex) and the server can listen for `ui-change`.
+
+*I throw an event but a few stores are handling it?!*<br>
+Most likely you have collision in the action types. I'd suggest to use the following schema for naming them: `storename:action-name` or something similar, which guarantees uniqness.
+
 ## Conclusion
 
 The first part of this post shown how we can wire the store with the view. The second part was about the basic idea of the network communication with external services. The last section described a sample implementation of the black box responsible for handling external messages, store changes, serialization of the store and sending it through the network. Although the first two parts were relatively canonical and predefined by flux, the last chapter was completely custom implementation. With it I wanted to imply that the micro-architecture we use (MVC, MVP, MVVM, flux, whatever) does not provide us the entire project design. It only puts some rules on how we should organize our application, defines the main building blocks and how we can wire them together, however, if we want to build a real-life application, most likely we'll need to put some additional effort - the architecture or the framework won't be able to solve all our concerns.
