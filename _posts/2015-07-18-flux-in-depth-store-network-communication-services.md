@@ -26,7 +26,7 @@ As we said, the UI in flux is built with pure components, which are (mostly) not
 
 Lets peek at the flux data flow once again:
 
-[![High-Level Overview](/images/overview-components/flux-overview.png)](/images/overview-components/flux-overview.png)
+![High-Level Overview](/images/overview-components/flux-overview.png)
 
 As we can see from the diagram above, the data flow starts in the view, goes to an action, which invokes the dispatcher, after that the store catches dispatcher's event and in the end the data arrives in the view again. Alright, so the store is responsible for providing the data to the view. So far so good. How we can make the store deliver the required by the view data? Well, it can trigger an event! Recently observables are getting quite popular. For good or bad, they are going to be included in the JavaScript standard. If this makes you angry because you have to learn new things and JavaScript is getting fatter, you can find the guy who stays behind all of this here:
 
@@ -173,7 +173,7 @@ In this section I'll describe the basics of the network communication and later 
 
 Alright, in the diagram which shows the overview of flux there is a "hanging" action. There's no incoming arrow to the leftmost action but there's outgoing one:
 
-[![Overview Incoming Action](/images/store-services/flux-overview.png)](/images/store-services/flux-overview.png)
+![Overview Incoming Action](/images/store-services/flux-overview.png)
 
 ### From the Network to the UI
 
