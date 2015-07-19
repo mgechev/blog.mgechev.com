@@ -189,6 +189,8 @@ In order to send network events based on changes of the store we can observe it 
 
 ![Store to Network](/images/store-services/store-to-network.png)
 
+But why the `Service` module shuld listen for store changes? Can't it listen directly on the dispatcher? Most likely, in the store we'll have some logic for handling the action passed by the dispatcher (for example format the raw data passed by the view). If the `Service` module listens for changes at the dispatcher we will duplicate this logic twice.
+
 Everything looks good so far. But the `Service` module is still a huge black box. In the next section I'll suggest a sample design of this module. If you don't agree with something, have any questions or recommendations let me know.
 
 ## The Service Module
@@ -226,6 +228,10 @@ The `StoreObserver` is responsible for handling change events of the store. Once
 ### `NetworkObserver`
 
 Waits for new messages emitted by the data `Channel`. This component is responsible for parsing the messages and processing them. Once the message is parsed, based on its content the `NetworkObserver` invokes specific `Action`.
+
+## Third-party Services
+
+If you're using a third-party service (Twilio for example) you can process in a similar fashion. You can create a wrapper of the service (in the case of Twilio, the `Twilio` global) and bring it in your flux data-flow.
 
 ### Quick FAQ:
 
