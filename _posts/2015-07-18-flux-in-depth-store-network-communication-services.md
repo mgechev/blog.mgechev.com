@@ -26,7 +26,7 @@ As we said, the UI in flux is built with pure components, which are (mostly) not
 
 Lets peek at the flux data flow once again:
 
-![High-Level Overview](/images/overview-components/flux-overview.png)
+[![High-Level Overview](/images/overview-components/flux-overview.png)](/images/overview-components/flux-overview.png)
 
 As we can see from the diagram above, the data flow starts in the view, goes to an action, which invokes the dispatcher, after that the store catches dispatcher's event and in the end the data arrives in the view again. Alright, so the store is responsible for providing the data to the view. So far so good. How we can make the store deliver the required by the view data? Well, it can trigger an event! Recently observables are getting quite popular. For good or bad, they are going to be included in the JavaScript standard. If this makes you angry because you have to learn new things and JavaScript is getting fatter, you can find the guy who stays behind all of this here:
 
@@ -34,7 +34,7 @@ As we can see from the diagram above, the data flow starts in the view, goes to 
 
 Observables are good way of building our store. If the view is able to observe the store for changes, it can update itself once the store updates. Lets take a look at the following design pattern (yeah, my friends already noticed I'm talking about design patterns constantly and did an intervention for me but didn't help).
 
-![Intervention](/images/intervention.jpg)
+[![Intervention](/images/intervention.jpg)](/images/intervention.jpg)
 
 ### Chain of Responsibility
 
@@ -60,7 +60,7 @@ Why I said all of this? Well, this is the pattern Chain of Responsibility:
 
 Or if you're have more enterprise taste, here is the UML class diagram of this design pattern:
 
-![Chain of Responsibility](/images/patterns/behavioral/chain-of-responsibilities.svg)
+[![Chain of Responsibility](/images/patterns/behavioral/chain-of-responsibilities.svg)](/images/patterns/behavioral/chain-of-responsibilities.svg)
 
 Why do we need Chain of Responsibility? Well, our store is a tree of objects, once a property in an internal node in the tree changes, it'll propagate this change to the root. The root component in the view will listen for events triggered by the store object. Once it detects a change it'll set its state. I'm sure it sounds weird and obfuscated, lets take a look at a diagram, which illustrates a simple chat application:
 
@@ -68,7 +68,7 @@ Why do we need Chain of Responsibility? Well, our store is a tree of objects, on
 
 Lets take a look at the following diagram, it illustrates the initial setup of our application:
 
-![Initial Setup](/images/store-services/initial-setup.png)
+[![Initial Setup](/images/store-services/initial-setup.png)](/images/store-services/initial-setup.png)
 
 The tree on the left-hand side is the store, which serialized into JSON looks the following way:
 
@@ -112,7 +112,7 @@ Basically, the root component (`ChatBox`) is subscribed to the `change` event of
 
 What happens if something change our store?
 
-![Change of store](/images/store-services/message-change.png)
+[![Change of store](/images/store-services/message-change.png)](/images/store-services/message-change.png)
 
 On the diagram above something changed the first message in the `Chat` store (lets say the `text` property was changed). Once a property in a `message` changes, the message emits an event and propagates it to the parent (step `1`) which means that the event reaches the `messages` collection. The `messages` collection triggers change event and propagates the event to the `chat` (root object, step `2`). The `chat` object emits a change event, which is being caught by the `ChatBox` component, which sets its state to the content of the store. That's it...
 
@@ -122,7 +122,7 @@ In the next section, we're going to take a look how the view can modify the stor
 
 Now lets suppose the user enters a message and sends it. Inside a send handler, defined in `MessageInput` we invoke the action `addMessage(text, user)` the `MessageActions` object (step 1) (peek at the flux overview diagram above). The `MessageActions` explicitly invokes the `Dispatcher` (step 2), which throws an event. This event is being handled by the `Messages` component (step 3), which adds the message to the list of messages and triggers a `change` event. Now we're going to the previous case - "Store to View". All of this is better illustrated on the following diagram:
 
-![Component updates store](/images/store-services/component-update-store.png)
+[![Component updates store](/images/store-services/component-update-store.png)](/images/store-services/component-update-store.png)
 
 ### Model vs UI state
 
@@ -158,7 +158,7 @@ This doesn't seem like quite a good idea. If you have a big store and huge compo
 
 For example, if you're using `react-dnd` in your application, the drag & drop component has its own state, which doesn't have to be merged with the rest of the store. It can live independently. Let me show you what I mean on the following diagram:
 
-![Two Stores](/images/store-services/two-stores.png)
+[![Two Stores](/images/store-services/two-stores.png)](/images/store-services/two-stores.png)
 
 In this example, when the store containing the dialog position updates it does not require update of the entire component tree.
 
@@ -173,13 +173,13 @@ In this section I'll describe the basics of the network communication and later 
 
 Alright, in the diagram which shows the overview of flux there is a "hanging" action. There's no incoming arrow to the leftmost action but there's outgoing one:
 
-![Overview Incoming Action](/images/store-services/flux-overview.png)
+[![Overview Incoming Action](/images/store-services/flux-overview.png)](/images/store-services/flux-overview.png)
 
 ### From the Network to the UI
 
 We can use this "hanging" action in order to integrate the communication with the external services. Lets take a look at the following picture, in order to visualize basic communication with external service:
 
-![Basic Service Communication](/images/store-services/basic-service.png)
+[![Basic Service Communication](/images/store-services/basic-service.png)](/images/store-services/basic-service.png)
 
 In it we can trace how a network event is being processed. The cloud is an external service/application. Initially we get a new message, it is being processed by the `Service` object (it is black on the diagram because it is like a black box for us right now, it may get quite complex depending on your application), later the semantics behind the received message is found and based on it, `Service` invokes a `StoreAction`. Now the flow goes exactly the way we described it earlier (From the Store to the View). We're good for now. But what happens if the store changes? Nothing so far.
 
@@ -187,7 +187,7 @@ In it we can trace how a network event is being processed. The cloud is an exter
 
 In order to send network events based on changes of the store we can observe it and perform a specific action based on the change. Since it extends `EventEmitter` we can simply add `on change` handlers to the store inside the `Service` and this way we can easily handle all changes and process them:
 
-![Store to Network](/images/store-services/store-to-network.png)
+[![Store to Network](/images/store-services/store-to-network.png)](/images/store-services/store-to-network.png)
 
 But why the `Service` module shuld listen for store changes? Can't it listen directly on the dispatcher? Most likely, in the store we'll have some logic for handling the action passed by the dispatcher (for example format the raw data passed by the view). If the `Service` module listens for changes at the dispatcher we will duplicate this logic twice.
 
@@ -197,7 +197,7 @@ Everything looks good so far. But the `Service` module is still a huge black box
 
 I was wondering whether to use UML for showing the components building the `Service` module, however I choose to make a colorful diagram like the one bellow:
 
-![The Service Module](/images/store-services/service-components.png)
+[![The Service Module](/images/store-services/service-components.png)](/images/store-services/service-components.png)
 
 There are a lot of boxes here. The yellow ones are part of the flux architecture. The blue ones are responsible for sending updates from the application to the remote service, the red ones are responsible for handling network events and the green ones are the intersection between the last two categories. One component could be implemented with a few classes, we're not restricting ourselves to these components. We can think of them more like categories rather then specific classes. Here we'll demonstrate a sample decomposition of the service module. Lets describe the most interesting components one by one.
 
