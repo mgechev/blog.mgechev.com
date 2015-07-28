@@ -50,4 +50,6 @@ class ArticleCollection {
 }
 ```
 
-We have `ArticleCollection`, which provides methods for fetching new articles and removing already existing ones. There are two "special" methods (`getSpecialArticleById` and `removeSpecialArticle`), which are responsible for dealing with articles, which require specialized access.
+We have `ArticleCollection`, which provides methods for fetching new articles and removing already existing ones. There are two "special" methods (`getSpecialArticleById` and `removeSpecialArticle`), which are responsible for dealing with articles, which require authorized access.
+
+In a typical scenario, during our development process we may want to add logging when given method is called and when its execution is completed.

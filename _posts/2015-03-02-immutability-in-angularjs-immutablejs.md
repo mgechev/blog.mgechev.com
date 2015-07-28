@@ -26,32 +26,32 @@ React is awesome, there are no two opinions. I'm also huge AngularJS fan. A few 
 
 On 28 of May, 2014, the first commit of [Immutable.js](https://github.com/facebook/immutable-js) was pushed in the facebook's organization on GitHub. Immutable.js is a set of immutable data structures (List, Set, Map, etc.) implemented in JavaScript. What exactly is an immutable data structure? Well it is a data structure, which can't change. Each action, which intends to change the collection creates a new one.
 
-{% highlight JavaScript %}
+```JavaScript
 let list = Immutable.List([1, 2, 3]);
 let changed = list.push(4);
 list.toString();    // List [ 1, 2, 3 ]
 changed.toString(); // List [ 1, 2, 3, 4 ]
 list === changed    // false
-{% endhighlight %}
+```
 
 Compared to the mutable JavaScript lists:
 
-{% highlight JavaScript %}
+```JavaScript
 let list = [1, 2, 3];
 list.push(4);
 console.log(list); // [1, 2, 3, 4]
-{% endhighlight %}
+```
 
 ## AngularJS data-binding
 
 There are a lot of posts about how the AngularJS data-binding and dirty checking works. I even created a light AngularJS implementation in order [to illustrate it](https://github.com/mgechev/light-angularjs/blob/master/src/Scope.js#L61-L80) better. Basically it involves a lot of evaluations and comparisons of the watched expression and their results. For example:
 
-{% highlight JavaScript %}
+```JavaScript
 $scope.collection = generateHugeCollection();
 $scope.$watchCollection('collection', function (val) {
   // do some stuff with the changed value
 });
-{% endhighlight %}
+```
 
 Once we register watcher, which watches the expression `'collection'`, the expression gets evaluated at least once on each `$digest` loop and its current value gets compared to the previous value on each evaluation. The evaluation of this expression is with constant complexity (`O(1)`), since it only involves lookup of the property `collection`, but the equality check has a linear complexity (`O(n)`) (in case `$watchCollection` is used, otherwise it could be worst).
 
@@ -66,15 +66,15 @@ At least `n` times for `n` bindings.
 
 Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of `$watch` to `O(1)`, since now we don't need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:
 
-{% highlight JavaScript %}
+```JavaScript
 previous === current // O(1)
-{% endhighlight %}
+```
 
 ## Immutable.js and AngularJS
 
 Lets create a simple example in which we bind with `ng-repeat` to immutable list and render it in our HTML page:
 
-{% highlight JavaScript %}
+```JavaScript
 var app = angular.module('sampleApp', []);
 
 let SampleCtrl = ($scope) => {
@@ -82,9 +82,9 @@ let SampleCtrl = ($scope) => {
 };
 
 app.controller('SampleCtrl', SampleCtrl);
-{% endhighlight %}
+```
 
-{% highlight html %}
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,7 +96,7 @@ app.controller('SampleCtrl', SampleCtrl);
   </ul>
 </body>
 </html>
-{% endhighlight %}
+```
 
 ### Result:
 
@@ -114,21 +114,21 @@ Not exactly what we wanted, right? What Immutable.js does is to wrap the plain J
 
 What we can do now? Well, we can simply watch `$scope.list.toJS()` instead of only `$scope.list`. Anyway, this will be far from effective:
 
-{% highlight JavaScript %}
+```JavaScript
 let list = Immutable.List([1, 2, 3]);
 let jsList = list.toJS();
 list.toJS() === jsList // false
-{% endhighlight %}
+```
 
 This mean that Immutable.js creates a new JavaScript object for each call of `toJS`. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:
 
-{% highlight JavaScript %}
+```JavaScript
 $scope.$watchCollection(function () {
   return $scope.list._tail.array;
 }, function (val) {
   // do something with the changed value
 });
-{% endhighlight %}
+```
 
 Each time you watch a private property a kitty, somewhere, suffer! There are two reasons this is a bad choice:
 
@@ -146,7 +146,7 @@ In order to deal with this issue, I created a simple directive, which allows bin
 
 Lets take a look at the code example, which uses `angular-immutable`:
 
-{% highlight JavaScript %}
+```JavaScript
 var app = angular.module('sampleApp', ['immutable']);
 
 let SampleCtrl = ($scope) => {
@@ -154,9 +154,9 @@ let SampleCtrl = ($scope) => {
 };
 
 app.controller('SampleCtrl', SampleCtrl);
-{% endhighlight %}
+```
 
-{% highlight html %}
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -168,7 +168,7 @@ app.controller('SampleCtrl', SampleCtrl);
   </ul>
 </body>
 </html>
-{% endhighlight %}
+```
 
 ### Result:
 
@@ -185,7 +185,7 @@ With only two slight changes we made it work! All we did was:
 
 Since the whole library is implemented in only a few lines of code lets take a look at the `immutable` directive's source code:
 
-{% highlight JavaScript %}
+```JavaScript
 /* global angular */
 
 var immutableDirective = () => {
@@ -210,7 +210,7 @@ var immutableDirective = () => {
 
 angular.module('immutable', [])
   .directive('immutable', immutableDirective);
-{% endhighlight %}
+```
 
 When the `immutableDirective` is used as an attribute, it accepts as value the name of the immutable property. Later, it adds watcher for this property. Once the immutable data "changes" we get a new reference, so the watcher can perform the check with a constant complexity (only returns `scope.$parent[immutable]`, which returns a reference, so Angular can use `===` for comparison).
 
@@ -255,7 +255,7 @@ I run 24 tests - 12 using immutable list and 12 using plain JavaScript array. Si
 
 The code I run is:
 
-{% highlight JavaScript %}
+```JavaScript
 function SampleCtrl($scope, $timeout) {
   'use strict';
   // Current runs count
@@ -287,18 +287,18 @@ function SampleCtrl($scope, $timeout) {
   }
   changeCollection();
 }
-{% endhighlight %}
+```
 
 The code for Immutable.js is similar except that the body of `$timeout` looks like:
 
-{% highlight JavaScript %}
+```JavaScript
 var idx = Math.floor(Math.random() * (SIZE - 1));
 $scope.list = $scope.list.set(idx, Math.random());
-{% endhighlight %}
+```
 
 And here is the markup, which I used:
 
-{% highlight html %}
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -309,7 +309,7 @@ And here is the markup, which I used:
 <script src="/scripts/all.js"></script>
 </body>
 </html>
-{% endhighlight %}
+```
 
 ### Results
 
@@ -317,11 +317,37 @@ And here is the markup, which I used:
 
 Here are the results I got from running the benchmark with plain JavaScript array:
 
-|       | 1     | 5     | 10    | 20    |
-|-------|-------|-------|-------|-------|
-| 100   | 2.517 | 2.56  | 2.573 | 2.58  |
-| 1000  | 2.555 | 2.675 | 2.747 | 2.853 |
-| 10000 | 2.861 | 4.025 | 7.736 | 15.68 |
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>20</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>100</td>
+<td>2.517</td>
+<td>2.56</td>
+<td>2.573</td>
+<td>2.58</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>2.555</td>
+<td>2.675</td>
+<td>2.747</td>
+<td>2.853</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>2.861</td>
+<td>4.025</td>
+<td>7.736</td>
+<td>15.68</td>
+</tr>
+</tbody></table>
 
 When the collection gets bigger the test case running time gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations performed by `$watchCollection`.
 
@@ -329,12 +355,37 @@ When the collection gets bigger the test case running time gets slower. When we 
 
 Here are the results running the same code with immutable list:
 
-|       | 1     | 5     | 10    | 20    |
-|-------|-------|-------|-------|-------|
-| 100   | 2.696 | 2.507 | 2.562 | 2.569 |
-| 1000  | 2.715 | 2.54  | 2.569 | 2.49  |
-| 10000 | 2.832 | 2.538 | 2.599 | 2.708 |
-
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>20</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>100</td>
+<td>2.696</td>
+<td>2.507</td>
+<td>2.562</td>
+<td>2.569</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>2.715</td>
+<td>2.54</td>
+<td>2.569</td>
+<td>2.49</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>2.832</td>
+<td>2.538</td>
+<td>2.599</td>
+<td>2.708</td>
+</tr>
+</tbody></table>
 
 We see how much better performance the Immutable.js collection has. Once we increase the collection size and the number of watchers the running time of the `Plain JavaScript array` test case grows exponentially. In the case of immutable data the running time stays stable.
 
@@ -344,7 +395,7 @@ On the other hand, since when using immutable list, the watcher runs with a cons
 
 Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:
 
-{% highlight html %}
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -358,7 +409,7 @@ Lets explore what will happen if we render the collection we used for profiling.
 <script src="/scripts/all.js"></script>
 </body>
 </html>
-{% endhighlight %}
+```
 
 And for testing the plain JavaScript array I used the same markup with the `immutable` attribute removed. I changed the parameters of these test cases to:
 
@@ -378,11 +429,33 @@ The watcher added by `ng-repeat` is being ignored for now.
 
 And here are the results:
 
-|           | 1      | 5      | 15     | 25     | 30     |
-|-----------|--------|--------|--------|--------|--------|
-| Immutable | 14.714 | 14.296 | 14.8   | 14.489 | 14.331 |
-| Plain     | 13.308 | 15.689 | 23.415 | 19.986 | 27.526 |
-
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>15</th>
+<th>25</th>
+<th>30</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Immutable</td>
+<td>14.714</td>
+<td>14.296</td>
+<td>14.8</td>
+<td>14.489</td>
+<td>14.331</td>
+</tr>
+<tr>
+<td>Plain</td>
+<td>13.308</td>
+<td>15.689</td>
+<td>23.415</td>
+<td>19.986</td>
+<td>27.526</td>
+</tr>
+</tbody></table>
 
 Here is a chart for better understanding of the benchmark:
 
