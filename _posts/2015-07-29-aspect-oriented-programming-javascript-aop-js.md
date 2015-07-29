@@ -107,13 +107,13 @@ class ArticleCollection {
 }
 ```
 
-Cool...looks quite messy? How about having 20 more similar domain classes where we need to have the same logging logic? Lets look at the snippets and find patterns:
+Cool...looks quite messy? How about having 20 more similar domain classes where we need to have the same logging logic? Lets look at the snippets and find some patterns:
 
 - In the beginning of the method's invocation we log message in the format: `Invoked METHOD_NAME with arguments: ARG1, ARG2, ..., ARG3`.
 - On success we log: `The invocation of METHOD_NAME completed successfully`
 - On error we log: `Error during the invocation of METHOD_NAME`
 
-What can we do in order to handle all these duplications? Create decorator of the class? Yeah, probably it is going to work. However, there's more elegant way to deal with these duplications. Lets say, we define something called `LoggerAspect`:
+What can we do in order to modularize these duplications? Create decorator of the class? Yeah, probably it is going to work. However, there's more elegant way to deal with this. Lets say, we define something called `LoggerAspect` and take advantage of the [ES2016 decorators declarative](https://medium.com/google-developers/exploring-es7-decorators-76ecb65fb841) syntax:
 
 ```javascript
 class LoggerAspect {
@@ -132,7 +132,7 @@ class LoggerAspect {
 }
 ```
 
-Lets step-by-step translate this to human language:
+Lets translate this step-by-step to human language:
 
 ```javascript
 // ...
@@ -193,7 +193,7 @@ class ArticleCollection {
 }
 ```
 
-That's it. We replaced the entire 56 lines `ArticleCollection` definition with the 20 lines definition here. However, the lack of code duplications here is not our biggest win! We were able to isolate the logging into separate module, called aspect. The same strategy is applicable in many different cases:
+That's it. We replaced all the 56 lines of the `ArticleCollection` definition with the 20 lines definition by taking advantage of the module called `LoggerAspect`. However, the lack of code duplications here is not our biggest win. We were able to isolate the logging code into separate module, called aspect. The same strategy is applicable in many different scenarios:
 
 - Transactions
 - Authorization
@@ -203,8 +203,8 @@ That's it. We replaced the entire 56 lines `ArticleCollection` definition with t
 
 ## Conclusions
 
-The post illustrated a typical use case for Aspect-Oriented Programming. In the past there were a few libraries implementing proxy-based AOP in JavaScript, however the syntax wasn't getting even close to already known solutions (for example the AOP implementation in Spring). ES2016 introduced the decorators syntax, which is in the core of the Dependency Injection mechanism of Angular 2. It is here to stay and implementing AOP with it is quite handy.
+The post illustrated a typical use case for Aspect-Oriented Programming. In the past there were a few libraries implementing proxy-based AOP in JavaScript, however the syntax wasn't getting even close to already known solutions (for example the AOP implementation in Spring). ES2016 introduced the decorators syntax, which is in the core of the Dependency Injection of Angular 2. It is here to stay and implementing AOP with it is quite handy.
 
 ### Future Development
 
-The examples above are based on a library I developed, called [`aspect.js`](https://github.com/mgechev/aspect.js). It is still under active development, so a lot of changes are going to be introduced (even name change). You can play with the framework using the instructions in the project's [README](https://github.com/mgechev/aspect.js/blob/master/README.md#demo).
+The examples above are based on a library I developed, called [`aspect.js`](https://github.com/mgechev/aspect.js). It is still under active development, so a lot of changes are going to be introduced. You can play with the framework using the instructions in the project's [README](https://github.com/mgechev/aspect.js/blob/master/README.md#demo). For comments and recommendations you can use the [GitHub issue tracker of the project](https://github.com/mgechev/aspect.js/issues) or the comment section below.
