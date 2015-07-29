@@ -111,4 +111,58 @@ Cool...looks quite messy? How about having 20 more similar classes were we need 
 - On success we log: `The invocation of METHOD_NAME completed successfully`
 - On error we log: `Error during the invocation of METHOD_NAME`
 
-What we can do in order to handle all these duplications?
+What we can do in order to handle all these duplications? Create decorator of the class? Yeah, probably it is going to work. However, there's more elegant way to deal with these duplications. Lets say we define something called `LoggerAspect`:
+
+```javascript
+class LoggerAspect {
+  @before(/.*/, /Article/)
+  beforeLogger(args) {
+    console.log(`Invoked ${args.methodName} with arguments: `);
+  }
+  @afterResolve(/.*/, /Article/)
+  afterResolveLogger(m) {
+    console.log('The invocation of ');
+  }
+  @afterReject(/.*/, /Article/) {
+    console.log('Error during the invocation of ___');
+  }
+}
+```
+In this snippet we said that we want:
+
+- Before all methods, which names match the regular expression `/Article/` inside classes, which names match the regular expression: `/.*/`, we want to invoke the `beforeLogger` method's body
+- After the promise returned by any methods, which match the regular expressions passed as arguments to the `afterResolve` decorator, is resolved we want to invoke the `afterResolveLogger`'s body
+- After rejection of the promise returned by all methods, which match the criteria.
+
+How we can apply this "aspect" to our `ArticleCollection`?
+
+```javascript
+@Wove
+class ArticleCollection {
+  getArticleById(id) {
+    return fetch(`/articles/${id}`);
+      .then(res => {
+        return res.json()
+      });
+  }
+  getArticles() {
+    return fetch('/articles');
+  }
+  removeArticleById(id) {
+    return fetch(`/articles/${id}`, {
+        method: 'delete'
+      });
+  }
+  updateArticle(id, article) {
+    return fetch(`/articles/${id}`, {
+        method: 'put'
+      });
+  }
+}
+```
+
+That's it. We replaced the entire 56 lines `ArticleCollection` definition with the 20 lines definition here. However, the lack of code duplications here is not our biggest win! We were able to isolate the logging into separate module, called aspect.
+
+## Conclusions
+
+### Future Development
