@@ -13,6 +13,8 @@ tags:
   - Aspects
 ---
 
+*Note: The following blog post is based on the syntax of the library aop.js, which can be [found here](https://github.com/mgechev/aop.js).*
+
 The object-oriented programming paradigm is powerful. We design an OO system by decomposition of the problem domain, following guiding principles concerning the decomposition and the communication between the different modules. The process is structured; it involves logical thinking, understanding of the domain and eventual predictions for the future evolution of the system. Often we're trying to keep our code DRY ([not always](https://twitter.com/BonzoESC/status/442003113910603776/photo/1)), highly coherent and loosely coupled. However, in some cases this is just impossible. There are some code snippets we're just blindly copying and pasting all around our code base.
 
 ## Cross-cutting Concerns
