@@ -127,7 +127,7 @@ class LoggerAspect {
   }
   @afterReject(/.*/, /Article/)
   afterRejectLogger(meta) {
-    console.log('Error during the invocation of ${meta.name}');
+    console.log(`Error during the invocation of ${meta.name}`);
   }
 }
 ```
@@ -160,7 +160,7 @@ Okay, sounds good...How about `afterReject`?
 ```javascript
 @afterReject(/.*/, /Article/)
 afterRejectLogger {
-  console.log('Error during the invocation of ${meta.name}');
+  console.log(`Error during the invocation of ${meta.name}`);
 }
 ```
 
