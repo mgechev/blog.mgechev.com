@@ -1,5 +1,5 @@
 ---
-title: Aspect-oriented Programming in JavaScript
+title: Aspect-Oriented Programming in JavaScript
 author: minko_gechev
 layout: post
 categories:
@@ -118,16 +118,16 @@ What can we do in order to handle all these duplications? Create decorator of th
 ```javascript
 class LoggerAspect {
   @before(/.*/, /Article/)
-  beforeLogger(args) {
-    console.log(`Invoked ${args.methodName} with arguments: `);
+  beforeLogger(meta, ...args) {
+    console.log(`Invoked ${meta.name} with arguments: ${args.join(', ')}`);
   }
   @afterResolve(/.*/, /Article/)
-  afterResolveLogger(m) {
-    console.log('The invocation of ');
+  afterResolveLogger(meta) {
+    console.log(`The invocation of ${meta.name}`);
   }
   @afterReject(/.*/, /Article/)
-  afterRejectLogger {
-    console.log('Error during the invocation of ___');
+  afterRejectLogger(meta) {
+    console.log('Error during the invocation of ${meta.name}');
   }
 }
 ```
@@ -138,7 +138,7 @@ Lets step-by-step translate this to human language:
 // ...
 @before(/.*/, /Article/)
 beforeLogger(args) {
-  console.log(`Invoked ${args.methodName} with arguments: `);
+  console.log(`Invoked ${meta.name} with arguments: ${args.join(', ')}`);
 }
 // ...
 ```
@@ -150,7 +150,7 @@ How about this:
 ```javascript
 @afterResolve(/.*/, /Article/)
 afterResolveLogger(m) {
-  console.log('The invocation of ');
+  console.log(`The invocation of ${meta.name}`);
 }
 ```
 - After the resolution of promise returned any method, which name matches the regular expression `/Article/`, defined within class, which name matches the regular expression `/.*/` invoke the body of `afterResolveLogger`. This means that for all matched methods will be created a wrapper, which invokes the method and on resolve of the returned promise calls the `afterResolveLogger`.
@@ -160,7 +160,7 @@ Okay, sounds good...How about `afterReject`?
 ```javascript
 @afterReject(/.*/, /Article/)
 afterRejectLogger {
-  console.log('Error during the invocation of ___');
+  console.log('Error during the invocation of ${meta.name}');
 }
 ```
 
