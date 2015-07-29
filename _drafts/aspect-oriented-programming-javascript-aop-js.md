@@ -13,7 +13,7 @@ tags:
   - Aspects
 ---
 
-*Note: The following blog post is based on the syntax of the library aop.js, which can be [found here](https://github.com/mgechev/aop.js).*
+*Note: The following blog post is based on the syntax of the library aspect.js, which can be [found here](https://github.com/mgechev/aspect.js).*
 
 The object-oriented programming paradigm is powerful. We design an OO system by decomposition of the problem domain, following guiding principles concerning the decomposition and the communication between the different modules. The process is structured; it involves logical thinking, understanding of the domain and eventual predictions for the future evolution of the system. Often we're trying to keep our code DRY ([not always](https://twitter.com/BonzoESC/status/442003113910603776/photo/1)), highly coherent and loosely coupled. However, in some cases this is just impossible. There are some code snippets we're just blindly copying and pasting all around our code base.
 
@@ -207,4 +207,4 @@ The post illustrated a typical use case for Aspect-Oriented Programming. In the 
 
 ### Future Development
 
-The examples above are based on a library I developed, called [`aop.js`](https://github.com/mgechev/aop.js). It is still under active development, so a lot of changes are going to be introduced (even name change). You can play with the framework using the instructions in the project's [README](https://github.com/mgechev/aop.js/blob/master/README.md#demo).
+The examples above are based on a library I developed, called [`aspect.js`](https://github.com/mgechev/aspect.js). It is still under active development, so a lot of changes are going to be introduced (even name change). You can play with the framework using the instructions in the project's [README](https://github.com/mgechev/aspect.js/blob/master/README.md#demo).
