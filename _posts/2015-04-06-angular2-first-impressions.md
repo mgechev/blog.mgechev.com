@@ -297,7 +297,7 @@ It is done when the bindings change, lazily. Probably it will perform better in 
 We trust AngularJS that it is going to be implemented well and we won't need to touch it!
 
 *Will it lead to any debugging complications (for example entering the change detection, generated class because of a breakpoint we're in)?*<br>
-If you use your debugger properly you should not have any issues. Take a look at the [slides of Addy Osmani on the state of DevTools, 2015, jQuery London meetup](https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109).
+If you use your debugger properly you should not have any issues. Take a look at the [slides of Addy Osmani on the state of DevTools, 2015, jQueryUK](https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109).
 
 ### Further reading
 
