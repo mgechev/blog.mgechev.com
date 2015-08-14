@@ -251,7 +251,7 @@ class App extends React.Component {
     for (let d in dialogs) {
       this.refs[d].close();
     }
-    this.refs[dialg].open();
+    this.refs[dialog].open();
   }
 
   render() {
