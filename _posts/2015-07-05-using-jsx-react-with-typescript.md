@@ -51,6 +51,13 @@ Alright, TypeScript introduced these ambient type definitions. Cool. However, th
 
 ## How to do That?
 
+**Update 22nd of August**<br>
+Now you do not need to build typescript by your own, instead you can use
+
+```bash
+npm install typescript@next
+```
+
 As last step, I'm going to show you how we can take advantage of this feature today!
 
 Install TypeScript inside a directory:
