@@ -59,6 +59,7 @@ Some of the open source projects I've developed are:
 
 I also like talking about software development. Some of my talks:
 
+- ["Single-Page Applications: Challenges"](https://speakerdeck.com/mgechev/single-page-applications-challenges), [IT Weekend](http://ukraine.itweekend.ua/en/) (Kiev, Ukraine, 12th of September, 2015)
 - ["Bringing Immutability to Angular"](https://speakerdeck.com/mgechev/bringing-immutability-to-angular), [Front-end Weekend](http://frontendweekend.uwcua.com/) (online, 16th of August, 2015)
 - ["Immutability with Angular with Minko Gechev"](http://devchat.tv/adventures-in-angular/054-aia-immutability-with-angular-with-minko-gechev), [Adventures in Angular Podcast](http://adventuresinangular.com/) (online, 29th of July, 2015)
 - ["Introduction to Angular 2"](https://speakerdeck.com/mgechev/introduction-to-angular-2), Webloz Edge (Burgas, Bulgaria, 29th of June, 2015)
