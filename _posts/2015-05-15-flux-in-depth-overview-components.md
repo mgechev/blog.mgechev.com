@@ -59,7 +59,7 @@ Okay, so I said this only in order to tell you that the Dispatcher is simply an 
 
 ### Action
 
-Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their calls to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection. Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view? The view only invokes methods of actions, which should be named semantically correctly. The action is responsible for translating these calls to an events, which are understandable by the Store. In this case the actions may combine a few calls at one event or fork given action to two or more different events.
+Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their calls to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection. Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view? The view only invokes methods of actions, which should be named semantically correctly. The action is responsible for translating these calls to a events, which are understandable by the Store. In this case the actions may combine a few calls at one event or fork given action to two or more different events.
 
 So from the diagram above we can notice that the arrows are in only a single direction. This is one of the "selling points" of flux:
 
@@ -157,7 +157,7 @@ In the snippet above we can notice that:
 - Each operation, which will eventually mutate the data structure returns a new immutable object (list in this case), so `list !== newList`
 - The returned immutable object from the mutation operation is the same as the initial list but with the modification applied
 - The list can contains heterogeneous data (numbers and objects)
-- The list items are *note immutable*, we pushed the `foo` object inside the list and changed it right after that
+- The list items are *not immutable*, we pushed the `foo` object inside the list and changed it right after that
 
 It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js' list as a thin wrapper around the standard JavaScript array:
 
