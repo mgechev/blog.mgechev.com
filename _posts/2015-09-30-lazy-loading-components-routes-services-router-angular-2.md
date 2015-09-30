@@ -84,7 +84,7 @@ export class About {
 
 The `About` component uses the service `NameList`, which is located under `../../services/NameList`. So far so good, now lets take a look at how our application looks like:
 
-![Sample app](../images/lazy-loading-angular-2/sample-app.gif)
+![Sample app](/images/lazy-loading-angular-2/sample-app.gif)
 
 As we can see from Chrome DevTools' Network tab, during the initial page load all the components and services used in the entire application are being downloaded. However, in order to render the `Home` view we don't need the `About` component, neither the `NameList` service (usually the template of the `About` component will be requested as well. However, in this example it is being inlined inside the component by a gulp task).
 
@@ -202,14 +202,14 @@ Now the file doesn't contain any reference to the `About` component. Instead it 
 
 Lets take a look at how the page load will look this time:
 
-![Sample lazy app](../images/lazy-loading-angular-2/sample-lazy-app.gif)
+![Sample lazy app](/images/lazy-loading-angular-2/sample-lazy-app.gif)
 
 As we can see there are two additional resources, which are being downloaded on demand:
 
 - `about.js`
 - `NameList.js`
 
-![Victory](../images/lazy-loading-angular-2/victory-is-mine.png)
+![Victory](/images/lazy-loading-angular-2/victory-is-mine.png)
 
 ## Conclusion
 
