@@ -27,7 +27,7 @@ In order to get familiar with the upcoming content you need to have basic unders
 
 Lets take a look at this sample application:
 
-```javascript
+```ts
 import {Component, View, bootstrap} from 'angular2/angular2';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_BINDINGS} from 'angular2/router';
 import {Home} from './components/home/home';
@@ -59,7 +59,7 @@ In the snippet above we create a new component with controller the `App` class. 
 
 Here's the implementation of the `About` component:
 
-```javascript
+```ts
 import {Component, View, CORE_DIRECTIVES} from 'angular2/angular2';
 
 import {NameList} from '../../services/NameList';
@@ -108,7 +108,7 @@ The Angular router accepts a component for value of the `component` property of 
 
 Lets define a `componentProxyFactory`, which will be responsible for creating component proxies:
 
-```javascript
+```ts
 export class ComponentProvider {
   path:string;
   provide:{(module:any):any};
@@ -155,7 +155,7 @@ And thats all!
 
 Now lets take a look how we can refactor our root component in order to take advantage of the lazy loading:
 
-```javascript
+```ts
 import {Component, View, bootstrap} from 'angular2/angular2';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_BINDINGS} from 'angular2/router';
 import {Home} from './components/home/home';
@@ -187,7 +187,7 @@ bootstrap(App, [ROUTER_BINDINGS]);
 ```
 Now the file doesn't contain any reference to the `About` component. Instead it registers in the route definition for the `About` component using:
 
-```javascript
+```ts
 {
   path: '/about',
   component: componentProxyFactory({
