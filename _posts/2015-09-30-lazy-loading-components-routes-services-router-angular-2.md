@@ -19,7 +19,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 
 ## Background
 
-*Disclamer: Angular 2 is still in alpha. All the APIs we're using here are quite likely to change. If you notice that the article is not up to date, please open a PR, leave a comment or contact me via [twitter](https://twitter.com/mgechev).*
+*Disclaimer: Angular 2 is still in alpha. All the APIs we're using here are quite likely to change. If you notice that the article is not up to date, please open a PR, leave a comment or contact me via [twitter](https://twitter.com/mgechev).*
 
 In order to get familiar with the upcoming content you need to have basic understanding of Angular 2 and the component based router introduced by the framework. Good introduction to routing in Angular 2 could be found [here](http://blog.thoughtram.io/angular/2015/06/16/routing-in-angular-2.html).
 
