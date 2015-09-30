@@ -114,11 +114,10 @@ export class ComponentProvider {
   provide:{(module:any):any};
 }
 
-export function componentProxyFactory(provider:ComponentProvider):Type {
-  const PROVIDER = provider;
-  const PROXY_CLASSNAME = 'component-wrapper';
-  const PROXY_SELECTOR = `.${PROXY_CLASSNAME}`;
+const PROXY_CLASSNAME = 'component-wrapper';
+const PROXY_SELECTOR = `.${PROXY_CLASSNAME}`;
 
+export function componentProxyFactory(provider:ComponentProvider):Type {
   @Component({
     selector: 'component-proxy',
     bindings: [bind(ComponentProvider).toValue(provider)]
