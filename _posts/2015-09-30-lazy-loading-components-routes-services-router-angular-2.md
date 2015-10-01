@@ -102,7 +102,27 @@ Although the `About` component is not essential for rendering the `Home` compone
 
 In order to workaround this issue we can use the ES2015 module loader imperative API.
 
-### Lazy Loading of Angular 2 Components
+### AsyncRoute
+
+The *obvious* Angular solution to the problem us using `AsyncRoute`. This is class, which implements `RouteDefinition` and allows asynchronous loading of the component associated with given route. This allows on demand loading of the component's dependencies as well. Here's now our definition will look like with `AsyncRoute`:
+
+```ts
+@RouteConfig([
+  { path: '/', component: Home, as: 'home' },
+  new AsyncRoute({
+    path: '/about',
+    loader: () => System.import('./components/about/about').then(m => m.About),
+    as: 'about'
+  })
+])
+```
+Basically we register two routes:
+- A regular route
+- Async route. The async route accepts as argument a `loader`. The `loader` is a function that must return a promise, which needs to be resolved with the component that needs to be rendered.
+
+So far so good! Everything looks great and we achieved our goal. However, there are some more advanced cases we may want to cover. For example, we may need to throw events when the route change has started and completed. In the case of `AsyncRoute` we can implement a generic loader, which takes care of this. However, we may want to implement something like a splash screen or have even further control on the component's rendering. In such case we may use a:
+
+### Virtual Proxy
 
 The Angular router accepts a component for value of the `component` property of all of its routes definitions. However, instead of providing the concrete component, which needs to be rendered we can provide a component proxy. This is the [Virtual Proxy pattern](https://en.wikipedia.org/wiki/Proxy_pattern#Possible_Usage_Scenarios). Inside the component proxy we can load the target component and later, when it is loaded, using the `DynamicComponentLoader` we can render it onto the screen.
 
