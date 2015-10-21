@@ -59,6 +59,7 @@ Some of the open source projects I've developed are:
 
 I also like talking about software development. Some of my talks:
 
+- ["Cutting Angular's Crosscuts](https://speakerdeck.com/mgechev/cutting-angulars-crosscuts), AngularConnect (London, United Kingdom, 21st of October, 2015)
 - ["Immutable.js with Angular"](https://www.youtube.com/watch?v=gN1K1hE9v4g), [AngularAir Podcast](http://angular-air.com/) (online, 22nd of September, 2015)
 - ["Single-Page Applications: Challenges"](https://speakerdeck.com/mgechev/single-page-applications-challenges), [IT Weekend](http://ukraine.itweekend.ua/en/) (Kiev, Ukraine, 12th of September, 2015)
 - ["Bringing Immutability to Angular"](https://speakerdeck.com/mgechev/bringing-immutability-to-angular), [Front-end Weekend](http://frontendweekend.uwcua.com/) (online, 16th of August, 2015)
