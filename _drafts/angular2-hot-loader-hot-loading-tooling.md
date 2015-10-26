@@ -23,13 +23,13 @@ Here is a sample demo of the prototype I built:
 
 <iframe width="420" height="315" src="https://www.youtube.com/embed/S9pKbi3WrCM" frameborder="0" allowfullscreen></iframe>
 
-The code for the demo could be found at my [GitHub profile](https://github.com/mgechev/angular2-hot-loader-demo). In the next a couple of sections I'll describe how it works and what are its pros and cons.
+**The code for the demo could be found at my [GitHub profile](https://github.com/mgechev/angular2-hot-loader-demo).** In the next a couple of sections I'll describe how it works and what are its pros and cons.
 
 ## Basic Architecture
 
-![]()
+![](/images/angular2-hot-loader.png)
 
-In order to detect all the changes in the components in our application, we need to watch them. For this purpose I've used the [watch](https://www.npmjs.com/package/watch) package in npm. Once we detect a change in any of the components we need to send its updated version to application. For this purpose I've implemented a super basic JSON based protocol via WebSockets, which is responsible for sending updates to the front-end which are basically the ES5 + CommonJS version of the changed components.
+In order to detect all the changes in the components in our application, we need to watch the source code files associated to them. For this purpose I've used the [watch](https://www.npmjs.com/package/watch) package in npm. Once we detect a change in any of the components we need to send its updated version to application. For this purpose I've implemented a super basic JSON based protocol via WebSockets, which is responsible for sending updates to the front-end which are basically the ES5 + CommonJS version of the changed components.
 
 In the front-end of our application, we need to include the hot-loader scripts, which basically accepts the changed components and updates all their instances in the rendered application.
 
