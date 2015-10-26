@@ -69,7 +69,7 @@ Well, when new version of any component is delivered to the application your sta
 
 ## Current limitations
 
-Since I worked on the hot loader for a couple of hours on Sunday I wasn't able to make it as well functional as I'd want to. The work is still in progress but here are a few things which work pretty well:
+Since the hot loader is based on a couple of hours effort, I wasn't able to make it as well functional as I'd want to. The work is still in progress so I'd love to hear your opinions on if we can approach better in the component patching. However, here are a few things which work pretty well:
 
 - Patching all instances of existing components, including:
   - Patching changed templates
@@ -89,6 +89,6 @@ Since I worked on the hot loader for a couple of hours on Sunday I wasn't able t
 
 Although hot loading seems super amazing it looks like a hacky solution to a real problem to me. For sure there's much more work to be done in both react-hot-loader and angular2-hot-loader but for sure we're going in the right direction!
 
-The Angular 2 hot loader is pretty much work in progress so be tunned! Meanwhile, take a look at the book I'm working on ["Switching to Angular 2"](https://www.packtpub.com/web-development/switching-angular-2).
+The Angular 2 hot loader is pretty much work in progress so be tunned for more functional version which I'll publish on npm! Meanwhile, take a look at the book I'm working on ["Switching to Angular 2"](https://www.packtpub.com/web-development/switching-angular-2).
 
 
