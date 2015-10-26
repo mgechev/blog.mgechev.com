@@ -31,13 +31,13 @@ Here is a sample demo of the prototype I built:
 
 In order to detect all the changes in the components in our application, we need to watch the source code files associated to them. For this purpose I've used the [watch](https://www.npmjs.com/package/watch) package in npm. Once we detect a change in any of the components we need to send its updated version to application. For this purpose I've implemented a super basic JSON based protocol via WebSockets, which is responsible for sending updates to the front-end which are basically the ES5 + CommonJS version of the changed components.
 
-In the front-end of our application, we need to include the hot-loader scripts, which basically accepts the changed components and updates all their instances in the rendered application.
+In the front-end of the application, we need to include the hot-loader scripts, which basically accepts the code of the changed components and updates all their instances in the rendered application.
 
 ## Handling the State
 
-The tricky part here is to preserve the state of the application itself although we need to rerender the changed component(s). This is an easy task with dumb components (pure components) because they don't hold any state so you can freely rerender them and just populate them with the data stored somewhere in the rest of your app. In react this can be achieved by using a flux-like architecture where the state of your application is decoupled from the UI in a module called store. We can approach the exact same way in Angular 2 by taking advantage of flux/redux/whatever. However, in Angular we also have out-of-the-box dependency injection, which can makes our life even easier.
+The tricky part here is to preserve the state of the application itself although we need to rerender the changed component(s). This is an easy task with dumb components (pure components) because they don't hold any state so you can freely rerender them and just populate them with the data stored somewhere else in your app. In react this can be achieved by using a flux-like architecture where the state of your application is decoupled from the UI in a module called store. We can approach the exact same way in Angular 2 by taking advantage of flux/redux/whatever. However, in Angular we also have out-of-the-box dependency injection, which can makes our life even easier.
 
-Here is an example of how we can preserve the state of the application by using singleton services:
+Here is an example of how we can preserve the state of the application by using a singleton services:
 
 ```ts
 @Component({
@@ -50,12 +50,13 @@ Here is an example of how we can preserve the state of the application by using 
 ])
 export class AppCmp {}
 ```
-Basically we define a root component called `AppCmp`, which has a single provider - binding of the `NameList` services to an instance of the class itself. Since this is a singleton if we are required to rerender our application, even if we need to re-instantiate all the components in our application, they accept as arguments the same instances of all their dependencies they owned before the rerendering was required. This allows them to render the new version of themselves based on the same state.
+Basically we define a root component called `AppCmp`, which has a single provider - binding of the `NameList` services to an instance of the class itself. Since this is a singleton if we are required to rerender the application, even if we need to re-instantiate all the components inside of it, they will get as arguments the same instances of all their dependencies they had before the rerendering was required. This allows us to render the new version of the components based on the same state.
 
 You may ask, but what if I hold the sate in my component instead? For example, what if I have the following component and I change its `_foo` field by an input:
 
 ```ts
 @Component({
+  // ...
 })
 export class Foobar {
   _foo: string;
@@ -64,7 +65,7 @@ export class Foobar {
   }
 }
 ```
-Well, when new version of any component is delivered to the application your state will be lost. React-hot-loader solves this issue by patching the component without re-instantiating them, however, I wasn't able to find a clean way to do this in Angular so far. Does this mean that react is better in sense of hot loading? I wouldn't say so. I might have not considered all the different options for patching the components (I'm not completely familiar with Angular 2's code base) and still..since react's components are only being patched, no change in the constructor of the component will be applied to the patched component in the front-end. This means that the state of given component can be initialized only ONCE when the component is loaded for first time. Both of these Angular 2 and React related issues could be handled by using pure components and externalizing your state, which generally is considered as good practice.
+Well, when new version of any component is delivered to the application your state will be lost. React-hot-loader solves this issue by patching the component without re-instantiating them, however, I wasn't able to find a clean way to do this in Angular so far. Does this mean that react is better in sense of hot loading? I wouldn't say so. I might have not considered all the different options for patching the components (I'm not completely familiar with Angular 2's code base) and still..since react's components are only being patched, no change in the constructor of the component will be applied to the patched component in the front-end. This means that the state of given an instance of given component can be initialized only ONCE when the instance is rendered for first time. Both of these Angular 2 and React related issues could be handled by using pure components and externalizing your state, which generally is considered as good practice.
 
 ## Current limitations
 
