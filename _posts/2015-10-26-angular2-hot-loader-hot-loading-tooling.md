@@ -52,7 +52,7 @@ export class AppCmp {}
 ```
 Basically we define a root component called `AppCmp`, which has a single provider - binding of the `NameList` services to an instance of the class itself. Since this is a singleton if we are required to rerender the application, even if we need to re-instantiate all the components inside of it they will get the exact same instance of the `NameList` service.  We can apply this for all the component's dependencies and this way their state can be easily externalized. This allows us to render the new version of the components based on the same state.
 
-You may ask, but what if I hold the sate in my component instead? For example, what if I have the following component and I change its `_foo` field by an input:
+You may ask, but what if I hold the state in my component instead? For example, what if I have the following component and I change its `_foo` field by an input:
 
 ```ts
 @Component({
