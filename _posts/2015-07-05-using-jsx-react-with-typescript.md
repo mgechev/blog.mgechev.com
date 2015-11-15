@@ -51,10 +51,11 @@ Alright, TypeScript introduced these ambient type definitions. Cool. However, th
 
 ## How to do That?
 
-Install TypeScript via npm:
+Install TypeScript and react via npm:
 
 ```bash
-npm install typescript
+npm init
+npm install typescript react
 ```
 In order to verify that you've installed proper TypeScript version use:
 
@@ -93,6 +94,8 @@ Create a sample file called `test.tsx` (notice the extension **tsx**, it is mand
 ```ts
 /// <reference path="../typing/react.d.ts" />
 
+import * as React from 'react';
+
 class DemoProps {
   public name:string;
   public age:number;
@@ -122,13 +125,25 @@ cd typing
 ```
 Now take the React's ambient type declaration from [here](https://github.com/borisyankov/DefinitelyTyped/blob/master/react/react.d.ts) and save it inside `typing`. Make sure the file is called `react.d.ts`. This will prevent us from getting any compile-time errors.
 
-And we're almost there!
+Now the directory structure should look like:
+
+```
+.
+├── app
+│   └── test.tsx
+├── typings
+│   └── react.d.ts
+├── package.json
+└── node_modules
+```
+
+The last step is to compile the `test.tsx` file:
 
 ```bash
 cd ..
 # This line will run the typescript compiler over your `test.tsx` file and
 # output the transpiler content in `./app/test.js`
-./node_modules/typescript/bin/tsc --jsx react ./app/test.tsx
+./node_modules/typescript/bin/tsc --jsx react --module commonjs ./app/test.tsx
 ```
 Thats it. Now you can check out the content of `./app/test.js`. There you should find the transpiled content.
 Did you notice the `--jsx` option of the TypeScript compiler? It may accepts two different values:
