@@ -54,8 +54,34 @@ Alright, TypeScript introduced these ambient type definitions. Cool. However, th
 Install TypeScript via npm:
 
 ```bash
+npm install typescript
+```
+In order to verify that you've installed proper TypeScript version use:
+
+```bash
+./node_modules/typescript/bin/tsc --version
+```
+
+You should see output similar to:
+
+```
+message TS6029: Version 1.6.2
+```
+
+If npm have installed older version of TypeScript on any reason use:
+
+```bash
+npm install typescript@1.6.2
+```
+
+If you want have the TypeScript's compiler as global executable (`tsc`) use:
+
+```bash
 npm install -g typescript
 ```
+
+### Developing a Component in TSX file
+
 Now create an `app` directory and enter it:
 
 ```bash
