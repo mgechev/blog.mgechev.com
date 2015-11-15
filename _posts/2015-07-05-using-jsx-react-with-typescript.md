@@ -51,25 +51,10 @@ Alright, TypeScript introduced these ambient type definitions. Cool. However, th
 
 ## How to do That?
 
-**Update 22nd of August**<br>
-Now you do not need to build typescript by your own, instead you can use
+Install TypeScript via npm:
 
 ```bash
-npm install typescript@next
-```
-
-As last step, I'm going to show you how we can take advantage of this feature today!
-
-Install TypeScript inside a directory:
-
-```bash
-mkdir test-typescript-project
-cd test-typescript-project
-git clone https://github.com/Microsoft/TypeScript.git
-cd TypeScript
-npm install -g jake
-npm install
-jake local
+npm install -g typescript
 ```
 Now create an `app` directory and enter it:
 
@@ -79,7 +64,7 @@ cd app
 ```
 Create a sample file called `test.tsx` (notice the extension **tsx**, it is mandatory) and add the following content:
 
-```text
+```ts
 /// <reference path="../typing/react.d.ts" />
 
 class DemoProps {
@@ -94,9 +79,7 @@ class Demo extends React.Component<DemoProps, any> {
     this.foo = 42;
   }
   render() {
-    return (
-      <div>Hello world!</div>
-    );
+    return <div>Hello world!</div>
   }
 }
 ```
@@ -119,7 +102,7 @@ And we're almost there!
 cd ..
 # This line will run the typescript compiler over your `test.tsx` file and
 # output the transpiler content in `./app/test.js`
-node TypeScript/built/local/tsc.js --jsx react ./app/test.tsx
+./node_modules/typescript/bin/tsc --jsx react ./app/test.tsx
 ```
 Thats it. Now you can check out the content of `./app/test.js`. There you should find the transpiled content.
 Did you notice the `--jsx` option of the TypeScript compiler? It may accepts two different values:
