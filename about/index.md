@@ -23,9 +23,10 @@ You can contact me at: **mgechev at gmail**
 
 Some of the open source projects I've developed are:
 
-### AngularJS
+### Angular
 
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
+- [angular2-hot-loader](https://github.com/mgechev/angular2-hot-loader)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
