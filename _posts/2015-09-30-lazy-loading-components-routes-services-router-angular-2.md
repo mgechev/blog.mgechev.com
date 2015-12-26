@@ -37,8 +37,8 @@ import {About} from './components/about/about';
   selector: 'app'
 })
 @RouteConfig([
-  { path: '/', component: Home, as: 'home' },
-  { path: '/about', component: About, as: 'about' }
+  { path: '/', component: Home, name: 'home' },
+  { path: '/about', component: About, name: 'about' }
 ])
 @View({
   templateUrl: './app.html',
@@ -66,9 +66,7 @@ import {NameList} from '../../services/NameList';
 
 @Component({
   selector: 'about',
-  bindings: [NameList]
-})
-@View({
+  bindings: [NameList],
   templateUrl: './components/about/about.html',
   directives: [CORE_DIRECTIVES]
 })
@@ -108,11 +106,11 @@ The *obvious* Angular solution to the problem us using `AsyncRoute`. This is cla
 
 ```ts
 @RouteConfig([
-  { path: '/', component: Home, as: 'home' },
+  { path: '/', component: Home, name: 'home' },
   new AsyncRoute({
     path: '/about',
     loader: () => System.import('./components/about/about').then(m => m.About),
-    as: 'about'
+    name: 'about'
   })
 ])
 ```
@@ -185,14 +183,14 @@ import {componentProxyFactory} from './component_proxy';
   selector: 'app',
 })
 @RouteConfig([
-  { path: '/', component: Home, as: 'home' },
+  { path: '/', component: Home, name: 'home' },
   {
     path: '/about',
     component: componentProxyFactory({
       path: './components/about/about',
       provide: m => m.About
     }),
-    as: 'about'
+    name: 'about'
   }
 ])
 @View({
@@ -213,7 +211,7 @@ Now the file doesn't contain any reference to the `About` component. Instead it 
     path: './components/about/about',
     provide: m => m.About
   }),
-  as: 'about'
+  name: 'about'
 }
 ```
 

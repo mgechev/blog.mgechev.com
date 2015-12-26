@@ -42,7 +42,7 @@ Here is an example of how we can preserve the state of the application by using 
 ```ts
 @Component({
   selector: 'app',
-  providers: [bind(NameList).toValue(new NameList())],
+  providers: [provide(NameList, { useValue: new NameList() })],
   // ...
 })
 @RouteConfig([
