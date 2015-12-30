@@ -16,7 +16,7 @@ A couple of months ago I wrote ["Lazy Loading of Route Components in Angular 2"]
 
 This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user's experience.
 
-The code for this article is available at [my GitHub account](https://github.com/mgechev/dynamic-route-creator).
+The code for this article is available at [my GitHub account](https://github.com/mgechev/dynamic-route-creator/blob/master/app/components/app/app.ts).
 
 ## Problem
 
