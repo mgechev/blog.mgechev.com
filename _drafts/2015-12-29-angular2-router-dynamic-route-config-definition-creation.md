@@ -14,9 +14,13 @@ tags:
 
 A couple of months ago I wrote ["Lazy Loading of Route Components in Angular 2"](http://blog.mgechev.com/2015/09/30/lazy-loading-components-routes-services-router-angular-2/), where I explained how we can take advantage of the `AsyncRoute`s and the [virtual proxy pattern](https://en.wikipedia.org/wiki/Proxy_pattern) in Angular 2.
 
-## The Problem
+This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user experience.
 
-This way we can cut the initial load time of our application by loading only the required for given view directives, services and pipes. Although this strategy works great we are coupled with the route's name:
+## Problem
+
+This strategy works great! The only things that we need to provide to the `AsyncRoute` definition are `name`, `path` and a `loader`.
+
+Inside of the `loader` function we can have whatever custom logic we want. The only contract that we sign with the framework is that the `loader` needs to return a promise:
 
 ```ts
 @RouteConfig([
@@ -29,21 +33,35 @@ This way we can cut the initial load time of our application by loading only the
 ])
 ```
 
-For instance in the snippet above we need to register the `AsyncRoute` and associate it with the name `about` in order to be able to reference it inside of the template with:
+But what if we receive the route definitions from another service and we don't have them during initialization time?
+
+Well, in such case we need to solve the following three problems:
+
+### Referencing not registered routes inside of a template
+
+If we want to reference to a route which is not declared within `@RouteConfig` by using:
 
 ```html
-<a [routeLink]="['/about']">About</a>
+<a [routeLink]="['/not-registered']">Not registered</a>
 ```
 
-If we get the components that we need to load dynamically (for instance by a RESTful API) we need to generate fake route names which only goal is to stand as placeholders.
+We will get a runtime error. However, we need to implement a behavior in which we can list the available at given point routes.
 
-## The Solution
+### Updating the `@RouteConfig`'s metadata
 
-Lets see how we can dynamically add route entries!
+This is required for consistency. Since the way we register routes in Angular 2 is by using `@RouteConfig`, we need to make sure that it's always up-to-date, with all the routes available.
 
-### Rendering route links dynamically
+### Dynamically registering routes
 
-First, explore how we can show links to the routes we want to add. Since Angular 2 will throw an error in case we reference to a route which is not defined we need to render the links dynamically as well, depending on the registered routes. We can define a component called `AppNav` which receives a list of objects of the type `{ name: "Route name", path: ['/Route', 'Path'] }` and renders it:
+We need to make the framework aware of the new route definition that we received from the remote service. For this purpose we need to play with the router's internals, in order to provide the instructions for loading the new route.
+
+## Solution
+
+Lets start by exploring the solution of the first problem:
+
+### Dynamically rendering the application's navigation
+
+We can define a component called `AppNav` which receives a list of objects of the type `{ name: "Route name", path: ['/Route', 'Path'] }` and renders the navigation:
 
 ```ts
 @Component({
@@ -64,9 +82,9 @@ export class AppNav {
 }
 ```
 
-The component above has a single input called `routes` and uses the `ROUTER_DIRECTIVES`. Once the `routes` property changes its template will be populated with the passed value.
+The component above has a single `@Input` called `routes` and uses the `ROUTER_DIRECTIVES` because of the `routerLink` directive. Once the `routes` property changes its template will be populated with the passed value.
 
-We can use the component the following way:
+We can use this component in the following way:
 
 ```html
 <app-nav [routes]="[
@@ -77,33 +95,34 @@ We can use the component the following way:
 
 So far so good! Now lets see how we can get the list of registered routes and pass them to the directive!
 
-### Getting the registered routes
+### Messing around with the `@RouteConfig`'s metadata
 
-Lets peek at the semantics of the `@RouteConfig` decorator. All it does is to add another item to the array of `annotations` stored as metadata associated to given component. This means that by using the `Reflect` API we can get all the registered routes.
+Lets peek at the semantics of the `@RouteConfig` decorator. All it does is to add another item to the array of `annotations` stored as metadata associated with given component. This means that by using the `Reflect` API we can get all the registered routes!
 
-In order to have better separation of concerns lets define a class called `DynamicRouteCreator`, which has the following API:
+In order to have better separation of concerns we can isolate the logic for configuring the dynamic routes into a separate class.
+Lets define a class called `DynamicRouteConfigurator`, which has the following API:
 
 ```ts
 @Injectable()
-class DynamicRouteCreator {
+class DynamicRouteConfigurator {
   constructor(private registry: RouteRegistry) {}
   // Gets the list of registered with @RouteConfig routes
-  // associated to given `component`
+  // associated with given `component`
   getRoutes(component: Type) {...}
   // Updates the metadata added by @RouteConfig associated
-  // to given `component`
+  // with given `component`
   updateRoutes(component: Type, routeConfig) {...}
   // Adds additional `route` to given `component`
   addRoute(component: Type, route) {...}
 }
 ```
 
-Now lets define a root component which uses the `AppNav` component and `DynamicRouteCreator` service we defined:
+Now lets define a root component which uses the `AppNav` component and `DynamicRouteConfigurator` service we defined:
 
 ```ts
 @Component({
   selector: 'app',
-  viewProviders: [DynamicRouteCreator],
+  viewProviders: [DynamicRouteConfigurator],
   templateUrl: './components/app/app.html',
   styleUrls: ['./components/app/app.css'],
   encapsulation: ViewEncapsulation.None,
@@ -114,12 +133,14 @@ Now lets define a root component which uses the `AppNav` component and `DynamicR
 ])
 export class AppCmp {
   appRoutes: string[][];
-  constructor(private dynamicRouteCreator: DynamicRouteCreator) {...}
+  constructor(private dynamicRouteConfigurator: DynamicRouteConfigurator) {...}
   private getAppRoutes(): string[][] {}
 }
 ```
 
 So far so good! Now lets explore the definition of `getRoutes`:
+
+#### Getting the registered routes
 
 ```ts
 getRoutes(component: Type) {
@@ -130,7 +151,9 @@ getRoutes(component: Type) {
 }
 ```
 
-Above we simply get all the `annotations` associated to the passed as argument component and get the `RouteConfig`.
+Above we simply get all the `annotations` associated with the passed as argument component and get the `RouteConfig`.
+
+#### Updating the registered routes
 
 The implementation of `updateRoutes` is quite simple as well:
 
@@ -152,35 +175,40 @@ updateRoutes(component: Type, routeConfig) {
 }
 ```
 
-We loop over all the `annotations` in order to find the index of the metadata added by the `@RouteConfig` decorator and when we find it, we update it. Right after that we update the annotations using `Reflect.defineMetadata(...)`.
+We loop over all the `annotations` in order to find the index of the metadata added by the `@RouteConfig` decorator and when we find it, we update its value. Right after that we update the annotations using `Reflect.defineMetadata(...)`.
 
-### Populating the link list
+#### Updating the navigation
 
-We can populate the list with the routes links in the `AppNav` component by using the `DynamicRouteCreator` in the `AppCmp`'s constructor:
+After we defined the `AppNav` component and we can get the registered with `@RouteConfig` routes we can render links to all available routes!
+
+We can populate the list with the routes links in the `AppNav` component by setting the `appRoutes`' value:
 
 ```ts
-constructor(private dynamicRouteCreator: DynamicRouteCreator) {
+constructor(private dynamicRouteConfigurator: DynamicRouteConfigurator) {
   this.appRoutes = this.getAppRoutes();
+  // ...
 }
 ```
 
-Now lets try to asynchronously add another route! We can notice that the `DynamicRouteCreator` has a method called `addRoute` so we can take advantage of it and later take a detailed look at its implementation:
+### Dynamically registering new routes
+
+Now lets try to asynchronously add another route! We can notice that the `DynamicRouteConfigurator` has a method called `addRoute`, so lets use it:
 
 ```ts
-constructor(private dynamicRouteCreator: DynamicRouteCreator) {
+constructor(private dynamicRouteConfigurator: DynamicRouteConfigurator) {
   this.appRoutes = this.getAppRoutes();
   setTimeout(_ => {
     let route = { path: '/about', component: AboutCmp, as: 'About' };
-    this.dynamicRouteCreator.addRoute(this.constructor, route);
+    this.dynamicRouteConfigurator.addRoute(this.constructor, route);
     this.appRoutes = this.getAppRoutes();
   }, 1000);
 }
 ```
-All we do above is to set a timeout for 1 second, define the `About` route and add it to the `AppCmp` using the instance of the `DynamicRouteCreator`. As last step we update the value of the `appRoutes` which will be reflected by the `AppNav` component.
+All we do above is to set a timeout for 1 second, define the `About` route and add it to the `AppCmp` using the injected instance of the `DynamicRouteConfigurator`. As last step we update the value of the `appRoutes` which will be reflected by the `AppNav` component.
 
-### Using the RouteRegistry
+#### Using the RouteRegistry
 
-Now in order to get complete gasp on the entire implementation lets take a look at the implementation of the `addRoute` method defined within the `DynamicRouteCreator`:
+Now in order to get complete clarity of the entire implementation lets take a look at the `addRoute` method defined within the `DynamicRouteConfigurator`:
 
 ```ts
 addRoute(component: Type, route) {
@@ -190,10 +218,8 @@ addRoute(component: Type, route) {
   this.registry.config(component, route);
 }
 ```
-As first step we get all the registered routes associated to the target component by using `getRoutes`, later we append one additional route and we invoke the `updateRoutes` method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the `RouteRegister` passed as dependency via the DI mechanism of the framework.
+As first step we get all the registered routes associated with the target component by using `getRoutes`, later we append one additional route and we invoke the `updateRoutes` method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the `RouteRegister` passed as dependency via the DI mechanism of the framework.
 
 ## Conclusion
 
-Registering routes dynamically is definitely not something that you are going to need to do in a typical SPA, however, by using public APIs provided by Angular 2 you can achieve it pretty simply.
-
-Another point for future improvement of the `DynamicRouteCreator` is to allow further modification of the route configuration, such as deletion of existing routes. Although the `RouteRegistry` allows this functionality we'll need to touch private APIs (the `_routes` property of the `RouteRegistry` instances).
+Another point for future improvement of the `DynamicRouteConfigurator` is to allow further modification of the route configuration, such as deletion of existing routes. Although the `RouteRegistry` allows this functionality we'll need to touch private APIs (the `_routes` property of the `RouteRegistry` instances).
