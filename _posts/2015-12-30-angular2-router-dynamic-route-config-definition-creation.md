@@ -1,5 +1,5 @@
 ---
-title: Adding Routes Dynamically in Angular 2
+title: Dynamically Configuring the Angular's Router
 author: minko_gechev
 layout: post
 categories:
