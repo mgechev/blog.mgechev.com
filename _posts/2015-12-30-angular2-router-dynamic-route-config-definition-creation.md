@@ -14,13 +14,15 @@ tags:
 
 A couple of months ago I wrote ["Lazy Loading of Route Components in Angular 2"](http://blog.mgechev.com/2015/09/30/lazy-loading-components-routes-services-router-angular-2/), where I explained how we can take advantage of the `AsyncRoute`s and the [virtual proxy pattern](https://en.wikipedia.org/wiki/Proxy_pattern) in Angular 2.
 
-This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user experience.
+This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user's experience.
+
+The code for this article is available at [my GitHub account](https://github.com/mgechev/dynamic-route-creator).
 
 ## Problem
 
 This strategy works great! The only things that we need to provide to the `AsyncRoute` definition are `name`, `path` and a `loader`.
 
-Inside of the `loader` function we can have whatever custom logic we want. The only contract that we sign with the framework is that the `loader` needs to return a promise:
+Inside of the `loader` function we can have whatever custom logic we want to. The only contract that we sign with the framework is that the `loader` needs to return a promise:
 
 ```ts
 @RouteConfig([
@@ -33,7 +35,7 @@ Inside of the `loader` function we can have whatever custom logic we want. The o
 ])
 ```
 
-But what if we receive the route definitions from another service and we don't have them during initialization time?
+But what if we receive the routes definitions from a remote service and we don't have them during initialization time?
 
 Well, in such case we need to solve the following three problems:
 
@@ -45,7 +47,7 @@ If we want to reference to a route which is not declared within `@RouteConfig` b
 <a [routeLink]="['/not-registered']">Not registered</a>
 ```
 
-We will get a runtime error. However, we need to implement a behavior in which we can list the available at given point routes.
+We will get a runtime error. This means that we need to implement a behavior in which we can list the available at given point of time routes.
 
 ### Updating the `@RouteConfig`'s metadata
 
@@ -138,7 +140,7 @@ export class AppCmp {
 }
 ```
 
-So far so good! Now lets explore the definition of `getRoutes`:
+Now lets explore the definition of `getRoutes`:
 
 #### Getting the registered routes
 
@@ -151,7 +153,7 @@ getRoutes(component: Type) {
 }
 ```
 
-Above we simply get all the `annotations` associated with the passed as argument component and get the `RouteConfig`.
+Above we simply get all the `annotations` associated with the passed as argument component and extract the declared routes.
 
 #### Updating the registered routes
 
@@ -179,9 +181,9 @@ We loop over all the `annotations` in order to find the index of the metadata ad
 
 #### Updating the navigation
 
-After we defined the `AppNav` component and we can get the registered with `@RouteConfig` routes we can render links to all available routes!
+We already have the definition of the `AppNav` component! Now we can get the registered with `@RouteConfig` routes  and render links to all of them.
 
-We can populate the list with the routes links in the `AppNav` component by setting the `appRoutes`' value:
+We can populate the list with the links to the routes using the `AppNav` component, by setting the `appRoutes`' value:
 
 ```ts
 constructor(private dynamicRouteConfigurator: DynamicRouteConfigurator) {
