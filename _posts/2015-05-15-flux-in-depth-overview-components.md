@@ -59,7 +59,7 @@ Okay, so I said this only in order to tell you that the Dispatcher is simply an 
 
 ### Action
 
-Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their calls to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection. Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view? The view only invokes methods of actions, which should be named semantically correctly. The action is responsible for translating these calls to events, which are understandable by the Store. In this case the actions may combine a few calls at one event or fork given action to two or more different events.
+Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their calls to the Dispatcher's `dispatch` method. This might seems like unnecessary level of indirection. Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher's `dispatch` method? Why not simply call the dispatch method from the view? The view only invokes methods of actions, which should be named semantically correctly. The action is responsible for translating these calls to a events, which are understandable by the Store. In this case the actions may combine a few calls at one event or fork given action to two or more different events.
 
 So from the diagram above we can notice that the arrows are in only a single direction. This is one of the "selling points" of flux:
 
@@ -191,7 +191,7 @@ What we can do is to:
 - Use Immutable.js for our data structures
 - Deep freeze our data items
 
-Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns ([or](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/) [no](https://facebook.github.io/react/docs/advanced-performance.html)) but it will make your debugging experience even easier since your components won't produce any side effects, in case you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
+Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns ([or](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/) [not](https://facebook.github.io/react/docs/advanced-performance.html)) but it will make your debugging experience even easier since your components won't produce any side effects, in case you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
 
 #### Stateful vs Stateless
 
@@ -293,7 +293,7 @@ class App extends React.Component {
 }
 ```
 
-Okay...but how the `Navigation` component will tell the `App` component when to open any of the dialogs? Remember our `ProfileManagement` component needs to be able to open the `profile` dialog as well...? We can workaround this issue by pass callbacks:
+Okay...but how will the `Navigation` component tell the `App` component when to open any of the dialogs? Remember our `ProfileManagement` component needs to be able to open the `profile` dialog as well...? We can workaround this issue by passing callbacks:
 
 ```javascript
 class App extends React.Component {
@@ -352,7 +352,7 @@ We can use custom event system. Implementing the publish/subscribe pattern and a
 - Pure components
 - Unidirectional data flow
 
-All our components are going to have access to a global mutable object and through this object they are going to achieve bidirectional data flow...plenty of dirty words in a single sentence! Did you see how only a second inattention may cause you regrets during your entire life...! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!
+All our components are going to have access to a global mutable object and through this object they are going to achieve bidirectional data flow...plenty of dirty words in a single sentence! Did you see how only a second of inattention may cause you regrets during your entire life...! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!
 
 ##### Solution
 
@@ -375,7 +375,7 @@ class Dialog extends React.Component {
 }
 ```
 
-It should not has its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the declaimer that it might sounds like a huge overhead but I promise that it's worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:
+It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it's worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:
 
 - The user clicks the "Chat" button
 - The button `onClick` handler is being invoked
@@ -385,11 +385,11 @@ It should not has its own opinion on the topic! Okay, so how we should proceed i
 - The `Store` throws new change event
 - The `App` component catches the change event and propagates the `Store` down through the tree
 
-This is how we took advantage of all our flux components! Yeah, it sounds complex, I believe, but you'll get used to it and you'll love it! All new ideas are hard to gasp initially but once you find value in them you just can't live without them!
+This is how we took advantage of all our flux components! Yeah, it sounds complex, I believe, but you'll get used to it and you'll love it! All new ideas are hard to grasp initially but once you find value in them you just can't live without them!
 
 ##### ...but what about stateful components...
 
-We said that we may also have stateful components in some rare cases...Here is an example - your dialogs are draggable, you can keep the component's coordinates in their state. People can argue with me about this and they will have their point. For example [`react-dnd`](https://github.com/gaearon) externalize the component's coordinates in the `Store` as well. However, in most cases I think we can violate the rule about stateless components and just keep the component specific state inside itself. However, *if another component needs to change state of given component we should definitely externalize it* and apply flux (just like in the scenario above).
+We said that we may also have stateful components in some rare cases...Here is an example - your dialogs are draggable, you can keep the component's coordinates in their state. People can argue with me about this and they will have their point. For example [`react-dnd`](https://github.com/gaearon) externalizes the component's coordinates in the `Store` as well. However, in most cases I think we can violate the rule about stateless components and just keep the component specific state inside itself. However, *if another component needs to change state of given component we should definitely externalize it* and apply flux (just like in the scenario above).
 
 But how we can keep such state persistent if we need to? A few weeks ago I wrote a mixin called `react-pstate`, which allows you to persist your component's state. You can take a look at the module [here](https://github.com/mgechev/react-pstate).
 
