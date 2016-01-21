@@ -113,7 +113,7 @@ class DynamicRouteConfigurator {
   getRoutes(component: Type) {...}
   // Updates the metadata added by @RouteConfig associated
   // with given `component`
-  updateRoutes(component: Type, routeConfig) {...}
+  updateRouteConfig(component: Type, routeConfig) {...}
   // Adds additional `route` to given `component`
   addRoute(component: Type, route) {...}
 }
@@ -157,10 +157,10 @@ Above we simply get all the `annotations` associated with the passed as argument
 
 #### Updating the registered routes
 
-The implementation of `updateRoutes` is quite simple as well:
+The implementation of `updateRouteConfig` is quite simple as well:
 
 ```ts
-updateRoutes(component: Type, routeConfig) {
+updateRouteConfig(component: Type, routeConfig) {
   let annotations = Reflect.getMetadata('annotations', component);
   let routeConfigIndex = -1;
   for (let i = 0; i < annotations.length; i += 1) {
@@ -220,7 +220,7 @@ addRoute(component: Type, route) {
   this.registry.config(component, route);
 }
 ```
-As first step we get all the registered routes associated with the target component by using `getRoutes`, later we append one additional route and we invoke the `updateRoutes` method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the `RouteRegister` passed as dependency via the DI mechanism of the framework.
+As first step we get all the registered routes associated with the target component by using `getRoutes`, later we append one additional route and we invoke the `updateRouteConfig` method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the `RouteRegister` passed as dependency via the DI mechanism of the framework.
 
 ## Conclusion
 
