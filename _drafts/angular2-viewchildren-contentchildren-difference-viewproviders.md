@@ -32,7 +32,7 @@ Well, in the user interface it is actually quite similar. We can think of the in
 
 We can illustrate this graphically by the following structural diagram:
 
-![]("../images/component-directive-angular2.png")
+![](../images/component-directive-angular2.png)
 
 The the figure above we have two elements:
 
@@ -41,7 +41,7 @@ The the figure above we have two elements:
 
 This means that using the preceding abstraction we can build structures of the following form:
 
-![]("../images/component-tree-angular2.png")
+![](../images/component-tree-angular2.png)
 
 On the above figure we can see a hierarchical structure of components and directives. The leaf components on the diagram are either directives or components that don't hold reference any other components or directives.
 
@@ -102,7 +102,7 @@ We can also skip the `select` attribute of the `ng-content` element. In this cas
 
 The end result of the application will be as follows:
 
-![]("../images/todo-app-sample.gif")
+![](../images/todo-app-sample.gif)
 
 ### ViewChildren and ContentChildren
 
