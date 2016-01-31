@@ -36,7 +36,7 @@ We can illustrate this graphically by the following structural diagram:
 
 In the figure above we have two elements:
 
-- `Directive` - A self-contained elements which hold some logic, but do not contain any structure.
+- `Directive` - A self-contained element which holds some logic, but does not contain any structure.
 - `Component` - An element, which specifies the `Directive` element and holds a list of other `Directive` instances (which could also be components since `Component` extends `Directive`).
 
 This means that using the preceding abstractions we can build structures of the following form:
@@ -49,7 +49,7 @@ On the above figure we can see a hierarchical structure of components and direct
 
 Now, in order to be more specific, lets switch to the context of Angular 2.
 
-In order to better illustrate the concepts the we are going to explore, lets build a simple application:
+In order to better illustrate the concepts we are going to explore, lets build a simple application:
 
 ```ts
 // ...
@@ -110,7 +110,7 @@ There are two more components which are not interesting for our discussion so we
 
 ### ViewChildren and ContentChildren
 
-And yes, it was that easy! Now we are ready to define what the concepts of **view children** and **content children** are. **The children element which are located inside of its template of a component are called *view children* **. On the other hand, **elements which are used between the opening and closing tags of the host element of given component are called *content children* **.
+And yes, it was that easy! Now we are ready to define what the concepts of **view children** and **content children** are. **The children element which are located inside of its template of a component are called *view children* **. On the other hand, **elements which are used between the opening and closing tags of the host element of a given component are called *content children* **.
 
 This means that `todo-input` and `todo` could be considered view children of `todo-app`, and `footer` (if it is defined as Angular 2 component or directive) could be considered as a content child.
 
