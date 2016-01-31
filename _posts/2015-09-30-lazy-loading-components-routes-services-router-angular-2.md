@@ -29,7 +29,7 @@ Lets take a look at this sample application:
 
 ```ts
 import {Component, View, bootstrap} from 'angular2/angular2';
-import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_BINDINGS} from 'angular2/router';
+import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
 import {Home} from './components/home/home';
 import {About} from './components/about/about';
 
@@ -47,7 +47,7 @@ import {About} from './components/about/about';
 })
 class App {}
 
-bootstrap(App, [ROUTER_BINDINGS]);
+bootstrap(App, [ROUTER_PROVIDERS]);
 ```
 
 This is the root component of [angular2-seed](https://github.com/mgechev/angular2-seed/blob/c5c7f8ffc3be1d75040ee11d9220c22dadf59c57/app/app.ts).
@@ -66,7 +66,7 @@ import {NameList} from '../../services/NameList';
 
 @Component({
   selector: 'about',
-  bindings: [NameList],
+  providers: [NameList],
   templateUrl: './components/about/about.html',
   directives: [CORE_DIRECTIVES]
 })
@@ -135,10 +135,10 @@ export class ComponentProvider {
 const PROXY_CLASSNAME = 'component-wrapper';
 const PROXY_SELECTOR = `.${PROXY_CLASSNAME}`;
 
-export function componentProxyFactory(provider:ComponentProvider):Type {
+export function componentProxyFactory(provider: ComponentProvider): Type {
   @Component({
     selector: 'component-proxy',
-    bindings: [bind(ComponentProvider).toValue(provider)]
+    providers: [provide(ComponentProvider, { useValue: provider })]
   })
   @View({
     template: `<span #content/>`
@@ -165,7 +165,7 @@ Now lets take a look at the code step by step:
   - `provide` - a provider, which will return the target component based on the passed module as argument
 2. We define a function called `componentProxyFactory`:
   - This function accepts as argument a `ComponentProvider` object and returns a new component called `VirtualComponent`.
-  - The `VirtualComponent` defines a single binding, in order to allow the provider to be passed as argument to the constructor through DI.
+  - The `VirtualComponent` defines a single provider, in order to allow the provider to be passed as argument to the constructor through DI.
   - Inside `VirtualComponent`'s constructor we load the module based on the provider's `path` and right after that loaded in the template using: `loader.loadIntoLocation(provider.provide(m), el, 'content');`
 
 And thats all!
@@ -174,7 +174,7 @@ Now lets take a look how we can refactor our root component in order to take adv
 
 ```ts
 import {Component, View, bootstrap} from 'angular2/angular2';
-import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_BINDINGS} from 'angular2/router';
+import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router';
 import {Home} from './components/home/home';
 
 import {componentProxyFactory} from './component_proxy';
@@ -200,7 +200,7 @@ import {componentProxyFactory} from './component_proxy';
 })
 class App {}
 
-bootstrap(App, [ROUTER_BINDINGS]);
+bootstrap(App, [ROUTER_PROVIDERS]);
 ```
 Now the file doesn't contain any reference to the `About` component. Instead it registers in the route definition for the `About` component using:
 
