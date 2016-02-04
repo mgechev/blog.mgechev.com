@@ -15,11 +15,11 @@ tags:
 
 [On 18th of September 2014](https://github.com/angular/angular/commits/master?page=24) was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS' 2.0 [website](https://angular.io/) and gave a couple of talks on [ng-conf](https://www.youtube.com/watch?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7&v=QHulaj5ZxbI) about their new router, change detection, templating, etc. I'm passionate about AngularJS since its early versions so I decided give it a try using the [quick start](https://angular.io/docs/js/latest/quickstart.html). In the meantime I and also created an [angular2-seed project](https://github.com/mgechev/angular2-seed) for my test, dummy projects. In order to have a better understanding of what is going on (and handle the lack of documentation) I dug inside their source code. I had great time doing this, what I saw was one of the most well written and smartest pieces of software I've ever read. Soon I'm planning to expand my paper ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns) with design patterns used inside Angular2.
 
-In this blog post I'll share my first impressions of the framework and I'll try to keep them as less subjective as possible, although my affinity to AngularJS. I'll start with the general changes and after that keep going into details.
+In this blog post I'll share my first impressions of the framework and I'll try to keep them as objective as possible, despite my affinity to AngularJS. I'll start with the general changes and after that keep going into details.
 
 ## Written in TypeScript
 
-As Microsoft already published, [Angular2 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using exactly TypeScript. By "extended version of TypeScript" I mean, TypeScript with added <strike>annotations</strike>decorators (its syntax looks similar to the annotations in Java).
+As Microsoft already published, [Angular2 is written in TypeScript](http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx). There are a couple of advantages using strongly typed language and a couple of more advantages using TypeScript specifically. By "extended version of TypeScript" I mean, TypeScript with added <strike>annotations</strike>decorators (its syntax looks similar to the annotations in Java).
 
 ![JavaScript Dialects](/images/js-dialects-ven.png)
 
@@ -34,7 +34,7 @@ And here are some of the main advantages using TypeScript as statically typed la
   - TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.
   - TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.
 
-In the past I've actively considered using a language with static type system, for building my single-page apps. I was thinking mostly about Dart, the fact that the types there are optional wasn't a concern, because in the critical areas of your code you would be able to use them and you'll get all the benefits a statically typed language provides. TypeScript seemed like a nice language but I've never thought it is going to shine the way it does now. Anyway, TypeScript seems like a better option because of its syntax - much easier to learn given it is superset of ES6.
+In the past I've actively considered using a language with static type system, for building my single-page apps. I was thinking mostly about Dart, the fact that the types there are optional wasn't a concern, because in the critical areas of your code you would be able to use them and you'll get all the benefits a statically typed language provides. TypeScript seemed like a nice language but I never thought would shine the way it does now. Anyway, TypeScript seems like a better option because of its syntax - much easier to learn given it is superset of ES6.
 
 ### Quick FAQ:
 
@@ -42,7 +42,7 @@ In the past I've actively considered using a language with static type system, f
 Probably yes, but you can disable it when you plan to deploy your app in production.
 
 *Shold I use TypeScript for my Angular2 application?*<br>
-It is not necessary but I'd recommend you to do so, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you to do so.
+It is not necessary but I'd recommend you do, because of all the benefits I mentioned above. Actually you even don't have to use ES6, but I'd even more strongly recommend you do.
 
 *Alright, if I do use TypeScript...how can I debug it when my browser supports only ES5? Should I debug the generated code?*<br>
 Traceur will create source maps for you. You will debug the code you've already written, not the ES5 generated by the transpilation process.
@@ -141,7 +141,7 @@ No. Angular2 has a great [forms module](http://angularjs.blogspot.com/2015/03/fo
 Yes you can! I'd even recommend to use Flux! Here is one more [great post by Victor Savkin about using Flux with AngularJS](http://victorsavkin.com/post/99998937651/building-angular-apps-using-flux-architecture).
 
 *So Angular2 is basically ReactJS implemented by Google?*<br>
-No. The binding mechanism is completely different, it provides wider functionality than React (Angular2 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for Angular2, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to Angular2 if you haven't coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.
+No. The binding mechanism is completely different. It provides wider functionality than React (Angular2 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for Angular2, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to Angular2 if you haven't coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.
 
 ## WebComponents
 
