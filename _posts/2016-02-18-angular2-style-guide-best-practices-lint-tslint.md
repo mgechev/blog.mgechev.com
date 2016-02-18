@@ -1,5 +1,5 @@
 ---
-title: Enforcing Best Practices with Static Code Analysis for Angular 2 Projects
+title: Enforcing Best Practices with Static Code Analysis of Angular 2 Projects
 author: minko_gechev
 layout: post
 categories:
