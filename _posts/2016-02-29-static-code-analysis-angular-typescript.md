@@ -1,5 +1,5 @@
 ---
-title: Static Code Analysis of Angular 2 and TypeScript
+title: Static Code Analysis of Angular 2 and TypeScript Projects
 author: minko_gechev
 layout: post
 categories:
