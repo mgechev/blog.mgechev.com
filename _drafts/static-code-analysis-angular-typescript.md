@@ -250,6 +250,25 @@ The way to achieve this goal is to reuse the error reporting mechanism of alread
 
 Thanks to the extensible nature of tslint this is another goal which can be achieved by using it. Verifying that given source file follows defined style guidelines involves static code analysis similar to the one performed by the rules declared by [tslint](https://github.com/palantir/tslint/blob/master/src/rules/) and the [ones developed by the community](https://github.com/palantir/tslint#custom-rule-sets-from-the-community).
 
+### Current progress
+
+At this point I have some progress here in the master branch of the repository [`ng2lint`](https://github.com/mgechev/ng2lint/).
+
+The following rules are implemented:
+
+- Directive selector type.
+- Directive selector name convention.
+- Directive selector name prefix.
+- Component selector type.
+- Component selector name convention.
+- Component selector name prefix.
+- Use @Input instead of inputs decorator property.
+- Use @Output instead of outputs decorator property.
+- Use @HostListeners and @HostBindings instead of host decorator property.
+- Do not use the @Attribute decorator (implemented by [PreskoIsTheGreatest](https://github.com/PreskoIsTheGreatest)).
+
+### Further work
+
 Possible improvements which can be achieved here is extension of the default walkers that we already have. For instance adding operations such as:
 
 - `visitDirectiveMetadata`
@@ -259,5 +278,41 @@ Possible improvements which can be achieved here is extension of the default wal
 
 could save us form a lot of boilerplate code in ng2lint.
 
+Another possible extension here is validation of the file names we lint based on a semantics gatherd from the file's content.
+
+For instance, if we find out that inside of given file there's definition of a component we can validate that the file name follows the name convention:
+
+```
+NAME.component.ts
+```
+
 ### Verifying Program Correctness
+
+This is the most challenging part of the linter because of the following reasons:
+
+- TypeScript does not parses the Angular templates.
+- There is extra semantics on top of TypeScript introduced by Angular 2.
+- There are externalized templates which need to be loaded from disk.
+- There are definitions of directives and components which need to be resolved.
+- The process is slow so parsing should be performed only over the changed code.
+
+Lets discuss approaches for handling some of these challenges.
+
+#### TypeScript does not parses the Angular templates
+
+Suppose we have the following component definition:
+
+```ts
+@Component({
+  selector: 'custom-heading',
+  template: '<h1>{{heading}}</h1>'
+})
+class CustomHeadingComponent {
+  heading = 42;
+}
+```
+
+Once TypeScript's compiler parses our Angular program the AST will look something like:
+
+![](../images/ng2ast.png)
 
