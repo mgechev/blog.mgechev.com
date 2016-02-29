@@ -43,9 +43,9 @@ For instance, according to best practices described in the [Angular 2 style guid
 
 By saying correct I mean that the project follows some rules, which are enforced by the Angular framework and without following these rules our Angular application will has a run-time error. Using static code analysis we can verify that:
 
-- All used inside the templates pipes are declared.
+- All pipes used inside the templates are declared.
 - All custom attributes of elements in the templates are declared as either inputs, outputs or directives.
-- All identifiers used in inlined in the template expressions exist in the corresponding symbol table (which in the context of Angular is the instance of the component associated to the template).
+- All identifiers used are inlined in the template expressions exist in the corresponding symbol table (which in the context of Angular is the instance of the component associated to the template).
 - etc.
 
 ### Usage out-of-the box
