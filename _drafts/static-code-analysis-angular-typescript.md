@@ -23,7 +23,13 @@ So far, most of the blog posts I've written are tutorials; they explain how we c
 
 The current post is about a project I am interested in. A few days ago I explained my motivation behind the ["Community-drive Style Guide" for Angular 2](https://github.com/mgechev/angular2-style-guide) that we're working on. I also mentioned that I am planning to build a configurable static-code analyzer, which makes sure given project follows best practices and is correct Angular 2 code.
 
-I called this project [ng2lint](https://github.com/mgechev/ng2lint. Lets explain the scope of the analyzer I'm going to discuss in this article.
+I called this project [ng2lint](https://github.com/mgechev/ng2lint. Lets define the scope of the analyzer and the goals ahead of it:
+
+### Following Style guidelines
+
+By following style guidelines I mean standard linting, such as the one introduced by tslint. The Angular 2 Style Guide provides some sample tslint configuration file, which can be used.
+
+As extension of the functionality provided by tslint the [ng2linter]((https://github.com/mgechev/ng2lint) should introduce filename checking, based on the conventions defined the style guide.
 
 ### Following the Best Practices
 
@@ -31,13 +37,7 @@ Although in most cases there's quite a good understanding of what best practices
 
 For instance, according to best practices described in the [Angular 2 style guide](https://github.com/mgechev/angular2-style-guide) directives should be used as attributes and components should be used as elements. However, in some specific environment when we have a legacy project which uses different conventions we should be able to adapt to the way the project is written.
 
-### Following Style guidelines
-
-By following style guidelines I mean typical linting, such as the one introduced by tslint. The Angular 2 Style Guide provides some sample tslint configuration file, which can be used.
-
-As extension of the functionality provided by tslint the [ng2linter]((https://github.com/mgechev/ng2lint) should introduce filename checking, based on the conventions defined the style guide.
-
-### Correctness
+### Verifying Program Correctness
 
 By saying correct I mean that the project follows some rules, which are enforced by the Angular framework, such as:
 
@@ -45,6 +45,10 @@ By saying correct I mean that the project follows some rules, which are enforced
 - All custom attributes of elements in the templates should be declared as either inputs, outputs or directives.
 - Misspelled method name in an expression used within a template.
 - etc.
+
+### Usage out-of-the box
+
+The linter is supposed to work with the current tools that developers use. This means that in order to see warnings in your favorite IDE or text editor you should not be supposed to develop plugin for it.
 
 ### Out of Scope
 
@@ -233,3 +237,27 @@ let foo: any = 32;
 ```
 
 Will fail with `type decoration of 'any' is forbidden`.
+
+## Challenges in ng2lint
+
+Now lets take a look at the goals we defined earlier and see how what we already know can be applied to achieve them.
+
+### Usage out-of-the box
+
+The way to achieve this goal is to reuse the error reporting mechanism of already existing tool. `tslint` is already widely supported by most IDEs and text editors that are popular in the Angular's community so if ng2lint uses its error reporting mechanism this could be a great win.
+
+### Following Style guidelines & Following the Best Practices
+
+Thanks to the extensible nature of tslint this is another goal which can be achieved by using it. Verifying that given source file follows defined style guidelines involves static code analysis similar to the one performed by the rules declared by [tslint](https://github.com/palantir/tslint/blob/master/src/rules/) and the [ones developed by the community](https://github.com/palantir/tslint#custom-rule-sets-from-the-community).
+
+Possible improvements which can be achieved here is extension of the default walkers that we already have. For instance adding operations such as:
+
+- `visitDirectiveMetadata`
+- `visitComponentMetadata`
+- `visitHostListener`
+- etc.
+
+could save us form a lot of boilerplate code in ng2lint.
+
+### Verifying Program Correctness
+
