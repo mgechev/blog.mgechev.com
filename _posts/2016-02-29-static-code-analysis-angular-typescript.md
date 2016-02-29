@@ -287,13 +287,15 @@ Lets discuss approaches for handling some of these challenges.
 Suppose we have the following component definition:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'custom-heading',
-  template: '<h1>\{\{heading\}\}</h1>'
+  template: '<h1>{{heading}}</h1>'
 })
 class CustomHeadingComponent {
   heading = 42;
 }
+{% endraw %}
 ```
 
 Once TypeScript's compiler parses Angular program the AST will look something like:
@@ -317,7 +319,9 @@ The first argument of the `parse` method of the parser is the template of the co
 In case `CustomHeadingComponent` is a top-level component we can parse its template with:
 
 ```ts
-parser.parse('<h1>\{\{heading\}\}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
+{% raw %}
+parser.parse('<h1>{{heading}}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
+{% endraw %}
 ```
 
 The `parse` method will return an `HtmlAst` which can be validated with visitor, similar to the one we use for validation of the TypeScript code.
@@ -424,14 +428,16 @@ The final thing left here is the procedure for validation of the template's expr
 Lets take a look at the following component:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'custom-cmp',
-  template: '<h1>\{\{foo + bar\}\}</h1>'
+  template: '<h1>{{foo + bar}}</h1>'
 })
 class CustomComponent {
   foo;
   bar;
 }
+{% endraw %}
 ```
 
 If we parse this source file using TypeScript's parser and after that we parse its template by using Angular's `TemplateParser` we will get:
@@ -445,7 +451,9 @@ On the image above we can see two ASTs merged together:
 
 The problem now is that although we've parsed both the source file and the template, we haven't parsed the Angular expression. Angular defines a small DSL which allows us to execute different expressions in the context of given component.
 
-In order to verify that the above expression `\{\{foo + bar\}\}` could be invoked in the context of `CustomComponent` we need to go through another process of parsing. For this purpose we can use Angular's parser defined under `core/change_detection/parser/parser.ts`.
+{% raw %}
+In order to verify that the above expression `{{foo + bar}}` could be invoked in the context of `CustomComponent` we need to go through another process of parsing. For this purpose we can use Angular's parser defined under `core/change_detection/parser/parser.ts`.
+{% endraw %}
 
 We need to get reference to its instance and parse the expression. After that we'll get the following mixture of ASTs:
 
