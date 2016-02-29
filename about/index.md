@@ -26,16 +26,17 @@ Some of the open source projects I've developed are:
 ### Angular
 
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
-- [angular2-hot-loader](https://github.com/mgechev/angular2-hot-loader)
+- [Community-Driven Angular 2 Style Guide](https://github.com/mgechev/angular2-style-guide)
+- [angular2-seed](https://github.com/mgechev/angular2-seed)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
-- [angular-transitions](https://github.com/mgechev/angular-transitions)
-- [ng-tutorial](https://github.com/mgechev/ng-tutorial)
 - [angular-webrtc](https://github.com/mgechev/angular-webrtc)
-- [angular2-seed](https://github.com/mgechev/angular2-seed)
-- [Collections optimized for the AngularJS change detection](https://github.com/mgechev/versionable-collections)
 - [angular-vnc](https://github.com/mgechev/angular-vnc)
+- [Collections optimized for the AngularJS change detection](https://github.com/mgechev/versionable-collections)
+- [ng-tutorial](https://github.com/mgechev/ng-tutorial)
+- [angular-transitions](https://github.com/mgechev/angular-transitions)
+- [angular2-hot-loader](https://github.com/mgechev/angular2-hot-loader)
 
 ### ReactJS
 
@@ -46,6 +47,7 @@ Some of the open source projects I've developed are:
 ### Others
 
 - [plainvm](http://plainvm.mgechev.com/)
+- [ng2lint - static code analyzer for Angular 2 and TypeScript projects](https://github.com/mgechev/ng2lint)
 - [aspect.js - Library for aspect-oriented programming in JavaScript](https://github.com/mgechev/aspect.js)
 - [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [BlobReader - a simplified interface for reading Blobs](https://github.com/mgechev/blobreader)
