@@ -250,7 +250,7 @@ The way to achieve this goal is to reuse the error reporting mechanism of alread
 
 Thanks to the extensible nature of tslint this is another goal which can be achieved by using it. Verifying that given source file follows defined style guidelines involves static code analysis similar to the one performed by the rules declared by [tslint](https://github.com/palantir/tslint/blob/master/src/rules/) and the [ones developed by the community](https://github.com/palantir/tslint#custom-rule-sets-from-the-community).
 
-### Current progress
+#### Current progress
 
 At this point I have some progress here in the master branch of the repository [`ng2lint`](https://github.com/mgechev/ng2lint/).
 
@@ -267,7 +267,7 @@ The following rules are implemented:
 - Use @HostListeners and @HostBindings instead of host decorator property.
 - Do not use the @Attribute decorator (implemented by [PreskoIsTheGreatest](https://github.com/PreskoIsTheGreatest)).
 
-### Further work
+#### Further work
 
 Possible improvements which can be achieved here is extension of the default walkers that we already have. For instance adding operations such as:
 
@@ -315,4 +315,139 @@ class CustomHeadingComponent {
 Once TypeScript's compiler parses our Angular program the AST will look something like:
 
 ![](../images/ng2ast.png)
+
+Notice the red node in the bottom-right; it is the initializer of the second key-value pair from the object literal that we pass to the `@Component` decorator.
+
+Since it is not responsibility of TypeScript to parses Angular's templates it only holds their string representation, or in case of `templateUrl` their path.
+
+Fortunately, Angular 2 exposes its `TemplateParser`. Thanks to Angular's platform agnostic implementation and parse5, `TemplateParser` could be used in node environment.
+It allows us to parse the templates using the followign API:
+
+```ts
+let parser: TemplateParser = injector.get(TemplateParser);
+parser.parse(templateString, directivesList, pipesList, templateUrl);
+```
+The first argument of the `parse` method of the parser is the template of the component. As second argument we need to pass the list of the directives and pipes visible by the component (this includes the list of directives/pipes declared in the `directives`/`pipes` property of `ComponentMetadata` as well as all other directives/pipes declared in the same way in parent components). In our case we don't need to pass any template url since the template is used inline.
+
+In case `CustomHeadingComponent` is a top-level component we need to:
+
+```ts
+parser.parse('<h1>{{heading}}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
+```
+
+The `parse` method will return an `HtmlAst` which can be validated with visitor the same way we vaidate the rest of the code.
+
+#### Externalized templates which need to be loaded from disk
+
+Now lets suppose instead of `template` our component uses `templateUrl`. This means that our validator need to read the template from the disk, in a directory (usually) relative to the component's definition.
+
+The disk I/O operations are slow:
+
+```
+Latency Comparison Numbers
+--------------------------
+L1 cache reference                           0.5 ns
+Branch mispredict                            5   ns
+L2 cache reference                           7   ns                      14x L1 cache
+Mutex lock/unlock                           25   ns
+Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
+Compress 1K bytes with Zippy             3,000   ns        3 us
+Send 1K bytes over 1 Gbps network       10,000   ns       10 us
+Read 4K randomly from SSD*             150,000   ns      150 us          ~1GB/sec SSD
+Read 1 MB sequentially from memory     250,000   ns      250 us
+Round trip within same datacenter      500,000   ns      500 us
+Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
+Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
+Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
+Send packet CA->Netherlands->CA    150,000,000   ns  150,000 us  150 ms
+```
+
+This means that in the perfect scenario we want to read external templates from disk **only** when they change. This could be achieved with something like [`fs.watch`](https://nodejs.org/docs/latest/api/fs.html) or any of its high-level wrappers.
+
+#### Definitions of directives and components which need to be resolved
+
+Now lets suppose we have the following component definitions:
+
+```ts
+// cmp_a.ts
+import {Component} from 'angular2/core';
+import {B} from './cmps_b_c';
+
+@Component({
+  selector: 'foo',
+  templateUrl: './a.html',
+  directives: [B]
+})
+export class A {}
+```
+```ts
+// cmps_b_c.ts
+import {Component} from 'angular2/core';
+import {D} from './dir_d';
+
+@Component({
+  selector: 'c',
+  template: 'c'
+})
+export class C {}
+
+@Component({
+  selector: 'b',
+  template: '<c></c><div d></div>',
+  directives: [D, C],
+  inputs: ['foo']
+})
+export class B {}
+```
+
+```ts
+// dir_d.ts
+import {Directive} from 'angular2/core';
+
+@Directive({
+  selector: '[d]'
+})
+export class D {}
+```
+
+Lets suppose we want to validate the template of component `B`:
+
+```ts
+parser.parse('<c></c><div d></div>', COMMON_DIRECTIVES, COMMON_PIPES, null);
+```
+
+The parser will throw an error:
+
+```
+Template parse errors:
+The element 'div' does not have a native attribute "d".
+```
+
+That is the case since we haven't included the directive `D` in the array we pass as second argument to `parse`.
+
+This means that we need to create a context specific for each of the components in the component tree which includes the visible by the component directives and pipes.
+In case we want to validate the entire component tree what we need to do is to validate each of the components in their own context. Before doing this we need to gather some meaningful to us data for the component itself.
+
+Lets track the process of building the component tree's intermediate representation for component `A`:
+
+- Gather metadata for component `A`
+  - TypeScript generates AST for the component
+  - Based on the AST we create an intermediate Angular specific component representation
+    - We collect the `selector`, `template`, `inputs`, `outputs`, etc.
+    - We collect all `directives` (note that the directives here are actually references to other classes)
+      - Find the file which contains the definition of the target directive
+      - Gather metadata for the directive (notice that this is a recursive call and there could be cyclic dependencies)
+      - Add the directive with its entire subtree (if component) to the directives array of the component `A`
+    - We collect all `pipes` (note that the pipes here are actually references to other classes)
+      - Find the file which contains the definition of the target pipe
+      - Gather metadata for the pipe
+      - Add the pipe to the pipes array of the component `A`
+
+Alright, now we are done. There are two things to note here:
+
+- There could be cyclic dependencies between components which are resolved with `forwardRef`.
+- There are a lot of disk I/O operations because the directives used by any component are most likely located in different files.
+
+We will see what we can do for the I/O operations in the section: "Externalized templates which need to be loaded from disk", which is generic and could be applied for templates as well as for directives.
+
 
