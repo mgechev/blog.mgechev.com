@@ -31,7 +31,7 @@ In this article I will explain the main goals of the project, as well as its cor
 
 We can make sure given project follows some predefined style guidelines by using a standard [linting](https://en.wikipedia.org/wiki/Lint_(software)), such as the one introduced by [tslint](https://palantir.github.io/tslint/). The Angular 2 Style Guide provides a sample [`tslint` configuration file](https://github.com/mgechev/angular2-style-guide#tslint), which can be used.
 
-As extension of the functionality provided by `tslint` the [`ng2lint`er]((https://github.com/mgechev/ng2lint) should introduce file name validation, based on the conventions defined in the style guide.
+As extension of the functionality provided by `tslint` the [`ng2lint`er](https://github.com/mgechev/ng2lint) should introduce file name validation, based on the conventions defined in the style guide.
 
 ### Following the Best Practices
 
