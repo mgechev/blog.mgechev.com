@@ -141,7 +141,95 @@ Deep-dive in parsers is out of the scope of the current article but lets say a f
 
 Lets take a look at the AST of the program above:
 
-![](../images/ast.png)
+![AST](../images/ast.png)
+
+In case you're interested in further reading about parsers, take a look at the following resources:
 
 - [Context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar)
 - [Extended Backus–Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form)
+- [Abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+
+### One more step...
+
+We're almost done with the theory behind ng2lint. In this final step we will just peek at the backend of any compiler by introducing a classical design pattern which is exclusively used there.
+
+> In object-oriented programming and software engineering, the [visitor design pattern](https://en.wikipedia.org/wiki/Visitor_pattern) is a way of separating an algorithm from an object structure on which it operates.
+
+How we can use this pattern in order to interpret the program we defined above, using its intermediate AST representation?
+
+Here's how we can develop a visitor for this purpose:
+
+```ts
+class InterpretationVisitor {
+  execute(ast) {
+    ast.statements.forEach(this.visitNode.bind(this));
+  }
+  visitNode(node) {
+    switch (node.type) {
+      case 'if_statement':
+      return this.visitIfStatement(node);
+      break;
+      case 'expression':
+      return this.visitExpression(node);
+      break;
+      default:
+      throw new Error('Unrecognized node');
+    }
+  }
+  visitIfStatement(node) {
+    if (this.visitNode(node.condition)) {
+      node.statements.forEach(this.visitNode.bind(this));
+    }
+  }
+  visitExpression(node) {
+    if (node.operator) {
+      return this.visitNode(node.left) + this.visitNode(node.right);
+    }
+    return node.value;
+  }
+}
+```
+
+Now all we have to do in order to interpret the program is to:
+
+```ts
+let visitor = new InterpretationVisitor();
+visitor.execute(root);
+```
+
+Using similar approach we can as well analyze the program. [`tslint`](https://github.com/palantir/tslint) for instance uses similar approach for the implementation of the rules it provides.
+
+Lets peek at a sample rule definition:
+
+```ts
+import * as ts from "typescript";
+import * as Lint from "../lint";
+
+export class Rule extends Lint.Rules.AbstractRule {
+    public static FAILURE_STRING = "type decoration of 'any' is forbidden";
+
+    public apply(sourceFile: ts.SourceFile): Lint.RuleFailure[] {
+        return this.applyWithWalker(<Lint.RuleWalker>(new NoAnyWalker(sourceFile, this.getOptions())));
+    }
+}
+
+class NoAnyWalker extends Lint.RuleWalker {
+    public visitAnyKeyword(node: ts.Node) {
+        this.addFailure(this.createFailure(node.getStart(), node.getWidth(), Rule.FAILURE_STRING));
+        super.visitAnyKeyword(node);
+    }
+}
+```
+
+The rule above forbids defines two classes:
+
+- `Rule` - internally `tslint` creates instances of the rule classes and invokes them over the individual files by calling their `apply` method.
+- `NoAnyWalker` - a visitor which extends the `RuleWalker` class which provides some primitives for `RuleWalker`s. The `NoAnyWalker` overrides the definition of the `visitAnyKeyword` method and reports a failure once it finds "`any` decorations".
+
+For instance:
+
+```ts
+let foo: any = 32;
+```
+
+Will fail with `type decoration of 'any' is forbidden`.
