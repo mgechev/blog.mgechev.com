@@ -29,5 +29,5 @@ I like talking about software development. I've spoken in San Francisco, Las Veg
 
 And a few others, which could be found at my [GitHub account](https://github.com/mgechev).
 
-If you're looking for speakers for your next JavaScript, Angular, React, etc. related conference you can reach me at *mgechev at gmail*.
+If you're looking for speakers for your next JavaScript, Angular, React, etc. related conference you can reach me at **mgechev at gmail**.
 
