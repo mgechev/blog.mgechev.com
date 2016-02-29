@@ -4,9 +4,9 @@ author: minko_gechev
 layout: page
 ---
 
-## Talks
+![AngularConnect](/images/ngconnect.jpg)
 
-I like talking about software development. I've spoken in Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
+I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
 - ["Building Universal Applications with Angular 2"](https://speakerdeck.com/mgechev/building-universal-applications-with-angular-2), OpenFest 2015 (Sofia, Bulgaria), ITWeekend 2015 (Sofia, Bulgaria), JSTalks 2015 (Sofia, Bulgaria).
 - ["Cutting Angular's Crosscuts](https://speakerdeck.com/mgechev/cutting-angulars-crosscuts), [video (en)](https://www.youtube.com/watch?v=C6e6-31HD5A), AngularConnect (London, United Kingdom, 21st of October, 2015)
