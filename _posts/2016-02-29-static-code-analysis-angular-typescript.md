@@ -289,7 +289,7 @@ Suppose we have the following component definition:
 ```ts
 @Component({
   selector: 'custom-heading',
-  template: '<h1>{{heading}}</h1>'
+  template: '<h1>\{\{heading\}\}</h1>'
 })
 class CustomHeadingComponent {
   heading = 42;
@@ -317,7 +317,7 @@ The first argument of the `parse` method of the parser is the template of the co
 In case `CustomHeadingComponent` is a top-level component we can parse its template with:
 
 ```ts
-parser.parse('<h1>{{heading}}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
+parser.parse('<h1>\{\{heading\}\}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
 ```
 
 The `parse` method will return an `HtmlAst` which can be validated with visitor, similar to the one we use for validation of the TypeScript code.
@@ -426,7 +426,7 @@ Lets take a look at the following component:
 ```ts
 @Component({
   selector: 'custom-cmp',
-  template: '<h1>{{foo + bar}}</h1>'
+  template: '<h1>\{\{foo + bar\}\}</h1>'
 })
 class CustomComponent {
   foo;
@@ -445,7 +445,7 @@ On the image above we can see two ASTs merged together:
 
 The problem now is that although we've parsed both the source file and the template, we haven't parsed the Angular expression. Angular defines a small DSL which allows us to execute different expressions in the context of given component.
 
-In order to verify that the above expression `{{foo + bar}}` could be invoked in the context of `CustomComponent` we need to go through another process of parsing. For this purpose we can use Angular's parser defined under `core/change_detection/parser/parser.ts`.
+In order to verify that the above expression `\{\{foo + bar\}\}` could be invoked in the context of `CustomComponent` we need to go through another process of parsing. For this purpose we can use Angular's parser defined under `core/change_detection/parser/parser.ts`.
 
 We need to get reference to its instance and parse the expression. After that we'll get the following mixture of ASTs:
 
