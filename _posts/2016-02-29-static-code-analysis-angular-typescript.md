@@ -183,7 +183,7 @@ This means that the visitor pattern is perfect for this purpose - we will develo
 
 Here's how we can develop a visitor for this purpose:
 
-```ts
+```typescript
 class InterpretationVisitor {
   execute(ast) {
     ast.statements.forEach(this.visitNode.bind(this));
@@ -216,7 +216,7 @@ class InterpretationVisitor {
 
 Now all we have to do in order to interpret the program is:
 
-```ts
+```typescript
 let visitor = new InterpretationVisitor();
 visitor.execute(root);
 ```
@@ -225,7 +225,7 @@ visitor.execute(root);
 
 Lets peek at a sample rule definition:
 
-```ts
+```typescript
 import * as ts from "typescript";
 import * as Lint from "../lint";
 
@@ -252,7 +252,7 @@ In the snippet above we have definition of two classes:
 
 For instance:
 
-```ts
+```typescript
 let foo: any = 32;
 ```
 
@@ -286,7 +286,7 @@ Lets discuss approaches for handling some of these challenges.
 
 Suppose we have the following component definition:
 
-```ts
+```typescript
 {% raw %}
 @Component({
   selector: 'custom-heading',
@@ -309,7 +309,7 @@ Since it is not responsibility of TypeScript to parse Angular's templates it onl
 Fortunately, Angular 2 exposes its `TemplateParser`. Thanks to Angular's platform agnostic implementation and [parse5](https://github.com/inikulin/parse5), `TemplateParser` could be used in node environment.
 It allows us to parse the templates of our components using the following API:
 
-```ts
+```typescript
 let parser: TemplateParser = injector.get(TemplateParser);
 parser.parse(templateString, directivesList, pipesList, templateUrl);
 ```
@@ -318,7 +318,7 @@ The first argument of the `parse` method of the parser is the template of the co
 
 In case `CustomHeadingComponent` is a top-level component we can parse its template with:
 
-```ts
+```typescript
 {% raw %}
 parser.parse('<h1>{{heading}}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
 {% endraw %}
@@ -330,7 +330,7 @@ The `parse` method will return an `HtmlAst` which can be validated with visitor,
 
 Now lets suppose we have the following components definitions:
 
-```ts
+```typescript
 // cmp_a.ts
 import {Component} from 'angular2/core';
 import {B} from './cmps_b_c';
@@ -342,7 +342,7 @@ import {B} from './cmps_b_c';
 })
 export class A {}
 ```
-```ts
+```typescript
 // cmps_b_c.ts
 import {Component} from 'angular2/core';
 import {D} from './dir_d';
@@ -362,7 +362,7 @@ export class C {}
 export class B {}
 ```
 
-```ts
+```typescript
 // dir_d.ts
 import {Directive} from 'angular2/core';
 
@@ -374,7 +374,7 @@ export class D {}
 
 Lets suppose we want to validate the template of component `B`:
 
-```ts
+```typescript
 parser.parse('<c></c><div d></div>', COMMON_DIRECTIVES, COMMON_PIPES, null);
 ```
 
@@ -427,7 +427,7 @@ The final thing left here is the procedure for validation of the template's expr
 
 Lets take a look at the following component:
 
-```ts
+```typescript
 {% raw %}
 @Component({
   selector: 'custom-cmp',
