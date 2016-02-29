@@ -250,42 +250,6 @@ The way to achieve this goal is to reuse the error reporting mechanism of alread
 
 Thanks to the extensible nature of tslint this is another goal which can be achieved by using it. Verifying that given source file follows defined style guidelines involves static code analysis similar to the one performed by the rules declared by [tslint](https://github.com/palantir/tslint/blob/master/src/rules/) and the [ones developed by the community](https://github.com/palantir/tslint#custom-rule-sets-from-the-community).
 
-#### Current progress
-
-At this point I have some progress here in the master branch of the repository [`ng2lint`](https://github.com/mgechev/ng2lint/).
-
-The following rules are implemented:
-
-- Directive selector type.
-- Directive selector name convention.
-- Directive selector name prefix.
-- Component selector type.
-- Component selector name convention.
-- Component selector name prefix.
-- Use @Input instead of inputs decorator property.
-- Use @Output instead of outputs decorator property.
-- Use @HostListeners and @HostBindings instead of host decorator property.
-- Do not use the @Attribute decorator (implemented by [PreskoIsTheGreatest](https://github.com/PreskoIsTheGreatest)).
-
-#### Further work
-
-Possible improvements which can be achieved here is extension of the default walkers that we already have. For instance adding operations such as:
-
-- `visitDirectiveMetadata`
-- `visitComponentMetadata`
-- `visitHostListener`
-- etc.
-
-could save us form a lot of boilerplate code in ng2lint.
-
-Another possible extension here is validation of the file names we lint based on a semantics gatherd from the file's content.
-
-For instance, if we find out that inside of given file there's definition of a component we can validate that the file name follows the name convention:
-
-```
-NAME.component.ts
-```
-
 ### Verifying Program Correctness
 
 This is the most challenging part of the linter because of the following reasons:
@@ -336,33 +300,6 @@ parser.parse('<h1>{{heading}}</h1>', COMMON_DIRECTIVES, COMMON_PIPES, null);
 ```
 
 The `parse` method will return an `HtmlAst` which can be validated with visitor the same way we vaidate the rest of the code.
-
-#### Externalized templates which need to be loaded from disk
-
-Now lets suppose instead of `template` our component uses `templateUrl`. This means that our validator need to read the template from the disk, in a directory (usually) relative to the component's definition.
-
-The disk I/O operations are slow:
-
-```
-Latency Comparison Numbers
---------------------------
-L1 cache reference                           0.5 ns
-Branch mispredict                            5   ns
-L2 cache reference                           7   ns                      14x L1 cache
-Mutex lock/unlock                           25   ns
-Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
-Compress 1K bytes with Zippy             3,000   ns        3 us
-Send 1K bytes over 1 Gbps network       10,000   ns       10 us
-Read 4K randomly from SSD*             150,000   ns      150 us          ~1GB/sec SSD
-Read 1 MB sequentially from memory     250,000   ns      250 us
-Round trip within same datacenter      500,000   ns      500 us
-Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
-Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
-Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
-Send packet CA->Netherlands->CA    150,000,000   ns  150,000 us  150 ms
-```
-
-This means that in the perfect scenario we want to read external templates from disk **only** when they change. This could be achieved with something like [`fs.watch`](https://nodejs.org/docs/latest/api/fs.html) or any of its high-level wrappers.
 
 #### Definitions of directives and components which need to be resolved
 
@@ -490,3 +427,92 @@ In order to verify that the above expression `{{foo + bar}}` could be invoked in
 We need to get reference to its instance and parse the expression. After that we'll get the following mixture of ASTs:
 
 ![](../images/ng2ast_html_expr.png)
+
+Now, at this point, we can walk the most bottom AST and see whether the identifiers there are defined in the class `CustomComponent`.
+
+#### Externalized templates which need to be loaded from disk
+
+Now lets suppose instead of `template` our component uses `templateUrl`. This means that our validator need to read the template from the disk, in a directory (usually) relative to the component's definition.
+
+The disk I/O operations are slow:
+
+```
+Latency Comparison Numbers
+--------------------------
+L1 cache reference                           0.5 ns
+Branch mispredict                            5   ns
+L2 cache reference                           7   ns                      14x L1 cache
+Mutex lock/unlock                           25   ns
+Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
+Compress 1K bytes with Zippy             3,000   ns        3 us
+Send 1K bytes over 1 Gbps network       10,000   ns       10 us
+Read 4K randomly from SSD*             150,000   ns      150 us          ~1GB/sec SSD
+Read 1 MB sequentially from memory     250,000   ns      250 us
+Round trip within same datacenter      500,000   ns      500 us
+Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
+Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
+Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
+Send packet CA->Netherlands->CA    150,000,000   ns  150,000 us  150 ms
+```
+
+This means that in the perfect scenario we want to read external templates from disk **only** when they change. This could be achieved with something like [`fs.watch`](https://nodejs.org/docs/latest/api/fs.html) or any of its high-level wrappers.
+
+## Current Progress
+
+A few weeks ago I developed a few rules for `tslint` which add some custom Angular 2 specific validation behavior. The project is located in the master branch of the [ng2lint](https://github.com/mgechev/ng2lint) repository.
+
+According to [`npm`](https://www.npmjs.com/package/ng2lint) on avarage it has 150 downloads per day.
+
+The rules I develop include:
+
+- Directive selector type.
+- Directive selector name convention.
+- Directive selector name prefix.
+- Component selector type.
+- Component selector name convention.
+- Component selector name prefix.
+- Use @Input instead of inputs decorator property.
+- Use @Output instead of outputs decorator property.
+- Use @HostListeners and @HostBindings instead of host decorator property.
+- Do not use the @Attribute decorator (implemented by [PreskoIsTheGreatest](https://github.com/PreskoIsTheGreatest)).
+
+Possible improvements which can be achieved here is extension of the default walkers that we already have. For instance adding operations such as:
+
+- `visitDirectiveMetadata`
+- `visitComponentMetadata`
+- `visitHostListener`
+- etc.
+
+could save us form a lot of boilerplate code in ng2lint.
+
+Another possible extension here is validation of the file names we lint based on a semantics gatherd from the file's content.
+
+For instance, if we find out that inside of given file there's definition of a component we can validate that the file name follows the name convention:
+
+```
+NAME.component.ts
+```
+
+The last weekend I spend playing with more advanced implementation of the linter which aims validation of correctness. The entire progress is located in the [advanced branch of ng2lint](https://github.com/mgechev/ng2lint/tree/advanced/).
+
+In this branch I implemented the following:
+
+- Building in-memory intermediate representation of the component tree.
+- Reads externalized templates from disk
+- Validating component's templates for missing pipes/directives declared for given sub tree.
+- Parsing component's templates.
+
+The most significant and straightforward part of the validation is to parse the inlined expressions and verify that all the identifiers are defined.
+
+Another thing which needs to be done is to integrate both tools together. This will allow the "validating correctness module" to use the error reporting mechanism of tslint and work out of the box with editors like VSCode, WebStorm, etc.
+
+## Conclusion
+
+The process of building a complete linter for Angular 2 is quite challenging because of several reasons:
+
+- Computational intensity.
+- Various intermediate code representations.
+- Integration with the existing compiler of TypeScript.
+- Integration with existing linters such as tslint for working out of the box error reporting mechanism.
+
+Fortunately, neither of the challenging tasks is not related to nondeterminsm introduced by the framework. The Angular core team did great design decisions for making the static code analysis and tooling possible.
