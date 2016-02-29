@@ -1,4 +1,3 @@
-
 ---
 title: Static Code Analysis of Angular 2 and TypeScript
 author: minko_gechev
@@ -21,6 +20,8 @@ So far, most of the blog posts I've written are tutorials; they explain how we c
 - [ViewChildren and ContentChildren in Angular 2](http://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders)
 - [Build Your own Simplified AngularJS in 200 Lines of JavaScript](http://blog.mgechev.com/2015/03/09/build-learn-your-own-light-lightweight-angularjs)
 - [Remote Desktop Client with AngularJS and Yeoman](http://blog.mgechev.com/2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/)
+
+*The code for the current research could be found [here](https://github.com/mgechev/ng2lint/tree/master) and [here](https://github.com/mgechev/ng2lint/tree/advanced).*
 
 The current post is about an exciting project I am working on in my spare time. A few days ago I [explained my motivation](http://blog.mgechev.com/2016/02/18/angular2-style-guide-best-practices-lint-tslint) behind the ["Community-drive Style Guide" for Angular 2](https://github.com/mgechev/angular2-style-guide) that we're working on. I also mentioned that I am planning to build a configurable static-code analyzer, which makes sure given project follows best practices and contains "correct" Angular 2 code. I called this project [`ng2lint`](https://github.com/mgechev/ng2lint).
 
@@ -158,7 +159,7 @@ Deep-dive in parsing is out of the scope of the current article but lets tell a 
 
 Lets take a look at the AST of the program above:
 
-![AST](../images/ast.png)
+![AST](/images/ast.png)
 
 In case you're interested in further reading about parsers, take a look at the following resources:
 
@@ -297,7 +298,7 @@ class CustomHeadingComponent {
 
 Once TypeScript's compiler parses Angular program the AST will look something like:
 
-![Simple TypeScript AST of Angular program](../images/ng2ast.png)
+![Simple TypeScript AST of Angular program](/images/ng2ast.png)
 
 Notice the red node in the bottom-right - it is the initializer of the second key-value pair from the object literal that we pass to the `@Component` decorator.
 
@@ -435,7 +436,7 @@ class CustomComponent {
 
 If we parse this source file using TypeScript's parser and after that we parse its template by using Angular's `TemplateParser` we will get:
 
-![AST of Angular component with parsed template](../images/ng2ast_html.png)
+![AST of Angular component with parsed template](/images/ng2ast_html.png)
 
 On the image above we can see two ASTs merged together:
 
@@ -448,7 +449,7 @@ In order to verify that the above expression `{{foo + bar}}` could be invoked in
 
 We need to get reference to its instance and parse the expression. After that we'll get the following mixture of ASTs:
 
-![AST of Angular component with parsed template and template expressions](../images/ng2ast_html_expr.png)
+![AST of Angular component with parsed template and template expressions](/images/ng2ast_html_expr.png)
 
 Now, at this point, we can traverse the bottom most AST and see whether the identifiers there exist in the corresponding symbol table (which is the instance of the `CustomComponent` controller).
 
@@ -540,3 +541,18 @@ The process of building a complete linter for Angular 2 is quite challenging bec
 - Integration with existing linters such as `tslint` for working out of the box error reporting mechanism.
 
 Fortunately, neither of the challenging tasks is not related to nondeterminism introduced by the framework. The Angular core team did great design decisions for making the static code analysis and tooling possible.
+
+## Resources
+
+- [ng2lint's Official Repository](https://github.com/mgechev/ng2lint)
+- [tslint's Official Page](https://palantir.github.io/tslint/)
+- [Angular 2's Official Repository](https://github.com/angular/angular)
+- [TypeScript's Official Repository](https://github.com/Microsoft/TypeScript)
+- [Modern Compiler Design 2nd ed. 2012 Edition](http://www.amazon.com/Modern-Compiler-Design-Dick-Grune/dp/1461446988)
+- [Modern Compiler Implementation in Java 2nd Edition](http://www.amazon.com/gp/product/052182060X/)
+- [Modern Compiler Implementation in Java 2nd Edition](http://www.amazon.com/gp/product/052182060X/)
+- [Finite Automata](https://en.wikipedia.org/wiki/Finite-state_machine)
+- [Regular Expressions](https://en.wikipedia.org/wiki/Regular_expression)
+- [Context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar)
+- [Extended Backus–Naur Form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form)
+- [Abstract syntax trees](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
