@@ -262,7 +262,7 @@ Now when we run:
 $ tsc
 ```
 
-We can even remove the `<reference/>` tag from `jquery-demo.ts` and everything is still going to work! The behaviour of `tsc` in this case will be: "Take **all** the files and **all** the type definitions from the current directory and all of its subdirectories, except the ones declared in the 'exclude' array".
+We can even remove the `<reference/>` tag from `jquery-demo.ts` and everything is still going to work! The behaviour of `tsc` in this case will be: "Take **all** the files and **all** the type definitions from the current directory and all of its subdirectories, **except the ones declared in the 'exclude'** array".
 
 ### No Namespacing of Type Definitions
 
