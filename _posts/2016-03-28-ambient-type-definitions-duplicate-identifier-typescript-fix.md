@@ -48,7 +48,6 @@ class Superhero extends Person {
 let bar = new Person();
 
 bar.fly();
-
 ```
 
 If we try to compile the above file, the TypeScript compiler will throw the following error:
