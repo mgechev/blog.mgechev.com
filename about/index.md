@@ -49,6 +49,7 @@ Some of the open source projects I've developed are:
 - [plainvm](http://plainvm.mgechev.com/)
 - [codelyzer - static code analyzer for Angular 2 and TypeScript projects](https://github.com/mgechev/codelyzer)
 - [aspect.js - Library for aspect-oriented programming in JavaScript](https://github.com/mgechev/aspect.js)
+- [data-adapter - Micro library which allows declarative data transformation](https://github.com/mgechev/data-adapter)
 - [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [BlobReader - a simplified interface for reading Blobs](https://github.com/mgechev/blobreader)
 - [VNC plugin for Chrome DevTools](https://github.com/mgechev/devtools-vnc)
