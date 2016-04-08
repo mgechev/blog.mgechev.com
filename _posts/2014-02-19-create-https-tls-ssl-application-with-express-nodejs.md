@@ -23,7 +23,7 @@ Sometimes you want to test your application in environment closer to the real wo
 
 Here are two simple steps, which can be used to achieve this result:
 
- ### Generate self-signed certificate
+### Generate self-signed certificate
 
 If you don&#8217;t already have certificate you need to generate one:
 
