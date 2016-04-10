@@ -145,6 +145,7 @@ In order to be able to explain the concepts easier, I'll put them into the conte
 ![](/images/scalable-app/single.gif)
 
 - Multi player - allows you to compete with another player through the network. Both players connect to each other through WebRTC. Once the connection is established they start exchanging messages related to the game progress of one another. When any of the players completes her challenge she is declared as the winner:
+
 ![](/images/scalable-app/multi.gif)
 
 Now lets go through the layers from the diagram above, starting with the:
