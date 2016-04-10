@@ -464,14 +464,14 @@ Thanks to the current architecture we can:
 
 ### Configuration of Dependencies
 
-Now lets take a step back and look at the single-player service:
+Now lets take a step back and look at the single-player component:
 
 ```ts
 @Component({
   // more component-specific declarations
   providers: [
-    provide(AsyncService, { multi: true, useClass: GameServer }),
-    GameModel
+    provide(AsyncService, { multi: true, useClass: GameServer })
+    //...
   ]
 })
 export class SinglePlayerComponent {
@@ -479,9 +479,36 @@ export class SinglePlayerComponent {
 }
 ```
 
-In order to make the implementation more interested lets include one more rule. When we invoke the `onProgress` method of the model we want a new request to the server to be sent. The model will forward this action to a `GameServer` async service which will send it through the network. Based on the current entered text and the previous one, the remote service will decide whether the game is valid or not (imagine the user hasn't entered anything in the text field but instead copies and pastes the text content above directly. In such case the game should be invalid).
+In order to make the implementation more interested lets include one more rule. When we invoke the `onProgress` method of the model we want a new request to the server to be sent. The model will forward this action to a `GameServer` async service which will map it to a command with specific payload and send it through the network, using given gateway. Based on the current entered text and the previous state, the remote service will decide whether the game is valid or not (imagine the user hasn't entered anything in the text field but instead copies and pastes the text content above directly; in such case the game should be invalid).
+We can easily pass the `GameServer` async service using the multi-provider above. Multi-providers in Angular allow us to have multiple providers associated to the same token.
+
+In the multi-player screen we want to not only validate the game using the `GameServer` but also to send notification to the connected peer with our progress. This can happen with adding a single line of code:
+
+```ts
+@Component({
+  // more component-specific declarations
+  providers: [
+    provide(AsyncService, { multi: true, useClass: GameServer }),
+    provide(AsyncService, { multi: true, useClass: GameP2PService }),
+    //...
+  ]
+})
+export class MultiPlayerComponent {
+  // Some basic logic here
+}
+```
+
+This way to our `GameModel` in the context of the `MultiPlayerComponent` will be passed two async services: `GameServer` and `GameP2PService`.
 
 
+## Conclusion
 
+The above architecture has a couple of properties:
 
-In single-player mode, `onProgress` should activate only the `GameServer` service because we want to only check whether the current move is valid or not. However, in multi-player mode we want not only
+- Predictable state management thanks to the redux-like style of programming.
+- Testability. For resolving any of the dependencies we're using the dependency injection mechanism of Angular 2 so we can easily mock any of them for our testing environment.
+- Easy for newcomers to join the project. When a developer who is not familiar with the architecture joins the team she can start developing components in the UI layer and use the facades which abstract the async services layer and the state management. To new developers the architecture will look like traditional MVC.
+- Context dependent dependencies. We can reuse our models and therefore follow the open-closed principle by using context specific async services.
+- Explicitness. The async services layer is explicit and each async service implements the action to command mapping by itself. Across async services we can have shared [data adapters](http://npmjs.org/package/data-adapter).
+- Easy management of asynchronous events. Thanks to RxJS we can treat such events as streams and apply high-order functions over them.
+
