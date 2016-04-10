@@ -146,7 +146,7 @@ The UI components layer contains framework-specific components (in our case Angu
 
 The entire component tree is nothing more than the [composite pattern](https://en.wikipedia.org/wiki/Composite_pattern) and we have [controllers](http://martinfowler.com/eaaCatalog/pageController.html) associated to the individual components.
 
-![](/images/patterns/structural/composite.svg)
+![](/wp-content/uploads/patterns/composite.png)
 
 Here's a sample implementation of the game component from the sample application explained above:
 
