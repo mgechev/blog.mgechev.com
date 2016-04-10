@@ -218,6 +218,7 @@ Using high-level abstraction such as the `GameModel` allows new team members to 
 ### Model Definition
 
 The facade used by the game component is the `GameModel`. Here's its definition:
+
 ```ts
 @Injectable()
 export class GameModel extends Model {
