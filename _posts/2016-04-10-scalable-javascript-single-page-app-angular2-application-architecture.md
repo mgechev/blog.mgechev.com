@@ -22,7 +22,7 @@ A couple of months ago I started working on a single-page  application with quit
 
 ## Requirements
 
-The application is the core product of a startup I am working on and has quite dynamic requirements because of the early stage of its development and the competitive business environment.
+The application is the core product of a startup I am working on and has quite **dynamic requirements** because of the early stage of its development and the competitive business environment.
 
 ### Scalable Communication Layer
 
@@ -36,7 +36,7 @@ On top of that we may (or may not) have the following:
 - Other parties who have established p2p connection with the current user.
 - Real-time communication with application server.
 
-Given the multiple communication protocols (HTTP, WebSocket, UDP via WebRTC) we need different package formats:
+Given the **multiple communication protocols** (HTTP, WebSocket, UDP via WebRTC) we need different package formats:
 
 - JSON-based for HTTP and/or WebSocket
 - [JSON-RPC](http://jsonrpc.org) for WebSocket
@@ -62,7 +62,7 @@ Talking about team...
 
 ### Modular Design
 
-As mentioned, the team will scale. The level of experience of the team members will differ. This means that multiple people with different level of expertise need to work together on the same project. In the perfect scenario, the most junior team members could be completely unfamiliar with the functional paradigm and still be productive. In order to achieve this we need to provide high-level abstractions which makes us feel we are using a simple MVC.
+As mentioned, the team will scale. The level of experience of the team members will differ. This means that **multiple developers with different level of expertise** need to work together on the same project. In the perfect scenario, the most junior team members could be completely unfamiliar with the functional paradigm and still be productive. In order to achieve this we need to provide high-level abstractions which makes us feel we are using a simple MVC.
 
 The layered diagram below shows the core modules of the architecture we stopped on:
 
@@ -86,11 +86,11 @@ The context of the facades in our application is going to be determined by the c
 
 This means that inside of the `SinglePlayerComponent` we want our `GameModel` (the facade) to use the `GameServer` async service; inside of `MultiPlayerComponent` the `GameModel` should use `GameServer` as well as `GameP2PService`.
 
-Having such context dependent dependency instantiation is a perfect candidate for using [**Dependency Injection Pattern**](https://en.wikipedia.org/wiki/Dependency_injection).
+Having such **context dependent dependency instantiation** is a perfect candidate for using [**Dependency Injection Pattern**](https://en.wikipedia.org/wiki/Dependency_injection).
 
 ### Lazy-loading
 
-The application can grow a lot. It may become more than 50k lines of JavaScript, which means that lazy-loading of the individual [bounded contexts](http://martinfowler.com/bliki/BoundedContext.html) is essential.
+The application will grow a lot. It may become more than 50k lines of JavaScript, which means that **lazy-loading of the individual [bounded contexts](http://martinfowler.com/bliki/BoundedContext.html)** is essential.
 
 If we think in terms of the game we mentioned earlier, we want to have the following directory structure:
 
@@ -110,15 +110,15 @@ If we think in terms of the game we mentioned earlier, we want to have the follo
 
 Once the user opens the home screen we want to load the entire `home` directory, together with the `shared` directory. If right after that the user navigates to the single-player page we want to download only the content of the `single-player` directory, etc.
 
-Using this directory structure, we can easy distribute the application development among the individual team members by providing one such bounded context to a developer, for instance.
+Using this directory structure, we can easy **distribute the application development among the individual team members** by providing one such bounded context to a developer, for instance.
 
 ### Other requirements
 
 For the architecture we also have the standard set of requirements including:
 
-- Testability.
-- Maintability.
-- [Open/closed](https://en.wikipedia.org/wiki/Open/closed_principle).
+- **Testability**.
+- **Maintability**.
+- [**Open/closed**](https://en.wikipedia.org/wiki/Open/closed_principle).
 
 ## Technology Stack
 
