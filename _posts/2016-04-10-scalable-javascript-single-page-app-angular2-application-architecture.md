@@ -512,6 +512,20 @@ export class MultiPlayerComponent {
 
 This way, when the `GameModel` is used in the context of the `MultiPlayerComponent`, it will receive two async services: `GameServer` and `GameP2PService`.
 
+## Recap
+
+The diagram below ilustrates a sample use case of the application - user login scenario.
+
+![](/images/scalable-app/arch.png)
+
+The image is devided into six different sectors:
+
+- Component tree - encapsulates the UI related logic.
+- Model - provides facade for the state management and data communication layers.
+- State - immutable tree which contains the applicaiton state.
+- Service layer - encapsulates the communication logic with external services.
+- Communicaiton logic - encapsulates the communication protocols and package formats of external services.
+
 ## Conclusion
 
 The proposed architecture above has the following properties:
