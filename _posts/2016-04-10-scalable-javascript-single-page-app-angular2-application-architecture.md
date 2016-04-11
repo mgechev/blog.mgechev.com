@@ -340,7 +340,6 @@ Also, the format of the data can be different. For instance, lets say we want to
 For instance, lets take a look at the implementation of the `GameP2PService`:
 
 ```ts
-
 @Injectable()
 export class GameP2PService extends AsyncService {
   constructor(private _rtcGateway: WebRTCGateway, private _store: Store<any>) {
