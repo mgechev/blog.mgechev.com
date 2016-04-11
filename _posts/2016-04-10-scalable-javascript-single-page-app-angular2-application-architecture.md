@@ -160,7 +160,7 @@ The entire component tree is nothing more than the [composite pattern](https://e
 
 Here's a sample implementation of the `GameComponent` from the sample application explained above:
 
-```ts
+```typescript
 @Component({
   // Some component-specific declarations
   providers: [GameModel]
