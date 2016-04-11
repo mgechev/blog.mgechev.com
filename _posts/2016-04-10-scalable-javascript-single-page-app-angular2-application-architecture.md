@@ -514,7 +514,7 @@ This way, when the `GameModel` is used in the context of the `MultiPlayerCompone
 
 ## Recap
 
-The diagram below ilustrates a sample use case of the application - user login scenario.
+The diagram below ilustrates a sample use case of the application - user registration scenario.
 
 ![](/images/scalable-app/arch.png)
 
