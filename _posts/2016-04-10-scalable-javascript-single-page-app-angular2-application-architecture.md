@@ -539,7 +539,7 @@ The proposed architecture above has the following properties:
 
 ## Slides from my talk
 
-Here you can find slides from talk I did on the subject:
+Here you can find slides from a talk I did on this subject:
 
 <script async class="speakerdeck-embed" data-slide="2" data-id="f4ea5093eaf241e3b4a45f40ab10dc03" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
