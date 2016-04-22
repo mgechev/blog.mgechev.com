@@ -26,7 +26,7 @@ The application is the core product of a startup I am working on and has quite *
 
 ### Scalable Communication Layer
 
-We have relatively stable business domain, however, there are could be several external actors which will mutate the state of the application. We have the usual:
+We have relatively stable business domain, however, there are several external actors which will mutate the state of the application. We have the usual:
 
 - User of the application.
 - RESTful API.
@@ -48,7 +48,7 @@ Given all the services we need to communicate with, RxJS seems like a perfect fi
 
 ### Predictable State Management
 
-In the above scenario there are multiple sources of mutation. The user is the most obvious one, the push notifications that we will get from the real-time services is another and the other peers we communicate with using WebRTC are a third source. Having a predictable state management is quite essential in order to not each a point where we have different versions of the store, containing different data.
+In the above scenario there are multiple sources of mutation. The user is the most obvious one, the push notifications that we will get from the real-time services is another and the other peers we communicate with using WebRTC are a third source. Having a predictable state management is quite essential in order to not reach a point where we have different versions of the store, containing different data.
 
 There are many patterns which help us achieve predictable state management. Currently the most popular one is [redux](http://redux.js.org/). In order to have type safety and good tooling we bet on TypeScript.
 
@@ -70,11 +70,11 @@ The layered diagram below shows the core modules of the architecture we stopped 
 
 The top layer includes the **UI components** that the user is going to directly interact with, for instance, dialogs, forms, etc.
 
-The **facade** below the UI components' layer represents "a set of objects that provide a simplified interface to a larger body of code". Basically, the main purpose of this layer is to provide a set of classes that allow us to trigger application specific actions that will augment the reducers' calls, and forward actions to **async services**. The reducers and the state from the diagram above are the exact same components know from the redux pattern.
+The **facade** below the UI components' layer represents "a set of objects that provide a simplified interface to a larger body of code". Basically, the main purpose of this layer is to provide a set of classes that allow us to trigger application specific actions that will augment the reducers' calls, and forward actions to **async services**. The reducers and the state from the diagram above are the exact same components known from the redux pattern.
 
-From now on, for simplicity lets call our facades **models**. For instance, if we have are developing a game, inside of our `GameComponent` we will use the `GameModel` which abstracts the store mutation, as well as the **async services**.
+From now on, for simplicity lets call our facades **models**. For instance, if we are developing a game, inside of our `GameComponent` we will use the `GameModel` which abstracts the store mutation, as well as the **async services**.
 
-Another core role of the facades is to forward the actions used by the reducers to a set of **async services**. Once given action is being triggered, it will be passed to an async service that will handle it somehow. We can think of the async services as [remote proxies](https://en.wikipedia.org/wiki/Proxy_pattern) to external services. They map the application specific actions to remote commands. Then why is this component called async service instead of remote service? Async services should handle all calls to asynchronous APIs,including WebRTC, WebSocket, as well as, IndexDB.
+Another core role of the facades is to forward the actions used by the reducers to a set of **async services**. Once a given action is being triggered, it will be passed to an async service that will handle it somehow. We can think of the async services as [remote proxies](https://en.wikipedia.org/wiki/Proxy_pattern) to external services. They map the application specific actions to remote commands. Then why is this component called async service instead of remote service? Async services should handle all calls to asynchronous APIs,including WebRTC, WebSocket, as well as IndexDB.
 
 In case we have an async service that represents a proxy to a RESTful API, it will hold a reference to an HTTP gateway. Once the async service receives an instance of an action, it will map the action to a RESTful command and sent it through the gateway.
 
@@ -110,7 +110,7 @@ If we think in terms of the game we mentioned earlier, we want to have the follo
 
 Once the user opens the home screen we want to load the entire `home` directory, together with the `shared` directory. If right after that the user navigates to the single-player page we want to download only the content of the `single-player` directory, etc.
 
-Using this directory structure, we can easy **distribute the application development among the individual team members** by providing one such bounded context to a developer, for instance.
+Using this directory structure, we can easily **distribute the application development among the individual team members** by providing one such bounded context to a developer, for instance.
 
 ### Other requirements
 
@@ -260,7 +260,7 @@ The `GameModel` can start the game by dispatching the `startGame` action, create
 this._store.dispatch(GameActions.startGame());
 ```
 
-Calling the `dispatch` method of the store with give action will apply all the registered reducers to the store, with the passed action as an argument and will produce a new store. This store will be then emitted to the view through the `game$` observable. The entire flow represents something like:
+Calling the `dispatch` method of the store with given action will apply all the registered reducers to the store, with the passed action as an argument and will produce a new store. This store will be then emitted to the view through the `game$` observable. The entire flow represents something like:
 
 ![](/images/scalable-app/ngrx.png)
 
@@ -285,7 +285,7 @@ export const gameReducer = (state: any = initialState.get('game'), action: Actio
 };
 ```
 
-Now lets trace what will happen when we emit the `invalidGame` action.
+Now let's trace what will happen when we emit the `invalidGame` action.
 
 - The store will invoke all the reducers associated to it, including the `gameReducer` defined above.
 - The `gameReducer` will produce a new game by setting the `invalid` property to `true` of the `state` object.
@@ -308,7 +308,7 @@ Now lets trace what will happen when we emit the `invalidGame` action.
     </div>
   ```
 
-Alright. This was pure ngrx/redux stuff. Now lets take a look at how we use the:
+Alright. This was pure ngrx/redux stuff. Now let's take a look at how we use the:
 
 ### Async Services
 
@@ -330,10 +330,10 @@ export abstract class Model {
   }
 }
 ```
-Once the services' call completes we can handle the returned by them result. For instance, above when the services' call fails we emit the `gameInvalid` action and change the state of the game. Notice that in case of multiple services it won't be practical so this logic should be moved to the async service itself.
+Once the services' call completes we can handle the result returned by them. For instance, above when the services' call fails we emit the `gameInvalid` action and change the state of the game. Notice that in case of multiple services it won't be practical so this logic should be moved to the async service itself.
 
 Alright, but the different services can use different communication protocol, which means different data packages. For instance, the `GameServer` can use JSON-RPC-like messages but in multi-player mode we may want to exchange BERT packages.
-Also, the format of the data can be different. For instance, lets say we want to send the entire text that the user have typed in case of the `GameServer` but we want to send only the change between the current text value and the previous value in case of the `GameP2PService` (used in multi-player mode).
+Also, the format of the data can be different. For instance, lets say we want to send the entire text that the user has typed in case of the `GameServer` but we want to send only the change between the current text value and the previous value in case of the `GameP2PService` (used in multi-player mode).
 
 **The responsibility of mapping the domain model to the remote service's model representation, as well as taking care of the format of the packages belongs to the `AsyncService` itself.** It is the only module which "understands" the remote service.
 
@@ -410,11 +410,11 @@ And a single public method:
 
 - `send` - sends data and returns an observable. [Why I decided to return observable instead of promise](https://github.com/angular/angular/issues/5876)?
 
-Now lets see what we actually send through the network:
+Now let's see what we actually send through the network:
 
 ### Commands and Payloads
 
-We want to **not couple the individual commands with the transport protocol**. This means that should be able to:
+We want to **not couple the individual commands with the transport protocol**. This means that we should be able to:
 
 - Send RPC commands through an HTTP, WebSockets, WebRTC gateways.
 - Use BERT/JSON or whatever for payloads of RESTful/RPC commands.
@@ -475,7 +475,7 @@ Thanks to the current architecture we can implement:
 
 ### Configuration of Dependencies
 
-Now lets take a step back and look at the single-player component:
+Now let's take a step back and look at the single-player component:
 
 ```ts
 @Component({
@@ -522,7 +522,7 @@ The image is devided into six different sectors:
 
 - Component tree - encapsulates the UI related logic.
 - Model - provides facade for the state management and data communication layers.
-- State - immutable tree which contains the applicaiton state.
+- State - immutable tree which contains the application state.
 - Service layer - encapsulates the communication logic with external services.
 - Communicaiton logic - encapsulates the communication protocols and package formats of external services.
 
@@ -533,7 +533,7 @@ The proposed architecture above has the following properties:
 - **Predictable state management** thanks to the redux-like pattern it is based on. All the gateways, models, async services, commands, payloads **must be stateless**.
 - **Testability**. For resolving any of the services we're using the dependency injection mechanism of Angular 2 so we can easily mock any of them for our testing environment.
 - **Easy for newcomers to join the project**. When a developer who is not familiar with the architecture joins the team she can start developing components in the UI layer and use the facades which abstract the async services layer, and the state management. To new developers the architecture will look like traditional MVC.
-- **Context dependent dependencies**. We can reuse the models across components since they are not dependent by the async services they use. Therefore we are follow the open-closed principle by using context specific async services.
+- **Context dependent dependencies**. We can reuse the models across components since they are not dependent by the async services they use. Therefore we follow the open-closed principle by using context specific async services.
 - **Explicitness**. The async services layer is explicit and each async service implements the action-to-command mapping by itself. Across async services we can have shared [data adapters](http://npmjs.org/package/data-adapter).
 - **Easy management of asynchronous events**. Thanks to RxJS we can treat such events as streams and apply high-order functions over them.
 
