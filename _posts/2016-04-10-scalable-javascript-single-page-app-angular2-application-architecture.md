@@ -537,3 +537,9 @@ The proposed architecture above has the following properties:
 - **Explicitness**. The async services layer is explicit and each async service implements the action-to-command mapping by itself. Across async services we can have shared [data adapters](http://npmjs.org/package/data-adapter).
 - **Easy management of asynchronous events**. Thanks to RxJS we can treat such events as streams and apply high-order functions over them.
 
+## Slides from my talk
+
+Here you can find slides from talk I did on the subject:
+
+<script async class="speakerdeck-embed" data-slide="2" data-id="f4ea5093eaf241e3b4a45f40ab10dc03" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
