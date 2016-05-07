@@ -8,6 +8,7 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
+- ["Automated Angular 2 Style Checking with Codelyzer"](https://youtu.be/bci-Z6nURgE), ng-conf (Salt Lake City, Utah, United States, 6th of May, 2016)
 - ["Scalable Angular 2 Application Architecture"](https://speakerdeck.com/mgechev/scalable-angular-2-application-architecture), FDConf (Minsk, Belarus, 16th of April, 2016)
 - ["Angular 2 - Quick Web Start"](https://speakerdeck.com/mgechev/angular-2-quick-web-start), "Angular 2 ❤ NativeScript" (Sofia, Bulgaria, 10th of March, 2016)
 - ["Building Universal Applications with Angular 2"](https://speakerdeck.com/mgechev/building-universal-applications-with-angular-2), OpenFest 2015 (Sofia, Bulgaria), ITWeekend 2015 (Sofia, Bulgaria), JSTalks 2015 (Sofia, Bulgaria).
