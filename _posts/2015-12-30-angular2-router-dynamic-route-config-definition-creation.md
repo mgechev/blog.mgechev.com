@@ -13,7 +13,7 @@ tags:
 ---
 
 <div class="warning">
-  **Warning**: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
+  <strong>Warning</strong>: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
 </div>
 
 A couple of months ago I wrote ["Lazy Loading of Route Components in Angular 2"](http://blog.mgechev.com/2015/09/30/lazy-loading-components-routes-services-router-angular-2/), where I explained how we can take advantage of the `AsyncRoute`s and the [virtual proxy pattern](https://en.wikipedia.org/wiki/Proxy_pattern) in Angular 2.
