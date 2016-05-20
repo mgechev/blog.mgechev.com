@@ -12,6 +12,10 @@ tags:
   - Router
 ---
 
+<div class="warning">
+  **Warning**: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
+</div>
+
 A couple of months ago I wrote ["Lazy Loading of Route Components in Angular 2"](http://blog.mgechev.com/2015/09/30/lazy-loading-components-routes-services-router-angular-2/), where I explained how we can take advantage of the `AsyncRoute`s and the [virtual proxy pattern](https://en.wikipedia.org/wiki/Proxy_pattern) in Angular 2.
 
 This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user's experience.

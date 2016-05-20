@@ -13,6 +13,10 @@ tags:
   - Performance
 ---
 
+<div class="warning">
+  **Warning**: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
+</div>
+
 For the examples in the content below I've used the [angular2-seed](https://github.com/mgechev/angular2-seed) project. The code for the article could be found at my [GitHub account](https://github.com/mgechev/lazy-loading-routes-angular2).
 
 This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we're about to solve.
