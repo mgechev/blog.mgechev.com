@@ -364,7 +364,6 @@ private _getInstruction(urlPath: string, urlParams: string[],
   this._cache.set(hashKey, instruction);
   return instruction;
 }
-
 ```
 
 So we're done with most of the work!
