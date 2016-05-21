@@ -13,7 +13,7 @@ tags:
   - Performance
 ---
 
-<div class="warning">
+<div class="error-box">
   <strong>Warning</strong>: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
 </div>
 
