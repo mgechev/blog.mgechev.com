@@ -1,5 +1,5 @@
 ---
-title: Implementing the Missing "resolve" Function in the Angular 2 Router
+title: Implementing the Missing "resolve" Feature of the Angular 2 Router
 author: minko_gechev
 layout: post
 categories:
@@ -21,7 +21,7 @@ With the `router-deprecated` module we can get similar behavior by using `@CanAc
 In this article I'll explain what solution we use until the `resolve` functionality is supported. Demo of the final result can be found [here](#demo). The code associated to this article is at [my GitHub account](https://github.com/mgechev/ng2-router).
 
 <div class="warning-box">
-  <strong>Disclaimer</strong>: This article is mostly for learning purposes. It uses already deprecated Angular 2 module and offers a custom solution.
+  <strong>Disclaimer</strong>: This article is mostly for learning purposes. It uses already deprecated Angular 2 module and offers a custom solution which most likely will not be supported in future.
 </div>
 
 The article is structured in the following way:
