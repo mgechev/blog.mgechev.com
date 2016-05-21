@@ -46,7 +46,7 @@ Here's demo of final result of our implementation:
 
 With the deprecated router our routes configuration looks like:
 
-```typescript
+```javascript
 @Component(...)
 @RouteConfig([
   {
@@ -67,7 +67,7 @@ Our goal is to be able to perform an asynchronous action on which given routing 
 
 This means that we need to change the route definition objects to something like:
 
-```typescript
+```javascript
 @Component(...)
 @RouteConfig([
   {
@@ -91,7 +91,7 @@ Once the user navigates to `/about/:joe`, for instance, we will load all the use
 
 A better API will be:
 
-```typescript
+```javascript
 @Component(...)
 @RouteConfig([
   {
@@ -126,7 +126,7 @@ In order to get a better idea of what we want to achieve, lets take a look at a 
 
 Now, lets define our base component:
 
-```typescript
+```javascript
 @Component(...)
 @RouteConfig([
   {
@@ -155,7 +155,7 @@ Inside of it we define an `About` route which has a `defer` property. In the `re
 
 In order to get the value that we resolved the promise with we can do the following:
 
-```typescript
+```javascript
 import { Component, Inject } from '@angular/core';
 import { DEFER } from '@angular/router-deprecated';
 
@@ -197,7 +197,7 @@ As first step we will fork the `router-deprecated` module [located here](https:/
 
 Since we want to provide slightly different APIs for routes definition we need to modify the `route_definition.ts` file:
 
-```typescript
+```javascript
 export interface RouteDefinition {
   // All the properties we're familiar with...
   defer?: Defer;
@@ -219,7 +219,7 @@ The only new property we introduced here is an optional one called `defer`. It m
 
 Doesn't the `Defer` interface look similar to a factory provider definition?
 
-```typescript
+```javascript
 new Provider(String, { useFactory: (value) => { return "Value: " + value; },
                     deps: [Number] })
 ```
@@ -234,7 +234,7 @@ Hell yeah! We are going to use provider like this once we reach the point when w
 
 Notice that in the `RouteDefinition` the `deps` property is optional. This means that our router can break in case the user doesn't provide value for it. That is why we need to normalize the route definition in the `route_config_normalizer.ts`. This file provides a method called `normalizeRouteConfig` which accepts a `RouteDefinition` object and normalizes it depending on the properties it has. What we'd do here is:
 
-```typescript
+```javascript
 export function normalizeRouteConfig(config: RouteDefinition,
                                      registry: RouteRegistry): RouteDefinition {
   if (!config.defer) {
@@ -253,7 +253,7 @@ Above we define a dummy `defer` object in case the user hasn't provided one.
 
 The `normalizeRouteConfig` method is also responsible for creating different route definition objects such as `AsyncRoute`s and `Route`s. In order to not loose the `defer` property from our `RouteDefinition` we need to pass it to the constructors of any `RouteDefinition`-like class:
 
-```typescript
+```javascript
 ...
 if (componentDefinitionObject.type == 'constructor') {
   return new Route({
@@ -286,7 +286,7 @@ Everything so far works fine, except that the `Route` and `AsyncRoute`'s constru
 
 There's an abstract class called `AbstractRoute` which defines the base functionality for all the different route types. In order to make this class keep a reference to the `defer` value we need to:
 
-```typescript
+```javascript
 export abstract class AbstractRoute implements RouteDefinition {
   name: string;
   useAsDefault: boolean;
@@ -321,7 +321,7 @@ The rest of the changes we need to make are in the `Route` and `AsyncRoute` clas
 
 First add a `_defer` property to the `RouteRule` class like this:
 
-```typescript
+```javascript
 export class RouteRule implements AbstractRule {
   // ...
   constructor(private _routePath: RoutePath, public handler: RouteHandler,
@@ -340,7 +340,7 @@ From the diagram above we can notice that the route definition objects get trans
 
 In `rule_set.ts` include the route's `defer` property in the `RouteRule` instantiation process:
 
-```typescript
+```javascript
 // ...
 let newRule = new RouteRule(routePath, handler, config.name, config.defer);
 // ...
@@ -348,7 +348,7 @@ let newRule = new RouteRule(routePath, handler, config.name, config.defer);
 
 The `RouteRule` class has a private `_getInstruction` method, which based on the state of the `RouteRule` instance and passed arguments returns an instruction. We need to update its implementation to:
 
-```typescript
+```javascript
 private _getInstruction(urlPath: string, urlParams: string[],
                         params: {[key: string]: any}): ComponentInstruction {
   if (isBlank(this.handler.componentType)) {
@@ -373,7 +373,7 @@ So we're done with most of the work!
 The final, and the most interesting step is this one! In order to render the routing component once the associated data to it is resolved, we need to edit the `router-outlet` directive. Open the file `router_outlet.ts` and take a look at the `activate` method:
 
 
-```typescript
+```javascript
 // ...
 activate(nextInstruction: ComponentInstruction): Promise<any> {
   var previousInstruction = this._currentInstruction;
@@ -408,13 +408,13 @@ Notice that inside of the method we create a custom set of `providers` which inc
 
 Now we can use the `defer` property of the `nextInstruction` which is accessible via:
 
-```typescript
+```javascript
 const defer = nextInstruction.defer;
 ```
 
 In order to invoke the `resolve` method of the `defer` object in the context of the injector which includes providers for `RouteData` and `RouteParams` we can:
 
-```typescript
+```javascript
 var DEFER_INIT_TOKEN = new OpaqueToken('DeferInitToken');
 var commonProviders = [
   provide(RouteData, {useValue: nextInstruction.routeData}),
@@ -434,13 +434,13 @@ var injector = ReflectiveInjector.fromResolvedProviders(providers, parentInjecto
 
 This way we create an injector which has all providers from the `_viewContainerRef` (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate the provider associated to the `DEFER_INIT_TOKEN` we can:
 
-```typescript
+```javascript
 injector.get(DEFER_INIT_TOKEN);
 ```
 
 ...which will return a promise. Once the promise is resolved we are supposed to activate the component so in the end we'll have:
 
-```typescript
+```javascript
 // ...
 return injector.get(DEFER_INIT_TOKEN).then((data) => {
   var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(
@@ -467,7 +467,7 @@ If the promise gets rejected we throw the error gotten from it. An important thi
 
 We associate that data to the token `DEFER`, which means that it can be injected with:
 
-```typescript
+```javascript
 class AboutComponent {
   constructor(@Inject(DEFER) data: any) {
     // ...
