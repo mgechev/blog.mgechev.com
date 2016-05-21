@@ -160,7 +160,7 @@ The entire component tree is nothing more than the [composite pattern](https://e
 
 Here's a sample implementation of the `GameComponent` from the sample application explained above:
 
-```typescript
+```javascript
 @Component({
   // Some component-specific declarations
   providers: [GameModel]
@@ -219,7 +219,7 @@ Using high-level abstraction such as the `GameModel` allows new team members to 
 
 The facade used by the game component is the `GameModel`. Here's its definition:
 
-```ts
+```javascript
 @Injectable()
 export class GameModel extends Model {
   games$: Observable<string>;
@@ -256,7 +256,7 @@ The model can mutate the store by dispatching [actions, created by the action cr
 
 The `GameModel` can start the game by dispatching the `startGame` action, created by the `GameActions` action creator by:
 
-```ts
+```javascript
 this._store.dispatch(GameActions.startGame());
 ```
 
@@ -268,7 +268,7 @@ First, the action will go to the store. After that the store will invoke all the
 
 The reducer is simply a pure function which produces the same output when given the same input. Here's the implementation of the reducer that will handle the `startGame` action:
 
-```ts
+```javascript
 export const gameReducer = (state: any = initialState.get('game'), action: Action) => {
   switch (action.type) {
     case START_GAME:
@@ -292,7 +292,7 @@ Now let's trace what will happen when we emit the `invalidGame` action.
 - The observer associated to the `game$` observable will trigger a new value.
 - The `GameComponent` above will handle the change in the state with:
 
-  ```ts
+  ```javascript
     invalid() {
       return this._model.game$
         .scan((accum: boolean, current: any) => {
@@ -314,7 +314,7 @@ Alright. This was pure ngrx/redux stuff. Now let's take a look at how we use the
 
 `AsyncService` is an abstract class which looks the following way:
 
-```ts
+```javascript
 export abstract class AsyncService {
   abstract process(data: Action): Observable<any>;
 }
@@ -322,7 +322,7 @@ export abstract class AsyncService {
 
 When the `onProgress` method of the `GameModel` is invoked, we'll `performAsyncAction` which in this case is the `gameProgress` action gotten from the `GameActions` action creator. `performAsyncAction` will loop over the `_services` and invoke their `process` methods:
 
-```ts
+```javascript
 export abstract class Model {
   constructor(private _services: AsyncService[]) {}
   protected performAsyncAction(action: Action) {
@@ -339,7 +339,7 @@ Also, the format of the data can be different. For instance, lets say we want to
 
 For instance, lets take a look at the implementation of the `GameP2PService`:
 
-```ts
+```javascript
 @Injectable()
 export class GameP2PService extends AsyncService {
   constructor(private _rtcGateway: WebRTCGateway, private _store: Store<any>) {
@@ -383,7 +383,7 @@ Inside of the `process` method we need to do two things:
 
 Gateway is nothing more than a concrete implementation of the following abstract class:
 
-```ts
+```javascript
 export abstract class Gateway {
   dataStream: Observable<any>;
   connectionEvents: Observable<boolean>;
@@ -423,7 +423,7 @@ This brings great flexibility and reusability by allowing us to use different co
 
 The `Command` class looks like:
 
-```ts
+```javascript
 export abstract class Command {
   constructor(payload?: CommandPayload) {...}
   get id(): number {...}
@@ -477,7 +477,7 @@ Thanks to the current architecture we can implement:
 
 Now let's take a step back and look at the single-player component:
 
-```ts
+```javascript
 @Component({
   // more component-specific declarations
   providers: [
@@ -496,7 +496,7 @@ In case of single-player game, once we invoke the `onProgress` method of the `Ga
 
 In the multi-player screen we want to not only use the `GameServer` but also to send notification to the connected peer with the player's progress. This can happen with adding a single line of code:
 
-```ts
+```javascript
 @Component({
   // more component-specific declarations
   providers: [
