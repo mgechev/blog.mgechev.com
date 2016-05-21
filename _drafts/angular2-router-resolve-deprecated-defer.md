@@ -1,5 +1,5 @@
 ---
-title: Implementing the Missing "resolve" Function in the Angular 2 Router
+title: Implementing the Missing "resolve" Feature of the Angular 2 Router
 author: minko_gechev
 layout: post
 categories:
