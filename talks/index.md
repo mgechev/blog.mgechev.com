@@ -4,7 +4,7 @@ author: minko_gechev
 layout: page
 ---
 
-![AngularConnect](/images/ngconnect.jpg)
+![Talks](/images/talks.jpg)
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
