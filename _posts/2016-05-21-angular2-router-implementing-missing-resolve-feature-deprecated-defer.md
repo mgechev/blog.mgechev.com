@@ -120,6 +120,52 @@ Once the user navigates to `/about/:joe`, the `resolve` method of the `defer` ob
 
 Why the `resolve` method to return promise, why not observable instead? Observables will give us much greater flexibility (in case the `loadUser` method fails we can retry or we can just stop the request, etc, good discussion on this topic can be found [here](https://github.com/angular/angular/issues/5876)) but provide more complex API.
 
+Now, in order to follow the API introduced by AngularJS 1.x more strictly and provide the entire functionality it has we can modify the interface of the `defer` property to:
+
+```javascript
+@Component(...)
+@RouteConfig([
+  {
+    path: '/',
+    name: 'Home',
+    component: HomeComponent
+  },
+  {
+    path: '/about/:name',
+    name: 'About',
+    component: AboutComponent,
+    defer: {
+      user: {
+        resolve: (model: User, params: RouteParams) => {
+          return model.loadUser(params.get('name'));
+        },
+        deps: [User, RouteParams]
+      },
+      auth: {
+        resolve: (auth: Auth, params: RouteParams) => {
+          return auth.isAuthorized(params.get('name'));
+        },
+        deps: [Auth, RouteParams]
+      }
+    }
+  }
+])
+export class AppComponent {}
+```
+
+Leter we will be able to inject the "deferred" parameters to our component's constructor like:
+
+```javascript
+@Component(...)
+class AboutComponent {
+  constructor(@Inject('user') user: User, @Inject('auth') isAuthorized: boolean) {
+    // ...
+  }
+}
+```
+
+Sweet!
+
 ## Simple example
 
 In order to get a better idea of what we want to achieve, lets take a look at a specific example based on the [angular2-seed](https://github.com/mgechev/angular2-seed). You can find the code for the demo [here](https://github.com/mgechev/ng2-router/tree/demo).
@@ -139,12 +185,14 @@ Now, lets define our base component:
     name: 'About',
     component: AboutComponent,
     defer: {
-      resolve: (params: RouteParams) => {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => resolve(params.get('name')), 2000);
-        });
-      },
-      deps: [RouteParams]
+      name: {
+        resolve: (params: RouteParams) => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => resolve(params.get('name')), 2000);
+          });
+        },
+        deps: [RouteParams]
+      }
     }
   }
 ])
@@ -157,17 +205,18 @@ In order to get the value that we resolved the promise with we can do the follow
 
 ```javascript
 import { Component, Inject } from '@angular/core';
-import { DEFER } from '@angular/router-deprecated';
 
 @Component(...)
 export class AboutComponent {
-  constructor(@Inject(DEFER) name: any) {
+  constructor(@Inject('name') name: any) {
     console.log(name);
   }
 }
 ```
 
-Once the user navigates to `/about/:name` in 2 seconds we'll see the value of the `:name` parameter logged in the console. For demo take a look [here](#demo).
+Once the user navigates to `/about/:name` in 2 seconds we'll see the value of the `:name` parameter logged in the console. Notice that the value of the token we inject is the same with the key inside of the `defer` property in the route definition.
+
+For demo take a look [here](#demo).
 
 Now lets start our...implementation! But before that...
 
@@ -203,21 +252,25 @@ export interface RouteDefinition {
   defer?: Defer;
 }
 
+export interface Defer {
+  [key: string]: DeferredFactory;
+}
+
 /**
  * An object which needs to be resolved until we are able to render the route component.
  *
  * @example
- * const baz: Defer = { resolve: () => Promise.resolve(), deps: [] };
+ * const baz: DeferredFactory = { resolve: () => Promise.resolve(), deps: [] };
  */
-export interface Defer {
+export interface DeferredFactory {
   resolve: (...deps: any[]) => Promise<any>;
   deps?: any[];
 }
 ```
 
-The only new property we introduced here is an optional one called `defer`. It must be an object having the "shape" defined in the `Defer` interface. This means for each route which depends on an async action, we need to define a `resolve` function, that is supposed to return an instance of type `Promise` and an optional `deps` property. The `deps` property defines the list of the dependencies that need to be passed to the `resolve` function.
+The only new property we introduced here is an optional one called `defer`. It must be an object having the "shape" defined in the `Defer` interface. On the other hand, the `Defer` interface defines a set of key-value pairs with strings as keys and objects of type `DeferredFactory` as values. We will be able to inject the value gotten from the resolved promise, returned by the `resolve` function, by using a token associated with the `DeferredFactory` instance. Notice that we also have a `deps` property inside of the `DeferredFactory`. This array contains a list of tokens that we want to be injected inside of the `resolve` function.
 
-Doesn't the `Defer` interface look similar to a factory provider definition?
+Doesn't the `DeferredFactory` interface look similar to a factory provider definition?
 
 ```javascript
 new Provider(String, { useFactory: (value) => { return "Value: " + value; },
@@ -225,31 +278,31 @@ new Provider(String, { useFactory: (value) => { return "Value: " + value; },
 ```
 
 
-Hell yeah! We are going to use provider like this once we reach the point when we need to invoke the `resolve` function. The benefits we get here:
+Hell yeah! We are going to a list of providers like this once we reach the point when we need to resolve all the deferred values. The benefits we get here:
 
 - We are able to inject dependencies associated to any token.
 - After minification everything is going to work since we're passing tokens which are either direct references to the dependencies instances of which we want to invoke, or references to any other tokens which will not be influenced by minification.
 
 ### Step 2
 
-Notice that in the `RouteDefinition` the `deps` property is optional. This means that our router can break in case the user doesn't provide value for it. That is why we need to normalize the route definition in the `route_config_normalizer.ts`. This file provides a method called `normalizeRouteConfig` which accepts a `RouteDefinition` object and normalizes it depending on the properties it has. What we'd do here is:
+Notice that in the `RouteDefinition` the `deps` property is optional. This means that our router can break in case the user doesn't provide value for it in any of the deferred factories. That is why we need to normalize the route definition in the `route_config_normalizer.ts`. This module provides a method called `normalizeRouteConfig` which accepts a `RouteDefinition` object and normalizes it depending on the properties it has. What we'd do here is:
 
 ```javascript
 export function normalizeRouteConfig(config: RouteDefinition,
                                      registry: RouteRegistry): RouteDefinition {
   if (!config.defer) {
-    config.defer = {
-      resolve: () => Promise.resolve(),
-      deps: []
-    };
-  } else if (!config.defer.deps) {
-    config.defer.deps = [];
+    config.defer = {};
+  } else {
+    Object.keys(config.defer).forEach(key => {
+      let d = config.defer[key];
+      d.deps = d.deps || [];
+    });
   }
   // ...
 }
 ```
 
-Above we define a dummy `defer` object in case the user hasn't provided one.
+Above we define a dummy `defer` object in case the user hasn't provided one. In case we have definitions of deferred factories we loop through all of them and set the `deps` property to an empty array in case it is not defined or has a falsy value.
 
 The `normalizeRouteConfig` method is also responsible for creating different route definition objects such as `AsyncRoute`s and `Route`s. In order to not loose the `defer` property from our `RouteDefinition` we need to pass it to the constructors of any `RouteDefinition`-like class:
 
@@ -370,8 +423,7 @@ So we're done with most of the work!
 
 ### Step 5
 
-The final, and the most interesting step is this one! In order to render the routing component once the associated data to it is resolved, we need to edit the `router-outlet` directive. Open the file `router_outlet.ts` and take a look at the `activate` method:
-
+The final, and the most exciting step is this one! In order to render the routing component once the associated data to it is resolved, we need to edit the `router-outlet` directive. Open the file `router_outlet.ts` and take a look at the `activate` method:
 
 ```javascript
 // ...
@@ -404,7 +456,7 @@ activate(nextInstruction: ComponentInstruction): Promise<any> {
 
 The `activate` method accepts an instruction and renders the component associated with it once it gets available (i.e. its template is loaded, etc.).
 
-Notice that inside of the method we create a custom set of `providers` which include the `RouteData` associated to the given route, as well as `RouteParams` and the `Router`. After that the `activate` method loads the target component next to the `router-outlet` directive. It does this with the `DynamicComponentLoader` by taking all the defined above providers plus all the providers which reside in the `_viewContainerRef` (for a reference take a look [here](https://github.com/angular/angular/blob/bb8976608db93b9ff90a71187608a4390cbd7a07/modules/%40angular/core/src/linker/dynamic_component_loader.ts#L137-L139)).
+Notice that inside of the method is created a custom set of `providers` which include the `RouteData` associated with the given route, as well as `RouteParams` and the `Router`. After that the `activate` method loads the target component next to the `router-outlet` directive. It does this with the `DynamicComponentLoader` by taking all the defined above providers plus all the providers which reside in the `_viewContainerRef` (for a reference take a look [here](https://github.com/angular/angular/blob/bb8976608db93b9ff90a71187608a4390cbd7a07/modules/%40angular/core/src/linker/dynamic_component_loader.ts#L137-L139)).
 
 Now we can use the `defer` property of the `nextInstruction` which is accessible via:
 
@@ -415,37 +467,43 @@ const defer = nextInstruction.defer;
 In order to invoke the `resolve` method of the `defer` object in the context of the injector which includes providers for `RouteData` and `RouteParams` we can:
 
 ```javascript
-var DEFER_INIT_TOKEN = new OpaqueToken('DeferInitToken');
+// ...
 var commonProviders = [
   provide(RouteData, {useValue: nextInstruction.routeData}),
   provide(RouteParams, {useValue: new RouteParams(nextInstruction.params)}),
   provide(routerMod.Router, {useValue: childRouter})
 ];
-var providers = ReflectiveInjector.resolve(commonProviders.concat(
-  provide(DEFER_INIT_TOKEN, {
-    useFactory: function () {
-      return defer.resolve.apply(null, arguments);
-    }, deps: defer.deps
-  })
-));
+var tokens = Object.keys(defer);
+var localProviders = tokens.map((token: string) => {
+  var current = defer[token];
+  return provide(token, {
+    useFactory: current.resolve,
+    deps: current.deps
+  });
+});
+var providers = ReflectiveInjector.resolve(commonProviders.concat(localProviders));
 var parentInjector = this._viewContainerRef.parentInjector;
 var injector = ReflectiveInjector.fromResolvedProviders(providers, parentInjector);
+// ...
 ```
 
-This way we create an injector which has all providers from the `_viewContainerRef` (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate the provider associated to the `DEFER_INIT_TOKEN` we can:
+This way we create an injector which has all providers from the `_viewContainerRef` (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated to the keys in the `defer` object we can:
 
 ```javascript
-injector.get(DEFER_INIT_TOKEN);
+var deferPromises = tokens.map((token: string) => injector.get(token))
 ```
 
-...which will return a promise. Once the promise is resolved we are supposed to activate the component so in the end we'll have:
+...which will return an array of promises. We can wait for all promises to be resolved by using `Promise.all`. Once the promise returned by `Promise.all` is resolved we are supposed to activate the component so in the end we'll have:
 
 ```javascript
 // ...
-return injector.get(DEFER_INIT_TOKEN).then((data) => {
-  var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(
-    provide(DEFER, { useValue: data })
-  ));
+return deferPromises.then((data) => {
+  localProviders = tokens.map((token: string, idx: number) => {
+    return provide(token, {
+      useValue: data[idx]
+    });
+  });
+  var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(localProviders));
   this._componentRef =
       this._loader.loadNextToLocation(componentType, this._viewContainerRef, deferResolvedProviders);
   return this._componentRef.then((componentRef) => {
@@ -463,17 +521,7 @@ return injector.get(DEFER_INIT_TOKEN).then((data) => {
 });
 ```
 
-If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the `loadNextToLocation` method with different set of providers. This time we don't include our `DEFER_INIT_TOKEN` because the user of the component doesn't need it. We don't want the users of our router to be able to inject the promise in the constructors of their components, but only the data that it was resolved to.
-
-We associate that data to the token `DEFER`, which means that it can be injected with:
-
-```javascript
-class AboutComponent {
-  constructor(@Inject(DEFER) data: any) {
-    // ...
-  }
-}
-```
+If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the `loadNextToLocation` method with different set of providers. This time we don't include our initial providers because the user of the component doesn't need them. We don't want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.
 
 ## Now to use?
 
