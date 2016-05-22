@@ -229,7 +229,7 @@ In order to get a better understanding be the content below, lets make a quick i
 ![](/images/ng2-routing.png)
 
 - First the user declares her routing configuration in the `@RouteConfig` decorator.
-- After that the input goes through normalization (we already passed this stage).
+- After that the input goes through normalization.
 - As next step the routing objects get translated to routing rules.
 - On navigation the router creates different navigation instructions.
 - In the end the `router-outlet` renders the target component by using a specific sequence of instructions.
@@ -270,7 +270,7 @@ export interface DeferredFactory {
 }
 ```
 
-The only new property we introduced here is an optional one called `defer`. It must be an object having the "shape" defined in the `Defer` interface. On the other hand, the `Defer` interface defines a set of key-value pairs with strings as keys and objects of type `DeferredFactory` as values. We will be able to inject the value gotten from the resolved promise, returned by the `resolve` function, by using a token associated with the `DeferredFactory` instance. Notice that we also have a `deps` property inside of the `DeferredFactory`. This array contains a list of tokens that we want to be injected inside of the `resolve` function.
+The only new property we introduced here is an optional one called `defer`. It must be an object having the "shape" defined by the `Defer` interface. On the other hand, the `Defer` interface defines a set of key-value pairs with strings as keys and objects of type `DeferredFactory` as values. We will be able to inject the values gotten from the resolved promises, returned by the `resolve` functions, by using the tokens associated with the `DeferredFactory` instance. Notice that we also have a `deps` property inside of the `DeferredFactory`. This array contains a list of tokens that we want to be injected inside of the `resolve` function.
 
 Doesn't the `DeferredFactory` interface look similar to a factory provider definition?
 
@@ -280,14 +280,14 @@ new Provider(String, { useFactory: (value) => { return "Value: " + value; },
 ```
 
 
-Hell yeah! We are going to a list of providers like this once we reach the point when we need to resolve all the deferred values. The benefits we get here:
+Hell yeah! We are going to use a list of providers like this one once when we reach the point when we need to resolve all the deferred values. The benefits we get here:
 
 - We are able to inject dependencies associated to any token.
 - After minification everything is going to work since we're passing tokens which are either direct references to the dependencies instances of which we want to invoke, or references to any other tokens which will not be influenced by minification.
 
 ### Step 2
 
-Notice that in the `RouteDefinition` the `deps` property is optional. This means that our router can break in case the user doesn't provide value for it in any of the deferred factories. That is why we need to normalize the route definition in the `route_config_normalizer.ts`. This module provides a method called `normalizeRouteConfig` which accepts a `RouteDefinition` object and normalizes it depending on the properties it has. What we'd do here is:
+Notice that in the `RouteDefinition` the `deps` property is optional. This means that our router can break in case the user doesn't provide value for it, in any of the deferred factories. That is why we need to normalize the route definition in the `route_config_normalizer.ts` file. This module provides a method called `normalizeRouteConfig` which accepts a `RouteDefinition` object and normalizes it depending on the properties it has. What we'd do here is:
 
 ```javascript
 export function normalizeRouteConfig(config: RouteDefinition,
@@ -304,7 +304,7 @@ export function normalizeRouteConfig(config: RouteDefinition,
 }
 ```
 
-Above we define a dummy `defer` object in case the user hasn't provided one. In case we have definitions of deferred factories we loop through all of them and set the `deps` property to an empty array in case it is not defined or has a falsy value.
+Above we define a dummy `defer` object in case the user hasn't provided one. On the other hand, if we have definitions of deferred factories we loop over all of them and set the `deps` property to an empty array in case it is not defined or has a falsy value.
 
 The `normalizeRouteConfig` method is also responsible for creating different route definition objects such as `AsyncRoute`s and `Route`s. In order to not loose the `defer` property from our `RouteDefinition` we need to pass it to the constructors of any `RouteDefinition`-like class:
 
@@ -366,9 +366,9 @@ export abstract class AbstractRoute implements RouteDefinition {
 
 The only three differences from the original implementation here are:
 
-- We have one more property of the class called `defer`.
-- In the destructuring in the `constructor` we get one more property from the passed object called `defer`.
-- We assign value the passed `defer` variable to the `defer` property of the route.
+- We declare one more property of the class called `defer`.
+- In the destructuring in the `constructor` we get one more property from the passed object, called `defer`.
+- We assign the value passed by the `defer` variable to the `defer` property of the route.
 
 The rest of the changes we need to make are in the `Route` and `AsyncRoute` classes, were we should to pass the `defer` property to the base constructor call.
 
