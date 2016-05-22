@@ -14,7 +14,7 @@ tags:
 
 For the last a couple of months I'm working on an Angular 2 based [PWA](https://developers.google.com/web/progressive-web-apps/). The more complex the application gets, the more I appreciate that our choice was Angular! For routing we're using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.
 
-One of the features that I miss most in both the new and the newest Angular 2 routes is the `resolve` functionality which the AngularJS 1.x router and the ui-router offer. In short, this functionality allows your application to load data on navigation event and render the routing component once the data has been successfully downloaded.
+One of the features that I miss most in both the new and the newest Angular 2 routes is the `resolve` functionality which the AngularJS 1.x router and the ui-router offer. In short, this functionality allows your application to load data on navigation events and render the routing component once the data has been successfully downloaded.
 
 With the `router-deprecated` module we can get similar behavior by using `@CanActivate` decorator, unfortunately we cannot take advantage of the dependency injection mechanism without [any dirty hacks](https://stackoverflow.com/questions/33462532/using-resolve-in-angular2-routes).
 
@@ -44,7 +44,7 @@ Here's demo of final result of our implementation:
 
 ## API Design
 
-With the deprecated router our routes configuration looks like:
+Using the deprecated router we can define our routing configuration by:
 
 ```javascript
 @Component(...)
@@ -63,9 +63,9 @@ With the deprecated router our routes configuration looks like:
 export class AppComponent {}
 ```
 
-Our goal is to be able to perform an asynchronous action on which given routing component depends, before the component gets rendered. For instance, we may want to load the profile of the user associated with the `:name` parameter in the `About` route, before the `AboutComponent` gets rendered.
+Our goal is to be able to perform an asynchronous action on which given routing component depends before the component gets rendered. For instance, we may want to load the profile of the user associated with the `:name` parameter in the `About` route, before the `AboutComponent` gets rendered.
 
-This means that we need to change the route definition objects to something like:
+This means that we need to alter additional configuration data to the route definition objects:
 
 ```javascript
 @Component(...)
@@ -114,11 +114,11 @@ A better API will be:
 export class AppComponent {}
 ```
 
-Although the route definition above looks a bit more complex at first, it provides great flexibility! First - we have access to all the registered in our `Injector` dependencies, second - we have access to all the local dependencies associated with our route (`RouteParams` in this case).
+Although the route definition above looks a bit more complex at first, it provides great flexibility! First - we have access to all the registered in our `Injector` dependencies, second - we have access to all the local dependencies associated with the given route (`RouteParams` in this case).
 
-Once the user navigates to `/about/:joe`, the `resolve` method of the `defer` object will be invoked, but before that, all the dependencies passed to the `deps` array will be instantiated in order to be passed to `resolve`. Based on the passed dependencies, the `resolve` method will call the `model`'s `loadUser` method with `joe` as argument. Once the promise returned by the `loadUser` method gets resolved, the component `AboutComponent` will get rendered.
+Once the user navigates to `/about/:joe`, the `resolve` method of the `defer` object will be invoked, but before that, all the dependencies passed to the `deps` array will be instantiated in order to be passed to `resolve`. Based on the passed dependencies, the `resolve` method will call the `model`'s `loadUser` method with `joe` as argument. Once the promise returned by the `loadUser` method gets resolved, the component `AboutComponent` will be rendered.
 
-Why the `resolve` method to return promise, why not observable instead? Observables will give us much greater flexibility (in case the `loadUser` method fails we can retry or we can just stop the request, etc, good discussion on this topic can be found [here](https://github.com/angular/angular/issues/5876)) but provide more complex API.
+Why to make the `resolve` method return a promise, why not observable instead? Observables will give us much greater flexibility (in case the `loadUser` method fails we can retry or we can just stop the request, etc, good discussion on this topic can be found [here](https://github.com/angular/angular/issues/5876)) but provide more complex API.
 
 Now, in order to follow the API introduced by AngularJS 1.x more strictly and provide the entire functionality it has we can modify the interface of the `defer` property to:
 
@@ -153,7 +153,7 @@ Now, in order to follow the API introduced by AngularJS 1.x more strictly and pr
 export class AppComponent {}
 ```
 
-Leter we will be able to inject the "deferred" parameters to our component's constructor like:
+Later we will be able to inject the "deferred" parameters to our component's constructor like:
 
 ```javascript
 @Component(...)
@@ -164,13 +164,15 @@ class AboutComponent {
 }
 ```
 
+Notice that the tokens of the dependencies are the keys associated to the specific deferred properties in the `defer` configuration object.
+
 Sweet!
 
 ## Simple example
 
 In order to get a better idea of what we want to achieve, lets take a look at a specific example based on the [angular2-seed](https://github.com/mgechev/angular2-seed). You can find the code for the demo [here](https://github.com/mgechev/ng2-router/tree/demo).
 
-Now, lets define our base component:
+Lets define our base component:
 
 ```javascript
 @Component(...)
@@ -199,7 +201,7 @@ Now, lets define our base component:
 export class AppComponent {}
 ```
 
-Inside of it we define an `About` route which has a `defer` property. In the `resolve` function we return a promise which we resolve after two seconds with the `name` property gotten from `RouteParams`'s instance.
+Inside of it we define an `About` route which has a `defer` property. In the `resolve` function we return a promise which we resolve after two seconds with the value of the `name` routing parameter, gotten from the `RouteParams`'s instance.
 
 In order to get the value that we resolved the promise with we can do the following:
 
@@ -214,7 +216,7 @@ export class AboutComponent {
 }
 ```
 
-Once the user navigates to `/about/:name` in 2 seconds we'll see the value of the `:name` parameter logged in the console. Notice that the value of the token we inject is the same with the key inside of the `defer` property in the route definition.
+Once the user navigates to `/about/:name` in 2 seconds we'll see the value of the `:name` parameter logged in the console. Notice that the value of the token we inject is the same as the key inside of the `defer` property in the route definition object.
 
 For demo take a look [here](#demo).
 
