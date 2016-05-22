@@ -374,7 +374,7 @@ The rest of the changes we need to make are in the `Route` and `AsyncRoute` clas
 
 ### Step 4
 
-First add a `_defer` property to the `RouteRule` class like this:
+Now, first add a `_defer` property to the `RouteRule` class like this:
 
 ```javascript
 export class RouteRule implements AbstractRule {
@@ -389,9 +389,9 @@ export class RouteRule implements AbstractRule {
 }
 ```
 
-Now we can do the same for the `AsyncRoute`.
+We need to do the same for the `AsyncRoute`.
 
-From the diagram above we can notice that the route definition objects get translated to route rules. In order to preserve the `defer` definition object to the rules we need to do the following:
+From the diagram above we can notice that the route definition objects get translated to route rules. In order to preserve the `defer` definition object in the rules we need to do the following:
 
 In `rule_set.ts` include the route's `defer` property in the `RouteRule` instantiation process:
 
@@ -421,11 +421,11 @@ private _getInstruction(urlPath: string, urlParams: string[],
 }
 ```
 
-So we're done with most of the work!
+We're done with most of the work!
 
 ### Step 5
 
-The final, and the most exciting step is this one! In order to render the routing component once the associated data to it is resolved, we need to edit the `router-outlet` directive. Open the file `router_outlet.ts` and take a look at the `activate` method:
+The final, and the most exciting step is this one! In order to render the routing component once the associated with it data is resolved, we need to update the `router-outlet` directive. Open the file `router_outlet.ts` and take a look at the `activate` method:
 
 ```javascript
 // ...
@@ -466,7 +466,7 @@ Now we can use the `defer` property of the `nextInstruction` which is accessible
 const defer = nextInstruction.defer;
 ```
 
-In order to invoke the `resolve` method of the `defer` object in the context of the injector which includes providers for `RouteData` and `RouteParams` we can:
+In order to invoke the `resolve` method of the `defer` object in the context of the current injector (which includes providers for `RouteData` and `RouteParams`) we can:
 
 ```javascript
 // ...
@@ -489,7 +489,7 @@ var injector = ReflectiveInjector.fromResolvedProviders(providers, parentInjecto
 // ...
 ```
 
-This way we create an injector which has all providers from the `_viewContainerRef` (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated to the keys in the `defer` object we can:
+This way we create an injector which has all providers from the `_viewContainerRef` (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated with the keys in the `defer` object we can:
 
 ```javascript
 var deferPromises = tokens.map((token: string) => injector.get(token))
@@ -523,7 +523,7 @@ return deferPromises.then((data) => {
 });
 ```
 
-If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the `loadNextToLocation` method with different set of providers. This time we don't include our initial providers because the user of the component doesn't need them. We don't want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.
+If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the `loadNextToLocation` method with different set of providers. To the keys used in the `defer` object we associate values instead of factories. These are the values gotten from the resolved promises returned by the factories. We don't want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.
 
 ## Now to use?
 
