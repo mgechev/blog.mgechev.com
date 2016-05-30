@@ -117,15 +117,24 @@ What can we do in order to modularize these duplications? Create decorator of th
 
 ```javascript
 class LoggerAspect {
-  @before(/.*/, /Article/)
+  @beforeMethod({
+    methodNamePattern: /.*/,
+    classNamePattern: /Article/
+  })
   beforeLogger(meta, ...args) {
     console.log(`Invoked ${meta.name} with arguments: ${args.join(', ')}`);
   }
-  @afterResolve(/.*/, /Article/)
+  @afterResolve({
+    methodNamePattern: /.*/,
+    classNamePattern: /Article/
+  })
   afterResolveLogger(meta) {
     console.log(`The invocation of ${meta.name}`);
   }
-  @afterReject(/.*/, /Article/)
+  @afterReject({
+    methodNamePattern: /.*/,
+    classNamePattern: /Article/
+  })
   afterRejectLogger(meta) {
     console.log(`Error during the invocation of ${meta.name}`);
   }
@@ -136,7 +145,10 @@ Lets translate this step-by-step to human language:
 
 ```javascript
 // ...
-@before(/.*/, /Article/)
+@before({
+  methodNamePattern: /.*/,
+  classNamePattern: /Article/
+})
 beforeLogger(args) {
   console.log(`Invoked ${meta.name} with arguments: ${args.join(', ')}`);
 }
@@ -148,7 +160,10 @@ beforeLogger(args) {
 How about this:
 
 ```javascript
-@afterResolve(/.*/, /Article/)
+@afterResolve({
+  methodNamePattern: /.*/,
+  classNamePattern: /Article/
+})
 afterResolveLogger(m) {
   console.log(`The invocation of ${meta.name}`);
 }
@@ -158,7 +173,10 @@ afterResolveLogger(m) {
 Okay, sounds good...How about `afterReject`?
 
 ```javascript
-@afterReject(/.*/, /Article/)
+@afterReject({
+  methodNamePattern: /.*/,
+  classNamePattern: /Article/
+})
 afterRejectLogger {
   console.log(`Error during the invocation of ${meta.name}`);
 }
@@ -200,6 +218,10 @@ That's it. We replaced all the 56 lines of the `ArticleCollection` definition wi
 - Formatting data
 - Attaching observers
 - etc.
+
+## Video
+
+Here's video from my talk on AngularConnect where I did an overview of the library above:
 
 ## Conclusions
 
