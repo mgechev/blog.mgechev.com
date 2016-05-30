@@ -223,6 +223,8 @@ That's it. We replaced all the 56 lines of the `ArticleCollection` definition wi
 
 Here's video from my talk on AngularConnect where I did an overview of the library above:
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/C6e6-31HD5A" frameborder="0" allowfullscreen></iframe>
+
 ## Conclusions
 
 The post illustrated a typical use case for Aspect-Oriented Programming. In the past there were a few libraries implementing proxy-based AOP in JavaScript, however the syntax wasn't getting even close to already known solutions (for example the AOP implementation in Spring). ES2016 introduced the decorators syntax, which is in the core of the Dependency Injection of Angular 2. It is here to stay and implementing AOP with it is quite handy.
