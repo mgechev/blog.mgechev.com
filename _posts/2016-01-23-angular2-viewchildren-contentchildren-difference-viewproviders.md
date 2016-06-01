@@ -120,10 +120,10 @@ Now comes the interesting part! Lets see how we can access and manipulate these 
 
 ##### Playing around with View Children
 
-Angular 2 provides the following property decorators in the `angular2/core` package: `@ViewChildren`, `@ViewChild`, `@ContentChildren` and `@ContentChild`. We can use them the following way:
+Angular 2 provides the following property decorators in the `@angular/core` package: `@ViewChildren`, `@ViewChild`, `@ContentChildren` and `@ContentChild`. We can use them the following way:
 
 ```ts
-import {ViewChild, ViewChildren, Component...} from 'angular2/core';
+import {ViewChild, ViewChildren, Component...} from '@angular/core';
 
 // ...
 
