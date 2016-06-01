@@ -226,8 +226,8 @@ visitor.execute(root);
 Lets peek at a sample rule definition:
 
 ```typescript
-import * as ts from "typescript";
-import * as Lint from "../lint";
+import * as ts from 'typescript';
+import * as Lint from '../lint';
 
 export class Rule extends Lint.Rules.AbstractRule {
     public static FAILURE_STRING = "type decoration of 'any' is forbidden";
@@ -332,7 +332,7 @@ Now lets suppose we have the following components definitions:
 
 ```typescript
 // cmp_a.ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {B} from './cmps_b_c';
 
 @Component({
@@ -344,7 +344,7 @@ export class A {}
 ```
 ```typescript
 // cmps_b_c.ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {D} from './dir_d';
 
 @Component({
@@ -364,7 +364,7 @@ export class B {}
 
 ```typescript
 // dir_d.ts
-import {Directive} from 'angular2/core';
+import {Directive} from '@angular/core';
 
 @Directive({
   selector: '[d]'
