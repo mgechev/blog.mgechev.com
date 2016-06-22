@@ -525,7 +525,7 @@ return deferPromises.then((data) => {
 
 If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the `loadNextToLocation` method with different set of providers. To the keys used in the `defer` object we associate values instead of factories. These are the values gotten from the resolved promises returned by the factories. We don't want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.
 
-## Now to use?
+## How to use?
 
 You can install the modified router using:
 
