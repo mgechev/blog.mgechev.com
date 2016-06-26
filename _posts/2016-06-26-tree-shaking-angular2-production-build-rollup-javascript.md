@@ -24,9 +24,9 @@ This is main reason Angular is (was) criticized for. During the keynote of [ng-c
 
 In this blog post we'll explain all the steps we need to go through in order to achieve such results!
 
-*The experiments from this blog posts are located here:
-- [Simple build with minification](https://github.com/mgechev/angular2-simple-build).
-- [Tree-shaking and minification](https://github.com/mgechev/angular2-rollup-build).
+*The experiments from this blog posts are located here:<br>
+- [Simple build with minification](https://github.com/mgechev/angular2-simple-build).<br>
+- [Tree-shaking and minification](https://github.com/mgechev/angular2-rollup-build).<br>
 - [ngc, tree-shaking and minification](https://github.com/mgechev/angular2-ngc-rollup-build).*
 
 ## Sample Application
