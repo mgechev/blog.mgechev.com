@@ -532,7 +532,9 @@ The final result is 49K!
 
 ## Conclusion
 
-![Application Bundle Size](/images/ng2-build/bundle-size-chart.png)
+<a href="/images/ng2-build/bundle-size-chart.png">
+  <img src="/images/ng2-build/bundle-size-chart.png" alt="Application Bundle Size" width="400">
+</a>
 
 As we can see from the chart above, by applying a set of optimizations over our production bundle we can reduce the size of our application up to 33 times!
 
