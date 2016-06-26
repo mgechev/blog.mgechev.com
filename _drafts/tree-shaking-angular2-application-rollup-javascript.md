@@ -18,7 +18,7 @@ This way the user may experience slowdown during the initial page load, but once
 
 In order to help developers take advantage of the technologies behind the PWA as easy as possible, the Angular team is working on the Angular [mobile-toolkit](https://github.com/angular/mobile-toolkit). However, a big concern for developing high-performance Angular 2 is the framework size itself. For instance, a simple non-optimized "Hello world!" Angular 2 application, bundled with [browserify](http://browserify.org/) is 1.6MB! This is suicidal when your users are supposed to download it via an unreliable 3G connection.
 
-![](/images/ngc-intro/not-optimized.png)
+![Non optimized app](/images/ngc-intro/not-optimized.png)
 
 This is main reason Angular is (was) criticized for. During the keynote of [ng-conf](http://ng-conf.org/), [Brad Green](https://twitter.com/bradlygreen) (manager of the Angular team) mentioned that the core team managed to drop the size of the "Hello world!" app to **less than 50K**!
 
@@ -182,10 +182,10 @@ We reduced the size of the bundle with another ~78% only by applying compression
 
 In this section we'll use very important property of the ES2015 modules - they are tree-shakable!
 
-<img src="/images/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
+<img src="/images/ngc-intro/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
 <script>
 document.getElementById('tree-img').onclick = function () {
-  this.src = '/images/tree-shaking.gif';
+  this.src = '/images/ngc-intro/tree-shaking.gif';
 };
 </script>
 
@@ -527,7 +527,7 @@ The final result is 49K!
 
 ## Conclusion
 
-![Application Bundle Size](/images/bundle-size-chart.png)
+![Application Bundle Size](/images/ngc-intro/bundle-size-chart.png)
 
 As we can see from the chart above, by applying a set of optimizations over our production bundle we can reduce the size of our application up to 33 times!
 
