@@ -12,15 +12,15 @@ tags:
   - commonjs
 ---
 
-Progressive Web Applications help us build native-like web apps, thanks to amazing tools such as Service Workers, IndexDB, App Shell etc. Once the browser downloads all the static assets required by our app, the active Service Worker can cache all of them locally.
+[Progressive Web Applications](https://developers.google.com/web/progressive-web-apps/) help us build native-like web apps, thanks to amazing tools such as Service Workers, IndexDB, App Shell etc. Once the browser downloads all the static assets required by our app, the active Service Worker can cache all of them locally.
 
-This means that the user may experience slowdown during the initial page load, but once the page has been successfully loaded for first time, each next time the load will be instant!
+This way the user may experience slowdown during the initial page load, but once the page has been successfully loaded for first time, each next time the load will be instant!
 
-In order to help developers take advantage of the technologies behind the PWA as easy as possible, the Angular team is working on the Angular [mobile-toolkit](https://github.com/angular/mobile-toolkit). However, a big concern for Angular is the framework size itself. For instance, a simple "Hello world!" Angular 2 application, bundled with [browserify](http://browserify.org/) is 1.6MB!
+In order to help developers take advantage of the technologies behind the PWA as easy as possible, the Angular team is working on the Angular [mobile-toolkit](https://github.com/angular/mobile-toolkit). However, a big concern for developing high-performance Angular 2 is the framework size itself. For instance, a simple non-optimized "Hello world!" Angular 2 application, bundled with [browserify](http://browserify.org/) is 1.6MB! This is suicidal when your users are supposed to download it via an unreliable 3G connection.
 
-![](/images/not-optimized.png)
+![](/images/ngc-intro/not-optimized.png)
 
-This is definitely a lot, and is one of the main things Angular is criticized for. During the keynote of [ng-conf](http://ng-conf.org/), [Brad Green](https://twitter.com/bradlygreen) (manager of the Angular team) mentioned that the core team managed to drop the size of the application above to **less than 50K**!
+This is main reason Angular is (was) criticized for. During the keynote of [ng-conf](http://ng-conf.org/), [Brad Green](https://twitter.com/bradlygreen) (manager of the Angular team) mentioned that the core team managed to drop the size of the "Hello world!" app to **less than 50K**!
 
 In this blog post we'll explain all the steps we need to go through in order to achieve such results!
 
@@ -28,7 +28,7 @@ In this blog post we'll explain all the steps we need to go through in order to 
 
 In order to get a better understanding of the optimizations explained below, lets first describe the sample application that we're going to apply them on.
 
-Our application is going to consist the following two files:
+Our app is going to consist the following two files:
 
 ```javascript
 // app.component.ts
@@ -53,9 +53,9 @@ import { bootstrap } from '@angular/platform-browser-dynamic';
 bootstrap(AppComponent);
 ```
 
-In `app.component.ts` we have a single component with a template which is going to render the text `"Hello world!"`. On the other hand, `main.ts` is responsible for bootstrapping the application, by using the `@angular/platform-browser-dynamic` package.
+In `app.component.ts` we have a single component with a template which is going to render the text `"Hello world!"`. `main.ts` is responsible for bootstrapping the application, using the `bootstrap` method exported by the `@angular/platform-browser-dynamic` package.
 
-Our `index.html` page will look like:
+Our `index.html` page looks like:
 
 ```html
 <!DOCTYPE html>
@@ -86,17 +86,14 @@ And here's the directory layout:
 ├── tsconfig.json
 ├── node_modules
 ├── typings
-│   ├── globals
-│   │   └── es6-shim
-│   └── index.d.ts
 └── typings.json
 ```
 
-`dist` is where the output is going to live (i.e. application bundles), we're using typings and npm in order to manage, respectively, the typings and the dependencies of our application.
+`dist` is where the output is going to live (i.e. application bundles), we're using typings and npm in order to manage, respectively, the ambient TypeScript type definitions and the dependencies of our application.
 
 ## Step 1 - Minification and Compression
 
-The two most obvious optimizations that we can apply are minification and compression. You can find the example explained in this section [here](https://github.com/mgechev/angular2-simple-build). I'd recommend you to clone the repository and run:
+The two most obvious optimizations that we can apply are minification and compression. You can find the example explained in this section [in my GitHub profile](https://github.com/mgechev/angular2-simple-build). I'd recommend you to clone the repository and run:
 
 ```bash
 npm install
@@ -105,7 +102,6 @@ npm install
 Now we can explore the build process by taking a look at `package.json`:
 
 ```json
-...
 "scripts": {
   "clean": "rm -rf dist",
   "typings": "typings install",
@@ -115,20 +111,19 @@ Now we can explore the build process by taking a look at `package.json`:
   "build_prod": "npm run build && browserify -s main dist/main.js > dist/bundle.js && npm run minify",
   "minify": "uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js"
 }
-...
 ```
 
-We have a simple `clean` command which does nothing more than just to remove the `dist` directory. In order to install all the required typings once the `npm install` command has completed, we run `typings install` as `postinstall` script.
+We have a simple `clean` script which removes the `dist` directory. In order to install all the required typings once the `npm install` command completes its execution, we have `typings install` as `postinstall` script.
 
 Our `build` script first cleans the `dist` directory and after that compiles our application by using the TypeScript compiler. This will produce two files - `main.js` and `app.component.js`, in the `dist` directory.
 
-By using SystemJS we can already use our application in browsers that support SystemJS, but since we want to reduce the number of HTTP requests made by the browser in the process of loading the app, we can bundle it. This is what we do in `build_prod`:
+By using SystemJS we can already run them in the browser, but since we want to reduce the number of HTTP requests made by the browser in the process of loading the app, we can create a single bundle. This is what we do in `build_prod`:
 
 ```bash
 npm run build && browserify -s main dist/main.js > dist/bundle.js && npm run minify
 ```
 
-In the script above, first we run the TypeScript compiler, once the app has been compiled, all we need to do is to create a "standalone" bundle with entry point the `dist/main.js` file, and output the bundles content to `bundle.js` within the `dist` directory.
+In the script above, first we use the TypeScript compiler. Once the app has been compiled, all we need to do is to create a ["standalone" bundle](https://github.com/substack/node-browserify#usage) with entry point the `dist/main.js` file, and output the bundles content to `bundle.js` within the `dist` directory.
 
 In order to try the app you can use:
 
@@ -138,13 +133,16 @@ npm run serve
 open http://localhost:5556
 ```
 
-Now lets see what is the bundle size:
+### Size Analysis
+
+Now lets see what the bundle size is:
 
 ```
 $ ls -lah bundle.js
 -rw-r--r--  1 mgechev  staff   1.6M Jun 26 12:01 bundle.js
 ```
-Wow...so we reached the disastrous point we described above. The bundle contains a bunch of useless content:
+
+Wow...so we reached the disastrous point we described above! However, the bundle contains a bunch of useless content such as:
 
 - Unused functions, variables...
 - A lot of whitespace.
@@ -164,11 +162,13 @@ $ ls -lah bundle.min.js
 -rw-r--r--  1 mgechev  staff   702K Jun 26 12:01 bundle.min.js
 ```
 
-So, we reduced the size of the bundle to 702K only by applying a simple minification.
+So, we reduced the size of the bundle to 702K only by applying a simple minification!
+
+#### Compression of the Application
 
 Most HTTP servers support compression of the content, with gzip. The requested by the browser resources are compressed by the web server and sent through the network. Responsibility of the client is to decompress them.
 
-Lets find out what is the size of the compressed bundle:
+Lets find out what the size of the compressed bundle is:
 
 ```
 $ gzip bundle.min.js
@@ -176,24 +176,24 @@ $ ls -lah bundle.min.js.gz
 -rw-r--r--   1 mgechev  staff   152K Jun 26 12:01 bundle.min.js.gz
 ```
 
-We reduced the size of the bundle with another ~78% only by applying gzip. But we can do better!
+We reduced the size of the bundle with another ~78% only by applying compression! But we can do even better!
 
 ## Step 2 - Tree-Shaking
 
 In this section we'll use very important property of the ES2015 modules - they are tree-shakable!
 
-<img src="/images/tree-shaking-frame.jpg" id="tree" style="cursor: pointer">
+<img src="/images/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
 <script>
-document.getElementById('tree').onclick = function () {
+document.getElementById('tree-img').onclick = function () {
   this.src = '/images/tree-shaking.gif';
 };
 </script>
 
-What does tree-shaking mean:
+What does tree-shaking means:
 
-> Tree-shaking, excluding unused exports from bundles.
+> Tree-shaking is excluding unused exports from bundles.
 
-Because the ES2015 modules are static, by performing a static code analysis over them we can decide which exports are used and which are not used in our application. In contrast, CommonJS modules are not always tree-shakable because of the dynamic nature of JavaScript.
+Because the ES2015 modules are static, by performing a static code analysis over them we can decide which exports are used and which are not used in our application. In contrast, CommonJS modules are not always tree-shakable because of the dynamic nature of their format.
 
 For instance:
 
@@ -211,7 +211,8 @@ rl.question('Algorithm you want to use for sorting the numbers? ', answer => {
 });
 ```
 
-It is impossible by performing a static code analysis to guess which algorithm will be chosen by the user.
+It is impossible to guess which algorithm will be chosen by the user by performing a static code analysis.
+
 With ES2015 we can do something like:
 
 ```javascript
@@ -229,11 +230,11 @@ rl.question('Algorithm you want to use for sorting the numbers? ', answer => {
 });
 ```
 
-In this way, we will be able to perform tree-shaking and remove the `./graphs` import, since we're not using `Graphs` anywhere. On the other hand, we need to import all sorting algorithms because we have a level of non-determinism - we're not sure what the input of the user is going to be so we can't get rid of anything from `Algorithms`.
+In this way, we will be able to perform tree-shaking and remove the `./graphs` module from the final bundle because since we're not using `Graphs` anywhere. On the other hand, we need to import all sorting algorithms because we have a level of non-determinism - we're not sure what the input of the user is going to be so we can't get rid of anything from `Algorithms`.
 
 ### Applying Tree-Shaking with Rollup
 
-Rollup.js is a module bundler which is optimized for ES2015 modules. It is a great, pluggable tool which allows us to perform tree-shaking over ES2015 and CommonJS (by using a plugin).
+Rollup.js is a module bundler which is optimized for ES2015 modules. It is a great, pluggable tool which allows us to perform tree-shaking over ES2015 and CommonJS (in most cases) by using a plugin.
 
 We're going to integrate Rollup in the example above, trying to achieve even smaller bundle size! The example from this section is [available here](https://github.com/mgechev/angular2-rollup-build).
 
@@ -255,15 +256,15 @@ Now, lets take a look at the `scripts` section in our `package.json` in order to
 
 We have the same `clean`, `typings`, `serve`, `postinstall`, `minify` and `build` scripts like above. The new things here are `rollup`, `es5`, `build_prod`.
 
-`rollup` will be responsible for bundling our app by performing tree-shaking.
+`rollup` is responsible for bundling our app and perform tree-shaking in the process.
 
-TypeScript supports ES2015 modules, which means that we can apply tree-shaking directly over our non-transpiled app. This is further simplified by the [TypeScript plugin for Rollup](https://github.com/rollup/rollup-plugin-typescript) which allows us to perform the transpilation as the part of the bundling. This would work great if the dependencies of our applications were distributed as TypeScript as well. However, Angular 2 is distributed as ES5 and ES2015 (within the `esm` directory), and RxJS is distributed as ES5 and ES2015 (in the `rxjs-es` package).
+TypeScript supports ES2015 modules, which means that we can apply tree-shaking directly over our non-transpiled app. This is further simplified by the [TypeScript plugin for Rollup](https://github.com/rollup/rollup-plugin-typescript) which allows us to perform the transpilation as the part of the bundling. This would work great if the dependencies of our application were distributed as TypeScript as well. However, Angular 2 is distributed as ES5 and ES2015 (within the `esm` directory), and RxJS is distributed as ES5 and ES2015 (in the `rxjs-es` package).
 
-Since we can't apply tree-shaking directly over the TypeScript of our app, we'll first need to transpile itto TypeScript, after that bundle it to ES2015 bundle by using rollup, and in the end transpile it to ES5.
+Since we can't apply tree-shaking directly over the original TypeScript files of our app, we'll first need to transpile it to TypeScript, after that create an ES2015 bundle by using rollup, and in the end transpile it to ES5.
 
-Because of this there's a very important difference between the `tsconfig.json` presented in the example above, and the one used in this section:
+Because of these changes in the flow of the build process, there's a very important difference between the `tsconfig.json` presented in the example above, and the one used in this section:
 
-```json
+```js
 {
   "compilerOptions": {
     "target": "es2015",
@@ -277,7 +278,7 @@ Because of this there's a very important difference between the `tsconfig.json` 
 }
 ```
 
-Our target version here is `es2015` in order to allow us to transpile our TypeScript application to ES2015 modules.
+Our target version here is `es2015` in order to transpile the TypeScript application to an ES2015 one, with ES2015 modules.
 
 Now we can explore the `rollup` script:
 
@@ -285,9 +286,9 @@ Now we can explore the `rollup` script:
 rollup -f iife -c -o dist/bundle.es2015.js
 ```
 
-Above we tell to `rollup` to bundle the modules as IIFE (Immediately-Invoked Function Expression), use the configuration file provided in the root of the project (`rollup.config.js`) and output the bundle as `bundle.es2015.js` in `dist`.
+Above we tell `rollup` to bundle the modules as IIFE (Immediately-Invoked Function Expression), use the configuration file provided in the root of the project (`rollup.config.js`) and output the bundle as `bundle.es2015.js` in `dist`.
 
-Now lets explain the `rollup.config.js` file:
+Now lets take a look at the `rollup.config.js` file:
 
 ```javascript
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -318,11 +319,11 @@ export default {
 };
 ```
 
-The best thing here is that the file is plain JavaScript! We export the configuration object, and declare inside of it the `entry` point of the application, the `module` name (required if we use IIFE bundle), we declare that we want to have `sourceMap`, and the set of plugins that we want to use.
+Great thing about this configuration file is that it is pure JavaScript! We export the configuration object, and declare inside of it the `entry` point of the application, the `module` name (required if we use IIFE bundling), we also declare that we want to have `sourceMap`s, and the set of plugins that we want to use.
 
-This is the last tricky part of the configuration! We use the `nodeResovle` plugin for rollup in order to hint the bundler that we want to use node-like module resolution. Once the bundle finds import like `@angular/core`, it'll go to `node_modules/@angular/core` and read the `package.json` file. Once it finds property clled `main:jsnext`, the bundler will use the file pointed as value of it. If such property is not found, the bundler will use the file pointed by `main`.
+We use the `nodeResovle` plugin for rollup in order to hint the bundler that we want to use node-like module resolution. Once the bundler finds import like `@angular/core`, for instance, it'll go to `node_modules/@angular/core` and read the `package.json` file there. Once it finds property called `main:jsnext`, the bundler will use the file set as its value. If such property is not found, the bundler will use the file pointed by `main`.
 
-The problem comes that RxJS is distributed as ES5 by default. In order to handle this problem, for bundling the required RxJS operations we'll use the package `rxjs-es`, which is already [available in `package.json`](https://github.com/mgechev/angular2-rollup-build/blob/master/package.json#L38). After installing this module, we need to make sure that the module bundler will use `rxjs-es` instead of `rxjs` in `node_modules`. This is exactly what the purpose of the `rollupNG2` plugin is - to translate all the `rxjs/*` imports to `rxjs-es/*` ones.
+A problem comes that RxJS is distributed as ES5 by default. In order to deal with this problem, for bundling the required RxJS operations we'll use the package `rxjs-es`, which is already [available in `package.json`](https://github.com/mgechev/angular2-rollup-build/blob/master/package.json#L38). After installing this module, we need to make sure that the module bundler will use `rxjs-es` instead of `rxjs` from `node_modules`. This is exactly what the purpose of the `rollupNG2` plugin is - to translate all the `rxjs/*` imports to `rxjs-es/*` ones.
 
 Alright, now if we run:
 
@@ -330,7 +331,7 @@ Alright, now if we run:
 npm run clean && npm run build && npm run rollup
 ```
 
-We'll get the bundle `bundle.es2015.js`. Although Chrome already has 100% ES2015 support, it still doesn't support ES2015 modules, so we'll need to transpile this bundle to ES5.
+We'll get the bundle `bundle.es2015.js`. Now lets transpile this bundle to ES5.
 
 This can be easily achieved by using the `es5` script:
 
@@ -338,24 +339,24 @@ This can be easily achieved by using the `es5` script:
 tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js
 ```
 
-We use the TypeScript compiler and output the ES5 bundle to `dist/bundle.js` (note that this script may throw an error for `Duplicate identifier _subscribe`).
+We use the TypeScript compiler and output the ES5 bundle to `dist/bundle.js` (note that this script may throw an error for `Duplicate identifier _subscribe`, which is not problematic at this point).
 
-Now in order to get our final bundle we need to invoke `npm run minify`. To preview the result use:
+In order to get our final optimized, bundle we need to invoke `npm run minify`. To verify that the application still works use:
 
 ```bash
 npm run serve
 ```
 
-### Analysis
+### Size Analysis
 
-Lets find out what is the size of our ES5 bundle:
+Lets find out what the size of our ES5 bundle is:
 
 ```bash
 $ ls -lah bundle.js
 -rw-r--r--  1 mgechev  staff   1.4M Jun 26 13:00 bundle.js
 ```
 
-Great! This is 200K less than the previous section! Now lets see what the bundle size will be after minification:
+Great! This is 200K smaller than the previous section! Now lets see what the bundle size will be after minification:
 
 ```bash
 $ ls -lah bundle.min.js
@@ -375,21 +376,23 @@ About 25% reduction of the bundle size! But I'm sure we can do even better!
 
 ## Using ngc
 
-As [static-analysis enthusiast](https://www.youtube.com/watch?v=bci-Z6nURgE), I'm following the progress around the Angular compiler (**ngc**). The basic idea of ngc is to process the templates of the components in our application and [generate VM friendly, tree-shakable code](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html). This can happen either run-time or build-time, but since in run-time compilation the application is already loaded in the browser we can't take advantage of tree-shaking. The project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli).
+As [static code analysis enthusast](https://www.youtube.com/watch?v=bci-Z6nURgE), I'm following the progress around the Angular compiler (**ngc**).
 
-Although in the previous example we already applied decent tree-shaking we still can do better! Why? Well, having an HTML template we're not completely sure what parts of Angular we can get rid of from our final bundle since HTML is not something that rollup can analyze statically. That's why we can:
+The core idea of ngc is to process the templates of the components in our applications and [generate VM friendly](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html), tree-shakable code. This can happen either run-time or build-time, but since in run-time compilation the application is already loaded in the browser we can't take advantage of tree-shaking. The project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli).
+
+Although in the previous example we already applied decent tree-shaking we still can do better! Why? Well, having an HTML template rollup is not completely sure what parts of Angular we can get rid of from the final bundle since HTML is not something that rollup can analyze at all. That's why we can:
 
 - Compile our application (including templates) to TypeScript with ngc.
 - Perform tree-shaking with rollup (this way we will get *at least* as small bundle as above).
 - Transpile the bundle to ES5.
 - Minify the bundle.
-- Gzip it.
+- Gzip it!
 
 Alright, lets begin! The code explained in the paragraphs below can be [found here](https://github.com/mgechev/angular2-ngc-rollup-build).
 
 Lets take a look at the scripts in `package.json`:
 
-```bash
+```json
 "scripts": {
   "typings": "typings install",
   "serve": "http-server . -p 5558",
@@ -404,7 +407,7 @@ Lets take a look at the scripts in `package.json`:
 }
 ```
 
-`build_prod` just confirms the order into which the individual actions need to be performed. Lets take a look at the clean method, since it looks quite complex this time.
+`build_prod` just confirms the order into which the individual actions need to be performed. Lets take a look at the `clean` method, since it looks quite complex this time:
 
 ```
 rm -rf dist && rm -rf app/*.ngfactory.ts && cd compiled && ls | grep -v main-ngc.ts | xargs rm && cd ..
@@ -422,29 +425,15 @@ const appInjector = ReflectiveInjector.resolveAndCreate(BROWSER_APP_PROVIDERS, b
 coreBootstrap(AppComponentNgFactory, appInjector);
 ```
 
-This is how we can bootstrap a precompiled app at the moment of writing. Notice that we bootstrap the app by using `AppComponentNgFactory`, and import it from `app.component.ngfactory`, i.e. a generated file. So, once we compile our app with `ngc` we want to move everything in the `compiled` directory, and after that invoke the TypeScript compiler, in order to make it produce ES2015 code. That is why our `tsconfig.json` is slightly changed as well:
+This is what the process of bootstrapping a precompiled app at the moment of writing is. Notice that we bootstrap the app by using `AppComponentNgFactory`, and import it from `app.component.ngfactory`, i.e. a generated by ngc file. So, once we compile our app with `ngc`, we want to move everything in the `compiled` directory, and after that invoke the TypeScript compiler, in order to make it produce ES2015 code. That is why our `tsconfig.json` is slightly changed as well:
 
-**tsconfig-tsc.json**
-```json
+```javascript
+// tsconfig-tsc.json
 {
   "compilerOptions": {
     "target": "es2015",
     "module": "es2015",
-    "moduleResolution": "node",
-    "declaration": false,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "pretty": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitUseStrict": false,
-    "noFallthroughCasesInSwitch": true,
-    "outDir": "./dist",
-    "rootDir": "./compiled"
+    // ...
   },
   "compileOnSave": false,
   "files": [
@@ -476,9 +465,6 @@ Alright...now lets run `npm run ngc`. Once the scripts completes its execution, 
 ├── tsconfig-tsc.json
 ├── tsconfig.json
 ├── typings
-│   ├── globals
-│   │   └── es6-shim
-│   └── index.d.ts
 └── typings.json
 ```
 
@@ -488,7 +474,9 @@ Now we can transpile the application to ES2015:
 npm run build
 ```
 
-At this point we already have the ES2015 version of our app located in `dist`. The only two steps left are:
+*Notice that the `postinstall` script is quite complex as well. This is due to [this bug](https://github.com/angular/angular/issues/9540) introduced in `@angular/compiler-cli` by `RC.3`*
+
+At this point we already have the ES2015 version of our app located in `dist`. The only steps left are:
 
 - Tree-shaking.
 - Transpilation from ES2015 to ES5.
@@ -515,7 +503,7 @@ In order to make sure that everything works you can use:
 npm run serve
 ```
 
-### Analysis
+### Size Analysis
 
 Lets see how big is our precompiled, tree-shaked app!
 
@@ -535,21 +523,23 @@ $ ls -lah bundle.min.js.gz
 
 The final result is 49K!
 
-*Credits: Rob Wormald who did some experiments with [ngc here](https://github.com/robwormald/ng2-compiler-test2).*
+*Credits: Rob Wormald who did experiments with [ngc here](https://github.com/robwormald/ng2-compiler-test2).*
 
 ## Conclusion
 
-![](/images/bundle-size-chart.png)
+![Application Bundle Size](/images/bundle-size-chart.png)
 
 As we can see from the chart above, by applying a set of optimizations over our production bundle we can reduce the size of our application up to 33 times!
 
-This is thanks to a couple of factors:
+This is thanks to a couple of techniques:
 
-- Static code analysis, more specifically tree-shaking.
+- Optimization by performing static-code analysis, more specifically tree-shaking.
 - Minification (including mangling).
 - Compression with gzip.
 
-Definitely there's some overhead at first, before get all the things that are happening in this process. Luckily, in the end, all these things are going to be taken care of automatically by tools like [`angular-cli`](https://github.com/angular/angular-cli), and [angular2-seed](https://github.com/mgechev/angular2-seed).
+Definitely there's some overhead at first, before being able to get all the things going on in this process. Luckily, in the end, all this is going to happen automatically with tools like [`angular-cli`](https://github.com/angular/angular-cli), and [angular2-seed](https://github.com/mgechev/angular2-seed).
 
-As a matter of fact, we are already planning to add automated production build, which performs all the listed steps above in [`angular2-seed`](https://github.com/mgechev/angular2-seed/issues/864). However, we decided that we need to wait a little bit, making sure the tools are mature enough and allow us to provide high-quality solution for all of us.
+As a matter of fact, we are already planning to add automated production build, which performs all the listed steps above in [`angular2-seed`](https://github.com/mgechev/angular2-seed/issues/864). This is definitely going to happen in near future, once we make sure that all tools explained above are mature enough.
+
+By then, we can easily reduce the bundle size to ~150K only by applying minification and compression!
 
