@@ -549,3 +549,7 @@ This is thanks to a couple of factors:
 - Minification (including mangling).
 - Compression with gzip.
 
+Definitely there's some overhead at first, before get all the things that are happening in this process. Luckily, in the end, all these things are going to be taken care of automatically by tools like [`angular-cli`](https://github.com/angular/angular-cli), and [angular2-seed](https://github.com/mgechev/angular2-seed).
+
+As a matter of fact, we are already planning to add automated production build, which performs all the listed steps above in [`angular2-seed`](https://github.com/mgechev/angular2-seed/issues/864). However, we decided that we need to wait a little bit, making sure the tools are mature enough and allow us to provide high-quality solution for all of us.
+
