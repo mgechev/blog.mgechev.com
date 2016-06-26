@@ -371,19 +371,181 @@ $ ls -lah bundle.min.js.gz
 
 About 25% reduction of the bundle size! But I'm sure we can do even better!
 
-*Credits: Igor Minar published similar experiments in the official Angular 2 repository. They can be found [here](https://github.com/angular/angular/tree/a01a54c180470610dc359f1ab8c4503e51e440fa/modules/rollup-test)*.
+*Credits: Igor Minar published similar experiments in the official Angular 2 repository. They can be found [here](https://github.com/angular/angular/tree/a01a54c180470610dc359f1ab8c4503e51e440fa/modules/rollup-test).*
 
 ## Using ngc
 
-As [static-analysis enthusiast](https://www.youtube.com/watch?v=bci-Z6nURgE), I'm following the progress of the Angular compiler. The idea of the compiler is to process the templates of the components in our application by [generating VM friendly, tree-shakable code](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html), as part of the build process. This project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli).
+As [static-analysis enthusiast](https://www.youtube.com/watch?v=bci-Z6nURgE), I'm following the progress around the Angular compiler (**ngc**). The basic idea of ngc is to process the templates of the components in our application and [generate VM friendly, tree-shakable code](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html). This can happen either run-time or build-time, but since in run-time compilation the application is already loaded in the browser we can't take advantage of tree-shaking. The project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli).
 
-Although we already applied some decent tree-shaking we still can do better! Why? Well, having a HTML template we're not completely sure what parts of Angular we can get rid of since HTML is not something that rollup can analyze statically. That's why we can:
+Although in the previous example we already applied decent tree-shaking we still can do better! Why? Well, having an HTML template we're not completely sure what parts of Angular we can get rid of from our final bundle since HTML is not something that rollup can analyze statically. That's why we can:
 
-- Compile our application with ngc.
+- Compile our application (including templates) to TypeScript with ngc.
 - Perform tree-shaking with rollup (this way we will get *at least* as small bundle as above).
 - Transpile the bundle to ES5.
 - Minify the bundle.
 - Gzip it.
 
-Alright, lets begin!
+Alright, lets begin! The code explained in the paragraphs below can be [found here](https://github.com/mgechev/angular2-ngc-rollup-build).
+
+Lets take a look at the scripts in `package.json`:
+
+```bash
+"scripts": {
+  "typings": "typings install",
+  "serve": "http-server . -p 5558",
+  "postinstall": "npm i -f @angular/tsc-wrapped@latest && rm -rf node_modules/@angular/compiler-cli/node_modules && npm run typings",
+  "clean": "rm -rf dist && rm -rf app/*.ngfactory.ts && cd compiled && ls | grep -v main-ngc.ts | xargs rm && cd ..",
+  "build": "tsc -p tsconfig-tsc.json",
+  "rollup": "rollup -f iife -c -o dist/bundle.es2015.js",
+  "es5": "tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js",
+  "minify": "uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js",
+  "ngc": "ngc -p . && cp app/* compiled",
+  "build_prod": "npm run clean && npm run ngc && npm run build && npm run rollup && npm run es5 && npm run minify"
+}
+```
+
+`build_prod` just confirms the order into which the individual actions need to be performed. Lets take a look at the clean method, since it looks quite complex this time.
+
+```
+rm -rf dist && rm -rf app/*.ngfactory.ts && cd compiled && ls | grep -v main-ngc.ts | xargs rm && cd ..
+```
+
+What we do here is to remove the `dist` directory, all files which match `app/*.ngfactory.ts` and also everything except `main-ngc.ts` from the `compiled` directory. ngc produces `*.ngfactory.ts` files. Since they are artifacts from the build process we'd want to remove them before the next build. But why we remove everything except `main-ngc.ts` from the `compiled` directory? Lets take a look at the file's content:
+
+```javascript
+import {ComponentResolver, ReflectiveInjector, coreBootstrap} from '@angular/core';
+import {BROWSER_APP_PROVIDERS, browserPlatform} from '@angular/platform-browser';
+
+import {AppComponentNgFactory} from './app.component.ngfactory';
+
+const appInjector = ReflectiveInjector.resolveAndCreate(BROWSER_APP_PROVIDERS, browserPlatform().injector);
+coreBootstrap(AppComponentNgFactory, appInjector);
+```
+
+This is how we can bootstrap a precompiled app at the moment of writing. Notice that we bootstrap the app by using `AppComponentNgFactory`, and import it from `app.component.ngfactory`, i.e. a generated file. So, once we compile our app with `ngc` we want to move everything in the `compiled` directory, and after that invoke the TypeScript compiler, in order to make it produce ES2015 code. That is why our `tsconfig.json` is slightly changed as well:
+
+**tsconfig-tsc.json**
+```json
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "declaration": false,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "pretty": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "./dist",
+    "rootDir": "./compiled"
+  },
+  "compileOnSave": false,
+  "files": [
+    "compiled/main-ngc.ts"
+  ]
+}
+```
+
+We are using `compiled/main-ngc.ts` as entry file. Also notice that we have two `tsconfig` files: one for ngc and one for tsc.
+
+Alright...now lets run `npm run ngc`. Once the scripts completes its execution, here's the directory structure of the app:
+
+```
+.
+├── README.md
+├── app
+│   ├── app.component.ngfactory.ts
+│   ├── app.component.ts
+│   └── main.ts
+├── compiled
+│   ├── app.component.ngfactory.ts
+│   ├── app.component.ts
+│   ├── main-ngc.ts
+│   └── main.ts
+├── dist
+├── index.html
+├── package.json
+├── rollup.config.js
+├── tsconfig-tsc.json
+├── tsconfig.json
+├── typings
+│   ├── globals
+│   │   └── es6-shim
+│   └── index.d.ts
+└── typings.json
+```
+
+Now we can transpile the application to ES2015:
+
+```bash
+npm run build
+```
+
+At this point we already have the ES2015 version of our app located in `dist`. The only two steps left are:
+
+- Tree-shaking.
+- Transpilation from ES2015 to ES5.
+- Minification.
+- Gzipping.
+
+This is process we're already familiar with so lets invoke the individual scripts one by one without providing further explanation:
+
+```bash
+# Bundle the app
+npm run rollup
+
+# Notice that this command may fail with "Duplicate _identifier"
+# This will not have any impact over the end result.
+npm run es5
+
+# Minify the app
+npm run minify
+```
+
+In order to make sure that everything works you can use:
+
+```bash
+npm run serve
+```
+
+### Analysis
+
+Lets see how big is our precompiled, tree-shaked app!
+
+```
+$ ls -lah bundle.min.js
+-rw-r--r--  1 mgechev  staff   210K Jun 26 14:22 bundle.min.js
+```
+
+The application got more that twice smaller that it was without ngc!
+
+If we gzip it, we'll get the following results:
+
+```bash
+$ ls -lah bundle.min.js.gz
+-rw-r--r--  1 mgechev  staff    49K Jun 26 14:22 bundle.min.js.gz
+```
+
+The final result is 49K!
+
+*Credits: Rob Wormald who did some experiments with [ngc here](https://github.com/robwormald/ng2-compiler-test2).*
+
+## Conclusion
+
+![](/images/bundle-size-chart.png)
+
+As we can see from the chart above, by applying a set of optimizations over our production bundle we can reduce the size of our application up to 33 times!
+
+This is thanks to a couple of factors:
+
+- Static code analysis, more specifically tree-shaking.
+- Minification (including mangling).
+- Compression with gzip.
 
