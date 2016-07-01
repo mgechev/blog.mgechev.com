@@ -220,7 +220,7 @@ var Provider = {
 };
 {% endhighlight %}
 
-We have have a little bit more logic here so lets start with `get`. In `get` we initially check whether we already have this component cached in the `_cache` object. If it is cached we simply return it (see [singleton](https://github.com/mgechev/angularjs-in-patterns/#singleton)). `$rootScope` is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don't find the component in the cache we get its provider (factory) and invoke it using the `invoke` method, by passing its provider and local dependencies.
+We have a little bit more logic here so lets start with `get`. In `get` we initially check whether we already have this component cached in the `_cache` object. If it is cached we simply return it (see [singleton](https://github.com/mgechev/angularjs-in-patterns/#singleton)). `$rootScope` is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don't find the component in the cache we get its provider (factory) and invoke it using the `invoke` method, by passing its provider and local dependencies.
 
 In `invoke` the first thing we do is to assign an empty object to `locals` if there are no local dependencies. What are the local dependencies?
 
