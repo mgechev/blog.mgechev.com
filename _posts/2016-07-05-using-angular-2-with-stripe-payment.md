@@ -1,5 +1,5 @@
 ---
-title: Using Angular 2 with Stripe
+title: Using Stripe with Angular 2
 author: minko_gechev
 layout: post
 categories:
