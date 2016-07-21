@@ -41,16 +41,19 @@ Everything looks like a piece of cake at first, however, there are some complica
 Fortunately, Google Closure compiler [officially supports ES2015](https://www.reddit.com/r/javascript/comments/3pb750/ecmascript_6_is_now_officially_supported_by/), but unfortunately it supports only a subset of the module syntax. For instance:
 
 **bar.js**
+
 ```javascript
 export const bar = 42;
 ```
 
 **index.js**
+
 ```javascript
 export * from './bar';
 ```
 
 **foo.js**
+
 ```javascript
 import {bar} from './index';
 console.log(bar);
