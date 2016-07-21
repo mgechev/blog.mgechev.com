@@ -1,5 +1,5 @@
 ---
-title: Even Smaller Angular 2 Applications - 20K Production Bundle
+title: 2.5X Smaller Angular 2 Applications with Google Closure Compiler
 author: minko_gechev
 layout: post
 categories:
