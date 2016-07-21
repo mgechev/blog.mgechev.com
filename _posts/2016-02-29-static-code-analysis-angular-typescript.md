@@ -558,7 +558,6 @@ Fortunately, neither of the challenging tasks is not related to nondeterminism i
 - [TypeScript's Official Repository](https://github.com/Microsoft/TypeScript)
 - [Modern Compiler Design 2nd ed. 2012 Edition](http://www.amazon.com/Modern-Compiler-Design-Dick-Grune/dp/1461446988)
 - [Modern Compiler Implementation in Java 2nd Edition](http://www.amazon.com/gp/product/052182060X/)
-- [Modern Compiler Implementation in Java 2nd Edition](http://www.amazon.com/gp/product/052182060X/)
 - [Finite Automata](https://en.wikipedia.org/wiki/Finite-state_machine)
 - [Regular Expressions](https://en.wikipedia.org/wiki/Regular_expression)
 - [Context-free grammars](https://en.wikipedia.org/wiki/Context-free_grammar)
