@@ -23,7 +23,7 @@ In the post "[Building an Angular 2 Application for Production](http://blog.mgec
 Although we achieved impressive results we can do even better! In this post I'll show some of the work done by [Alex Eagle](https://twitter.com/Jakeherringbone) and [Jeff Cross](https://twitter.com/jeffbcross) from the Angular core team.
 
 <div class="warning-box">
-  <strong>Disclaimer</strong>: This article explains a research which uses experimental tools tools which **WILL** change in near future. **Do not** use anything described here in production.
+  <strong>Disclaimer</strong>: This article explains a research which uses experimental tools tools which <strong>WILL</strong> change in near future. <strong>Do not</strong> use anything described here in production.
 </div>
 
 ## Closure Compiler
