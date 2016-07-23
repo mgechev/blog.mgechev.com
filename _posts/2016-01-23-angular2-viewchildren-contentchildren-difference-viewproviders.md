@@ -43,7 +43,7 @@ This means that using the preceding abstractions we can build structures of the 
 
 ![](/images/component-tree-angular2.png)
 
-On the above figure we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references.
+On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references.
 
 ## Composition of Components in Angular 2
 
@@ -56,21 +56,21 @@ In order to better illustrate the concepts we are going to explore, lets build a
 @Component({
   selector: 'todo-app',
   providers: [TodoList],
-  directives: [TodoCmp, TodoInputCmp],
+  directives: [TodoComponent, TodoInputComponent],
   template: `
     <section>
       Add todo:
-      <todo-input (onTodo)="addTodo($event)"></todo-input>
+      <todo-input (todo)="addTodo($event)"></todo-input>
     </section>
     <section>
       <h4 *ngIf="todos.getAll().length">Todo list</h4>
-      <todo *ngFor="var todo of todos.getAll()" [todo]="todo">
+      <todo *ngFor="let todo of todos.getAll()" [todo]="todo">
       </todo>
     </section>
     <ng-content select="footer"></ng-content>
   `
 })
-class TodoAppCmp {
+class TodoAppComponent {
   constructor(private todos: TodoList) {}
   addTodo(todo) {
     this.todos.add(todo);
@@ -123,21 +123,19 @@ Now comes the interesting part! Lets see how we can access and manipulate these 
 Angular 2 provides the following property decorators in the `@angular/core` package: `@ViewChildren`, `@ViewChild`, `@ContentChildren` and `@ContentChild`. We can use them the following way:
 
 ```ts
-import {ViewChild, ViewChildren, Component...} from '@angular/core';
+import {ViewChild, ViewChildren, Component, AfterViewInit...} from '@angular/core';
 
 // ...
 
 @Component({
   selector: 'todo-app',
   providers: [TodoList],
-  directives: [TodoCmp, TodoInputCmp],
+  directives: [TodoComponent, TodoInputComponent],
   template: `...`
 })
-class TodoAppCmp {
-  @ViewChild(TodoInputCmp)
-  inputComponent: TodoInputCmp
-  @ViewChildren(TodoCmp)
-  todoComponents: QueryList<TodoCmp>;
+class TodoAppComponent implements AfterViewInit {
+  @ViewChild(TodoInputComponent) inputComponent: TodoInputComponent
+  @ViewChildren(TodoComponent) todoComponents: QueryList<TodoComponent>;
 
   constructor(private todos: TodoList) {}
   ngAfterViewInit() {
@@ -149,15 +147,15 @@ class TodoAppCmp {
 
 ```
 
-The example above shows how we can take advantage of `@ViewChildren` and `@ViewChild`. Basically we can decorate a property and this way query the view of an element. In the example above, we query the `TodoInputCmp` child component with `@ViewChild` and `TodoCmp` with `@ViewChildren`. We use different decorators since we have only a single input, so we can grab it with `@ViewChild` but we have multiple todo items rendered, so for them we need to apply the `@ViewChildren` decorator.
+The example above shows how we can take advantage of `@ViewChildren` and `@ViewChild`. Basically we can decorate a property and this way query the view of an element. In the example above, we query the `TodoInputComponent` child component with `@ViewChild` and `TodoComponent` with `@ViewChildren`. We use different decorators since we have only a single input, so we can grab it with `@ViewChild` but we have multiple todo items rendered, so for them we need to apply the `@ViewChildren` decorator.
 
-Another thing to notice are the types of the `inputComponent` and `todoComponents` properties. The first property is of type `TodoInputCmp`. It's value can be either `null` if Angular haven't found such child or reference to the instance of the component's controller (in this case, reference to an instance of the `TodoInputCmp` class). On the other hand, since we have multiple `TodoCmp` instances which can be dynamically added and removed from the view, the type of the `todoComponents` property is `QueryList<TodoCmp>`. We can think of the `QueryList` as an observable collection, which can throw events once items are added or removed from it.
+Another thing to notice are the types of the `inputComponent` and `todoComponents` properties. The first property is of type `TodoInputComponent`. It's value can be either `null` if Angular haven't found such child or reference to the instance of the component's controller (in this case, reference to an instance of the `TodoInputComponent` class). On the other hand, since we have multiple `TodoComponent` instances which can be dynamically added and removed from the view, the type of the `todoComponents` property is `QueryList<TodoComponent>`. We can think of the `QueryList` as an observable collection, which can throw events once items are added or removed from it.
 
 **Since Angular's DOM compiler will process the `todo-app` component before its children, during the instantiation of the `todo-app` component the `inputComponent` and `todosComponen` properties will not be initialized. Their values are going to be set in the `ngAfterViewInit` life-cycle hook**.
 
 ##### Accessing Content Children
 
-Almost the same rules are valid for the element's content children, however, there are some slight differences. In order to illustrate them better, lets take a look at the root component which uses the `TodoAppCmp`:
+Almost the same rules are valid for the element's content children, however, there are some slight differences. In order to illustrate them better, lets take a look at the root component which uses the `TodoAppComponent`:
 
 ```ts
 @Component({
@@ -167,7 +165,7 @@ Almost the same rules are valid for the element's content children, however, the
 class Footer {}
 
 @Component(...)
-class TodoAppCmp {...}
+class TodoAppComponent {...}
 
 @Component({
   selector: 'app',
@@ -183,18 +181,17 @@ class TodoAppCmp {...}
       </todo-app>
     </content>
   `,
-  directives: [TodoAppCmp, NgModel, Footer]
+  directives: [TodoAppComponent, NgModel, Footer]
 })
-export class AppCmp {}
+export class AppComponent {}
 ```
-In the snippet above we define two more components `Footer` and `AppCmp`. `Footer` visualizes all of the content passed between the opening and closing tag of its host element (`<footer>content to be projected</footer>`). On the other hand, `AppCmp` uses `TodoAppCmp` and passes `Footer` between its opening and closing tags. So given our terminology from above, `Footer` is a content child. We can access it in the following way:
+In the snippet above we define two more components `Footer` and `AppComponent`. `Footer` visualizes all of the content passed between the opening and closing tag of its host element (`<footer>content to be projected</footer>`). On the other hand, `AppComponent` uses `TodoAppComponent` and passes `Footer` between its opening and closing tags. So given our terminology from above, `Footer` is a content child. We can access it in the following way:
 
 ```ts
 // ...
 @Component(...)
-class TodoAppCmp {
-  @ContentChild(Footer)
-  footer: Footer;
+class TodoAppComponent implements AfterContentInit {
+  @ContentChild(Footer) footer: Footer;
   ngAfterContentInit() {
     // this.footer is now with value set
   }
@@ -208,7 +205,7 @@ As we can see from above the only two differences between accessing view childre
 
 Alright! We're almost done with our journey! As final step lets see what the difference between `providers` and `viewProviders` is (if you're not familiar with the dependency injection mechanism of Angular 2, you can take a look at [my book](https://www.packtpub.com/web-development/switching-angular-2)).
 
-Lets peek at the declaration of the `TodoAppCmp`:
+Lets peek at the declaration of the `TodoAppComponent`:
 
 ```ts
 class TodoList {
@@ -223,21 +220,21 @@ class TodoList {
 @Component({
   // ...
   viewProviders: [TodoList],
-  directives: [TodoCmp, TodoInputCmp],
+  directives: [TodoComponent, TodoInputComponent],
   // ...
 })
-class TodoAppCmp {
+class TodoAppComponent {
   constructor(private todos: TodoList) {}
   // ...
 }
 ```
 Inside of the `@Component` decorator we set the `viewProviders` property to an array with a single element - the `TodoList` service. The `TodoList` service holds all the todo items which are entered in the application.
 
-We inject the `TodoList` service in the `TodoAppCmp`'s constructor, but we can also inject it in any other directive's (or component) constructor, which is used in the `TodoAppCmp`'s view. This means that `TodoList` is accessible from:
+We inject the `TodoList` service in the `TodoAppComponent`'s constructor, but we can also inject it in any other directive's (or component) constructor, which is used in the `TodoAppComponent`'s view. This means that `TodoList` is accessible from:
 
 - `TodoList`
-- `TodoCmp`
-- `TodoInputCmp`
+- `TodoComponent`
+- `TodoInputComponent`
 
 However, if we try to inject this service in `Footer` component's constructor we are going to get the following runtime error:
 
