@@ -41,22 +41,24 @@ We'll use the most common example for this - AJAX calls.
 Let's suppose we have the following data, which should be resolved using XHR (XMLHttpRequests):
 
 **users.json**
-{% highlight json %}
+
+```json
 {
   "group": "admins",
   "users_list": ["user1.json", "user2.json"]
 }
-{% endhighlight %}
+```
 
 Where in each JSON file, corresponding to given user we have:
 
 **userx.json**
-{% highlight json %}
+
+```json
 {
   "username": "foobar",
   "avatar": "photox.png"
 }
-{% endhighlight %}
+```
 
 All we want to do is get the list of users with GET XHR, log the group name and after that get the users one by one (or at once if possible).
 
@@ -64,7 +66,7 @@ All we want to do is get the list of users with GET XHR, log the group name and 
 
 Let's implement the `getJSON` method:
 
-{% highlight javascript %}
+```javascript
 function getJSON(url, success, error) {
   'use strict';
   var xhr = new XMLHttpRequest();
@@ -80,11 +82,11 @@ function getJSON(url, success, error) {
   xhr.open('GET', url);
   xhr.send();
 }
-{% endhighlight %}
+```
 
 Our `loadUsers` function would look like this:
 
-{% highlight javascript %}
+```javascript
 function loadUsers() {
   getJSON('users.json', function (users) {
     console.log(users.group);
@@ -99,7 +101,7 @@ function loadUsers() {
     console.error(error);
   });
 }
-{% endhighlight %}
+```
 
 This looks...alright, I guess.
 What we do is to fetch the `users.json` and later, in the success callback, fetch each user in the `users_list` array. Excluding the ugliness of the code (plenty of nested callbacks), the functionality is not that bad because we can fetch up-to 6 users simultaneously (that's the limit in Chrome).
@@ -108,29 +110,29 @@ What we do is to fetch the `users.json` and later, in the success callback, fetc
 
 We can modify slightly `getJSON` in order to make it return a promise:
 
-{% highlight javascript %}
+```javascript
 function getJSON(url) {
   'use strict';
   var xhr = new XMLHttpRequest();
-  var d = Promise.defer();
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        d.resolve(JSON.parse(xhr.responseText));
-      } else {
-        d.reject(xhr.responseText);
+  return new Promise((resolve, reject) => {
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          resolve(JSON.parse(xhr.responseText));
+        } else {
+          reject(xhr.responseText);
+        }
       }
-    }
-  };
-  xhr.open('GET', url);
-  xhr.send();
-  return d.promise;
+    };
+    xhr.open('GET', url);
+    xhr.send();
+  });
 }
-{% endhighlight %}
+```
 
 Now `loadUsers` will look like this:
 
-{% highlight javascript %}
+```javascript
 function loadUsers() {
   getJSON('users.json')
   .then(function (data) {
@@ -141,7 +143,7 @@ function loadUsers() {
     });
   });
 }
-{% endhighlight %}
+```
 
 I believe, the code looks a little bit more compact. We still fetch up-to 6 users simultaneously, because of the call `data.users_list.map(getJSON)`.
 
@@ -149,7 +151,7 @@ I believe, the code looks a little bit more compact. We still fetch up-to 6 user
 
 Since `async` functions are still not implemented in the modern browsers, as Jake suggests, we can use generators as something akin to them. Let's leave our `getJSON` implementation untouched and implement `loadUsers` using a generator:
 
-{% highlight javascript %}
+```javascript
 function loadUsers() {
   spawn(function * () {
     var users = yield getJSON('users.json');
@@ -158,22 +160,22 @@ function loadUsers() {
     }
   });
 }
-{% endhighlight %}
+```
 
 Looks much more elegant, doesn't it? Now lets trace what is actually going on under the hood. Let's try to implement `spawn`.
 
 First of all, we should be aware of the fact that it accepts a generator function, so we should use it like:
 
-{% highlight javascript %}
+```javascript
 function spawn(genFunc) {
   var generator = genFunc();
   // ...
 }
-{% endhighlight %}
+```
 
 After the first invocation of our generator we will receive a promise:
 
-{% highlight javascript %}
+```javascript
 function spawn(genFunc) {
   var generator = genFunc();
   generator.next().value
@@ -181,13 +183,13 @@ function spawn(genFunc) {
     //...
   });
 }
-{% endhighlight %}
+```
 
 This snippet will invoke `getJSON` and will receive the returned promise (as `generator.next().value`). On resolve of the promise, the callback will be invoked with JavaScript object, equals to the parsed JSON we just fetched from `users.json`.
 
 As next step we need to invoke the generator with the received object, this way the local variable `users` (inside `loadUsers`) will hold the correct value and we will have access to the `users_list` property, over which we need to iterate with `map`:
 
-{% highlight javascript %}
+```javascript
 function spawn(genFunc) {
   var generator = genFunc();
   generator.next().value
@@ -198,11 +200,11 @@ function spawn(genFunc) {
     })
   });
 }
-{% endhighlight %}
+```
 
 Once we invoke the generator with the `users` object we continue the execution of the generator and enter the loop (`for...of`) where we invoke `yield` with the first promise. Once the promise is resolved we enter the `then` callback and we can request the second user:
 
-{% highlight javascript %}
+```javascript
 function spawn(genFunc) {
   var generator = genFunc();
   generator.next().value
@@ -216,10 +218,11 @@ function spawn(genFunc) {
     })
   });
 }
-{% endhighlight %}
+```
+
 As you see we have a series of nested promise calls. We can generalize them into the following implementation of `spawn`:
 
-{% highlight javascript %}
+```javascript
 function spawn(genFunc) {
   var generator = genFunc();
   function co(type, arg) {
@@ -246,7 +249,7 @@ function spawn(genFunc) {
   }
   co('next');
 }
-{% endhighlight %}
+```
 
 `Promise.resolve` has the same functionality as `Q.when`, everything else is quite straightforward.
 
