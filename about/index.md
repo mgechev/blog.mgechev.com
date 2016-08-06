@@ -25,8 +25,9 @@ Some of the open source projects I've developed are:
 
 ### Angular
 
+- [The Official Angular 2 Style Guide](https://angular.io/styleguide)
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
-- [Community-Driven Angular 2 Style Guide](https://github.com/mgechev/angular2-style-guide)
+- [Community-Driven Angular 2 Style Guide (deprecated)](https://github.com/mgechev/angular2-style-guide)
 - [angular2-seed](https://github.com/mgechev/angular2-seed)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
