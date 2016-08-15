@@ -13,7 +13,7 @@ I&#8217;ve got interests in programming languages, compilers, software design pa
 
 In my working hours I spend time solving interesting business problems using the appropriate technologies based on the projects' requirements. During my spare time, I love developing [open source software](https://github.com/mgechev), writing articles on topics I'm interested in, working out, drinking the best coffee in the area I'm based in and reading about psychology and philosophy.
 
-At the moment I&#8217;m based in Sofia, Bulgaria.
+At the moment I&#8217;m based in <strike>Sofia, Bulgaria</strike> San Francisco, California.
 
 I created a <a title="SofiaJS" href="http://sofiajs.org/" target="_blank">JavaScript user group</a> in Sofia, which has (had) regular [Beer.js](https://github.com/beerjs/sofia) meet-ups. For about fifteen years I've been training karate (since 1999) and since 2005 I&#8217;ve been using different programming languages (including Pascal, Haskell, C, C++, PHP, JavaScript, Io, Java, AspectJ, C#, VisualBasic, Ruby, Python, Perl, ActionScript, Prolog&#8230;even Clips) so as you might see I&#8217;ve met different programming paradigms &#8211; functional, object-oriented, prototype-based oo, aspect-oriented, logical programming, procedural&#8230;I just don&#8217;t have a patience to see what&#8217;s coming next after the OO &#8220;dictatorship&#8221; :-).
 
