@@ -118,7 +118,7 @@ As I mentioned above, the `detectChangesInternal` contains VM friendly code. Let
 
 The `detectChangesInternal` method for the compiled version of the template above is going to look something like:
 
-```javascipt
+```javascript
 // ...
 var currVal_6 = this.context.newName;
 if (import4.checkBinding(throwOnChange, this._expr_6, currVal_6)) {
@@ -204,11 +204,11 @@ As you might have already guessed, from AoT we get performance. The **initial re
 
 On the image below you can see how much time it takes to perform the initial rendering with JiT:
 
-<img src="/images/aot-angular/jit.jpg" style="display: block; margin: auto;">
+<img src="/images/aot-angular/jit.png" style="display: block; margin: auto;">
 
 On the image below you can see how much time it takes to perform the initial rendering with AoT:
 
-<img src="/images/aot-angular/jit.jpg" style="display: block; margin: auto;">
+<img src="/images/aot-angular/aot.png" style="display: block; margin: auto;">
 
 Another awesome thing about the Angular compiler is that it can emit not only JavaScript but TypeScript as well. This allows us to perform **type checking in templates**!
 
@@ -221,6 +221,8 @@ Last but not least, **energy efficiency**! We already mentioned that by using Ao
 Based on findings by the research "Who Killed My Battery: Analyzing Mobile Browser Energy Consumption" (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn't mention specific version of jQuery, based on the date when it was published I assume it's talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of `@angular/compiler` is 103K. This means that it'll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we're ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and `@angular/compiler` we're opening only a single TCP connection, which is the biggest consumer of energy).
 
 iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular 2 applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
+
+<img src="/images/aot-angular/better-place.png" style="display: block; margin: auto;">
 
 ## Conclusion
 
