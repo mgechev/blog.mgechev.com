@@ -129,30 +129,80 @@ Once we find out that the values are not equal we're going to store the change a
 
 Nothing unusual and terribly complicated so far.
 
-## When the compilation takes a place?
+## When the compilation takes place?
 
-The cool thing about the Angular's renderer is that it can be either invoked runtime (i.e. in the user's browser) or build-time (as part of our build process).
+The cool thing about the Angular's renderer is that it can be either invoked runtime (i.e. in the user's browser) or build-time (as part of our build process). This is due the portability property of Angular 2, we can run it on any platform so why to not make the Angular compiler run both in browser and node?
 
-## What we get from AoT?
+### Flow of events in Just-in-Time Compilation
+
+Lets trace the typical development flow without AoT:
+
+- Development of TypeScript application.
+- Transpilation of the app.
+- Bundling.
+- Minification.
+- Deployment.
+
+Once we've deployed the app and the user opens her browser, she goes through the following steps (without strict CSP):
+
+- Download all the assets.
+- Angular bootstraps.
+- Angular goes through the compilation process described above.
+- The application gets rendered.
+
+### Flow of events with Ahead-of-Time Compilation
+
+In contrast, with AoT we get through the following steps:
+
+- Development of the TypeScript app.
+- Compilation of the application with `ngc`:
+  - Performs compilation of the templates with the Angular compiler.
+  - Performs transpilation of the TypeScript code to JavaScript.
+- Bundling.
+- Minification.
+- Deployment.
+
+Although the above process seems lightly more complicated the user goes only through the steps:
+
+- Download all the assets.
+- Angular bootstraps.
+- The application gets rendered.
+
+As you can see the third step is missing which means faster/better UX.
 
 ## How the AoT compilation works?
 
+We already described how the Angular compiler works and what artifacts it produces. Although the AoT compilation differs from JiT compilation only by the time the it's performed there are slight complications.
+
+In JiT once we bootstrap the application we already have our root injector and all the directives available by the root component (they are declared in `BrowserModule`). This metadata can be passed to the compiler once it generates code for the root component of the application. Once we generate the code with JiT for the root component, we have all the metadata which can be used for generation of the code for all children components. Now we can generate the TypeScript for all the children components since we know not only which providers are available at this level of the component tree but also which directives are accessible.
+
+This will make the compiler know what to do when it finds an element in the template. For instance, the element `<bar-baz></bar-baz>` can be interpreted in two different ways depending on whether there's a directive available with selector `bar-baz` or not. Whether the compiler will only create an element `bar-baz` or also instantiate the component associated with the selector `bar-baz` depends on the metadata at the current phase of compilation (on the current state).
+
+Here comes a problem. How at build time we would know what directives are accessible on all levels of the component tree? Thanks to the great design of Angular we can perform a static code analysis and find this out! [Chuck Jazdzewski](https://github.com/chuckjaz) and [Alex Eagle](https://github.com/alexeagle) did amazing work in this direction by developing the [MetadataCollector](https://github.com/angular/angular/blob/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped/src/collector.ts) and other [related modules](https://github.com/angular/angular/tree/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped). What the collector does is to walk the component tree and extract the metadata for each individual component. This involves some awesome techniques which unfortunately are out of the scope of this blog post.
+
+## What we get from AoT?
+
+As you might have already guessed, from AoT we get performance. The **initial rendering performance** of the Angular applications we develop with AoT will be much faster compared to JiT since the JavaScript virtual machine needs to perform much less computations, i.e. we compile the templates to JavaScript only once as part of our development process.
+
+Another awesome thing about the Angular compiler is that it can emit not only JavaScript but TypeScript as well. This allows us to perform **type checking in templates**!
+
+Since the templates of our application are pure JavaScript/TypeScript, we know exactly what and where is used. This allows us to perform **effective tree-shaking** and drop all the directives/modules which are not used in our application out of the production bundle!
+
+JiT compilation cannot be performed in some cases. Since JiT both generates and evaluates code in the browser it uses `eval`. [CSP](https://developer.chrome.com/extensions/contentSecurityPolicy) and some specific environments will not allow us to dynamically evaluate the generated source code.
+
+Last but not least, **energy efficiency**! We already mentioned that by using AoT compilation we drop the bundle sizes of our applications by performing effective tree-shaking (take a look at [this blog post to see what are the actual results and implications](http://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)). The user devices need to perform even less calculations since they don't have to perform JiT. All this reduces battery consumption but how much?
+
+Based on findings by the research "Who Killed My Battery: Analyzing Mobile Browser Energy Consumption" (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery in Wikipedia takes about 4 Joules. Since the paper doesn't mention specific version of jQuery, based on the data when it was published I assume we're talking about ~1.8. Since wikipedia uses gzip for their static content this means that the bundle size is 33K. The gzipped + minified version of `@angular/compiler` is 103K. This means that it'll cost us 12.5J to download the compiler, process it with JavaScript virtual machine, etc. (we're ignoring the fact that we are not performing JiT which will additionally reduce the processor usage because in both cases - jQuery and `@angular/compiler` we're opening only a single TCP which is the biggest consumer of energy).
+
+iPhone 6s has a battery which is 6.9 Wh which is 24840J. Lets suppose there are 1m developers who have built 5 Angular applications on average. Each application has ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111 KWh. According to Google, 1Kwh ~ 12 cents, which means that we'll spend about $210 for recovering the spend energy. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice!
+
 ## Conclusion
 
-- What needs to be compiled?
-- How it gets compiled?
-- Why it needs to get compiled?
-- When the compilation needs to be performed?
-  - JiT cs AoT.
-- What we get from the compilation?
-  - Type checking
-  - Energy:
-    - Parse large amount of JS.
-    - A lot of calculations performed on each visit for each client.
-- How the compilation works?
-- Do we loose anything from AoT vs JiT?
-- Conclusion.
+
 
 ## References
 
 - [Inline Caches](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html)
+- [2.5X Smaller Angular 2 Applications with Google Closure Compiler](http://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)
+- [Who Killed My Battery: Analyzing Mobile Browser Energy Consumption](https://crypto.stanford.edu/~dabo/pubs/abstracts/browserpower.html)
+
