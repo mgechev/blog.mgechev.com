@@ -222,7 +222,7 @@ Based on findings by the research "Who Killed My Battery: Analyzing Mobile Brows
 
 iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular 2 applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
 
-<img src="/images/aot-angular/better-place.png" style="display: block; margin: auto;">
+<img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;">
 
 ## Conclusion
 
@@ -237,4 +237,5 @@ In general, the AoT compilation is a good strategy which is already integrated a
 - [Inline Caches](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html)
 - [2.5X Smaller Angular 2 Applications with Google Closure Compiler](http://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)
 - [Who Killed My Battery: Analyzing Mobile Browser Energy Consumption](https://crypto.stanford.edu/~dabo/pubs/abstracts/browserpower.html)
+- [Angular's Source Code](https://github.com/angular/angular)
 
