@@ -194,11 +194,15 @@ Last but not least, **energy efficiency**! We already mentioned that by using Ao
 
 Based on findings by the research "Who Killed My Battery: Analyzing Mobile Browser Energy Consumption" (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery in Wikipedia takes about 4 Joules. Since the paper doesn't mention specific version of jQuery, based on the data when it was published I assume we're talking about ~1.8. Since wikipedia uses gzip for their static content this means that the bundle size is 33K. The gzipped + minified version of `@angular/compiler` is 103K. This means that it'll cost us 12.5J to download the compiler, process it with JavaScript virtual machine, etc. (we're ignoring the fact that we are not performing JiT which will additionally reduce the processor usage because in both cases - jQuery and `@angular/compiler` we're opening only a single TCP which is the biggest consumer of energy).
 
-iPhone 6s has a battery which is 6.9 Wh which is 24840J. Lets suppose there are 1m developers who have built 5 Angular applications on average. Each application has ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111 KWh. According to Google, 1Kwh ~ 12 cents, which means that we'll spend about $210 for recovering the spend energy. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice!
+iPhone 6s has a battery which is 6.9 Wh which is 24840J. Lets suppose there are 1m developers who have built 5 Angular applications on average. Each application has ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111 KWh. According to Google, 1Kwh ~ 12 cents, which means that **we'll spend about $210 for recovering the consumed energy**. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice!
 
 ## Conclusion
 
+The Angular's compiler improves the performance of our applications dramatically by taking advantage of the inline caching mechanism of the JavaScript virtual machines. On top of that we can perform it as part of our build process which solves problems such as forbidden `eval`, allows us to perform more efficient tree-shaking, improves the initial rendering time, and also - **it makes the world a better place** :-).
 
+Do we loose anything by not performing the compilation runtime? In some very limited cases (when we generate the templates of the components on demand for instance) we may want to load non-compiled components runtime and perform the compilation in the browser, in such cases we'd need to include the `@angular/compiler` module as part of our application bundle.
+
+In general, the AoT compilation is a good strategy which is already integrated as part of the `angular2-seed` and you can take advantage of! Soon it will be included in `angular-cli` and be even more widely available!
 
 ## References
 
