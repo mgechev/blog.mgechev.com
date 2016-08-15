@@ -1,5 +1,5 @@
 ---
-title: Ahead of Time Compilation in Angular 2
+title: Ahead-of-Time Compilation in Angular 2
 author: minko_gechev
 layout: post
 categories:
