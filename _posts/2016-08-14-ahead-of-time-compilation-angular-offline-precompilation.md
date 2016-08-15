@@ -25,7 +25,7 @@ Recently I added Ahead-of-Time (AoT) compilation support to [angular2-seed](http
 
 ## Why we need compilation?
 
-The short answer of this question is - **We need compilation for achieving higher level of efficiency of our applications.** By efficiency I mean performance, energy and bandwidth consumption.
+The short answer of this question is - **We need compilation for achieving higher level of efficiency of our Angular applications.** By efficiency I mean performance, energy and bandwidth consumption.
 
 AngularJS 1.x had quite a dynamic approach for both rendering and change detection. For instance, the AngularJS 1.x compiler is quite generic. It is supposed to work for any template by performing a set of dynamic computations. Although this works great in the general case, the JavaScript Virtual Machines (VM) [struggles with optimizing the calculations on lower level](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html) because of their dynamic nature.
 
