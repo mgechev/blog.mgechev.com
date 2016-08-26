@@ -1,5 +1,5 @@
 ---
-title: Self-invoking functions in JavaScript
+title: Self-invoking functions in JavaScript (or Immediately Invoked Function Expressions)
 author: minko_gechev
 layout: post
 permalink: /2012/08/29/self-invoking-functions-in-javascript-or-immediately-invoked-function-expression/
@@ -13,7 +13,7 @@ tags:
   - JavaScript
   - patterns
 ---
-JavaScript is a bit of a strange language, sometimes doing strange things if you don&#8217;t follow best practices and if you&#8217;re not familiar with the ECMA standard. There are numerous strange things in the javascript syntax, one of those being the self-executing (self-invoking) functions. Here&#8217;s the syntax:
+JavaScript is a bit of a strange language, sometimes doing strange things if you don&#8217;t follow best practices and if you&#8217;re not familiar with the ECMA standard. There are numerous strange things in the JavaScript syntax, one of those being the self-executing (self-invoking) functions. Here&#8217;s the syntax:
 
 {% highlight JavaScript %}
 (function () {
