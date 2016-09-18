@@ -83,7 +83,7 @@ Behind the hood, the JavaScript virtual machine will see that only a single inst
 
 ## What needs to be compiled?
 
-By answering the question "Why we need compilation?" we answered the question "What needs to be compiled?" as well. In general we want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting chances in the bindings and rendering the UI. This way we are not coupled to the underlying platform (except markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered with NativeScript, for instance, as soon as the renderer understands the passed arguments.
+By answering the question "Why we need compilation?" we answered the question "What needs to be compiled?" as well. In general we want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the UI. This way we are not coupled to the underlying platform (except markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered with NativeScript, for instance, as soon as the renderer understands the passed arguments.
 
 ## How templates get compiled?
 
@@ -109,7 +109,7 @@ Both classes extend `AppView` and implement the following methods:
 
 The factory methods above are only responsible for instantiation of the generated `AppViews`. In short, based on a declarative HTML-like template we generate JavaScript/TypeScript. We already mentioned why it is so powerful in terms of rendering but it is also quite powerful in terms of change detection!
 
-As I mentioned above, the `detectChangesInternal` contains VM friendly code. Lets take a look at the compiled version of the template:
+As I mentioned above, the `detectChangesInternal` contains VM friendly code. Let's take a look at the compiled version of the template:
 
 ```html
 <div>{{newName}}</div>
@@ -133,7 +133,7 @@ this.detectContentChildrenChanges(throwOnChange);
 // ...
 ```
 
-Lets trace the method's execution.
+Let's trace the method's execution.
 .
 For call like: `import4.checkBinding(1, 3)`, in production mode, `checkBinding` will perform something like:
 
@@ -149,7 +149,7 @@ Nothing unusual and terribly complicated so far.
 
 <img src="/images/aot-angular/timing.jpg" style="display: block; margin: auto;">
 
-The cool thing about the Angular's compiler is that it can be either invoked runtime (i.e. in the user's browser) or build-time (as part of our build process). This is due the portability property of Angular 2 - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?
+The cool thing about the Angular's compiler is that it can be either invoked runtime (i.e. in the user's browser) or build-time (as part of our build process). This is due to the portability property of Angular 2 - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?
 
 ### Flow of events with Just-in-Time Compilation
 
@@ -190,9 +190,9 @@ As you can see the third step is missing which means faster/better UX and on top
 
 ## How the AoT compilation works?
 
-We already described how the Angular compiler works and what artifacts it produces. Although the AoT compilation differs from JiT compilation only by the time the it's performed there are slight complications.
+We already described how the Angular compiler works and what artifacts it produces. Although the AoT compilation differs from JiT compilation only by the time it's performed there are slight complications.
 
-In JiT once we bootstrap the application we already have our root injector and all the directives available to the root component (they are included in `BrowserModule`). This metadata will be passed to the compiler for the process of compilation of the template of the root component. Once the compiler generates the code with JiT, it has all the metadata which can be should be used for the generation of the code for all children components. It can generate the code for all of them since it already knows not only which providers are available at this level of the component tree but also which directives are visible there.
+In JiT once we bootstrap the application we already have our root injector and all the directives available to the root component (they are included in `BrowserModule`). This metadata will be passed to the compiler for the process of compilation of the template of the root component. Once the compiler generates the code with JiT, it has all the metadata which should be used for the generation of the code for all children components. It can generate the code for all of them since it already knows not only which providers are available at this level of the component tree but also which directives are visible there.
 
 This will make the compiler know what to do when it finds an element in the template. For instance, the element `<bar-baz></bar-baz>` can be interpreted in two different ways depending on whether there's a directive with selector `bar-baz` available or not. Whether the compiler will only create an element `bar-baz` or also instantiate the component associated with the selector `bar-baz` depends on the metadata at the current phase of the compilation process (on the current state).
 
@@ -220,7 +220,7 @@ Last but not least, **energy efficiency**! We already mentioned that by using Ao
 
 Based on findings by the research "Who Killed My Battery: Analyzing Mobile Browser Energy Consumption" (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn't mention specific version of jQuery, based on the date when it was published I assume it's talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of `@angular/compiler` is 103K. This means that it'll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we're ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and `@angular/compiler` we're opening only a single TCP connection, which is the biggest consumer of energy).
 
-iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular 2 applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't took the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
+iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular 2 applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't take the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
 
 <img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;">
 
