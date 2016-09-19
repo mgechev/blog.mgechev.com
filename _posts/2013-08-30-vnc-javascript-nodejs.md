@@ -48,11 +48,9 @@ cd js-vnc
 npm init{% endhighlight %}
 
 Now you should have folder called &#8220;js-vnc&#8221; with file named &#8220;package.json&#8221; in it.
-Use the following lines of code to install almost all the dependencies:
+Use the following line of code to install almost all the dependencies:
 
-{% highlight bash %}npm install rfb2 --save
-npm install connect --save
-npm install socket.io --save{% endhighlight %}
+{% highlight bash %}npm install rfb2 connect socket.io --save{% endhighlight %}
 
 Unfortunately node-png is not in the npm registry and we have to build it from source.
 Use:
