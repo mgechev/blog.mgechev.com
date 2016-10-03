@@ -257,7 +257,7 @@ So far, we improved the protocol processing by using WebSockets instead of HTTP,
 
 ![](/images/binary-protocol-processing/client-proxy-server.png)
 
-We can reduce the latency by changing the TCP server to a WebSocket server, which could be achieved with thin wrapper (something like [websockify](https://github.com/kanaka/websockify)).
+We can reduce the latency by moving the WebSocket proxy to the server machine. This way we will create a thin wrapper around the TCP server, so the data will be transferred locally (we can use something like [websockify](https://github.com/kanaka/websockify)).
 
 ## Conclusion
 
