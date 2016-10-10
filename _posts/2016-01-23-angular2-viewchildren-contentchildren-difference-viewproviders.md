@@ -12,7 +12,7 @@ tags:
   - ContentChildren
 ---
 
-In this article I'm going to explain the difference between the concepts of **view children** and **content children** in Angular 2. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties `providers` and `viewProviders` of the `@Component` decorator is.
+In this article I'm going to explain the difference between the concepts of **view children** and **content children** in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties `providers` and `viewProviders` of the `@Component` decorator is.
 
 You can find the source code of the current article at my [GitHub account](https://github.com/mgechev/viewchildren-contentchildren-demo/blob/master/app/app/components/app.ts). So lets our journey begin!
 
