@@ -14,7 +14,7 @@ tags:
 
 In this article I'm going to explain the difference between the concepts of **view children** and **content children** in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties `providers` and `viewProviders` of the `@Component` decorator is.
 
-You can find the source code of the current article at my [GitHub account](https://github.com/mgechev/viewchildren-contentchildren-demo/blob/master/app/app/components/app.ts). So lets our journey begin!
+You can find the source code of the current article at my [GitHub account](https://github.com/mgechev/viewchildren-contentchildren-demo/blob/master/src/client/app/app.ts). So lets our journey begin!
 
 ## Composing primitives
 
@@ -28,7 +28,7 @@ The Haskell code above we compose the functions `(*2)` and `(+1)` so that to eac
 
 ### Composition in the UI
 
-Well, in the user interface it is actually quite similar. We can think of the individual component as functions. These functions can be composed together in order and as result we get more complex functions.
+In user interface we can apply composition in a similar way. We can think of the individual component as functions. These functions can be composed together in order and as result we get more complex functions.
 
 We can illustrate this graphically by the following structural diagram:
 
@@ -43,7 +43,7 @@ This means that using the preceding abstractions we can build structures of the 
 
 ![](/images/component-tree-angular2.png)
 
-On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references.
+On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references to other directives.
 
 ## Composition of Components in Angular 2
 
@@ -55,8 +55,6 @@ In order to better illustrate the concepts we are going to explore, lets build a
 // ...
 @Component({
   selector: 'todo-app',
-  providers: [TodoList],
-  directives: [TodoComponent, TodoInputComponent],
   template: `
     <section>
       Add todo:
@@ -67,11 +65,12 @@ In order to better illustrate the concepts we are going to explore, lets build a
       <todo *ngFor="let todo of todos.getAll()" [todo]="todo">
       </todo>
     </section>
-    <ng-content select="footer"></ng-content>
+    <ng-content select="app-footer"></ng-content>
   `
 })
 class TodoAppComponent {
   constructor(private todos: TodoList) {}
+
   addTodo(todo) {
     this.todos.add(todo);
   }
@@ -91,20 +90,20 @@ Well, this is basically an XML, so between the opening and closing tags of the `
 
 ```html
 <todo-app>
-  <footer>
+  <app-footer>
     Yet another todo app!
-  </footer>
+  </app-footer>
 </todo-app>
 ```
 
 ### Basic Content Projection with `ng-content`
 
-Now lets switch back to the `todo-app` component's definition for a second. Notice the last element in its template: `<ng-content select="footer"></ng-content>`.
-With `ng-content` we can grab the content between the opening and closing tag of the `todo-app` element and project it somewhere inside of the template! The value of the `select` attribute is a CSS selector, which allows us to select the content that we want to project. For instance in the example above, the `footer` will be injected at the bottom of the rendered todo component.
+Now lets switch back to the `todo-app` component's definition for a second. Notice the last element in its template: `<ng-content select="app-footer"></ng-content>`.
+With `ng-content` we can grab the content between the opening and closing tag of the `todo-app` element and project it somewhere inside of the template! The value of the `select` attribute is a CSS selector, which allows us to select the content that we want to project. For instance, in the example above, the `app-footer` will be projected at the bottom of the rendered todo component.
 
 We can also skip the `select` attribute of the `ng-content` element. In this case we will project the entire content passed between the opening and closing tags on the place of the `ng-content` element.
 
-There are two more components which are not interesting for our discussion so we are going to omit their implementation. The end result of the application will be as follows:
+There are two more components which are not interesting for our discussion so we are going to omit their implementation. Once completeld our application will look as follows:
 
 ![](/images/todo-app-sample.gif)
 
@@ -112,7 +111,7 @@ There are two more components which are not interesting for our discussion so we
 
 And yes, it was that easy! Now we are ready to define what the concepts of **view children** and **content children** are. **The children element which are located inside of its template of a component are called *view children* **. On the other hand, **elements which are used between the opening and closing tags of the host element of a given component are called *content children* **.
 
-This means that `todo-input` and `todo` could be considered view children of `todo-app`, and `footer` (if it is defined as Angular 2 component or directive) could be considered as a content child.
+This means that `todo-input` and `todo-item` could be considered view children of `todo-app`, and `app-footer` (if it is defined as Angular 2 component or directive) could be considered as a content child.
 
 #### Accessing View and Content Children
 
@@ -129,8 +128,6 @@ import {ViewChild, ViewChildren, Component, AfterViewInit...} from '@angular/cor
 
 @Component({
   selector: 'todo-app',
-  providers: [TodoList],
-  directives: [TodoComponent, TodoInputComponent],
   template: `...`
 })
 class TodoAppComponent implements AfterViewInit {
@@ -147,59 +144,59 @@ class TodoAppComponent implements AfterViewInit {
 
 ```
 
-The example above shows how we can take advantage of `@ViewChildren` and `@ViewChild`. Basically we can decorate a property and this way query the view of an element. In the example above, we query the `TodoInputComponent` child component with `@ViewChild` and `TodoComponent` with `@ViewChildren`. We use different decorators since we have only a single input, so we can grab it with `@ViewChild` but we have multiple todo items rendered, so for them we need to apply the `@ViewChildren` decorator.
+The example above shows how we can take advantage of `@ViewChildren` and `@ViewChild`. Basically we can decorate a property and this way query the view of a component. In the example above, we query the `TodoInputComponent` child component with `@ViewChild` and `TodoComponent` with `@ViewChildren`. We use different decorators because we have different number of instances of the components that we want to select. For instance, we can select `TodoInputComponent` with `@ViewChild` because we have only a single instance of it, but we have multiple todo items, so for them we need to apply the `@ViewChildren` decorator.
 
-Another thing to notice are the types of the `inputComponent` and `todoComponents` properties. The first property is of type `TodoInputComponent`. It's value can be either `null` if Angular haven't found such child or reference to the instance of the component's controller (in this case, reference to an instance of the `TodoInputComponent` class). On the other hand, since we have multiple `TodoComponent` instances which can be dynamically added and removed from the view, the type of the `todoComponents` property is `QueryList<TodoComponent>`. We can think of the `QueryList` as an observable collection, which can throw events once items are added or removed from it.
+Another thing to notice are the types of the `inputComponent` and `todoComponents` properties. The first property is of type `TodoInputComponent`. It's value can be either `null`, if Angular haven't found such child, or a reference to the instance of the component's controller (in this case, reference to an instance of the `TodoInputComponent` class). On the other hand, since we have multiple `TodoComponent` instances which can be dynamically added and removed from the view, the type of the `todoComponents` property is `QueryList<TodoComponent>`. We can think of the `QueryList` as an observable collection, which can emit events once items are added or removed from it.
 
-**Since Angular's DOM compiler will process the `todo-app` component before its children, during the instantiation of the `todo-app` component the `inputComponent` and `todosComponen` properties will not be initialized. Their values are going to be set in the `ngAfterViewInit` life-cycle hook**.
+**Since Angular's DOM compiler will process the `todo-app` component before its children, during the instantiation the `inputComponent` and `todosComponen` properties will have value `undefined`. Their values are going to be set in the `ngAfterViewInit` life-cycle hook**.
 
 ##### Accessing Content Children
 
-Almost the same rules are valid for the element's content children, however, there are some slight differences. In order to illustrate them better, lets take a look at the root component which uses the `TodoAppComponent`:
+Almost the same rules are valid for the element's content children, however, there are some slight differences. In order to illustrate them better, lets take a look at the root component, which uses the `TodoAppComponent`:
 
 ```ts
 @Component({
-  selector: 'footer',
+  selector: 'app-footer',
   template: '<ng-content></ng-content>'
 })
-class Footer {}
+class FooterComponent {}
 
 @Component(...)
 class TodoAppComponent {...}
 
 @Component({
-  selector: 'app',
+  selector: 'demo-app',
   styles: [
     'todo-app { margin-top: 20px; margin-left: 20px; }'
   ],
   template: `
     <content>
       <todo-app>
-        <footer>
+        <app-footer>
           <small>Yet another todo app!</small>
-        </footer>
+        </app-footer>
       </todo-app>
     </content>
-  `,
-  directives: [TodoAppComponent, NgModel, Footer]
+  `
 })
 export class AppComponent {}
 ```
-In the snippet above we define two more components `Footer` and `AppComponent`. `Footer` visualizes all of the content passed between the opening and closing tag of its host element (`<footer>content to be projected</footer>`). On the other hand, `AppComponent` uses `TodoAppComponent` and passes `Footer` between its opening and closing tags. So given our terminology from above, `Footer` is a content child. We can access it in the following way:
+
+In the snippet above we define two more components `FooterComponent` and `AppComponent`. `FooterComponent` visualizes all of the content passed between the opening and closing tags of its host element (`<app-footer>content to be projected</app-footer>`). On the other hand, `AppComponent` uses `TodoAppComponent` and passes `FooterComponent` between its opening and closing tags. So given our terminology from above, `FooterComponent` is a content child of `TodoAppComponent`. We can access it in the following way:
 
 ```ts
 // ...
 @Component(...)
 class TodoAppComponent implements AfterContentInit {
-  @ContentChild(Footer) footer: Footer;
+  @ContentChild(FooterComponent) footer: FooterComponent;
   ngAfterContentInit() {
-    // this.footer is now with value set
+    // this.footer now points to the instance of `FooterComponent`
   }
 }
 // ...
 ```
 
-As we can see from above the only two differences between accessing view children and content children are the decorators and the life-cycle hooks. For grabbing all the content children we should use `@ContentChildren` (or `@ContentChild` if there's only one child), and the children will be set on `ngAfterContentInit`.
+As we can see from above, the only two differences between accessing view children and content children are the decorators and the life-cycle hooks in which they are initialized. For grabbing all the content children we should use `@ContentChildren` (or `@ContentChild` if there's only one child), and the children will be set on `ngAfterContentInit`.
 
 #### `viewProviders` vs `providers`
 
@@ -210,17 +207,21 @@ Lets peek at the declaration of the `TodoAppComponent`:
 ```ts
 class TodoList {
   private todos: Todo[] = [];
+
   add(todo: Todo) {}
+
   remove(todo: Todo) {}
+
   set(todo: Todo, index: number) {}
+
   get(index: number) {}
+
   getAll() {}
 }
 
 @Component({
   // ...
-  viewProviders: [TodoList],
-  directives: [TodoComponent, TodoInputComponent],
+  viewProviders: [TodoList]
   // ...
 })
 class TodoAppComponent {
@@ -228,7 +229,8 @@ class TodoAppComponent {
   // ...
 }
 ```
-Inside of the `@Component` decorator we set the `viewProviders` property to an array with a single element - the `TodoList` service. The `TodoList` service holds all the todo items which are entered in the application.
+
+Inside of the `@Component` decorator we set the `viewProviders` property to an array with a single element - the `TodoList` class. The `TodoList` class holds all the todo items, which are entered in the current session.
 
 We inject the `TodoList` service in the `TodoAppComponent`'s constructor, but we can also inject it in any other directive's (or component) constructor, which is used in the `TodoAppComponent`'s view. This means that `TodoList` is accessible from:
 
@@ -236,24 +238,24 @@ We inject the `TodoList` service in the `TodoAppComponent`'s constructor, but we
 - `TodoComponent`
 - `TodoInputComponent`
 
-However, if we try to inject this service in `Footer` component's constructor we are going to get the following runtime error:
+However, if we try to inject this service in `FooterComponent`'s constructor we are going to get the following runtime error:
 
 ```
-EXCEPTION: No provider for TodoList! (Footer -> TodoList)
+ORIGINAL EXCEPTION: No provider for TodoList!
 ```
 
-**This means that providers declared in given component with `viewProviders` are accessible by the component itself and all of its view successors.**
+**This means that providers declared in given component with `viewProviders` are accessible by the component itself and all of its view children.**
 
-In case we want to make the service available to `Footer` as well we need to change the declaration of the component's providers from `viewProviders` to `providers`.
+In case we want to make the service available to `FooterComponent` as well we need to change the declaration of the component's providers from `viewProviders` to `providers`.
 
 ##### When to use `viewProviders`?
 
 Why would I use `viewProviders`, if such providers are not accessible by the content children of the component?
-Suppose you're developing a third-part library, which internally uses some services. These services are part of the **private** API of the library and you don't want to make them accessible to the users. If such private dependencies are registered with `providers` and the user passes content children to any of the components exported by the public API of your library, she will get access to them.
+Suppose you're developing a third-part library, which internally uses some services. These services are part of the **private** API of the library and you don't want to expose them to the users. If such private dependencies are registered with `providers` and the user passes content children to any of the components exported by the public API of your library, she will get access to them.
 However, if you use `viewProviders`, the providers will not be accessible from the outside.
 
 ## Summary
 
 In this article we took a brief look at how we can compose components and directives. We also explained what the difference between content children and view children is, as well as, how we can access these two different kinds of children.
 
-As final step we explained the semantics between the `viewProviders` and `providers` properties of the `@Component` decorator. If you have further interest in the topic I recommend you the book I'm working on "[Switching to Angular 2](https://www.packtpub.com/web-development/switching-angular-2)", which is already available in alpha!
+As final step we explained the semantics between the `viewProviders` and `providers` properties of the `@Component` decorator. If you have further interest in the topic I recommend you the book I'm working on "[Switching to Angular 2](https://www.packtpub.com/web-development/switching-angular-2)".
