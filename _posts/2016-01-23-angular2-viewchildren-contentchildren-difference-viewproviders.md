@@ -105,7 +105,7 @@ We can also skip the `select` attribute of the `ng-content` element. In this cas
 
 There are two more components which are not interesting for our discussion so we are going to omit their implementation. Once completeld our application will look as follows:
 
-![](/images/todo-app-sample.gif)
+<img src="/images/todo-app-sample.gif" style="width: 500px; display: block; margin: auto;">
 
 ### ViewChildren and ContentChildren
 
