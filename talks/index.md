@@ -8,6 +8,7 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
+- ["Linting Angular"](https://speakerdeck.com/mgechev/linting-angular), South Bay JavaScript (Mountain View, California, 12th of October 2016)
 - ["Angular 2 Toolset Support"](https://speakerdeck.com/mgechev/angular-2-toolset-support), Capgemini Webinar (online, 26th of May, 2016)
 - ["Integrated Web Stack with Angular 2"](https://speakerdeck.com/mgechev/integrated-web-stack-with-angular-2), xlr8con (Sofia, Bulgaria, 14th of May, 2016)
 - ["Automated Angular 2 Style Checking with Codelyzer"](https://youtu.be/bci-Z6nURgE), ng-conf (Salt Lake City, Utah, United States, 6th of May, 2016)
