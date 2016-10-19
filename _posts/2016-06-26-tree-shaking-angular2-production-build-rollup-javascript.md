@@ -539,7 +539,7 @@ The final result is 47K!
 
 *Credits: Rob Wormald who did experiments with [ngc here](https://github.com/robwormald/ng2-compiler-test2).*
 
-**Note that for large to medium size applications the bundle produced after performing AoT (Ahead-of-Time) compilation will most likely be bigger**. This is because the VM friendly JavaScript produced by `ngc` is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!
+> **Note that for large to medium size applications the bundle produced after performing AoT compilation will most likely be bigger** compared to same application using JiT compilation. This is because the VM friendly JavaScript produced by `ngc` is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!
 
 #### Using Brotli
 
