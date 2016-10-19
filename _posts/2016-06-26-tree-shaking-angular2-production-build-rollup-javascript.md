@@ -395,7 +395,7 @@ Well, it's smaller but I'm sure we can do even better!
 
 As [static code analysis enthusast](https://www.youtube.com/watch?v=bci-Z6nURgE), I'm following the progress around the Angular compiler (**ngc**).
 
-The core idea of ngc is to process the templates of the components in our applications and [generate VM friendly](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html), tree-shakable code. This can happen either run-time or build-time, but since in run-time (or Just-in-Time) compilation the application is already loaded in the browser we can't take advantage of tree-shaking. The project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli).
+The core idea of ngc is to process the templates of the components in our applications and [generate VM friendly](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html), tree-shakable code. The compilation can happen either run-time or build-time, but since in run-time (or Just-in-Time) compilation the application is already loaded in the browser we can't take advantage of tree-shaking. The project is [located here](https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli). In case we use ngc as part of our build process we call this type of compilation **Ahead-of-Time compilation** (or AoT).
 
 Although in the previous example we already applied decent tree-shaking we still can do better! Why? Well, having an HTML template rollup is not completely sure what parts of Angular we can get rid of from the final bundle since HTML is not something that rollup can analyze at all. That's why we can:
 
@@ -538,6 +538,8 @@ $ ls -lah bundle.min.js.gz
 The final result is 47K!
 
 *Credits: Rob Wormald who did experiments with [ngc here](https://github.com/robwormald/ng2-compiler-test2).*
+
+**Note that for large to medium size applications the bundle produced after performing AoT (Ahead-of-Time) compilation will most likely be bigger**. This is because the VM friendly JavaScript produced by `ngc` is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!
 
 #### Using Brotli
 
