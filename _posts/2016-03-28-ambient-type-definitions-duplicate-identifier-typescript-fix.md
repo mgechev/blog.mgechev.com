@@ -12,7 +12,7 @@ tags:
   - Basic
 ---
 
-Maintaining the [`angular2-seed`](https://github.com/mgechev/angular2-seed), I found out that the most common problem for developers using the project is:
+Maintaining the [`angular-seed`](https://github.com/mgechev/angular-seed), I found out that the most common problem for developers using the project is:
 
 ```
  Duplicate identifier 'export='. (2300)
@@ -63,7 +63,7 @@ $ node person-human.js
 Uncaught TypeError: bar.fly is not a function
 ```
 
-Although both scripts throw an error, `tsc` throws the error **compile-time**, compared to `node`, which throws the error **run-time**.
+Although both scripts throw an error, `tsc` throws the error **compile-time**, compared to `node`, which throws the error **runtime**.
 
 Compile-time errors are easy to handle by developers because they are based on a static code analysis performed over their code. This means that the compiler is able to notify the developers about eventual mistakes **before the code reaches the users**.
 
@@ -79,12 +79,14 @@ TypeScript compiles to JavaScript, which is great. This means that once the Type
 // jquery-demo.ts
 let a = $('.foo');
 ```
+
 We invoke the `$` function with a selector. The code above will produce the following compile-time error:
 
 ```
 $ tsc jquery-demo.ts
 Cannot find name '$'.
 ```
+
 This is due the fact that TypeScript is much stricter compared to JavaScript. It cannot relay on the fact that we may have included a reference to jQuery somewhere in our page. TypeScript needs to have **declaration** of `$`.
 
 That is why the **ambient type definitions** appeared. In order to declare that we have a global function called `$` what we can do is:
@@ -108,11 +110,9 @@ Notice that `declare var $: Function` is not a definition of the `$` function bu
 
 #### Why Ambient Type Definitions?
 
-The main purpose of the ambient type definitions is that they allow text editors and IDEs to perform advanced static analysis over libraries and frameworks written in JavaScript. This is a great benefit since we are able to get compile-time errors and IntelliSense during development! It is much less likely to hit run-time errors caused by misspelling a property name or just passing an object of an incorrect type to a function.
+The main purpose of the ambient type definitions is that they allow text editors and IDEs to perform advanced static analysis over libraries and frameworks written in JavaScript. This is a great benefit since we are able to get compile-time errors and IntelliSense during development! It is much less likely to hit runtime errors caused by misspelling a property name or just passing an object of an incorrect type to a function.
 
 ### Managing Ambient Type Definitions
-
-If you are already familiar with typings and tsd you can skip this section.
 
 It is quite likely to use the ambient type definitions for some of the most popular libraries written in JavaScript such, as jQuery, AngularJS 1.x, React, etc.
 
@@ -120,35 +120,17 @@ A few years back, from [DefinitelyTyped](https://github.com/DefinitelyTyped/), c
 
 Later this tool was deprecated and replaced by the more advanced one - [`typings`](https://github.com/typings/typings). Typings allows us to download the ambient type definitions of the libraries we use.
 
-You can install `typings` with:
+As part of the released of TypeScript 2, Microsoft [announced a way](https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/) to manage the TypeScript external type definitions with the `npm` registry (so we can use both `npm` and `yarn`).
+
+By default as part of `tsconfig.json`'s `compilerOptions` you can include the `lib` property. It contains a list of library files, with their corresponding type definitions. This means that if your compilation target is ES5, and you're building for the browser you should include: `es5` and `dom`, if you're using ES6 features, than you should include `es6` and so on. This will automatically include definitions for ES6 features such as `Map`, `Set`, etc. and the corresponding type definitions. More about the `lib` property can be found [here](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
+
+In order to install the ambient type definitions of jQuery using `npm` you can use:
 
 ```
-$ npm i -g typings
-```
-In order to install the ambient type definitions of jQuery using `typings` you can use:
-
-```
-$ typings install jquery --ambient
+$ npm i @types/jquery --save-dev
 ```
 
-The code above will produce the following directory structure:
-
-```
-.
-└── typings
-    ├── browser
-    │   └── ambient
-    │       └── jquery
-    │           └── index.d.ts
-    ├── browser.d.ts
-    ├── main
-    │   └── ambient
-    │       └── jquery
-    │           └── index.d.ts
-    └── main.d.ts
-
-7 directories, 4 files
-```
+Note that you usually want to use the `--save-dev` flag instead of `--save` since most likely you don't want the users of your `npm` package to install the type definitions of your third-party dependencies.
 
 ### Using Ambient Type Definitions
 
@@ -159,17 +141,7 @@ In the same directory where we installed jQuery's ambient type definitions, lets
 ```ts
 // jquery-demo.ts
 
-/// <reference path="./typings/browser/ambient/jquery/index.d.ts"/>
-let height = $('.foo').height();
-```
-Instead of in-lining the type definition inside `jquery-demo.ts` we used the `<reference/>` element.
-
-We can make this even shorter by:
-
-```ts
-// jquery-demo.ts
-
-/// <reference path="./typings/browser/browser.d.ts"/>
+/// <reference path="./node_modules/@types/jquery/index.d.ts"/>
 let height = $('.foo').height();
 ```
 
@@ -182,7 +154,11 @@ TypeScript defines a configuration file called `tsconfig.json`. In this file you
 ```json
 {
   "compilerOptions": {
-    "target": "es5"
+    "target": "es5",
+    "lib": ["dom", "es6"],
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
   "exclude": [
     "node_modules",
@@ -192,7 +168,15 @@ TypeScript defines a configuration file called `tsconfig.json`. In this file you
 }
 ```
 
-In this file we've set that we want to use `es5` as target language and that we want to **exclude** the directories `node_modules` and `dist`. Now lets add this file to the directory where we installed the jQuery's ambient type definition.
+In order to hint `tsc` where to look for the installed external type definitions you can use the `typeRoots` array, part of `compilerOptions` of your `tsconfig.json`.
+
+In this file we've set that we want to use `es5` as target language and that we want to **exclude** the directories `node_modules` and `dist`.
+
+Let's also install `@types/core-js` in order to have type definitions for the ES6 APIs that we'll use:
+
+```shell
+$ npm i @types/core-js
+```
 
 In the end our directory structure should look like:
 
@@ -201,73 +185,50 @@ In the end our directory structure should look like:
 ├── jquery-demo.js
 ├── jquery-demo.ts
 ├── tsconfig.json
-└── typings
-    ├── browser
-    │   └── ambient
-    │       └── jquery
-    │           └── index.d.ts
-    ├── browser.d.ts
-    ├── main
-    │   └── ambient
-    │       └── jquery
-    │           └── index.d.ts
-    └── main.d.ts
-
-7 directories, 7 files
+└── node_modules
+    └── @types
+        ├── jquery
+        │   ├── package.json
+        │   │── types-metadata.json
+        │   └── index.d.ts
+        └── core-js
+            ├── package.json
+            │── types-metadata.json
+            └── index.d.ts
 ```
+
 Thanks to the `tsconfig.json` we can compile our `jquery-demo.ts` using:
 
-```
+```shell
 $ tsc
 ```
 
-This way `tsc` will pick its configuration from the `tsconfig.json` file.
-
-After running the command...we get plenty of:
+And...we will get all these errors:
 
 ```
-# ...
-typings/main/ambient/jquery/index.d.ts(2829,5): error TS2300: Duplicate identifier 'length'.
-typings/main/ambient/jquery/index.d.ts(2834,5): error TS2300: Duplicate identifier 'selector'.
-typings/main/ambient/jquery/index.d.ts(2835,5): error TS2374: Duplicate string index signature.
-typings/main/ambient/jquery/index.d.ts(2836,5): error TS2375: Duplicate number index signature.
-typings/main/ambient/jquery/index.d.ts(3209,5): error TS2300: Duplicate identifier 'export='.
+./../.npm-packages/lib/node_modules/typescript/lib/lib.es2015.core.d.ts(17,14): error TS2300: Duplicate identifier 'PropertyKey'.
+node_modules/@types/core-js/index.d.ts(21,14): error TS2300: Duplicate identifier 'PropertyKey'.
+node_modules/@types/core-js/index.d.ts(85,5): error TS2687: All declarations of 'name' must have identical modifiers.
+node_modules/@types/core-js/index.d.ts(145,5): error TS2403: Subsequent variable declarations must have the same type.  Variable '[Symbol.unscopables]' must be of type '{ copyWithin: boolean; entries: boolean; fill: boolean; find: boolean; findIndex: boolean; keys: ...', but here has type 'any'.
+node_modules/@types/core-js/index.d.ts(262,5): error TS2687: All declarations of 'flags' must have identical modifiers.
 ```
 
-This is due the reason that:
+This is caused by multiple versions of the same type definitions. In `tsconfig.json` we have `es6` as part of the `lib` array but we also have `core-js` in `node_modules/@types`. In order to fix this problem we have two options:
 
-- `typings/browser/ambient/jquery/index.d.ts`
-- `typings/main/ambient/jquery/index.d.ts`
+- Change `es6` to `es5` in `compilerOptions`'s `lib` property. This way TypeScript won't include ES6 type definitions.
+- Remove `core-js` from `node_modules`. This way TypeScript will use only its internal ES6 type definitions.
 
-Contain the **same** definitions! In order to fix the error we should take advantage of the **exclude** section of `tsconfig.json`:
+Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, lets drop `node_modules/@types/core-js`.
 
-```json
-{
-  "compilerOptions": {
-    "target": "es5"
-  },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "typings/main",
-    "typings/main.d.ts"
-  ],
-  "compileOnSave": false
-}
-```
-Now when we run:
-
-```
-$ tsc
-```
+If we run `tsc` again, we'll get the compiled `jquery-demo.js` file.
 
 We can even remove the `<reference/>` tag from `jquery-demo.ts` and everything is still going to work! The behaviour of `tsc` in this case will be: "Take **all** the files and **all** the type definitions from the current directory and all of its subdirectories, **except the ones declared in the 'exclude'** array".
 
+Another option of `tsconfig.json` that we can use is the `files` property. If we set it, `tsc` will consider **only the files listed there plus all the referenced files within them**.
+
 ### No Namespacing of Type Definitions
 
-You might be wondering why would we have the same type definitions in both `main` and `browser`? The ambient type definitions in **TypeScript cannot be namespaced**. Why not? Well, if we use jQuery in our project and we cannot include two different sets of ambient type definitions since we have a single global `jQuery` object, so only a single interface.
-
-For this purpose `typings` uses two different sets of type definitions - for the front-end of our application and for its back-end/build/whatever.
+You might be wondering why would we have the same type definitions in both `compilerOptions`'s `lib` and `core-js`? The ambient type definitions in **TypeScript cannot be namespaced**. Why not? Well, if we use jQuery in our project and we cannot include two different sets of ambient type definitions since we have a single global `jQuery` object, so only a single interface.
 
 ## Recap
 
@@ -275,8 +236,7 @@ In recap:
 
 - TypeScript is statically typed language, which is great since we can catch the errors we do before the users of our software!
 - TypeScript adds type definitions through type annotations which help the compiler to perform advanced static code analysis.
-- We can take advantage of static typing with non-TypeScript library by using **ambient type definitions** with tools like [typings](https://github.com/typings/typings).
+- We can take advantage of static typing with non-TypeScript library by using **ambient type definitions** with and install them with `npm` or `yarn`.
 - The ambient type definitions are not namespaced, they are always global!
 - Fix `Duplicate *` error in TypeScript by using `tsconfig.json`'s **exclude** section and add there the redundant type definitions.
 - Using `<reference/>` is considered a bad practice.
-
