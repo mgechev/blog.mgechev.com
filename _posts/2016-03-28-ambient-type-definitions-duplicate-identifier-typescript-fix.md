@@ -20,7 +20,7 @@ Maintaining the [`angular-seed`](https://github.com/mgechev/angular-seed), I fou
 
 compilation error.
 
-In this quick tutorial I'll show discuss what does this error mean and how you can fix it. In order to get better understanding of the problem we'll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and typings.
+In this quick tutorial I'll show what does this error mean and how you can fix it. In order to get better understanding of the problem we'll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and `@types`.
 
 ## Intro
 
@@ -126,7 +126,7 @@ By default as part of `tsconfig.json`'s `compilerOptions` you can include the `l
 
 In order to install the ambient type definitions of jQuery using `npm` you can use:
 
-```
+```shell
 $ npm i @types/jquery --save-dev
 ```
 
@@ -168,7 +168,7 @@ TypeScript defines a configuration file called `tsconfig.json`. In this file you
 }
 ```
 
-In order to hint `tsc` where to look for the installed external type definitions you can use the `typeRoots` array, part of `compilerOptions` of your `tsconfig.json`.
+In order to hint `tsc` where to look for the installed external type definitions you can use the `typeRoots` array, part of `compilerOptions` of `tsconfig.json`.
 
 In this file we've set that we want to use `es5` as target language and that we want to **exclude** the directories `node_modules` and `dist`.
 
@@ -197,7 +197,7 @@ In the end our directory structure should look like:
             └── index.d.ts
 ```
 
-Thanks to the `tsconfig.json` we can compile our `jquery-demo.ts` using:
+Thanks to the `tsconfig.json` we can compile the `jquery-demo.ts` file using:
 
 ```shell
 $ tsc
@@ -211,6 +211,7 @@ node_modules/@types/core-js/index.d.ts(21,14): error TS2300: Duplicate identifie
 node_modules/@types/core-js/index.d.ts(85,5): error TS2687: All declarations of 'name' must have identical modifiers.
 node_modules/@types/core-js/index.d.ts(145,5): error TS2403: Subsequent variable declarations must have the same type.  Variable '[Symbol.unscopables]' must be of type '{ copyWithin: boolean; entries: boolean; fill: boolean; find: boolean; findIndex: boolean; keys: ...', but here has type 'any'.
 node_modules/@types/core-js/index.d.ts(262,5): error TS2687: All declarations of 'flags' must have identical modifiers.
+...
 ```
 
 This is caused by multiple versions of the same type definitions. In `tsconfig.json` we have `es6` as part of the `lib` array but we also have `core-js` in `node_modules/@types`. In order to fix this problem we have two options:
@@ -220,9 +221,13 @@ This is caused by multiple versions of the same type definitions. In `tsconfig.j
 
 Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, lets drop `node_modules/@types/core-js`.
 
+```shell
+$ rm -rf node_modules/@types/core-js
+```
+
 If we run `tsc` again, we'll get the compiled `jquery-demo.js` file.
 
-We can even remove the `<reference/>` tag from `jquery-demo.ts` and everything is still going to work! The behaviour of `tsc` in this case will be: "Take **all** the files and **all** the type definitions from the current directory and all of its subdirectories, **except the ones declared in the 'exclude'** array".
+We can even remove the `<reference/>` tag from `jquery-demo.ts` and everything is still going to work! The behaviour of `tsc` in this case will be: "Take **all** the files and **all** the type definitions from the current directory and all of its subdirectories, **except the ones declared in the `exclude`** array". This means that **we can also manage ambient type definitions with the `exclude` property in `tsconfig.json`**.
 
 Another option of `tsconfig.json` that we can use is the `files` property. If we set it, `tsc` will consider **only the files listed there plus all the referenced files within them**.
 
@@ -238,5 +243,5 @@ In recap:
 - TypeScript adds type definitions through type annotations which help the compiler to perform advanced static code analysis.
 - We can take advantage of static typing with non-TypeScript library by using **ambient type definitions** with and install them with `npm` or `yarn`.
 - The ambient type definitions are not namespaced, they are always global!
-- Fix `Duplicate *` error in TypeScript by using `tsconfig.json`'s **exclude** section and add there the redundant type definitions.
+- Fix `Duplicate *` error in TypeScript by using `tsconfig.json`'s **exclude** property and add there the redundant type definitions, or remove them.
 - Using `<reference/>` is considered a bad practice.
