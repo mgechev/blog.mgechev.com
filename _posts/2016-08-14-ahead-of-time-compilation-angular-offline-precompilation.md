@@ -18,7 +18,7 @@ Recently I added Ahead-of-Time (AoT) compilation support to [angular-seed](https
 - Why we need compilation in Angular?
 - What needs to be compiled?
 - How it gets compiled?
-- When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time AoT.
+- When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT).
 - What we get from AoT?
 - How the AoT compilation works?
 - Do we loose anything from using AoT vs JiT?
@@ -78,7 +78,7 @@ The snippet above contains a piece of the implementation of the generated `detec
 
 By answering the question "Why we need compilation?" we answered the question "What needs to be compiled?" as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.
 
-## Just-in-Time (JiT) vs Ahead-of-Time AoT
+## Just-in-Time (JiT) vs Ahead-of-Time (AoT)
 
 <img src="/images/aot-angular/timing.jpg" style="display: block; margin: auto;">
 
