@@ -114,7 +114,15 @@ The main purpose of the ambient type definitions is that they allow text editors
 
 ### Managing Ambient Type Definitions
 
-It is quite likely to use the ambient type definitions for some of the most popular libraries written in JavaScript such, as jQuery, AngularJS 1.x, React, etc.
+TypeScript's compiler can discover type definitions distributed with libraries you use. For instance, if you install Angular 2:
+
+```shell
+$ npm i @angular/core
+```
+
+The corresponding type definitions of the library will be already in `node_modules/@angular/core` directory. Typically most libraries written in TypeScript distribute their type definitions this way.
+
+However, there's huge percentage of libraries out there which do not distribute their type definitions as part of their packages. It is quite likely to use the ambient type definitions for some of the most popular libraries written in JavaScript such, as jQuery, AngularJS 1.x, React, etc.
 
 A few years back, from [DefinitelyTyped](https://github.com/DefinitelyTyped/), created a CLI (Command-Line Interface) manager called `tsd`.
 
@@ -122,7 +130,7 @@ Later this tool was deprecated and replaced by the more advanced one - [`typings
 
 As part of the released of TypeScript 2, Microsoft [announced a way](https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/) to manage the TypeScript external type definitions with the `npm` registry (so we can use both `npm` and `yarn`).
 
-By default as part of `tsconfig.json`'s `compilerOptions` you can include the `lib` property. It contains a list of library files, with their corresponding type definitions. This means that if your compilation target is ES5, and you're building for the browser you should include: `es5` and `dom`, if you're using ES6 features, than you should include `es6` and so on. This will automatically include definitions for ES6 features such as `Map`, `Set`, etc. and the corresponding type definitions. More about the `lib` property can be found [here](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
+By default as part of `tsconfig.json`'s `compilerOptions` you can include the `lib` property. It contains a list of typically used type definitions. This means that if your compilation target is ES5, and you're building for the browser you should include: `es5` and `dom`, if you're using ES6 features, than you should include `es6` and so on. This will automatically include definitions for ES6 features such as `Map`, `Set`, etc. and the corresponding type definitions. More about the `lib` property can be found [here](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
 
 In order to install the ambient type definitions of jQuery using `npm` you can use:
 
@@ -187,14 +195,14 @@ In the end our directory structure should look like:
 ├── tsconfig.json
 └── node_modules
     └── @types
-        ├── jquery
-        │   ├── package.json
-        │   │── types-metadata.json
-        │   └── index.d.ts
-        └── core-js
+        ├── jquery
+        │   ├── package.json
+        │   │── types-metadata.json
+        │   └── index.d.ts
+        └── core-js
             ├── package.json
             │── types-metadata.json
-            └── index.d.ts
+            └── index.d.ts
 ```
 
 Thanks to the `tsconfig.json` we can compile the `jquery-demo.ts` file using:
@@ -214,12 +222,12 @@ node_modules/@types/core-js/index.d.ts(262,5): error TS2687: All declarations of
 ...
 ```
 
-This is caused by multiple versions of the same type definitions. In `tsconfig.json` we have `es6` as part of the `lib` array but we also have `core-js` in `node_modules/@types`. In order to fix this problem we have two options:
+This is caused by multiple versions of the same type definitions. In `tsconfig.json` we have `es6` as part of the `lib` array but we also have `core-js` in `node_modules/@types`. **The type definitions in `core-js` overlap with the ones already distributed with TypeScript.** In order to fix this problem we have two options:
 
 - Change `es6` to `es5` in `compilerOptions`'s `lib` property. This way TypeScript won't include ES6 type definitions.
 - Remove `core-js` from `node_modules`. This way TypeScript will use only its internal ES6 type definitions.
 
-Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, lets drop `node_modules/@types/core-js`.
+Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, **lets drop `node_modules/@types/core-js`**.
 
 ```shell
 $ rm -rf node_modules/@types/core-js
@@ -245,3 +253,4 @@ In recap:
 - The ambient type definitions are not namespaced, they are always global!
 - Fix `Duplicate *` error in TypeScript by using `tsconfig.json`'s **exclude** property and add there the redundant type definitions, or remove them.
 - Using `<reference/>` is considered a bad practice.
+
