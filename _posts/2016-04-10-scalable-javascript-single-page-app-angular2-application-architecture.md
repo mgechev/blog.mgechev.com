@@ -130,7 +130,7 @@ For the architecture we also have the standard set of requirements including:
 
 After discussion of the architecture and potential extension points of the application, we considered different technologies. Our prime candidates were React and Angular 2. We have previous successful experience with React and a redux-like architecture.
 
-The only things we struggled with in our React project were lazy-loading and context dependent dependency instantiation. The [react-router](https://github.com/reactjs/react-router) supports lazy-loading, however, we still miss the lack of dependency injection. Another great selling point of Angular 2, for us, is its [WebWorkers support](https://github.com/angular/angular/blob/master/modules/angular2/docs/web_workers/web_workers.md).
+The only things we struggled with in our React project were lazy-loading and context dependent dependency instantiation. The [react-router](https://github.com/reactjs/react-router) supports lazy-loading, however, we still miss the lack of dependency injection. Another great selling point of Angular 2, for us, is its [WebWorkers support](https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/docs/web_workers/web_workers.md).
 
 Our final tech stack we choose is as follow:
 
