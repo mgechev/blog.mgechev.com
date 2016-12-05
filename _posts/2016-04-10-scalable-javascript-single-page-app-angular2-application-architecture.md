@@ -78,7 +78,7 @@ The **facade** below the UI components' layer represents "a set of objects that 
 
 From now on, for simplicity lets call our facades **models**. For instance, if we are developing a game, inside of our `GameComponent` we will use the `GameModel` which abstracts the store mutation, as well as the **async services**.
 
-Another core role of the facades is to forward the actions used by the reducers to a set of **async services**. Once a given action is being triggered, it will be passed to a set of async services which will handle it. On higher-level the models look exactly like [Active Record](http://www.martinfowler.com/eaaCatalog/activeRecord.html) because they are [mediators](https://en.wikipedia.org/wiki/Mediator_pattern) between the UI and the data layer.
+Another core role of the facades is to forward the actions used by the reducers to a set of **async services**. Once a given action is being triggered, it will be passed to a set of async services which will handle it. On higher-level the models look exactly like [Active Record](http://www.martinfowler.com/eaaCatalog/activeRecord.html) because they are [mediators](https://en.wikipedia.org/wiki/Mediator_pattern) between the UI and the data layer. However, note that **the model delegates the business logic to the reducers, and the communication with external services to the `AsyncService`s**.
 
 We can think of the async services as [remote proxies](https://en.wikipedia.org/wiki/Proxy_pattern) to external services. They map the application specific actions to remote commands. Then why is this component called async service instead of remote service? Async services should handle all calls to asynchronous APIs,including WebRTC, WebSocket, as well as IndexDB.
 
