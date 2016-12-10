@@ -8,6 +8,7 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
+- ["Scalable Application Architecture"](https://speakerdeck.com/mgechev/scalable-application-architecture), ng-be (Ghent, Belgium, 9th of December 2016)
 - ["Building Angular App for Production"](https://speakerdeck.com/mgechev/building-an-angular-app-for-production), Angular Orange County (Google, Orange County, 10th of November 2016), SoCal CodeCamp (USC, Los Angeles, 12th of November 2016)
 - ["Angular Toolset Support"](https://speakerdeck.com/mgechev/angular-toolset-support), Connect.Tech (Atlanta, Georgia, 22nd of October 2016)
 - ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist), Connect.Tech (Atlanta, Georgia, 21st of October 2016)
