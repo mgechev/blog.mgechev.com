@@ -1,15 +1,15 @@
 ---
-title: Ahead-of-Time Compilation in Angular 2
+title: Ahead-of-Time Compilation in Angular
 author: minko_gechev
 layout: post
 categories:
   - JavaScript
-  - Angular 2
+  - Angular
   - TypeScript
   - Compilers
 tags:
   - JavaScript
-  - Angular 2
+  - Angular
   - TypeScript
 ---
 
@@ -29,7 +29,7 @@ The short answer of this question is - **We need compilation for achieving highe
 
 AngularJS 1.x had quite a dynamic approach for both rendering and change detection. For instance, the AngularJS 1.x compiler is quite generic. It is supposed to work for any template by performing a set of dynamic computations. Although this works great in the general case, the JavaScript Virtual Machines (VM) [struggles with optimizing the calculations on lower level](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html) because of their dynamic nature. **Since the VM doesn't know the shapes of the objects which provide context for the dirty-checking logic (i.e. the so called scope), it's inline caches get a lot of misses which slows the execution down.**
 
-Angular 2 took different approach. Instead of using the same logic for performing rendering and change detection for each individual component, the framework **generates** VM-friendly code at runtime or build time. **This allows the JavaScript virtual machine to perform property access caching and execute the change detection/rendering logic much faster.**
+Angular, version 2 and above, took different approach. Instead of using the same logic for performing rendering and change detection for each individual component, the framework **generates** VM-friendly code at runtime or build time. **This allows the JavaScript virtual machine to perform property access caching and execute the change detection/rendering logic much faster.**
 
 For instance, take a look at the following example:
 
@@ -86,13 +86,13 @@ This section contains answer of the question:
 
 - *When the compilation takes place?*.
 
-The cool thing about the Angular's compiler is that it can be invoked either runtime (i.e. in the user's browser) or build-time (as part of the build process). This is due to the portability property of Angular 2 - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?
+The cool thing about the Angular's compiler is that it can be invoked either runtime (i.e. in the user's browser) or build-time (as part of the build process). This is due to the portability property of Angular - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?
 
 ### Flow of events with Just-in-Time Compilation
 
 Lets trace the typical development flow without AoT:
 
-- Development of Angular 2 application with TypeScript.
+- Development of Angular application with TypeScript.
 - Compilation of the application with `tsc`.
 - Bundling.
 - Minification.
@@ -109,7 +109,7 @@ Once we've deployed the app and the user opens her browser, she will go through 
 
 In contrast, with AoT we get through the following steps:
 
-- Development of Angular 2 application with TypeScript.
+- Development of Angular application with TypeScript.
 - Compilation of the application with [`ngc`](https://npmjs.com/package/@angular/compiler-cli).
   - Performs compilation of the templates with the Angular compiler and **generates (usually) TypeScript**.
   - Compilation of the TypeScript code to JavaScript.
@@ -411,7 +411,7 @@ Last but not least, **energy efficiency**! The user devices need to perform even
 
 Based on findings by the research "Who Killed My Battery: Analyzing Mobile Browser Energy Consumption" (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn't mention specific version of jQuery, based on the date when it was published I assume it's talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of `@angular/compiler` is 103K. This means that it'll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we're ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and `@angular/compiler` we're opening only a single TCP connection, which is the biggest consumer of energy).
 
-iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular 2 applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't take the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
+iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular applications. Each application have ~100 users per day. `5 apps * 1m * 100 users = 500m`. In case we perform JiT and we download the `@angular/compiler` it'll cost to the Earth `500m * 12.5J = 6250000000J`, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that **we'll spend about $210 for recovering the consumed energy for a day**. Notice that we even didn't take the further optimization that we'll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)
 
 <img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;">
 
