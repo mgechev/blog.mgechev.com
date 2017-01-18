@@ -289,13 +289,16 @@ Our initial production build process was to rsync the `dist/prod` directory prod
 
 Later we migrated the application to RC.5 to took advantage of the **[Ahead-of-Time compilation](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/). This increased our bundle size** even further - now it was close to 1M. Loading the bundle was not the only problem. On low-end devices it's parsing was taking up to a few seconds.
 
+*In fact, although you're able to get rid of the compiler, AoT can increases your bundle size. What AoT does is to generate code for your templates and DI, so if you have a lot of components the JavaScript generated for the templates may exceed the size of the compiler.*
+
 We took advantage of techniques such as:
 
 - Bundling.
 - Minification.
 - Tree-shaking.
 
-And later I blogged about this in ["Building an Angular 2 Application for Production"](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/)
+And later I blogged about this in ["Building an Angular 2 Application for Production"](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/).
+
 
 Although we applied everything from the list we still didn't have satisfying results.
 
