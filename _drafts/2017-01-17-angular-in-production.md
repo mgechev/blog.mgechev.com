@@ -414,6 +414,8 @@ In terms of network performance, the bundle size is the biggest struggle. Althou
 
 Last but not least, applying Ahead-of-Time compilation as part of our build process, helped us improve the initial rendering time.
 
+Web Workers also sound quite tempting. However, at the time of writing this article they are still not production ready. On top of that, **I would not recommend using Web Workers in development since you will loose sense of how your application behaves when running in the main UI thread.**
+
 # Resources
 
 1. [Ahead-of-Time compilation in Angular](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/)
