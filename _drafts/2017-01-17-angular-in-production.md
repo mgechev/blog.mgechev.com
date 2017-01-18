@@ -157,7 +157,7 @@ As a learned lesson here - **optimize your bindings**.
 
 Sometimes bindings are just heavy and we weren't able to do anything about it. For instance, we had to show the progress for each kid, and compute it based on given formula. In the same screen we had a screen for editing the kid's profile and a bunch of other components. Given that on each key press in an input which uses `[(ngModel)]` Angular performs change detection over the entire component tree, typing got really slow:
 
-![](/images/ng-prod/slow-typing.gif)
+<img src="/images/ng-prod/slow-typing.gif" alt="Unoptimized change detection" style="display: block; margin: auto;">
 
 But should we go through all the kid's performance computations in case the kid's instance hasn't changed? Yes, we should since we don't know if the object we own a reference to hasn't changed.
 
@@ -213,7 +213,7 @@ This way Angular performs change detection in the component subtree with root `K
 
 Here's what impact this had over the application:
 
-![](/images/ng-prod/fast-typing.gif)
+<img src="/images/ng-prod/fast-typing.gif" alt="Optimized with OnPush" style="display: block; margin: auto;">
 
 The lesson got from here is - **perform the optimal change detection strategy**.
 
@@ -221,7 +221,7 @@ The lesson got from here is - **perform the optimal change detection strategy**.
 
 We applied this optimization strategy wherever we could. Unfortunately, sometimes Angular was still performing unnecessary checks.
 
-![](/images/ng-prod/increment-bp.gif)
+<img src="/images/ng-prod/increment-bp.gif" alt="Increase animation" style="display: block; margin: auto;">
 
 On the image above, a kid in kindergarten is solving a test. Once it answers correctly we want to increase it's points with the result it got from the last answer. The component which animates the points increase, looks something like:
 
@@ -316,7 +316,7 @@ In the end, after a day of struggle with suffix trees and other graph algorithms
 
 One of the bundles we built represents the intro screen of the application and the sign-up flow, there's a bundle for the main functionality and finally, the core bundle which contains Angular and the common functionality among the first two.
 
-![](/images/ng-prod/bundles.png)
+<img src="/images/ng-prod/bundles.png" alt="Bundles relation" style="display: block; margin: auto;">
 
 In the prefect scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
 
