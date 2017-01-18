@@ -77,7 +77,7 @@ Based on a couple of other constraints, we came up with the **["Scalable Applica
 
 The only drawback we experienced was that the architecture was a bit too verbose (for state change you need to define an action, action creator a model method, eventually store property). However, I'm not sure being explicit to this level is a bad thing.
 
-Anther learned lesson from our implementation is that we weren't 100% reactive all the time. Quite often we had code like:
+Another learned lesson from our implementation is that we weren't 100% reactive all the time. Quite often we had code like:
 
 ```ts
 this.userModel
