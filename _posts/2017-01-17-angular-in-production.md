@@ -11,7 +11,7 @@ tags:
   - TypeScript
 ---
 
-In this informal essay I'll go through a case study of my experience in using Angular (2 and above) in production.
+In this informal essey I'll go through a case study of my experience in using Angular (2 and above) in production.
 
 Last April, together with a small team, we started working on an educational application; the second version of a product that I developed about 3 years ago using Angular 1.
 
@@ -94,7 +94,7 @@ Which is quite an imperative style of programming and doesn't always fit well in
 
 # Runtime performance
 
-A serious issue that we met initially were a couple of **memory leaks**. Observables are awesome and you can write very elegant code with them but sometime you forget to clean after yourself. There's a bit of a learning curve until you get conscious and disciplined enough to start cleaning all of your subscriptions.
+A serious issue that we met initially were a couple of **memory leaks**. Observables are awesome and you can write very elegant code with them but sometimes you forget to clean after yourself. There's a bit of a learning curve until you get conscious and disciplined enough to start cleaning all of your subscriptions.
 
 Some of the most painful and frustrating experiences I had were about finding leaking global event handlers. The sure thing is that you're going to notice them. A **few leaking click handlers can slow your application down dramatically**. They will cause Angular to run it's chance detection mechanism over the entire component tree on each click as many times as leaking callbacks you have. This happens because zone.js monkey patches `addEventListener` and automatically runs dirty checking over the entire component tree (if you haven't applied any advanced optimizations) for you.
 
@@ -132,7 +132,7 @@ class NameInputComponent {
 
 `[(ngModel)]` is the so-called banana in a box syntax and allows two-way data-binding.
 
-It is really convenient to use it, however, **each character you type will triggers multiple change detection checks**. If somewhere in your component tree you have:
+It is really convenient to use it, however, **each character you type will trigger multiple change detection checks**. If somewhere in your component tree you have:
 
 ```html
 <fib-cmp [n]="1e100"></fib-n>
@@ -283,7 +283,7 @@ One more problem solved. Running code outside Angular helped in this limited cas
 
 # Network performance
 
-Although we experienced some issues with runtime performance, it wasn't a big concern. Unfortunately, we noticed that huge percentage of our users didn't have enough patience to wait for the application to load.
+Although we experienced some issues with runtime performance, it wasn't a big concern. Unfortunately, we noticed that a huge percentage of our users didn't have enough patience to wait for the application to load.
 
 Our initial production build process was to rsync the `dist/prod` directory produced by [Angular Seed](https://github.com/mgechev/angular-seed) to the remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the end users but our gzipped bundle size was still about 800k.
 
@@ -325,7 +325,7 @@ One of the bundles we built represents the intro screen of the application (whic
 
 <img src="/images/ng-prod/bundles.png" alt="Bundles relation" style="display: block; margin: auto;">
 
-In the prefect scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
+In the prefetch scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
 
 Luckly, **Angular provides a solution for prefetching of lazy-loaded modules out of the box**. All we had to do was:
 
