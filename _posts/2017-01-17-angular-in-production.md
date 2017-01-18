@@ -365,7 +365,12 @@ The mobile toolkit helped us get additional performance boost for browsers which
 
 *The image above shows tree map of the non-optimized core bundle which is used for bootstrapping the application. Its optimized and gzipped size is about ~200K.*
 
-Unfortunately, as you can see from the tree map above **our core bundle was still too big and loading the application on 2G network required about 20s**. The third party libraries we use and the ngfactories (artifacts produced by the AoT compilation) take significant part of it.
+Unfortunately, as you can see from the tree map above **our core bundle was still too big and loading the application on 2G network required about 20s**. This happens because in order to render any of the screens we needed at least two of the bundles:
+
+- Core bundle which bootstraps the application.
+- Main or intro bundle which is loaded after the core bundle decides which view needs to be rendered.
+
+This required us to load at least ~400K of JavaScript (core bundle + main/intro) before being able to hide the loading screen and the worst part of that was that we needed to load the two bundles sequentially.
 
 ## Static app
 
