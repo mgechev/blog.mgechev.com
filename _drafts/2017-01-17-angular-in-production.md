@@ -17,11 +17,16 @@ Last April, together with a small team, we started working on an educational app
 
 The product targets young kids and their parents. It's purpose is to motivate kids to learn maths by earning rewards. The application had an iOS version with hundreds of thousands of users and we wanted to provide similar experience in the browser. We bet on mobile-first approach, since we were targeting kids playing on their tablets and phones.
 
+The application has two main modules:
+
+- An intro flow which includes a few screen explaining what the application is all about, sign-in and sign-up.
+- Main application which includes a quiz functionality, screen for choosing a reward, module for parent supervision, etc.
+
 In the end because of various business reasons the project's development was discontinued.
 
 # Choosing the tech stack
 
-Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main motivation behind it was to be:
+Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main criterias behind it were:
 
 - A good fit for the business goals.
 - Help us to reuse previous experience we had.
@@ -31,9 +36,9 @@ In the backend we stopped on Rails. We were considering GraphQL as a communicati
 
 ## Going statically typed
 
-One of the biggest flaws we experienced in the first version of the product was caused by the use of dynamically typed language. Different typos were caught after the application has been deployed to staging which made us feel the tech stack quite fragile. This made us consider a statically typed language for the development of the new version.
+One of the biggest flaws we experienced in the first version of the product were caused by the use of dynamically typed language. Different typos were caught after the application has been deployed to staging which made us feel the tech stack quite fragile. This prompted us consider a statically typed language for the development of the new version.
 
-Our choice was limited to either Flow or TypeScript. Although Elm sounds hot, it was going to limit our team scalability.
+Our choice was limited to either Flow or TypeScript. Although Elm sounds hot, it was going to limit our team scalability - it's hard to find developers with sufficient knowledge in this language.
 
 ## The framework...
 
@@ -43,18 +48,18 @@ Given this Angular may sound like the right solution but, on the other hand, the
 
 Well, in the end we bet on Angular based on the following reasons:
 
-- I already maintained one of the most popular [Angular starters](https://github.com/mgechev/angular-seed).  [Angular Seed](https://github.com/mgechev/angular-seed) was already quite mature thanks to the effort that a lot of people put into it. Furthermore, for the project it was going to be good to use it in a real project and fix the flaws I find.
+- I maintain one of the most popular [Angular starters](https://github.com/mgechev/angular-seed). [Angular Seed](https://github.com/mgechev/angular-seed) was already quite mature thanks to the effort that a lot of people put into it. Furthermore, for the project it was going to be good to use it in a real project and fix the flaws I find.
 - From our previous experience with Angular 1, we knew that the dependency injection mechanism of the framework is something that we're going to miss.
-- Even being still immature, Google were providing everything we we need - router, DI, change detection, view encapsulation, rendering, etc.
+- Even being still in beta, Angular was providing everything we need - router, DI, change detection, view encapsulation, rendering, etc.
 - It was a new, fun technology we wanted to explore in real-life projects.
 
 Although initially we weren't sure which statically typed dialect of JavaScript to use, Angular made the choice obvious and we bet on TypeScript. It's unsoundness was something we weren't really bothered about because it's quite limited and well thought out.
 
-If at this time I wasn't familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write [custom functionality for the Angular's router](http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/). In the end, this is the risk you take when you start using a technology in a beta version.
+If at this time I wasn't familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write [custom functionality for the Angular's router](http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/). In the end, this is the risk you take when you start using a technology in a beta version. The good thing is that once the framework got stable almost no breaking changes were introduced, although it has a decent API.
 
 # Architecture
 
-Flux and redux, both, are approaches I was really satisfied with in my past projects. On top of that, Angular plays really well with immutable data. Later, we found `@ngrx/store`. It's a micro library which provides a reactive state management inspired by redux and plays really well with Angular.
+Flux and redux, both, are architectural approaches I was really satisfied with in my past projects. On top of that, Angular plays really well with immutable data. Later, we found `@ngrx/store`. It's a micro library which provides a reactive state management inspired by redux and plays really well with Angular.
 
 In short, with `@ngrx/store` we can think of the redux's store as a stream of immutable objects. Each time you emit an action which gets handled by a reducer, the new state will be emitted through a stream. The different streams can be filtered, merged, mapped, etc. in a very elegant way. On top of that, Angular provides a nice, declarative way to bind to observables using the `async` pipe:
 
@@ -68,9 +73,9 @@ class CounterComponent {
 }
 ```
 
-Based on a couple of other constraints, we came up with the **["Scalable Application Architecture"](http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)** that I talked about on a couple of [conferences](https://www.youtube.com/watch?v=gtOPAj9_FSM). Although even now it is has some edges that could be polished, the entire team was happy with it. We were able to **scale the application to about 40k SLOC (source line of code)** and didn't experience any issues with state inconsistencies, neither scalability and separation of concerns.
+Based on a couple of other constraints, we came up with the **["Scalable Application Architecture"](http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)** that I talked about on a couple of [conferences](https://www.youtube.com/watch?v=gtOPAj9_FSM). Although even now it has some edges that could be polished, the entire team was happy using it. We were able to **scale the application to about 40k SLOC (source line of code)** and didn't experience any issues with state inconsistencies, neither scalability and separation of concerns.
 
-The only drawback we experienced was that the architecture was a bit verbose (for state mutation you need to define an action, action creator a model method, eventually store property). However, I'm not sure being explicit to this level is a bad thing.
+The only drawback we experienced was that the architecture was a bit too verbose (for state change you need to define an action, action creator a model method, eventually store property). However, I'm not sure being explicit to this level is a bad thing.
 
 Anther learned lesson from our implementation is that we weren't 100% reactive all the time. Quite often we had code like:
 
@@ -91,13 +96,13 @@ Which is quite an imperative style of programming and doesn't always fit well in
 
 A serious issue that we met initially were a couple of **memory leaks**. Observables are awesome and you can write very elegant code with them but sometime you forget to clean after yourself. There's a bit of a learning curve until you get conscious and disciplined enough to start cleaning all of your subscriptions.
 
-Some of the most painful and frustrating experiences I had was finding leaking global event handlers. The sure thing is that you're going to notice them. A **few leaking click handlers can slow your application down dramatically**. They will cause Angular to run it's chance detection mechanism over the entire component tree on each click as many times as leaking callbacks you have. This happens because zone.js monkey patches `addEventListener` and automatically runs dirty checking over the entire component tree (if you haven't applied any advanced optimizations) for you.
+Some of the most painful and frustrating experiences I had were about finding leaking global event handlers. The sure thing is that you're going to notice them. A **few leaking click handlers can slow your application down dramatically**. They will cause Angular to run it's chance detection mechanism over the entire component tree on each click as many times as leaking callbacks you have. This happens because zone.js monkey patches `addEventListener` and automatically runs dirty checking over the entire component tree (if you haven't applied any advanced optimizations) for you.
 
 Although it was a bit frustrating initially we were able to eliminate these problems. On top of that, both, Angular and rxjs do amazing job cleaning unused subscriptions. But it's still worth mentioning it one more time - **clean after yourself**.
 
 ## Optimize your bindings
 
-Although the **Angular's change detection is really well optimized**, running VM-friendly code, in a very complex user interface you may fill lag. Lets suppose we have the following component:
+Although the **Angular's change detection is really well optimized**, running VM-friendly code, in a very complex user interface you may feel lag. Lets suppose we have the following component:
 
 ```ts
 @Component({
@@ -109,7 +114,9 @@ class FancyButtonComponent {
 }
 ```
 
-And now imagine that this component is somewhere deep into our component tree. Each time we click the button Angular has to perform change detection over all rendered components. Again, the code which performs the change detection is generated by Angular and really well optimized but still, if you have bound to a computationally insensitive getter, for instance, you will feel slowdowns.
+And now imagine that this component is somewhere deep into our component tree. Each time we click the button Angular has to perform change detection over all rendered components. This happens because the framework doesn't have any guarantees that this leaf component won't modify an object used somewhere else.
+
+Again, **the code which performs the change detection is generated by Angular and really well optimized but still, if you have bound to a computationally insensitive getter, for instance, you will feel slowdowns.**
 
 Now imagine, instead of a button we have the following input:
 
@@ -161,7 +168,7 @@ Sometimes bindings are just heavy and we weren't able to do anything about it. F
 
 But should we go through all the kid's performance computations in case the kid's instance hasn't changed? Yes, we should since we don't know if the object we own a reference to hasn't changed.
 
-Fortunately, we used [immutable records](https://facebook.github.io/immutable-js/docs/#/Record) for representing our domain objects. Immutable records are something like maps but allow to take advantage of the static typing in TypeScript. Although they are pretty cool, they are also quite verbose. For instance, our `Kid` domain class looks something like:
+Fortunately, we used [immutable records](https://facebook.github.io/immutable-js/docs/#/Record) for representing our domain objects. Immutable records are something like immutable maps but allow to take advantage of the static typing in TypeScript. Although they are pretty cool, they are also quite verbose. For instance, our `Kid` domain class looks something like:
 
 ```ts
 const kidRecord = Immutable.Record({
@@ -189,11 +196,11 @@ export class Kid extends kidRecord implements IKid {
 }
 ```
 
-This way define:
+This way we define:
 
 - Immutable record with default values.
 - Class which extends the immutable record and declares the properties that the kid has.
-- Interface in order to be able to pass object literals as arguments to the `Kid`'s constructor.
+- Interface in order to be able to pass object literals as arguments to the `Kid`'s constructor and have static typing.
 
 In the end all we did in order to optimize the entire screen was:
 
@@ -223,7 +230,7 @@ We applied this optimization strategy wherever we could. Unfortunately, sometime
 
 <img src="/images/ng-prod/increment-bp.gif" alt="Increase animation" style="display: block; margin: auto;">
 
-On the image above, a kid in kindergarten is solving a test. Once it answers correctly we want to increase it's points with the result it got from the last answer. The component which animates the points increase, looks something like:
+On the image above, a kid in kindergarten is solving a test. Once it answers correctly we want to increase it's points with the result it got from the last answer. The component which animates the points increase looks something like:
 
 ```ts
 @Component({
@@ -248,9 +255,9 @@ class PointCounterComponent implements OnChange {
 }
 ```
 
-Remember we mentioned zone.js? It monkey patches not only `addEventListener` but all the async APIs in the browser, including `setTimeout`. This means that Angular will perform change detection every 10ms and it should since we modify the `boundPoints` property to which we have bound in the template.
+Remember we mentioned zone.js? **Zone.js monkey patches not only `addEventListener` but all the async APIs in the browser**, including `setTimeout`. This means that Angular will perform change detection every 10ms and it should since we modify the `boundPoints` property to which we have bound in the template.
 
-Fortunately, Angular provides us a solution. We can inject the `NgZone` and run the points animation outside the Angular's zone which won't trigger the change detection mechanism:
+Fortunately, Angular provides us a solution. We can inject the `NgZone` and run the points increase animation outside the Angular's zone which won't trigger the change detection mechanism:
 
 ```ts
 @Component({
@@ -270,7 +277,7 @@ class PointCounterComponent implements OnChange {
 }
 ```
 
-However, note that in this case you have to manually manipulate the DOM. In order to keep your component decoupled from DOM you should use `Renderer` from `@angular/core`.
+However, note that in this case you have to manually manipulate the DOM. In order to keep your component decoupled from DOM you should manipulate elements indirectly using the `Renderer` from `@angular/core`.
 
 One more problem solved. Running code outside Angular helped in this limited case but keep in mind that you should **use `runOutsideAngular` in very rare cases** since this way you're giving up the data-binding mechanism of the framework.
 
@@ -278,7 +285,7 @@ One more problem solved. Running code outside Angular helped in this limited cas
 
 Although we experienced some issues with runtime performance, it wasn't a big concern. Unfortunately, we noticed that huge percentage of our users didn't have enough patience to wait for the application to load.
 
-Our initial production build process was to rsync the `dist/prod` directory produced by [Angular Seed](https://github.com/mgechev/angular-seed) to the remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the end users but our bundle size was still about 800k.
+Our initial production build process was to rsync the `dist/prod` directory produced by [Angular Seed](https://github.com/mgechev/angular-seed) to the remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the end users but our gzipped bundle size was still about 800k.
 
 Later we migrated the application to RC.5 to took advantage of the **[Ahead-of-Time compilation](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/). This increased our bundle size** even further - now it was close to 1M. Loading the bundle was not the only problem. On low-end devices it's parsing was taking up to a few seconds.
 
@@ -308,19 +315,19 @@ After we migrated to the latest Angular router from our custom fork of it's prev
 
 This cound be applied recursively for each feature bundle, so we can have different sub-feature bundles, etc.
 
-Although the idea was clear, achieving it wasn't as simple as we expected. One of the main reasons why I still haven't provided out-of-the-box solution for lazy loading in [Angular Seed](https://github.com/mgechev/angular-seed) was the fact that it's hard to implement a solution which works for any application. Fortunately, in our team we are able to agree on specific constraints and implement a build process which relays that some conditions are met.
+Although the idea was clear, achieving it wasn't as simple as we expected. One of the main reasons why I still haven't provided out-of-the-box solution for lazy loading in [Angular Seed](https://github.com/mgechev/angular-seed) was the fact that it's hard to implement a solution which works for any application. Fortunately, in our team we are able to agree on specific constraints and implement a build process which relays that given preconditions are met.
 
 In the end, after a day of struggle with suffix trees and other graph algorithms, we came up with a solution which splits our application into three bundles. We load the bundles with SystemJS which is the default module loader for Angular.
 
 ### Prefetching of bundles
 
-One of the bundles we built represents the intro screen of the application and the sign-up flow, there's a bundle for the main functionality and finally, the core bundle which contains Angular and the common functionality among the first two.
+One of the bundles we built represents the intro screen of the application (which includes the sign-up flow), there's a bundle for the main functionality and finally, the core bundle which contains Angular and the common functionality among the first two.
 
 <img src="/images/ng-prod/bundles.png" alt="Bundles relation" style="display: block; margin: auto;">
 
 In the prefect scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
 
-Luckly, **Angular provides this out of the box for prefetching lazy-loaded modules**. All we had to do was:
+Luckly, **Angular provides a solution for prefetching of lazy-loaded modules out of the box**. All we had to do was:
 
 ```ts
 let routes: Routes = [...];
@@ -343,21 +350,23 @@ A few of it's features we used are:
 
 The mobile toolkit helped us get additional performance boost for browsers which support the modern standards.
 
-Unfortunately, **our core bundle was still too big and loading the application on 2G network required about than 20s**.
+<img src="/images/ng-prod/sourcemap.png" alt="Source tree map" style="display: block; margin: auto;">
+
+Unfortunately, as you can see from the image above **our core bundle was still too big and loading the application on 2G network required about 20s**. The third party libraries we use and the ngfactories (artifacts produced by the AoT compilation) take significant part of it.
 
 ## Static app
 
-In the intro screen of the product we have two pages of static content which explain to the parents what the application is all about. It is completely unnecessary to make the users wait until the assets of the application has been downloaded to let parents to read a few lines of text and decide if they want to sign-up or not.
+In the intro screen of the product we have two pages of static content which explain to the parents what the application is all about. It is completely unnecessary to make the users wait until the assets of the application have been downloaded to let parents to read a few lines of text and decide if they want to sign-up or not.
 
-What we decided to do was to take the templates of the components which represent these static pages and move them to a separate application which is not managed by Angular. We inlined the templates and wrote some custom JavaScript code which understands the basic routing directives, in particular `routerLink`.
+What we decided to do was to take the templates of the components which represent these static pages and move them to a separate application which is not managed by Angular. We inlined the templates and wrote some custom JavaScript code which understands the basic routing directives, in particular `routerLink`. This way we were able to reuse the templates across our "static app" and our Angular app.
 
 Conceptually the "static app" sounds similar to an application shell with the difference that it is an executable application with static content. All the JavaScript, styles and templates for these static pages were 20K in total. This way **we decreased the initial load time for new users to about 5s on 2G network**.
 
-What we did was to initially download the application's styles together with the static app. Once the static application gets rendered, in background we start prefetching the core and intro bundles. Once the bundles are ready and the user decides to continue, we just bootstrap the Angular application. In case the user is ready to register but the bundles are not yet downloaded, we show a loading indicator and ask the user to hold off for a second.
+What we did was to initially download the application's styles together with the "static app". Once the static application gets rendered, in background we start prefetching the core and intro bundles. Once the bundles are ready and the user decides to continue, we just bootstrap the Angular application. In case the user is ready to register but the bundles are not yet downloaded, we show a loading indicator and ask the user to hold on for a second.
 
-In case the user is already logged in and doesn't go to the intro screen (i.e. go to the main application functionality instead of the intro screen), the script files are most likely already in the cache so the application's load time is already instantaneous.
+In case the users are already logged in and don't go to the main screen directly, the script files are most likely already in the cache because users have previously used the app. This makes the application's load time instantaneous.
 
-The best thing about the static application is that it doesn't change often. This helped us to cache the JavaScript bundle not only in service worker's cache but also aggressively in the browser's cache.
+The best thing about the "static app" is that it doesn't change often. This helped us to cache its JavaScript bundle not only in service worker's cache but also aggressively in the browser's cache.
 
 ## Ahead-of-Time compilation
 
@@ -365,7 +374,7 @@ This optimization is more related to improvements of the runtime performance, ho
 
 As I mentioned above, once Angular RC5 was released, we migrated the application and introduced AoT compilation as part of the build process. In short, the core benefits of AoT compilation are:
 
-- We no longer need the Angular compiler as part of the production bundle. This reduces the size a bit.
+- We no longer need the Angular compiler as part of the production bundle. This reduces the size a bit (but on the other hand we get all the ngfactories).
 - The code becomes tree-shakable since the templates are compiled to JavaScript with static imports.
 - We don't have the runtime overhead of the Just-in-Time (JiT) compilation.
 
@@ -373,7 +382,7 @@ The first two points are quite self explanatory but the third point is the featu
 
 When we use our "static app" approach we bootstrap the Angular application after the "static app" has been already rendered. This means that we perform JiT compilation after we already have something onto the screen.
 
-The images below demonstrate the delayed Angular bootstrap. The gif on the right shows the delayed bootstrap with JiT compilation enabled and the gif on the left demonstrates what happens when we've compiled the application as part of the build process.
+The images below demonstrate the delayed Angular bootstrap. The gif on the right shows the delayed bootstrap with JiT compilation enabled and the gif on the left demonstrates what happens when we've compiled the application as part of the build process, i.e. AoT compilation:
 
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
@@ -386,7 +395,7 @@ The images below demonstrate the delayed Angular bootstrap. The gif on the right
   <div>
 </div>
 
-Suppose the user had waited 10 seconds to download our entire application. Right after that Angular will have to perform JiT compilation which means that the user won't see anything on the screen. Once the code for the templates and DI has been generated by the compiler, the user still needs to wait since the code needs to be parsed and just then the view could be rendered. On top of that, in **some cases (Chrome extensions, strict CSP) JiT compilation is even not possible since `eval` is not permitted**.
+Lets consider the JiT case. Suppose the user had waited 10 seconds to download our entire application. Right after that Angular will have to perform JiT compilation which means that the user won't see anything on the screen. Once the code for the templates and DI has been generated by the compiler, the user still needs to wait since the code needs to be parsed and just then the view could be rendered. On top of that, **in some cases (Chrome extensions, strict CSP) JiT compilation is not possible since `eval` is not permitted**.
 
 **It's definitely worth it to use AoT compilation in your application.**
 
@@ -396,25 +405,27 @@ A few other network performance improvements we did are:
 
 ### Offline store
 
-We were storing the entire application state into a big immutable object. This helped us apply additional optimization regarding the communication with the API server. Since it's very unlikely to have change in the data model between frequent refreshes of the page, we were able to serialize the entire application's store and save it in localStorage/indexDB.
+We were storing the entire application state into a big immutable object. This helped us apply additional optimization regarding the communication with the API server. Since it's very unlikely to have change in the data model between frequent refreshes of the app, we were able to serialize the entire application's store and save it in localStorage/indexDB.
 
-This way, when the user comes back to the application before some predefined interval of time, we're deserialize the state and feed our store. This helped us reduce the number of requests to the server even further.
+This way, when the user comes back to the application before some predefined interval of time, we deserialize the state and feed our store. This helped us reduce the number of requests to the server even further.
 
 ### SVG sprites
 
-Since H2 and server push are not there yet, we used SVG sprites in order to reduce the number of requests we send to the server. We automatically generated a sprite as part of our build process which contains a number of `defs`. Later, by using `<use xlink:href="..."></use>` we were referencing the individual images within an Angular component.
+Since H2 and server push are not widely supported yet, we used SVG sprites in order to reduce the number of requests we send to the server. We automatically generated a sprite as part of our build process which contains a number of `defs`. Later, by using `<use xlink:href="..."></use>` we were referencing the individual images within an Angular component.
 
-Since this approach doesn't work very well in old versions of IE, we were fetching the sprite using XHR and inlining the individual defs within the component representing the SVG image.
+Since this approach doesn't work very well in old versions of IE, we were fetching the sprite using XHR and inlining the individual defs within the component representing the SVG image. This is an approach similar to the one used by the polyfill [svg4everybody](https://github.com/jonathantneal/svg4everybody).
 
 # Conclusion
 
-In conclusion I can say that we really enjoyed the process of using the framework. One of the most impactful runtime optimizations that we applied was the `OnPush` change detection strategy, which plays really well with immutable.js.
+In conclusion I can say that **we really enjoyed the process of using the framework**. The combination of TypeScript and Angular allows development of scalable applications with consistent codebase.
+
+One of the most impactful runtime optimizations that we applied was the `OnPush` change detection strategy, which plays really well with immutable.js.
 
 In terms of network performance, the bundle size is the biggest struggle. Although the "static app" approach was quite hacky, it help us achieve nice final results by loading the "real application" in background.
 
 Last but not least, applying Ahead-of-Time compilation as part of our build process, helped us improve the initial rendering time.
 
-Web Workers also sound quite tempting. However, at the time of writing this article they are still not production ready. On top of that, **I would not recommend using Web Workers in development since you will loose sense of how your application behaves when running in the main UI thread.**
+Using Web Workers also sound quite tempting. Unfortunately, at the time of writing this article they are still not production ready. On top of that, **I would not recommend using Web Workers in development since you will loose sense of how your application behaves when running in the main UI thread.**
 
 # Resources
 
