@@ -11,7 +11,7 @@ tags:
   - TypeScript
 ---
 
-In this informal essey I'll go through a case study of my experience in using Angular (2 and above) in production.
+In this informal essay I'll go through a case study of my experience in using Angular (2 and above) in production.
 
 Last April, together with a small team, we started working on an educational application; the second version of a product that I developed about 3 years ago using Angular 1.
 
