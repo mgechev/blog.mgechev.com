@@ -64,6 +64,7 @@ Flux and redux, both, are architectural approaches I was really satisfied with i
 In short, with `@ngrx/store` we can think of the redux's store as a stream of immutable objects. Each time you emit an action which gets handled by a reducer, the new state will be emitted through a stream. The different streams can be filtered, merged, mapped, etc. in a very elegant way. On top of that, Angular provides a nice, declarative way to bind to observables using the `async` pipe:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'counter-cmp',
   template: '{{ counter | async }}'
@@ -71,6 +72,7 @@ In short, with `@ngrx/store` we can think of the redux's store as a stream of im
 class CounterComponent {
   counter = Observable.interval(1000);
 }
+{% endraw %}
 ```
 
 Based on a couple of other constraints, we came up with the **["Scalable Application Architecture"](http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)** that I talked about on a couple of [conferences](https://www.youtube.com/watch?v=gtOPAj9_FSM). Although even now it has some edges that could be polished, the entire team was happy using it. We were able to **scale the application to about 40k SLOC (source line of code)** and didn't experience any issues with state inconsistencies, neither scalability and separation of concerns.
@@ -105,6 +107,7 @@ Although it was a bit frustrating initially we were able to eliminate these prob
 Although the **Angular's change detection is really well optimized**, running VM-friendly code, in a very complex user interface you may feel lag. Lets suppose we have the following component:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'fancy-button',
   template: '<button (click)="n++">Totally {{n}} clicks</button>'
@@ -112,6 +115,7 @@ Although the **Angular's change detection is really well optimized**, running VM
 class FancyButtonComponent {
   n = 0;
 }
+{% endraw %}
 ```
 
 And now imagine that this component is somewhere deep into our component tree. Each time we click the button Angular has to perform change detection over all rendered components. This happens because the framework doesn't have any guarantees that this leaf component won't modify an object used somewhere else.
@@ -139,6 +143,7 @@ It is really convenient to use it, however, **each character you type will trigg
 ```
 
 ```ts
+{% raw %}
 @Component({
   selector: 'fib-cmp',
   template: '{{ fibonacci(n) }}'
@@ -154,6 +159,7 @@ class FibonacciComponent {
     return this.fibonacci(n - 1) + this.fibonacci(n - 2);
   }
 }
+{% endraw %}
 ```
 
 You'll feel a serious lag. Of course, we weren't calculating the n<sup>th</sup> Fibonacci number but we had some other heavy computations.
@@ -233,6 +239,7 @@ We applied this optimization strategy wherever we could. Unfortunately, sometime
 On the image above, a kid in kindergarten is solving a test. Once it answers correctly we want to increase it's points with the result it got from the last answer. The component which animates the points increase looks something like:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'point-counter',
   template: '{{ boundPoints }}'
@@ -253,6 +260,7 @@ class PointCounterComponent implements OnChange {
     };
   }
 }
+{% endraw %}
 ```
 
 Remember we mentioned zone.js? **Zone.js monkey patches not only `addEventListener` but all the async APIs in the browser**, including `setTimeout`. This means that Angular will perform change detection every 10ms and it should since we modify the `boundPoints` property to which we have bound in the template.
