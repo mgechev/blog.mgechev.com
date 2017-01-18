@@ -11,7 +11,7 @@ tags:
   - TypeScript
 ---
 
-In this informal essey I'll go through a case study of my experience in using Angular (2 and above) in production.
+In this informal essay I'll go through a case study of my experience in using Angular (2 and above) in production.
 
 Last April, together with a small team, we started working on an educational application; the second version of a product that I developed about 3 years ago using Angular 1.
 
@@ -26,7 +26,7 @@ In the end because of various business reasons the project's development was dis
 
 # Choosing the tech stack
 
-Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main criterias behind it were:
+Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main criteria behind it were:
 
 - A good fit for the business goals.
 - Help us to reuse previous experience we had.
@@ -316,7 +316,7 @@ After we migrated to the latest Angular router from our custom fork of it's prev
   - Main bundle which includes functionality used across the entire application.
   - Feature bundles which capture functionality from separate "bounded contexts".
 
-This cound be applied recursively for each feature bundle, so we can have different sub-feature bundles, etc.
+This could be applied recursively for each feature bundle, so we can have different sub-feature bundles, etc.
 
 Although the idea was clear, achieving it wasn't as simple as we expected. One of the main reasons why I still haven't provided out-of-the-box solution for lazy loading in [Angular Seed](https://github.com/mgechev/angular-seed) was the fact that it's hard to implement a solution which works for any application. Fortunately, in our team we are able to agree on specific constraints and implement a build process which relays that given preconditions are met.
 
@@ -330,7 +330,7 @@ One of the bundles we built represents the intro screen of the application (whic
 
 In the prefetch scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
 
-Luckly, **Angular provides a solution for prefetching of lazy-loaded modules out of the box**. All we had to do was:
+Luckily, **Angular provides a solution for prefetching of lazy-loaded modules out of the box**. All we had to do was:
 
 ```ts
 let routes: Routes = [...];
@@ -444,3 +444,4 @@ Using Web Workers also sound quite tempting. Unfortunately, at the time of writi
 10. [immutable.js](https://facebook.github.io/immutable-js/)
 11. [Angular 2 RC5 - NgModules, Lazy Loading and AoT compilation](https://angularjs.blogspot.com/2016/08/angular-2-rc5-ngmodules-lazy-loading.html)
 12. [Implementing the Missing "resolve" Feature of the Angular 2 Router](http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/)
+
