@@ -363,7 +363,9 @@ The mobile toolkit helped us get additional performance boost for browsers which
 
 <img src="/images/ng-prod/sourcemap.png" alt="Source tree map" style="display: block; margin: auto;">
 
-Unfortunately, as you can see from the image above **our core bundle was still too big and loading the application on 2G network required about 20s**. The third party libraries we use and the ngfactories (artifacts produced by the AoT compilation) take significant part of it.
+*The image above shows tree map of the non-optimized core bundle which is used for bootstrapping the application. Its optimized and gzipped size is about ~200K.*
+
+Unfortunately, as you can see from the tree map above **our core bundle was still too big and loading the application on 2G network required about 20s**. The third party libraries we use and the ngfactories (artifacts produced by the AoT compilation) take significant part of it.
 
 ## Static app
 
