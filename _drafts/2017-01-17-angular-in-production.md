@@ -19,7 +19,7 @@ The users of the original application were mostly young kids and their parents. 
 
 In the end because of not enough market fit the project's development was discontinued.
 
-## Choosing the tech stack
+# Choosing the tech stack
 
 Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main motivation behind it was to be:
 
@@ -29,13 +29,13 @@ Once the entire team got familiar with the business goals and the requirements w
 
 We had a great Rails developer so our technology for the backend was clear. We were considering GraphQL as a communication protocol between frontend and backend but in the end we decided to be a bit more conservative and bet on our  good old friend - REST. If I could go back, probably I'd have chosen GraphQL because I really enjoy its statically typed schema.
 
-### Going statically typed
+## Going statically typed
 
 One of the biggest flaws we experienced in the first version of the product was caused by the use of dynamically typed language. Different typos were caught after the application has been deployed to staging which made us feel it quite fragile. This made is consider a statically typed language for the development of the new version.
 
 Our choice was limited to either Flow or TypeScript. Although Elm sounds hot, it was going to limit our team's scalability.
 
-### The framework...
+## The framework...
 
 I had a successful experience with React in a few past projects where I used flux and redux. On the other hand, at this time I was contributing to the Angular's core and a couple of other projects in the Angular organization. I was also working on angular-seed, codelyzer and writing a book about Angular. We also had one team member with Angular experience from a course I taught at Sofia University.
 
@@ -55,7 +55,7 @@ Although initially we weren't sure which statically typed dialect of JavaScript 
 
 If at this time I wasn't familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write custom functionality for the Angular's router. In the end, this is the risk you take when you start using a technology in a beta version.
 
-## Architecture
+# Architecture
 
 Flux and redux, both, are approaches I was really satisfied with. On top of that, Angular plays really well with immutable data. Later, we found `@ngrx/store`. It's a micro library which provides a reactive state management inspired by redux and plays really well with Angular.
 
@@ -77,7 +77,7 @@ this.userModel
 
 Which is quite an imperative style of programming and doesn't always fit well in the FRP (Functional Reactive Paradigm) paradigm 
 
-## Runtime performance
+# Runtime performance
 
 A serious issue that we met initially were a couple of **memory leaks**. Observables are awesome and you can write very elegant code with them but sometime you forget to clean after yourself. There's a bit of a learning curve until you get conscious and disciplined enough to start cleaning all of your subscriptions.
 
@@ -85,7 +85,7 @@ Some of the most painful and frustrating experiences I had was finding leaking g
 
 Although it was a bit frustrating initially we were able to eliminate these problems. On top of that, both, Angular and rxjs do amazing job cleaning unused subscriptions. But it's still worth mentioning it one more time - **clean after yourself**.
 
-### Optimize your bindings
+## Optimize your bindings
 
 Although the Angular's change detection is really well optimized, running VM-friendly code, in a very complex user interface you may fill lag. Imagine the following component:
 
@@ -139,7 +139,7 @@ You'll feel a serious lag. Of course, we weren't computing the nth Fibonacci num
 
 As a learned lesson here - **optimize your bindings**.
 
-### Immutability is your best friend
+## Immutability is your best friend
 
 Sometimes bindings are just heavy and we weren't able to do anything about it. For instance, we had to show the progress for each kid, and compute it based on given formula. We hand to do this in a screen where we also had an input where we used `[(ngModel)]`. With 1 kid it was fine, but imagine how slow the typing into the input was with 4 kids and above.
 
@@ -199,7 +199,7 @@ class KidStatisticsComponent {
 
 This way Angular will perform change detection in the component subtree with root `KidStatisticsComponent` only if it gets different reference to any of its inputs.
 
-### When Immutability doesn't help
+## When Immutability doesn't help
 
 We applied this optimization strategy wherever we could. Unfortunately, sometimes Angular was still performing unnecessary checks.
 
@@ -254,7 +254,7 @@ class PointCounterComponent implements OnChange {
 
 One more problem solved. Although we experienced some issues with runtime performance, it wasn't a big concern. Unfortunately, we noticed that huge percentage of our users didn't have enough patience to wait for the application to load.
 
-## Network performance
+# Network performance
 
 Our initial production build process was to rsync the `dist/prod` directory produced by Angular Seed to our remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the final users but our bundle size was still about 800k.
 
@@ -276,7 +276,7 @@ We had a few more techniques in mind:
 - Service workers for caching/prefetching.
 - Using a "static app".
 
-### Lazy-loading
+## Lazy-loading
 
 After we migrated to the Angular router from our custom fork of it's previous version, we tried to apply lazy loading. The technique sounds quite clear:
 
@@ -288,7 +288,7 @@ Although the idea was clear, achieving it wasn't as simple as possible. One of t
 
 In the end, after a day of struggle with suffix trees and other fun algorithms we came up with a solution which split our application into three bundles. We load the bundles with SystemJS which is the default module loader for Angular.
 
-#### Prefetching of bundles
+### Prefetching of bundles
 
 One of the bundles represents the intro screen of the application and the sign-up flow, there's a bundle for the main functionality and finally, the core bundle which contains Angular and the common functionality among the first two.
 
@@ -304,7 +304,7 @@ let routes: Routes = [...];
 export const appRoutes = RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules });
 ```
 
-### Service workers
+## Service workers
 
 Service workers (SW) provide a new API which allows us to achieve advanced network control over all requests going from the browser to the network.
 
@@ -319,7 +319,7 @@ The mobile toolkit helped us get additional performance boost for browsers which
 
 Unfortunately, our main bundle (`app` from the image above) was still too big and on 2G network our application was loaded for more than 20s.
 
-### Static app
+## Static app
 
 In the intro screen of the product we have two pages of static content which explain to the parents what the application is all about. It is completely unnecessary to make the users wait until the assets of the application has been downloaded to let them to read a few lines of text and decide if they want to sign-up or not.
 
@@ -331,7 +331,7 @@ What we did was to initially download the application's styles together with the
 
 The best thing about the static application is that it doesn't change. This helped us to cache the bundle not only in service worker's cache but also aggressively in the browser's cache.
 
-### Ahead-of-Time compilation
+## Ahead-of-Time compilation
 
 As I mentioned above, once Angular RC5 was released, we migrated the application and introduced AoT compilation as part of the build process. In short, the core benefits of AoT compilation are:
 
@@ -341,10 +341,21 @@ As I mentioned above, once Angular RC5 was released, we migrated the application
 
 The first two points are quite self explanatory but the third point is the feature which has greatest impact over the user experience.
 
-Suppose the user had waited 10 seconds to get load our entire application. Right after that Angular will have to perform JiT compilation so the user will still see a blank screen. Once the code for the templates and DI has been generated by the compiler, the user still needs to wait since the code needs to be parsed and just then the view could be rendered.
+When using our "static app" approach we bootstrap the Angular application after the static one has been already rendered. This means that we perform JiT compilation after we already have something onto the screen. The images below demonstrate the delayed Angular bootstrap. The gif on the right shows the delayed bootstrap with JiT compilation enabled and the gif on the left demonstrates what happens when we've compiled the application as part of the build process.
 
-![](/images/ng-prod/aot.gif)
+<div style="display: flex; justify-content: space-around;">
+  <div style="text-align: center;">
+    <img src="/images/ng-prod/aot.gif"><br>
+    <span>AoT</span>
+  </div>
+  <div style="text-align: center;">
+    <img src="/images/ng-prod/jit.gif"><br>
+    <span>JiT</span>
+  <div>
+</div>
 
-![](/images/ng-prod/jit.jit)
+Suppose the user had waited 10 seconds to get load our entire application. Right after that Angular will have to perform JiT compilation so the user will still see a blank screen. Once the code for the templates and DI has been generated by the compiler, the user still needs to wait since the code needs to be parsed and just then the view could be rendered. In some cases JiT compilation is even not possible since `eval` is not permitted.
 
-The images above demonstrate the runtime overhead of JiT versus AoT even better.
+It's definitely worth it to use AoT compilation in your application.
+
+# Conclusion
