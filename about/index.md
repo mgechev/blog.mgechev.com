@@ -25,10 +25,10 @@ Some of the open source projects I've developed are:
 
 ### Angular
 
-- [The Official Angular 2 Style Guide](https://angular.io/styleguide)
+- [The Official Angular Style Guide](https://angular.io/styleguide)
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
-- [Community-Driven Angular 2 Style Guide (deprecated)](https://github.com/mgechev/angular2-style-guide)
-- [angular2-seed](https://github.com/mgechev/angular2-seed)
+- [Community-Driven Angular Style Guide (deprecated)](https://github.com/mgechev/angular2-style-guide)
+- [angular-seed](https://github.com/mgechev/angular-seed)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
@@ -48,7 +48,7 @@ Some of the open source projects I've developed are:
 ### Others
 
 - [plainvm](http://plainvm.mgechev.com/)
-- [codelyzer - static code analyzer for Angular 2 and TypeScript projects](http://codelyzer.com)
+- [codelyzer - static code analyzer for Angular and TypeScript projects](http://codelyzer.com)
 - [aspect.js - Library for aspect-oriented programming in JavaScript](https://github.com/mgechev/aspect.js)
 - [data-adapter - Micro library which allows declarative data transformation](https://github.com/mgechev/data-adapter)
 - [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
