@@ -1,10 +1,10 @@
 ---
-title: Building an Angular 2 Application for Production
+title: Building an Angular Application for Production
 author: minko_gechev
 layout: post
 categories:
   - JavaScript
-  - Angular 2
+  - Angular
   - DevOps
 tags:
   - rollup
@@ -275,7 +275,7 @@ We have the same `clean`, `serve`, `minify` and `build` scripts like above. The 
 
 `rollup` is responsible for bundling our app and perform tree-shaking in the process.
 
-TypeScript supports ES2015 modules, which means that we can apply tree-shaking directly over our non-transpiled app. This is further simplified by the [TypeScript plugin for Rollup](https://github.com/rollup/rollup-plugin-typescript) which allows us to perform the transpilation as the part of the bundling. This would work great if the dependencies of our application were distributed as TypeScript as well. However, Angular 2 is distributed as ES5 and ES2015, and RxJS is distributed as ES5 and ES2015 (in the `rxjs-es` package).
+TypeScript supports ES2015 modules, which means that we can apply tree-shaking directly over our non-transpiled app. This is further simplified by the [TypeScript plugin for Rollup](https://github.com/rollup/rollup-plugin-typescript) which allows us to perform the transpilation as the part of the bundling. This would work great if the dependencies of our application were distributed as TypeScript as well. However, Angular is distributed as ES5 and ES2015, and RxJS is distributed as ES5 and ES2015 (in the `rxjs-es` package).
 
 Since we can't apply tree-shaking directly over the original TypeScript files of our app, we'll first need to transpile it to ES2015, after that create an ES2015 bundle by using rollup, and in the end transpile it to ES5.
 
@@ -389,7 +389,7 @@ $ ls -lah bundle.min.js.gz
 
 Well, it's smaller but I'm sure we can do even better!
 
-*Credits: Igor Minar published similar experiments in the official Angular 2 repository. They can be found [here](https://github.com/angular/angular/tree/a01a54c180470610dc359f1ab8c4503e51e440fa/modules/rollup-test).*
+*Credits: Igor Minar published similar experiments in the official Angular repository. They can be found [here](https://github.com/angular/angular/tree/a01a54c180470610dc359f1ab8c4503e51e440fa/modules/rollup-test).*
 
 ## Using ngc
 
