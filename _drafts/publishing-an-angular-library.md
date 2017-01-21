@@ -17,7 +17,7 @@ In this post I'll quickly explain everything you need to know in order to publis
 - Should be bundled and distributed.
 - Work with the Angular's Ahead-of-Time compiler.
 
-Along the way, I'll provide examples from a module I recently released called [`ngresizable`](https://github.com/mgechev/ngresizable). [`ngresizable`](https://github.com/mgechev/ngresizable)` is a simple component which can make a DOM element resizable.
+Along the way, I'll provide examples from a module I recently released called [`ngresizable`](https://github.com/mgechev/ngresizable). [`ngresizable`](https://github.com/mgechev/ngresizable) is a simple component which can make a DOM element resizable.
 
 *If you find anything missing, please don't hesitate to comment below.*
 
