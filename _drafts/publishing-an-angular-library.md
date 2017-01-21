@@ -174,7 +174,7 @@ We can use `tsc` for this purpose and our `tsconfig.json` should look something 
 }
 ```
 
-This is a configuration file copied from `[ngresizable](https://github.com/mgechev/ngresizable)`.
+This is a configuration file copied from [`ngresizable`](https://github.com/mgechev/ngresizable).
 
 If we want to make the life of people who are using our package easier, we should also provide ES5 version of it. Here we have two options:
 
