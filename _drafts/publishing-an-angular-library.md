@@ -152,7 +152,7 @@ In order to keep the module tree-shakable, we need to distribute it in a way tha
 
 We can use `tsc` for this purpose and our `tsconfig.json` should look something like:
 
-```json
+```js
 {
   "compilerOptions": {
     "target": "es5",
@@ -195,7 +195,7 @@ In order to do this we can:
 
 In the end our [`package.json`](https://github.com/mgechev/ngresizable) can look something like:
 
-```json
+```js
 {
   ...
   "main": "ngresizable.bundle.js",
@@ -212,7 +212,7 @@ Since most likely the users of the package will use TypeScript, we need to provi
 
 `tsconfig.json` should look like:
 
-```json
+```js
 {
   "compilerOptions": {
     "target": "es5",
@@ -233,7 +233,7 @@ Since most likely the users of the package will use TypeScript, we need to provi
 
 ...and respectively `package.json`:
 
-```json
+```js
 {
   ...
   "main": "ngresizable.bundle.js",
@@ -251,7 +251,7 @@ If we distribute our module as JavaScript without any additional metadata, users
 
 Instead, we can precompile our module with `ngc` and enable the `"skipTemplateCodegen": true` option in `tsconfig.json`, our `tsconfig.json` can look like:
 
-```json
+```js
 {
   "compilerOptions": {
     "target": "es5",
@@ -307,8 +307,6 @@ After applying all these build steps, the final structure of the ngresizable mod
 ├── ngresizable.utils.js.map
 ├── ngresizable.utils.metadata.json
 └── package.json
-
-0 directories, 27 files
 ```
 
 As recap, notice that in the final package we have:
