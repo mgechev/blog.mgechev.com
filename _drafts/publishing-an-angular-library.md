@@ -25,6 +25,8 @@ Along the way, I'll provide examples from a module I recently released called `[
 
 One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which has to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs. In short, this means that if you're building your library for the web, you should not touch the DOM directly!
 
+<img src="/images/ng-lib/decouple.jpg" alt="Decouple package" style="display: block; margin: auto">
+
 Lets take a look at an example:
 
 ```ts
@@ -148,6 +150,8 @@ The components' distribution is not a trivial problem. Even Angular went through
 2. Developers should be able to use them as easy as possible in development mode, i.e. no transpilation of any kind should be required.
 3. We need to keep the lean to save network bandwidth and time.
 
+<img src="/images/ng-lib/package.jpg" alt="Distribute package" style="display: block; margin: auto">
+
 In order to keep the module tree-shakable, we need to distribute it in a way that it uses ES2015 modules. By having it in this format bundlers, such as [Rollup](http://rollupjs.org/) and [Webpack](https://webpack.github.io/), will be able to get rid of unused exports.
 
 We can use `tsc` for this purpose and our `tsconfig.json` should look something like:
@@ -246,6 +250,8 @@ Since most likely the users of the package will use TypeScript, we need to provi
 # Compatibility with Angular's AoT Compiler
 
 Ahead-of-Time compilation is a great feature and we need to develop & distribute our modules compatible with the compiler.
+
+<img src="/images/ng-lib/compatible.jpg" alt="Compatible with compiler" style="display: block; margin: auto">
 
 If we distribute our module as JavaScript without any additional metadata, users who depend on our package will not be able to compile their application. But how can we provide metadata to `ngc`? Well, we can include the TypeScript version of our modules as well...but it's not required.
 
