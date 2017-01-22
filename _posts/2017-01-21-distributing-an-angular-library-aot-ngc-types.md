@@ -16,14 +16,14 @@ In this post I'll quickly explain the minimum you need to know in order to publi
 - Be platform independent (i.e. run in Web Workers, Universal).
 - Should be bundled and distributed.
 - Work with the Angular's Ahead-of-Time compiler.
-- Play well with TypeScript and allow autocompletion and compile-time type checking.
+- Play well with TypeScript by allowing autocompletion and compile-time type checking.
 
 *If you're only interested in a quick checklist of things you need to consider for distributing your Angular library, go directly to the "[Distributing an Angular Library - Checklist](#checklist)" section.*
 
 Note that this article doesn't aim to provide complete guidelines for developing an npm module. If you're looking for this, I can recommend you:
 
-- [module best practices](https://github.com/mattdesl/module-best-practices)
 - [Creating Node.js modules](https://docs.npmjs.com/getting-started/creating-node-modules)
+- [module best practices](https://github.com/mattdesl/module-best-practices)
 - [How to build and publish an Angular module](https://medium.com/@cyrilletuzi/how-to-build-and-publish-an-angular-module-7ad19c0b4464)
 
 Along the way, I'll provide examples from a module I recently released called [`ngresizable`](https://github.com/mgechev/ngresizable). [`ngresizable`](https://github.com/mgechev/ngresizable) is a simple component which can make a DOM element resizable.
@@ -32,7 +32,7 @@ Along the way, I'll provide examples from a module I recently released called [`
 
 # Writing platform independent components
 
-One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which has to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the [dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)). In short, this means that if you're building your library for the web, you should not touch the DOM directly!
+One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which have to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the [dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)). In short, if you're building your library for the Web, you should not touch the DOM directly because this will make it unable to work in Web Workers and on the server and most developers need that!
 
 <img src="/images/ng-lib/decouple.jpg" alt="Decouple package" style="display: block; margin: auto">
 
@@ -75,12 +75,12 @@ class ZippyComponent {
 
 This snippet is quite coupled to the underlaying platform, and contains plenty of other anti-patterns, for instance we:
 
-1. Direclty interact with the header DOM element by invoking it's method `addEventListener`.
-2. Do not clear the event listener we add to the header element.
-3. Access the `classList` property of the native header element.
-4. Access property of the global object `document` which is not available in Web Workers, for instance.
+1. Direclty interact with the `header` DOM element by invoking it's method `addEventListener`.
+2. Do not clear the event listener we add to the `header` element.
+3. Access the `classList` property of the native `header` element.
+4. Access property of the global object `document`, however, `document` is not available on other platforms.
 
-Lets refactor it, in order to make it platform agnostic:
+Lets refactor the code, in order to make it platform agnostic:
 
 ```ts
 // Alright...
@@ -161,15 +161,15 @@ The code above contains a better implementation, which is platform agnostic and 
 
 The components' distribution is not a trivial problem. Even Angular went through several different structures of their npm modules. The things we need to consider for our packages are:
 
-1. They should be tree-shakable in production build.
+1. They should be tree-shakable. Tree-shaking is exclusively used for producing a production bundle, because it allows us to drop unused exports.
 2. Developers should be able to use them as easy as possible in development mode, i.e. no transpilation of any kind should be required.
 3. We need to keep the package lean to save network bandwidth and download time.
 
 <img src="/images/ng-lib/package.jpg" alt="Distribute package" style="display: block; margin: auto">
 
-In order to keep the module tree-shakable, we need to distribute it in a way that it uses ES2015 modules. By having it in this format bundlers, such as [Rollup](http://rollupjs.org/) and [Webpack](https://webpack.github.io/), will be able to get rid of unused exports.
+In order to keep the module tree-shakable, we need to distribute it in a way that it uses ES2015 modules (also known as `esm`). By having it in this format bundlers, such as [Rollup](http://rollupjs.org/) and [Webpack](https://webpack.github.io/), will be able to get rid of unused exports.
 
-We can use `tsc` for this purpose and our `tsconfig.json` should look something like:
+For this purpose we can use `tsc` so our `tsconfig.json` should look something like:
 
 ```js
 {
@@ -201,18 +201,22 @@ If we want to make the life of people who are using our package easier, we shoul
 The second approach has a few advantages:
 
 - We don't bloat the package with additional files - we have only the `esm` version of our package and a single bundle which contains everything else.
-- When developers use our package in development with SystemJS their browser can load the entire package with only a single request to the UMD bundle. In contrast, if we distribute the package without bundling the module but providing it as individual files instead, SystemJS will send request for each file. Once your project grows this can become inconvenient by slowing down each page refresh dramatically.
+- When developers use our package in development with SystemJS their browser can load the entire library with only a single request to the UMD bundle. In contrast, if we distribute the package without bundling the module but providing it as individual files instead, SystemJS will send request for each file. Once your project grows this can become inconvenient by slowing down each page refresh dramatically.
+
+It doesn't matter much which tool we'd choose for producing the UMD ES5 bundle. Google, for instance, [uses rollup for bundling Angular](https://github.com/angular/angular/blob/master/modules/%40angular/core/rollup.config.js), which is also the case for [ngresizable](https://github.com/mgechev/ngresizable/blob/master/rollup.config.js).
+
+In the end, since we don't have to complicate the directory structure of the package additionally, we can simply output both, the `esm` version of our code and the UMD bundle, in the root of directory of the distribution.
 
 ## Configuring the package
 
-So, now we have two different versions of our code `esm` and ES5 UMD bundle. The question is what entry file in `package.json` should we provide. We want bundlers which understand `esm` to use the ES2015 modules, and bundles which don't know how to use ES2015 modules to use the UMD bundle instead.
+So, now we have two different versions of our code `esm` and ES5 UMD bundle. The question is what entry file in `package.json` should we provide? We want bundlers which understand `esm` to use the ES2015 modules, and bundles which don't know how to use ES2015 modules to use the UMD bundle instead.
 
 In order to do this we can:
 
-- Set the value of `main` to the ES5 UMD bundle.
-- Set the value of `module` to the path of the entry file of the `esm` version of the app. `module` is field in `package.json` that bundlers such as rollup and webpack 2 expect to find ES2015 version of the code. Note that some old versions of the bundlers use `jsnext:main` instead of `module` so we need to set both properties.
+- Set the value of the `main` property of `package.json` to point to the ES5 UMD bundle.
+- Set the value of the `module` property to point to the entry file of the `esm` version of the library. `module` is a field in `package.json` where bundlers such as rollup and webpack 2 expect to find a reference to the ES2015 version of the code. Note that some older versions of the bundlers use `jsnext:main` instead of `module` so we need to set both properties.
 
-In the end our [`package.json`](https://github.com/mgechev/ngresizable) can look something like:
+Our final [`package.json`](https://github.com/mgechev/ngresizable) should look something like:
 
 ```js
 {
@@ -228,7 +232,7 @@ So far so good, but that's not all!
 
 ## Providing type definitions
 
-Since most likely the users of the package will use TypeScript, we need to provide type definitions for them. To do this, we need to enable the `declaration` flag in `tsconfig.json` and set the `types` field of our `package.json`.
+Since most likely the users of the package will use TypeScript, we need to provide type definitions to them. To do this, we need to enable the `declaration` flag in `tsconfig.json` and set the `types` field of our `package.json`.
 
 `tsconfig.json` should look like:
 
