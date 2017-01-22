@@ -354,15 +354,25 @@ For instance, the ngresizable component violates a practice from the styleguide:
 
 In this section we'll wrap things up, by briefly mentioning each point you need to consider:
 
-
-- Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).
-- Provide `esm` version of your library in order to allow tree-shaking.
-  - Reference the `esm` version under the `jsnext:main` property in `package.json`.
-- Provide ES5 bundle of your library.
-  - Reference the bundle under the `main` property of your `package.json`.
-- Provide the type definitions of your library by generating them with `tsc` with the `declaration` flag set to `true`.
-  - Reference the type definitions corresponding to the main module of your package in the `types` property in your `package.json`.
-- Compile your library with `ngc` and include the generated `*.metadata.json` files in your package. The `tsconfig.json` used by `ngc` should have `skipTemplateCodegen` set to true, under `angularCompilerOptions`.
+<ul>
+  <li>Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).</li>
+  <li>Provide <code>esm</code> version of your library in order to allow tree-shaking.
+    <ul>
+      <li>Reference the <code>esm</code> version under the <code>jsnext:main</code> property in <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Provide ES5 bundle of your library.
+    <ul>
+      <li>Reference the bundle under the <code>main</code> property of your <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Provide the type definitions of your library by generating them with <code>tsc</code> with the <code>declaration</code> flag set to <code>true</code>.
+    <ul>
+      <li>Reference the type definitions corresponding to the main module of your package in the <code>types</code> property in your <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Compile your library with <code>ngc</code> and include the generated <code>*.metadata.json</code> files in your package. The <code>tsconfig.json</code> used by <code>ngc</code> should have <code>skipTemplateCodegen</code> set to true, under <code>angularCompilerOptions</code>.</li>
+</ul>
 
 </div>
 
