@@ -210,7 +210,7 @@ So, now we have two different versions of our code `esm` and ES5 UMD bundle. The
 In order to do this we can:
 
 - Set the value of `main` to the ES5 UMD bundle.
-- Set the value of `jsnext:main` to the entry file of the `esm` version of the app. `jsnext:main` is field in `package.json` that bundlers such as rollup and webpack 2 expect to find ES2015 version of the code.
+- Set the value of `module` to the path of the entry file of the `esm` version of the app. `module` is field in `package.json` that bundlers such as rollup and webpack 2 expect to find ES2015 version of the code. Note that some old versions of the bundlers use `jsnext:main` instead of `module` so we need to set both properties.
 
 In the end our [`package.json`](https://github.com/mgechev/ngresizable) can look something like:
 
@@ -218,6 +218,7 @@ In the end our [`package.json`](https://github.com/mgechev/ngresizable) can look
 {
   ...
   "main": "ngresizable.bundle.js",
+  "module": "ngresizable.module.js",
   "jsnext:main": "ngresizable.module.js",
   ...
 }
@@ -256,6 +257,7 @@ Since most likely the users of the package will use TypeScript, we need to provi
 {
   ...
   "main": "ngresizable.bundle.js",
+  "module": "ngresizable.module.js",
   "jsnext:main": "ngresizable.module.js",
   "types": "ngresizable.module.d.ts",
   ...
@@ -358,7 +360,7 @@ In this section we'll wrap things up, by briefly mentioning each point you need 
   <li>Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).</li>
   <li>Provide <code>esm</code> version of your library in order to allow tree-shaking.
     <ul>
-      <li>Reference the <code>esm</code> version under the <code>jsnext:main</code> property in <code>package.json</code>.</li>
+      <li>Reference the <code>esm</code> version under the <code>module</code> and <code>jsnext:main</code> properties in <code>package.json</code>.</li>
     </ul>
   </li>
   <li>Provide ES5 bundle of your library.
