@@ -41,6 +41,7 @@ Lets take a look at an example:
 ```ts
 // ANTI-PATTERN
 
+{% raw %}
 @Component({
   selector: 'my-zippy',
   template: `
@@ -69,6 +70,7 @@ class ZippyComponent {
     });
   }
 }
+{% endraw %}
 ```
 
 This snippet is quite coupled to the underlaying platform, and contains plenty of other anti-patterns, for instance we:
@@ -83,6 +85,7 @@ Lets refactor it, in order to make it platform agnostic:
 ```ts
 // Alright...
 
+{% raw %}
 @Component({
   selector: 'my-zippy',
   template: `
@@ -117,6 +120,7 @@ class ZippyComponent implements AfterViewInit, OnDestroy {
       this.cleanCallback();
   }
 }
+{% endraw %}
 ```
 
 The code above looks better. It'll work on multiple platforms because we use the [`Renderer`](https://angular.io/docs/ts/latest/api/core/index/Renderer-class.html) instead of directly manipulating the DOM and accessing globals.
@@ -127,6 +131,7 @@ Although it works, we can do a bit better. We do a lot of manual things, for ins
 ```ts
 // Best
 
+{% raw %}
 @Component({
   selector: 'my-zippy',
   template: `
@@ -147,6 +152,7 @@ class ZippyComponent implements AfterViewInit, OnDestroy {
     this.toggle = !this.toggle;
   }
 }
+{% endraw %}
 ```
 
 The code above contains a better implementation, which is platform agnostic and also testable (we toggle the visibility of the content in the method `toggleZippy` so we can write tests for this easier).
@@ -342,11 +348,12 @@ For instance, the ngresizable component violates a practice from the styleguide:
 
 *Note that using `ng` as prefix of selector for your directives/components is not recommended because of possible collisions with components coming from Google.*
 
-<div style="padding: 15px; background-color: #E3F8FF;">
+<div style="padding: 20px; background-color: #E3F8FF;">
 
 <h1 id="checklist">Distributing an Angular Library - Checklist</h1>
 
 In this section we'll wrap things up, by briefly mentioning each point you need to consider:
+
 
 - Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).
 - Provide `esm` version of your library in order to allow tree-shaking.
