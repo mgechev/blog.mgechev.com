@@ -1,5 +1,5 @@
 ---
-title: Developing an Angular Library - The Definitive Guide
+title: Distributing an Angular Library - The Brief Guide
 author: minko_gechev
 layout: post
 categories:
@@ -11,19 +11,28 @@ tags:
   - TypeScript
 ---
 
-In this post I'll quickly explain everything you need to know in order to publish an Angular component to npm. By the end of the post you'll know how your module to:
+In this post I'll quickly explain the minimum you need to know in order to publish an Angular component to npm. By the end of the post you'll know how your module to:
 
 - Be platform independent (i.e. run in Web Workers, Universal).
 - Should be bundled and distributed.
 - Work with the Angular's Ahead-of-Time compiler.
+- Play well with TypeScript and allow autocompletion and compile-time type checking.
+
+*If you're only interested in a quick checklist of things you need to consider for distributing your Angular library, go directly to the "[Distributing an Angular Library - Checklist](#checklist)" section.*
+
+Note that this article doesn't aim to provide complete guidelines for developing an npm module. If you're looking for this, I can recommend you:
+
+- [module best practices](https://github.com/mattdesl/module-best-practices)
+- [Creating Node.js modules](https://docs.npmjs.com/getting-started/creating-node-modules)
+- [How to build and publish an Angular module](https://medium.com/@cyrilletuzi/how-to-build-and-publish-an-angular-module-7ad19c0b4464)
 
 Along the way, I'll provide examples from a module I recently released called [`ngresizable`](https://github.com/mgechev/ngresizable). [`ngresizable`](https://github.com/mgechev/ngresizable) is a simple component which can make a DOM element resizable.
 
-*If you find anything missing, please don't hesitate to comment below.*
+*If you find anything important missing, please don't hesitate to comment below.*
 
 # Writing platform independent components
 
-One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which has to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs. In short, this means that if you're building your library for the web, you should not touch the DOM directly!
+One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which has to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the [dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)). In short, this means that if you're building your library for the web, you should not touch the DOM directly!
 
 <img src="/images/ng-lib/decouple.jpg" alt="Decouple package" style="display: block; margin: auto">
 
@@ -140,15 +149,15 @@ class ZippyComponent implements AfterViewInit, OnDestroy {
 }
 ```
 
-The code above contains a better implementation, which is platform agnostic and also testable (we toggle the value of `this.toggle` in the method `toggleZippy` so we can write a test for the method).
+The code above contains a better implementation, which is platform agnostic and also testable (we toggle the visibility of the content in the method `toggleZippy` so we can write tests for this easier).
 
 # Distributing the components
 
 The components' distribution is not a trivial problem. Even Angular went through several different structures of their npm modules. The things we need to consider for our packages are:
 
-1. They should be tree-shakable for in the production build.
+1. They should be tree-shakable in production build.
 2. Developers should be able to use them as easy as possible in development mode, i.e. no transpilation of any kind should be required.
-3. We need to keep the lean to save network bandwidth and time.
+3. We need to keep the package lean to save network bandwidth and download time.
 
 <img src="/images/ng-lib/package.jpg" alt="Distribute package" style="display: block; margin: auto">
 
@@ -176,26 +185,26 @@ We can use `tsc` for this purpose and our `tsconfig.json` should look something 
 
 This is a configuration file copied from [`ngresizable`](https://github.com/mgechev/ngresizable).
 
-If we want to make the life of people who are using our package easier, we should also provide ES5 version of it. Here we have two options:
+If we want to make the life of people who are using our package easier, we should also provide ES5 version of it. Here are two options to be considered:
 
-- Distribute it in two directories - `esm` and `es5` which respectively contain two different versions of our package:
-  - `esm` - contains the ES5 version that uses ES2015 modules.
-  - `es5` - contains ES5 version of the package which uses commonjs, for instance.
+- Distribute it in two directories - `esm` and `es5` which respectively contain two different versions of our module's JavaScript files:
+  - `esm` - contains an ES5 version that uses ES2015 modules.
+  - `es5` - contains an ES5 version of the package which doesn't use any ES2015 syntax (i.e. the modules are in commonjs, amd, system or UMD format).
 - Distribute the packages with `esm` and also provide ES5 UMD (Universal Module Definition) bundle.
 
 The second approach has a few advantages:
 
 - We don't bloat the package with additional files - we have only the `esm` version of our package and a single bundle which contains everything else.
-- When developers use our package in development with SystemJS their browser can load the entire package with only a single request to the UMD bundle. In contrast, if we distribute the package without bundling the modules but providing them in individual files instead, SystemJS will send request for each file. Once your project grows this can become unpleasant by slowing down each page refresh dramatically.
+- When developers use our package in development with SystemJS their browser can load the entire package with only a single request to the UMD bundle. In contrast, if we distribute the package without bundling the module but providing it as individual files instead, SystemJS will send request for each file. Once your project grows this can become inconvenient by slowing down each page refresh dramatically.
 
 ## Configuring the package
 
-So, now we have two different versons of our code `esm` and ES5 UMD bundle. The question is what entry file in `package.json` should we provide. We want bundlers which understand `esm` to use the ES2015 modules, and bundles which don't know how to use ES2015 modules to use the UMD bundle.
+So, now we have two different versions of our code `esm` and ES5 UMD bundle. The question is what entry file in `package.json` should we provide. We want bundlers which understand `esm` to use the ES2015 modules, and bundles which don't know how to use ES2015 modules to use the UMD bundle instead.
 
 In order to do this we can:
 
 - Set the value of `main` to the ES5 UMD bundle.
-- Set the value of `jsnext:main` to the entry file of the `esm` version of the app.
+- Set the value of `jsnext:main` to the entry file of the `esm` version of the app. `jsnext:main` is field in `package.json` that bundlers such as rollup and webpack 2 expect to find ES2015 version of the code.
 
 In the end our [`package.json`](https://github.com/mgechev/ngresizable) can look something like:
 
@@ -253,9 +262,9 @@ Ahead-of-Time compilation is a great feature and we need to develop & distribute
 
 <img src="/images/ng-lib/compatible.jpg" alt="Compatible with compiler" style="display: block; margin: auto">
 
-If we distribute our module as JavaScript without any additional metadata, users who depend on our package will not be able to compile their application. But how can we provide metadata to `ngc`? Well, we can include the TypeScript version of our modules as well...but it's not required.
+If we distribute our module as JavaScript without any additional metadata, users who depend on our package will not be able to compile their Angular application. But how can we provide metadata to `ngc`? Well, we can include the TypeScript version of our modules as well...but it's not required.
 
-Instead, we can precompile our module with `ngc` and enable the `"skipTemplateCodegen": true` option in `tsconfig.json`, our `tsconfig.json` can look like:
+Instead, we should precompile our module with `ngc` and enable the `skipTemplateCodegen` flag in `tsconfig.json`'s `angularCompilerOptions`. After the last update our `tsconfig.json` will look like:
 
 ```js
 {
@@ -278,7 +287,7 @@ Instead, we can precompile our module with `ngc` and enable the `"skipTemplateCo
 }
 ```
 
-By default `ngc` generates ngfactories for our components and modules. By using `skipTemplateCodegen` we can skip this code generation and only get `*.metadata.json` files.
+By default `ngc` generates ngfactories for the components and modules. By using `skipTemplateCodegen` flag we can skip this and only get `*.metadata.json` files.
 
 # Recap
 
@@ -332,3 +341,29 @@ For instance, the ngresizable component violates a practice from the styleguide:
 - It uses component as an attribute. This is a practice which violation is acceptable in this specific case because of implementation details of the component.
 
 *Note that using `ng` as prefix of selector for your directives/components is not recommended because of possible collisions with components coming from Google.*
+
+<div style="padding: 15px; background-color: #E3F8FF;">
+
+<h1 id="checklist">Distributing an Angular Library - Checklist</h1>
+
+In this section we'll wrap things up, by briefly mentioning each point you need to consider:
+
+- Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).
+- Provide `esm` version of your library in order to allow tree-shaking.
+  - Reference the `esm` version under the `jsnext:main` property in `package.json`.
+- Provide ES5 bundle of your library.
+  - Reference the bundle under the `main` property of your `package.json`.
+- Provide the type definitions of your library by generating them with `tsc` with the `declaration` flag set to `true`.
+  - Reference the type definitions corresponding to the main module of your package in the `types` property in your `package.json`.
+- Compile your library with `ngc` and include the generated `*.metadata.json` files in your package. The `tsconfig.json` used by `ngc` should have `skipTemplateCodegen` set to true, under `angularCompilerOptions`.
+
+</div>
+
+# Conclusion
+
+In this blog post we explained briefly the most important things you need to consider when it comes to distribute your Angular library.
+
+We explained how to keep the library decoupled from the underlaying platform. After that we went to distributing your code in a way that it's tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular's Ahead-of-Time compiler.
+
+Finally, we summarized all the practices in a short list which can serve you as a checklist.
+
