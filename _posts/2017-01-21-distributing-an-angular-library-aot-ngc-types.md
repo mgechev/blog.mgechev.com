@@ -287,6 +287,7 @@ Instead, we should precompile our module with `ngc` and enable the `skipTemplate
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "declaration": true,
     "outDir": "./dist",
     "lib": ["es2015", "dom"]
   },
