@@ -203,7 +203,7 @@ The second approach has a few advantages:
 - We don't bloat the package with additional files - we have only the `esm` version of our package and a single bundle which contains everything else.
 - When developers use our package in development with SystemJS their browser can load the entire library with only a single request to the UMD bundle. In contrast, if we distribute the package without bundling the module but providing it as individual files instead, SystemJS will send request for each file. Once your project grows this can become inconvenient by slowing down each page refresh dramatically.
 
-It doesn't matter much which tool we'd choose for producing the UMD ES5 bundle. Google, for instance, [uses rollup for bundling Angular](https://github.com/angular/angular/blob/master/modules/%40angular/core/rollup.config.js), which is also the case for [ngresizable](https://github.com/mgechev/ngresizable/blob/master/rollup.config.js).
+It doesn't matter much which tool we'd choose for producing the UMD ES5 bundle. Google, for instance, [uses rollup for bundling Angular](https://github.com/angular/angular/blob/master/modules/%40angular/core/rollup.config.js), which is also the case for [ngresizable](https://github.com/mgechev/ngresizable/blob/master/rollup.config.js). It's pretty neat that you can compile your module to ES5 and ES2015 modules. Later your bundler can translate the ES2015 module syntax to UMD so you don't need any additional steps of transpilation.
 
 In the end, since we don't have to complicate the directory structure of the package additionally, we can simply output both, the `esm` version of our code and the UMD bundle, in the root of directory of the distribution.
 
@@ -274,7 +274,7 @@ Ahead-of-Time compilation is a great feature and we need to develop & distribute
 
 <img src="/images/ng-lib/compatible.jpg" alt="Compatible with compiler" style="display: block; margin: auto">
 
-If we distribute our module as JavaScript without any additional metadata, users who depend on our package will not be able to compile their Angular application. But how can we provide metadata to `ngc`? Well, we can include the TypeScript version of our modules as well...but it's not required.
+If we distribute our module as JavaScript without any additional metadata, users who depend on them will not be able to compile their Angular application. But how can we provide metadata to `ngc`? Well, we can include the TypeScript version of our modules as well...but it's not required.
 
 Instead, we should precompile our module with `ngc` and enable the `skipTemplateCodegen` flag in `tsconfig.json`'s `angularCompilerOptions`. After the last update our `tsconfig.json` will look like:
 
@@ -304,7 +304,7 @@ By default `ngc` generates ngfactories for the components and modules. By using 
 
 # Recap
 
-After applying all these build steps, the final structure of the [`ngresizable`](https://github.com/mgechev/ngresizable) module will look like:
+After applying all these build steps, the final structure of the [`ngresizable`](https://github.com/mgechev/ngresizable) module looks like this:
 
 ```
 .
@@ -340,9 +340,9 @@ After applying all these build steps, the final structure of the [`ngresizable`]
 As recap, notice that in the final package we have:
 
 - `ngresizable.bundle.js` - an ES5 UMD bundle of the module.
-- `esm` ES5 version of our code - which allows tree-shaking.
+- `esm` ES5 version of our code - allows tree-shaking.
 - `*.js.map` - source map files for easier debugging.
-- `*.metadata.json` - metadata required for ngc to do its job.
+- `*.metadata.json` - metadata required by `ngc` to do its job.
 - `*.d.ts` - type definitions which allow TypeScript to perform compile-time type checking and allow intellisense for our library.
 
 # Other topics
@@ -351,7 +351,7 @@ Very important topic that needs to be considered is related to following the sty
 
 For instance, the ngresizable component violates a practice from the styleguide:
 
-- It uses component as an attribute. This is a practice which violation is acceptable in this specific case because of implementation details of the component.
+- It uses a component as an attribute. This is a practice which violation is acceptable in this specific case because of implementation details of the component.
 
 *Note that using `ng` as prefix of selector for your directives/components is not recommended because of possible collisions with components coming from Google.*
 
@@ -368,7 +368,7 @@ In this section we'll wrap things up, by briefly mentioning each point you need 
       <li>Reference the <code>esm</code> version under the <code>module</code> and <code>jsnext:main</code> properties in <code>package.json</code>.</li>
     </ul>
   </li>
-  <li>Provide ES5 bundle of your library.
+  <li>Provide ES5 UMD bundle of your library.
     <ul>
       <li>Reference the bundle under the <code>main</code> property of your <code>package.json</code>.</li>
     </ul>
@@ -385,9 +385,9 @@ In this section we'll wrap things up, by briefly mentioning each point you need 
 
 # Conclusion
 
-In this blog post we explained briefly the most important things you need to consider when it comes to distribute your Angular library.
+In this blog post we briefly explained the most important things you need to consider when it comes to distributing your Angular library.
 
-We explained how to keep the library decoupled from the underlaying platform. After that we went to distributing your code in a way that it's tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular's Ahead-of-Time compiler.
+We explained how to keep the library decoupled from the underlaying platform. After that, we went to distributing our code in a way that it's tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular's Ahead-of-Time compiler.
 
 Finally, we summarized all the practices in a short list which can serve you as a checklist.
 
