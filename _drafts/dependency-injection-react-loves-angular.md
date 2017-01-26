@@ -120,4 +120,70 @@ A big improvement in the dependency injection mechanism of Angular 2 and above, 
 
 We have a root injector called `House`, which is parent of the injectors `Bathroom`, `Kitchen` and `Garage`. `Garage` is parent of `Car` and `Storage`. If we require the dependency with token `tire`, for instance from the injector `Storage`, `Storage` will try to find it in its list of registered providers. If it doesn't find it there, it'll look into `Garage`. If it is not there, `Garage` will look in `House`. In case `House` finds the dependency it will return it to `Garage` which will give it to `Storage`.
 
-Does the tree above look familiar? Well, recently most user interface is build as **tree of components**. This means that we can have a tree of injectors which are responsible for the instantiation of the individual components and their dependencies. Such injectors Angular calls **element injectors**.
+Does the tree above look familiar? Well, recently most frameworks for building user interface structure it as **tree of components**. This means that we can have a tree of injectors which are responsible for the instantiation of the individual components and their dependencies. Such injectors Angular calls **element injectors**.
+
+## Element injectors
+
+Lets take a brief look how this looks like in Angular. Suppose we have a game which has two modes:
+
+- Single-player mode.
+- Multi-player mode.
+
+When the user plays the game in single-player, we want to send some metadata to our application server through Web Sockets. However, if our user plays against another player, we want to establish a WebRTC data channel between them. Of course, it makes sense to send data to the application server as well. With Angular/[`injection-js`](https://github.com/mgechev/injection-js) we can handle this with [multi-providers](https://blog.thoughtram.io/angular2/2015/11/23/multi-providers-in-angular-2.html), but for the sake of simplicity lets suppose we want only p2p connection in case of multi-player.
+
+So, we have our `DataChannel`, which is an abstract class with a single method and an observable:
+
+```ts
+abstract class DataChannel {
+  dataStream: Observable<string>;
+  abstract send(data: string);
+}
+```
+
+Later this abstract class could be implemented by `WebRTCDataChannel` and `WebSocketDataChannel`. Respectively, the `SinglePlayerGameComponent` can use the `WebSocketDataChannel` and `MultiPlayerGameComponent` can use the `WebRTCDataChannel`. But what about the `GameComponent`? `GameComponent` can depend only on `DataChannel`. This way, depending on the context we're using it in, the associated element injector can pass the correct implementation, configured by its parent component. We can take a look at how this looks in Angular, with the following snippet in pseudo code:
+
+```ts
+@Component({
+  selector: 'game-cmp',
+  template: '...'
+})
+class GameComponent {
+  constructor(private channel: DataChannel) { ... }
+  ...
+}
+
+@Component({
+  selector: 'single-player',
+  providers: [
+    { provide: DataChannel, useClass: WebSocketDataChannel }
+  ],
+  template: '<game-cmp></game-cmp>'
+})
+class SinglePlayerGameComponent { ... }
+
+
+@Component({
+  selector: 'multi-player',
+  providers: [
+    { provide: DataChannel, useClass: WebRTCDataChannel }
+  ],
+  template: '<game-cmp></game-cmp>'
+})
+class MultiPlayerGameComponent { ... }
+```
+
+In the example above we have the declaration of the `GameComponent`, `SinglePlayerGameComponent` and `MultiPlayerGameComponent`. `GameComponent` has a single dependency of type `DataChannel`. Later in `SinglePlayerGameComponent` we associate the class `WebSocketDataChannel` to the token of the dependency that `GameComponent` accepts`.
+
+What will happen behind the scene is shown on the image below:
+
+<img src="/images/react-di/element-injectors.png" alt="Element Injectors" style="display: block; margin: auto;">
+
+Both the element injectors of `SinglePlayerGameComponent` and `MultiPlayerGameComponent` will have as their parent injector some root injector, which is not interesting for our discussion. `SinglePlayerGameComponent` will register a provider which will associate the `DataChannel` token to the `WebSocketDataChannel` class. This provider, together with a provider for the `SinglePlayerGameComponent` component will be registered into the `single` injector from the diagram.
+On the other hand, in the `multi` injector from the diagram we will have registration of a provider for the `MultiPlayerGameComponent` and a provider which associates `DataChannel` to `WebRTCDataChannel`.
+
+Finally, we will have two `game` injectors. One in the context of the `SinglePlayerGameComponent` and one in the context of `MultiPlayerGameComponent`. When we require the `DataChannel` token from the `game` injector which as parent has the `single` injector, we'll get an instance of the `WebSocketDataChannel`. In case we require the `DataChannel` token from the `game` injector which as parent has the `multi` injector, we'll get `WebRTCDataChannel`.
+
+That's it!
+
+Now it's time to apply this knowledge into the context of React.
+
