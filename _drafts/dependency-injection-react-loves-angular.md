@@ -24,7 +24,7 @@ With the following post I'm not intending to imply that using Angular's DI in Re
 
 Finally, I'm not implying that the Angular's dependency injection is the only way we can write well designed code, or even that we need the object-oriented paradigm for that. We can write high-quality code in any paradigm and any framework, if we put enough effort in the design process.
 
-This is just a small experiment I did during my [rainy Saturday evening](https://www.wunderground.com/history/airport/KSFO/2017/1/21/DailyHistory.html?req_city=San+Francisco&req_state=CA&req_statename=California&reqdb.zip=94102&reqdb.magic=1&reqdb.wmo=99999).
+This is based on a small experiment I did during my [rainy Saturday evening](https://www.wunderground.com/history/airport/KSFO/2017/1/21/DailyHistory.html?req_city=San+Francisco&req_state=CA&req_statename=California&reqdb.zip=94102&reqdb.magic=1&reqdb.wmo=99999). The post is with **learning purpose only**. It can help you understand how the dependency injection mechanism of Angular works, end eventually, give you some insight into the React's internals.
 
 # Introduction to dependency injection
 
@@ -32,7 +32,7 @@ If you're already familiar with what dependency injection is and how it can be u
 
 Dependency injection (DI) is a powerful tool which brings a [lot of benefits](https://softwareengineering.stackexchange.com/questions/19203/what-are-the-benefits-of-using-dependency-injection-and-ioc-containers). For instance, DI helps with following the [Single Responsibility Principle (SRP)](https://en.wikipedia.org/wiki/Single_responsibility_principle), by not coupling given entity with the instantiation of its dependencies. [Open/Closed Principle](https://en.wikipedia.org/wiki/Open/closed_principle) is another place where DI rocks! We can make given class depend on an abstract interface and by configuring its injector pass different implementations. This helps us to keep our code close to changes. This looks quite similar to the dependency inversion principle which states that:
 
-> A. High-level modules should not depend on low-level modules. Both should depend on abstractions.
+> A. High-level modules should not depend on low-level modules. Both should depend on abstractions.<br>
 > B. Abstractions should not depend on details. Details should depend on abstractions.
 
 Although DI does not directly enforces it, it can predispose us to write code which follows the principle.
