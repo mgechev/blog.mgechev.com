@@ -18,6 +18,8 @@ Another great technology that I've used in the past is React. I don't want to co
 
 This blog post is related to a fun experiment I did recently - **use Angular's dependency injection mechanism in React**.
 
+<img src="/images/react-di/angular-in-react.png" alt="React DI" style="display: block; margin: auto;">
+
 ## Disclaimer
 
 With the following post I'm not implying that using Angular's DI in React is either a good or a bad idea, it completely depends on the style of programming which works best for you. The example here is not something I use in production, and I would not recommend you to do so because it is not well tested and directly modifies React's internals.
