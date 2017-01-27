@@ -204,3 +204,17 @@ That's it!
 
 Now it's time to apply this knowledge into the context of React.
 
+# Implementing DI in React
+
+We need to implement an Inversion of Control (IoC) for the instantiation of the components in our application. This means that an injector should be responsible for the instantiation of the individual building blocks of the user interface. The process will go as follows:
+
+- Each component will declare its dependencies just by specifying their type in its constructor, or by using the `@Inject` parameter decorator.
+- We'll create an injector for each component, and call it an element injector. This injector will be responsible for the instantiation of the corresponding component and instantiation of its dependencies (it may query its parent injector).
+- Each component may declare a set of providers which will be included into its associated element injector.
+- We will add a predefined set of providers for the properties that are positionally injected into any React component (for instance, props).
+- For each nested component we need to set as its parent injector, the injector of its closest parent.
+
+That's it! Now lets implement it.
+
+## Digging into the code
+
