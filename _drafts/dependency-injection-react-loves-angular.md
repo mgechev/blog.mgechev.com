@@ -216,5 +216,138 @@ We need to implement an Inversion of Control (IoC) for the instantiation of the 
 
 That's it! Now lets implement it.
 
-## Digging into the code
+## Declaring component's providers
 
+In order to declare the providers for given component we will use approach similar to the one used in Angular. Angular's components declare their providers as value of the `providers` property of the object literal passed to the `@Component` decorator:
+
+```ts
+@Component({
+  selector: 'foo-bar',
+  providers: [Provider1, Provider2, ..., ProviderN]
+})
+class Component {...}
+```
+
+We will declare a class decorator called `@ProviderConfig` which using the [ES6 Reflect API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect) associates the providers to the corresponding component.
+
+```ts
+export function ProviderConfig(config: any[]) {
+  return function (target: any) {
+    Reflect.set(target, 'providers', config);
+    return target;
+  };
+};
+```
+
+The decorator can be used as follows:
+
+```ts
+@ProviderConfig([ Provider1, Provider2, ..., ProviderN ])
+class Component extends React.Component {
+  ...
+}
+```
+
+## Creating element injectors
+
+The purpose of this section is to apply the points listed in the previous section with minimum amount of changes into the React's code. Furthermore, the modifications should be as isolated as possible in order to be possible to distribute them as separate module, which allows using React with [injection-js](https://github.com/mgechev/injection-js).
+
+Internally, React wraps our components, together with a bunch of other stuff, into `ReactElement`s. Later, it uses the individual `ReactElement`s in order to create the specific component instances.
+
+These two happen in the following files (we'll explore only `react-dom`, ignoring other platforms):
+
+- `react/lib/ReactElement.js` - contains the factory method used for instantiation of `ReactElement`s (`createElement`).
+- `react-dom/lib/ReactCompositeComponent.js` - contains the method used for construction of our components.
+
+Lets explore the modifications required in `ReactElement.js`:
+
+```javascript
+var ReactElement = function (type, key, ref, self, source, owner, props) {
+  var injector = null;
+  if (typeof type !== 'string') {
+    const metadataProviders = Reflect.get(type, 'providers') || [];
+    const providers = [
+      type, {
+        provide: 'props', useValue: props
+      }
+    ].concat(metadataProviders);
+    if (owner) {
+      injector = owner._currentElement.injector.resolveAndCreateChild(providers);
+    } else {
+      injector = ReflectiveInjector.resolveAndCreate(providers);
+    }
+  }
+  var element = {
+    injector: injector,
+    ...
+  };
+  ...
+```
+
+This is fork of React 15.4.2. The code above shows all the modifications that I had to do in order to create an injector for each component. Lets explore the snippet step by step.
+
+First, we declare an `injector` which by default as value which equals `null`. Later, we check the type of the value that the variable `type` holds. It references either to the class of a component extending `React.Component`, or has a value of type string (`div`, `span`, etc). We ignore all string values since we don't want to create injectors for primitive DOM elements. In case we're creating a `ReactElement` for a non-primitive component, we first try to get its associated list of providers attached by the `@ProviderConfig` using the [ES6 Reflect API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect). Later, we form the list of providers for the element by concatenating:
+
+- The providers which we got from the Reflect API.
+- The list of default providers - one for the component itself (`type` references the component class we want to instantiate), and provider for the component's props. In this case we do two compromises for simplicity:
+  - As token of the provider we use the string `"props"`. A better practice would be to use an instance of `OpaqueToken`.
+  - We don't register provider for `context` and `updateQueue`.
+
+The final step is to check if the component has an `owner`. In case it does, we use its injector and create a child injector with the list of providers we have. Otherwise, we use the injector of this component as the root injector.
+
+## Instantiating components
+
+Now comes the final part - instantiation of the components by using their injectors. Lets take a look at the modifications required in `react-dom/lib/ReactCompositeComponent.js`:
+
+```javascript
+_constructComponentWithoutOwner: function (doConstruct, publicProps, publicContext, updateQueue) {
+  var Component = this._currentElement.type;
+
+  if (doConstruct) {
+    if (process.env.NODE_ENV !== 'production') {
+      var self = this;
+      return measureLifeCyclePerf(function () {
+        return self._currentElement.injector.get(Component);
+      }, this._debugID, 'ctor');
+    } else {
+      return this._currentElement.injector.get(Component);
+    }
+  }
+  ...
+```
+
+In this code, we get a reference to the component's class by getting the value of `this._currentElement.type`. Later, we use the injector associated with the current element in order to instantiate the component.
+
+## Using React with DI
+
+Here's a quick demo which illustrates how we can use our React with DI:
+
+```ts
+import * as React from 'react';
+import {Inject} from 'injection-js';
+import {ProviderConfig} from '../providers';
+import {WebSocketService} from '../websocket.service';
+
+@ProviderConfig([ WebSocketService ])
+export default class HelloWorldComponent extends React.Component<any, any> {
+  constructor(ws: WebSocketService, @Inject('props') props: any) {
+    super(props);
+  }
+  
+  render(){
+    return <div></div>;
+  }
+}
+```
+
+There's one important difference between how we use components with DI enabled, compared to the traditional approach - the parameters that the target component accepts are not injected positionally but instead based on the order we declared the dependencies in.
+
+As we can see from the example above, `HelloWorldComponent` accepts two arguments, both of them are injected through the DI mechanism of [`injection-js`](https://github.com/mgechev/injection-js). In contrast to the original API, the order of the parameters completely depends on our annotations.
+
+# Conclusion
+
+In this experiment we saw how we can use the dependency injection mechanism of Angular in React. We explained what DI is and what benefits it brings. We also saw how we apply it in the context of the development of user interface by using element injectors.
+
+Right after that, we went through a possible implementation of the element injectors in React by directly modifying the library's source code. I don't pretend that the code uses the best possible approach. Probably, we were able to isolate the entire modifications to only `_constructComponentWithoutOwner`, or even override only a public method and achieve similar results. This is just a sample implementation which demonstrates the base implementation details.
+
+Although the idea seems interesting, and possibly applicable in real-world applications, the example for the article **is not production ready**. I'd appreciate your feedback and ideas in the comments section.
