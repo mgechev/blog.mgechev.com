@@ -18,7 +18,7 @@ Another great technology that I've used in the past is React. I don't want to co
 
 This blog post is related to a fun experiment I did recently - **implement Angular's dependency injection mechanism in React**.
 
-<img src="/images/react-di/angular-in-react.jpeg" alt="React DI" style="display: block; margin: auto;">
+<img src="/images/react-di/angular-in-react.png" alt="React DI" style="display: block; margin: auto;">
 
 ## Disclaimer
 
@@ -139,7 +139,7 @@ injector.get(Socket).size; // 42
 
 In AngularJS all the providers were stored into a flat structure. A big improvement in the dependency injection mechanism of Angular 2 and above, is that we can build a hierarchical structure of injectors. For instance, lets take a look at the image below:
 
-<img src="/images/react-di/injectors-hierarchy.jpeg" alt="Dependency Injection Hierarchy" style="display: block; margin: auto;">
+<img src="/images/react-di/injectors-hierarchy.png" alt="Dependency Injection Hierarchy" style="display: block; margin: auto;">
 
 We have a root injector called `House`, which is parent of the injectors `Bathroom`, `Kitchen` and `Garage`. `Garage` is parent of `Car` and `Storage`. If we require the dependency with token `tire`, for instance, from the injector `Storage`, `Storage` will try to find it in its set of registered providers. If it doesn't find it there, it'll look into `Garage`. If it is not there, `Garage` will look in `House`. In case `House` finds the dependency it will return it to `Garage` which will give it back to `Storage`.
 
@@ -201,7 +201,7 @@ In the example above we have the declaration of the `GameComponent`, `SinglePlay
 
 What will happen behind the scene is shown on the image below:
 
-<img src="/images/react-di/element-injectors.jpeg" alt="Element Injectors" style="display: block; margin: auto;">
+<img src="/images/react-di/element-injectors.png" alt="Element Injectors" style="display: block; margin: auto;">
 
 The element injectors of `SinglePlayerGameComponent` and `MultiPlayerGameComponent` will have a parent injector. For simplicity, lets suppose both have the same parent since this is not interesting for our discussion. `SinglePlayerGameComponent` will register a provider which will associate the `DataChannel` token with the `WebSocketDataChannel` class. This provider, together with a provider for the `SinglePlayerGameComponent` component will be registered into the injector shown on the diagram as `single` (Angular registers more providers in the element injectors but we can ignore them for simplicity).
 On the other hand, in the `multi` injector from the diagram we will have registration of a provider for the `MultiPlayerGameComponent` and a provider which associates `DataChannel` with `WebRTCDataChannel`.
