@@ -14,7 +14,7 @@ tags:
 
 Recently I've been blogging mostly about Angular and it's not by accident! Angular is an amazing framework, bringing a lot of innovation to the front-end technologies, with a great community behind it. In the same time, the projects that I'm working on have various of different requirements and sometimes I need to consider different options.
 
-Another great technology that I've used in the past is React. I don't want to compare it with Agular; I'm sure there are variety of cases when one of them fits better compared to the other and visa versa. I respect the philosophy of both Angular and React, and I love seeing how they move Web forward!
+Another great technology that I've used in the past is React. I don't want to compare it with Angular; I'm sure there are variety of cases when one of them fits better compared to the other and visa versa. I respect the philosophy of both Angular and React, and I love seeing how they move Web forward!
 
 This blog post is related to a fun experiment I did recently - **use Angular's dependency injection mechanism in React**.
 
@@ -110,7 +110,7 @@ There are two more details in the example above:
 1. What if we have name collision with another token called `buffer-size`?
 2. How do we declare that given class accepts the `BUFFER_SIZE` size as dependency if it's not a type?
 
-We can handle the first problem by usig `OpaqueToken`. This way our `BUFFER_SIZE` definition will be:
+We can handle the first problem by using `OpaqueToken`. This way our `BUFFER_SIZE` definition will be:
 
 ```ts
 const BUFFER_SIZE = new OpaqueToken('BufferSize');
@@ -118,7 +118,7 @@ const BUFFER_SIZE = new OpaqueToken('BufferSize');
 
 The instances of the class `OpaqueToken` are uniques values which are used by the DI mechanism of Angular to represent tokens in cases when we cannot use a type.
 
-For the second problem, we can require a dependency whoes token is not a type by using the `@Inject` parameter decorator of Angular/[`injection-js`](https://github.com/mgechev/injection-js):
+For the second problem, we can require a dependency whose token is not a type by using the `@Inject` parameter decorator of Angular/[`injection-js`](https://github.com/mgechev/injection-js):
 
 ```ts
 const BUFFER_SIZE = new OpaqueToken('BufferSize');
@@ -137,7 +137,7 @@ injector.get(Socket).size; // 42
 
 ## Hierarchy of injectors
 
-In AngularJS all the providers were storred into a flat structure. A big improvement in the dependency injection mechanism of Angular 2 and above, is that we can build a hierarchical structure of injectors. For instance, lets take a look at the image below:
+In AngularJS all the providers were stored into a flat structure. A big improvement in the dependency injection mechanism of Angular 2 and above, is that we can build a hierarchical structure of injectors. For instance, lets take a look at the image below:
 
 <img src="/images/react-di/injectors-hierarchy.png" alt="Dependency Injection Hierarchy" style="display: block; margin: auto;">
 
@@ -317,7 +317,7 @@ As next step we check if the element of the current component has an owner. If i
 
 Since we want the created injector to be available for child components, we keep it as an entry in the Reflect API.
 
-Finally, we instantiate the component by invoking the `get` method of the current injector with a reference to the component's clas as first argument.
+Finally, we instantiate the component by invoking the `get` method of the current injector with a reference to the component's class as first argument.
 
 **Note that this code manipulates React's internals and uses private properties, prefixed with `_`! I don't recommend it for production usage because it is not well tested, doesn't cover factory components and most likely won't work in future releases of React.**
 
@@ -354,3 +354,4 @@ In this experiment we saw how we can use the dependency injection mechanism of A
 Right after that, we went through a possible implementation of the element injectors in React by directly modifying the library's source code.
 
 Although the idea seems interesting, and possibly applicable in real-world applications, the example for the article **is not production ready**. I'd appreciate your feedback and ideas in the comments section below.
+
