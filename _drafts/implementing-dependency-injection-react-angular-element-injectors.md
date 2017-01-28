@@ -26,7 +26,7 @@ This blog post is related to a fun experiment I did recently - **implement Angul
 
 *Finally, I'm not implying that the Angular's dependency injection is the only approach we can apply to write well decoupled code, or even that we need the object-oriented paradigm for that. We can write high-quality code in any paradigm and any framework if we put enough effort in the design process.*
 
-*This post is based on a small experiment I did during my [rainy Sunday evening](https://www.wunderground.com/history/airport/KSFO/2017/1/22/DailyHistory.html?req_city=San+Francisco&req_state=CA&req_statename=California&reqdb.zip=94102&reqdb.magic=1&reqdb.wmo=99999). The post is with* **learning purpose only**. *It can* **help you understand how dependency injection can be used in the development of modern user interface** *, end eventually, give you some insight into the React's and Angular's internals.*
+*This post is based on a small experiment I did during my [rainy Sunday evening](https://www.wunderground.com/history/airport/KSFO/2017/1/22/DailyHistory.html?req_city=San+Francisco&req_state=CA&req_statename=California&reqdb.zip=94102&reqdb.magic=1&reqdb.wmo=99999). The post is with* **learning purpose only**. *It can* **help you understand how dependency injection can be used in the development of modern user interface***, end eventually, give you some insight into the React's and Angular's internals.*
 
 # Introduction to dependency injection
 
