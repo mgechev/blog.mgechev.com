@@ -1,5 +1,5 @@
 ---
-title: Using Angular's Dependency Injection in React. Understanding Element Injectors.
+title: Implementing Angular's Dependency Injection in React. Understanding Element Injectors.
 author: minko_gechev
 layout: post
 categories:
