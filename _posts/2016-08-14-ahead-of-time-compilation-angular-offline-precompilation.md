@@ -179,8 +179,10 @@ The factory functions above are only responsible for instantiation of the genera
 As I mentioned above, the `detectChangesInternal` contains VM friendly code. Let's take a look at the compiled version of the template:
 
 ```html
+{% raw %}
 <div>{{newName}}</div>
 <input type="text" [(ngModel)]="newName">
+{% endraw %}
 ```
 
 The `detectChangesInternal` method going to look something like:
@@ -217,6 +219,7 @@ Nothing unusual and terribly complicated so far.
 Maybe you've noticed that within the **internal component** we're accessing the property `this.context`. The `context` of the internal component is the instasnce of the component's controller itself. So for instance:
 
 ```javascript
+{% raw %}
 @Component({
   selector: 'hero-app',
   template: '<h1>{{ hero.name }}</h1>'
@@ -224,11 +227,13 @@ Maybe you've noticed that within the **internal component** we're accessing the 
 class HeroComponent {
   hero: Hero;
 }
+{% endraw %}
 ```
 
 ...`this.context` will equal to `new HeroComponent()`. This means that in `detectChangesInternal` we have to access `this.context.name`. Here comes a problem. **If we want to emit TypeScript as output of the AoT compilation process we must make sure we access only public fields in the templates of our components.** Why is that? As we already mentioned the compiler can generate both TypeScript and JavaScript. Since TypeScript has access modifiers, and enforces access only to public properties outside the inheritance chain, inside the internal component we cannot access any private properties part of the context object, so both:
 
 ```javascript
+{% raw %}
 @Component({
   selector: 'hero-app',
   template: '<h1>{{ hero.name }}</h1>'
@@ -236,11 +241,13 @@ class HeroComponent {
 class HeroComponent {
   private hero: Hero;
 }
+{% endraw %}
 ```
 
 ...and...
 
 ```javascript
+{% raw %}
 class Hero {
   private name: string;
 }
@@ -252,6 +259,7 @@ class Hero {
 class HeroComponent {
   hero: Hero;
 }
+{% endraw %}
 ```
 
 will throw a compile time error in the generated `*.ngfactory.ts`. In the first example the internal component cannot access `hero` since it's private within `HeroComponent`, and in the second case the internal component won't be able to access `hero.name`, since `name` is private inside `Hero`.
@@ -261,6 +269,7 @@ will throw a compile time error in the generated `*.ngfactory.ts`. In the first 
 Alright, we'll bind only to public properties and invoke only public methods inside of the templates but what happens with the component encapsulation? This may doesn't seem like a big problem at first, but imagine the following scenario:
 
 ```javascript
+{% raw %}
 // component.ts
 @Component({
   selector: 'third-party',
@@ -280,6 +289,7 @@ class ThirdPartyComponent {
     }
   }
 }
+{% endraw %}
 ```
 
 The component above has a single input - `name`. Inside of the `name` setter it calculates the value of the `_initials` property. We can use the component as follows:
@@ -295,6 +305,7 @@ The component above has a single input - `name`. Inside of the `name` setter it 
 Since in JiT mode, the Angular compiler generates JavaScript, this works perfect! Each time the value of the `name` expression changes and equals to truthy value, the `_initials` property will be recomputed. However, the implementation of `ThirdPartyComponent` is not AoT-friendly (to make sure you access only public/existing fields in your templates you can use [codelyzer](https://github.com/mgechev/codelyzer). If we want to do so we have to change it to:
 
 ```javascript
+{% raw %}
 // component.ts
 @Component({
   selector: 'third-party',
@@ -309,6 +320,7 @@ class ThirdPartyComponent {
   @Input()
   set name(name: string) {...}
 }
+{% endraw %}
 ```
 
 And thus something like this will be possible:
@@ -335,6 +347,7 @@ class Consumer {
 The answer of how to solve this issue is rooted in the [Angular's code](https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/common/testing/mock_location_strategy.ts#L26). In case we want to make our code AoT-friendly (i.e. bind only to public properties and methods in our templates), and in the same time keep encapsulation, we can use the TypeScript annotation `/** @internal */`:
 
 ```javascript
+{% raw %}
 // component.ts
 @Component({
   selector: 'third-party',
@@ -350,6 +363,7 @@ class ThirdPartyComponent {
   @Input()
   set name(name: string) {...}
 }
+{% endraw %}
 ```
 
 The `initials` property will be public but if we compile our third-party library with `tsc` and the `--stripInternal` and `--declarations` flags set, the `initials` property will be omitted from the type declarations file (e.g. `d.ts` file) for `ThirdPartyComponent`. This way we will be able to access it within the bounderies of our library but it won't be accessible by its consumers.
