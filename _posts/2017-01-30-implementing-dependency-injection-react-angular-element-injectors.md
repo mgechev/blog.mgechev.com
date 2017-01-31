@@ -16,7 +16,7 @@ Recently I've been blogging mostly about Angular and it's not by accident! Angul
 
 Another great technology that I've used in the past is React. I don't want to compare it with Angular; I'm sure there are variety of cases when one of them fits better compared to the other and visa versa. I respect the philosophy of both Angular and React, and I love seeing how they move Web forward!
 
-This blog post is related to a fun experiment I did recently - **implement Angular's dependency injection mechanism in React**.
+This blog post is related to a fun experiment I did recently - **implement Angular's dependency injection mechanism in React**. A demo which contains the fork of `react-dom`, could be found at [my GitHub account](https://github.com/mgechev/react-di-demo.git).
 
 <img src="/images/react-di/angular-in-react.png" alt="React DI" style="display: block; margin: auto;">
 
