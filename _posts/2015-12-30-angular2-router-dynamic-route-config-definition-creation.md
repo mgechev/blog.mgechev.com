@@ -70,6 +70,7 @@ Lets start by exploring the solution of the first problem:
 We can define a component called `AppNav` which receives a list of objects of the type `{ name: "Route name", path: ['/Route', 'Path'] }` and renders the navigation:
 
 ```ts
+{% raw %}
 @Component({
   selector: 'app-nav',
   directives: [ROUTER_DIRECTIVES],
@@ -86,6 +87,7 @@ export class AppNav {
   @Input()
   routes: string[];
 }
+{% endraw %}
 ```
 
 The component above has a single `@Input` called `routes` and uses the `ROUTER_DIRECTIVES` because of the `routerLink` directive. Once the `routes` property changes its template will be populated with the passed value.

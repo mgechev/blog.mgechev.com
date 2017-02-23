@@ -129,6 +129,7 @@ export class CustomFormComponent {...}
 ...with the following template:
 
 ```html
+{% raw %}
 <h1>Custom Stripe Form</h1>
 
 <form action="" method="POST" id="payment-form" (submit)="getToken()">
@@ -159,7 +160,7 @@ export class CustomFormComponent {...}
 
   <input type="submit" value="Submit Payment">
 </form>
-
+{% endraw %}
 ```
 
 Notice that in our form we bind to the properties `cardNumber`, `expiryMonth`, `expiryYear`, `cvc`. Once the user fills the form, she can click on the `Submit Payment` button and the method `getToken()` will be invoked. Notice that in order to use `[(ngModel)]` each input should have a name.

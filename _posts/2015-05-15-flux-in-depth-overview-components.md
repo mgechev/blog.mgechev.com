@@ -212,6 +212,7 @@ Once the chat button is pressed all opened dialogs should be closed and the chat
 Lets implement the `Dialog` component in ReactJS:
 
 ```javascript
+{% raw %}
 class Dialog extends React.Component {
   constructor() {
     this.state = {};
@@ -240,6 +241,7 @@ class Dialog extends React.Component {
     );
   }
 }
+{% endraw %}
 ```
 
 ...and we can use it like:
@@ -359,6 +361,7 @@ All our components are going to have access to a global mutable object and throu
 We can handle this issue by using the "flux way". We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:
 
 ```javascript
+{% raw %}
 class Dialog extends React.Component {
   render() {
     let classNames = 'dialog';
@@ -373,6 +376,7 @@ class Dialog extends React.Component {
     );
   }
 }
+{% endraw %}
 ```
 
 It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it's worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:
