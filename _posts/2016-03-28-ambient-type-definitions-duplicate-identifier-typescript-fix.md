@@ -53,7 +53,7 @@ bar.fly();
 If we try to compile the above file, the TypeScript compiler will throw the following error:
 
 ```
-$ tsc person-human.ts
+$ tsc person-hero.ts
 Property 'fly' does not exists on type 'Person'.
 ```
 In contrast, if we run the following file with JavaScript:
