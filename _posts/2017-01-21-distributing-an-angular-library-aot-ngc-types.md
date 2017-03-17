@@ -11,7 +11,7 @@ tags:
   - TypeScript
 ---
 
-In this post I'll quickly explain the minimum you need to know in order to publish an Angular component to npm. By the end of the post you'll know how your module to:
+In this post I'll quickly explain the minimum you need to know in order to publish an Angular component to npm. By the end of the post you'll know how your module can:
 
 - Be platform independent (i.e. run in Web Workers, Universal).
 - Should be bundled and distributed.
@@ -32,7 +32,7 @@ Along the way, I'll provide examples from a module I recently released called [`
 
 # Writing platform independent components
 
-One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which have to interact with the underlaying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the [dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)). In short, if you're building your library for the Web, you should not touch the DOM directly because this will make it unable to work in Web Workers and on the server and most developers need that!
+One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which have to interact with the underlying platform depend on an abstraction. This is the abstract `Renderer`. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the [dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)). In short, if you're building your library for the Web, you should not touch the DOM directly because this will make it unable to work in Web Workers and on the server and most developers need that!
 
 <img src="/images/ng-lib/decouple.jpg" alt="Decouple package" style="display: block; margin: auto">
 
@@ -387,7 +387,7 @@ In this section we'll wrap things up, by briefly mentioning each point you need 
 
 In this blog post we briefly explained the most important things you need to consider when it comes to distributing your Angular library.
 
-We explained how to keep the library decoupled from the underlaying platform. After that, we went to distributing our code in a way that it's tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular's Ahead-of-Time compiler.
+We explained how to keep the library decoupled from the underlying platform. After that, we went to distributing our code in a way that it's tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular's Ahead-of-Time compiler.
 
 Finally, we summarized all the practices in a short list which can serve you as a checklist.
 
