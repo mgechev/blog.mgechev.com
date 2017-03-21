@@ -26,7 +26,7 @@ For a while, I've been doing [static code analysis](http://blog.mgechev.com/2016
 
 This is how ended up developing [ngrev](https://github.com/mgechev/ngrev). [ngrev](https://github.com/mgechev/ngrev) is an Electron application which uses the tooling I built around codelyzer on top of the Angular compiler. In case your application is compatible with Angular's Ahead-of-Time compiler [ngast](https://github.com/mgechev/ngast) can parse your entire codebase and return an abstract representation of it. Later, [ngrev](https://github.com/mgechev/ngrev) will render this abstract representation onto the screen, letting you to navigate between the different levels of abstraction of your project.
 
-"A picture is worth a thousand words", right? Then a 40 seconds video running with 60 fps is worth is worth 2,400,000 words. Instead of keep talking about what [ngrev](https://github.com/mgechev/ngrev) is and how it works, you can just take a look at the video below:
+"A picture is worth a thousand words", right? Then a 49 seconds video running with 60 fps is worth 2,940,000 words. Instead of keep talking about what [ngrev](https://github.com/mgechev/ngrev) is and how it works, you can just take a look at the video below:
 
 ## Core Features
 
