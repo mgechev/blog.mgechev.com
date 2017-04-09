@@ -8,6 +8,7 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
+- ["Mad Science with the Angular Compiler"](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler), [video (en)](https://www.youtube.com/watch?v=tBV4IQwPssU), ng-conf (Salt Lake City, Utah, 5th of April, 2017)
 - ["Linting Angular"](https://speakerdeck.com/mgechev/linting-angular-1), Modern Web (Mountain View, California, 9th of March 2017)
 - ["Angular as Integrated Development Platform](https://speakerdeck.com/mgechev/angular-as-integrated-development-platform), Angular Sofia (Sofia, Bulgaria, 12th of January 2017)
 - ["Scalable Application Architecture"](https://speakerdeck.com/mgechev/scalable-application-architecture), ng-be (Ghent, Belgium, 9th of December 2016)
