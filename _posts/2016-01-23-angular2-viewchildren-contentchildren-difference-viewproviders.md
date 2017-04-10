@@ -62,7 +62,7 @@ In order to better illustrate the concepts we are going to explore, lets build a
     </section>
     <section>
       <h4 *ngIf="todos.getAll().length">Todo list</h4>
-      <todo *ngFor="let todo of todos.getAll()" [todo]="todo">
+      <todo-item *ngFor="let todo of todos.getAll()" [todo]="todo">
       </todo>
     </section>
     <ng-content select="app-footer"></ng-content>
