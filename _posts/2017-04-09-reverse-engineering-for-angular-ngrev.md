@@ -114,7 +114,7 @@ For further information you can take a look at my ng-conf talk "Mad Science with
 Or if you prefer to dug into the existing tools taking advantage of static analysis:
 
 - [angular-cli](https://github.com/angular/angular-cli)
-- [codelyer](http://codelyzer.com/)
+- [codelyzer](http://codelyzer.com/)
 - [ngmigrate](https://github.com/mgechev/ngmigrate)
 - [ngworld](https://github.com/mgechev/world)
 - [ngd](https://github.com/compodoc/ngd)
