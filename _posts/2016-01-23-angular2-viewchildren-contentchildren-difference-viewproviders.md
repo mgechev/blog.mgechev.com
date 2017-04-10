@@ -1,13 +1,13 @@
 ---
-title: ViewChildren and ContentChildren in Angular 2
+title: ViewChildren and ContentChildren in Angular
 author: minko_gechev
 layout: post
 categories:
   - JavaScript
-  - Angular 2
+  - Angular
 tags:
   - JavaScript
-  - Angular 2
+  - Angular
   - ViewChildren
   - ContentChildren
 ---
@@ -18,7 +18,7 @@ You can find the source code of the current article at my [GitHub account](https
 
 ## Composing primitives
 
-First of all, lets clarify the relation between the **component** and **directive** concepts in Angular 2. A typical design pattern for developing user interface is the [composite pattern](https://en.wikipedia.org/wiki/Composite_pattern). It allows us to compose different primitives and treat them the same way as a single instance. In the world of functional programming we can compose functions. For instance:
+First of all, lets clarify the relation between the **component** and **directive** concepts in Angular. A typical design pattern for developing user interface is the [composite pattern](https://en.wikipedia.org/wiki/Composite_pattern). It allows us to compose different primitives and treat them the same way as a single instance. In the world of functional programming we can compose functions. For instance:
 
 ```haskell
 map ((*2).(+1)) [1, 2, 3]
@@ -45,9 +45,9 @@ This means that using the preceding abstractions we can build structures of the 
 
 On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references to other directives.
 
-## Composition of Components in Angular 2
+## Composition of Components in Angular
 
-Now, in order to be more specific, lets switch to the context of Angular 2.
+Now, in order to be more specific, lets switch to the context of Angular.
 
 In order to better illustrate the concepts we are going to explore, lets build a simple application:
 
@@ -111,7 +111,7 @@ There are two more components which are not interesting for our discussion so we
 
 And yes, it was that easy! Now we are ready to define what the concepts of **view children** and **content children** are. **The children element which are located inside of its template of a component are called *view children* **. On the other hand, **elements which are used between the opening and closing tags of the host element of a given component are called *content children* **.
 
-This means that `todo-input` and `todo-item` could be considered view children of `todo-app`, and `app-footer` (if it is defined as Angular 2 component or directive) could be considered as a content child.
+This means that `todo-input` and `todo-item` could be considered view children of `todo-app`, and `app-footer` (if it is defined as Angular component or directive) could be considered as a content child.
 
 #### Accessing View and Content Children
 
@@ -119,7 +119,7 @@ Now comes the interesting part! Lets see how we can access and manipulate these 
 
 ##### Playing around with View Children
 
-Angular 2 provides the following property decorators in the `@angular/core` package: `@ViewChildren`, `@ViewChild`, `@ContentChildren` and `@ContentChild`. We can use them the following way:
+Angular provides the following property decorators in the `@angular/core` package: `@ViewChildren`, `@ViewChild`, `@ContentChildren` and `@ContentChild`. We can use them the following way:
 
 ```ts
 import {ViewChild, ViewChildren, Component, AfterViewInit...} from '@angular/core';
@@ -200,7 +200,7 @@ As we can see from above, the only two differences between accessing view childr
 
 #### `viewProviders` vs `providers`
 
-Alright! We're almost done with our journey! As final step lets see what the difference between `providers` and `viewProviders` is (if you're not familiar with the dependency injection mechanism of Angular 2, you can take a look at [my book](https://www.packtpub.com/web-development/switching-angular-2)).
+Alright! We're almost done with our journey! As final step lets see what the difference between `providers` and `viewProviders` is (if you're not familiar with the dependency injection mechanism of Angular, you can take a look at [my book](https://www.packtpub.com/web-development/switching-angular-2)).
 
 Lets peek at the declaration of the `TodoAppComponent`:
 
@@ -258,4 +258,4 @@ However, if you use `viewProviders`, the providers will not be accessible from t
 
 In this article we took a brief look at how we can compose components and directives. We also explained what the difference between content children and view children is, as well as, how we can access these two different kinds of children.
 
-As final step we explained the semantics between the `viewProviders` and `providers` properties of the `@Component` decorator. If you have further interest in the topic I recommend you the book I'm working on "[Switching to Angular 2](https://www.packtpub.com/web-development/switching-angular-2)".
+As final step we explained the semantics between the `viewProviders` and `providers` properties of the `@Component` decorator. If you have further interest in the topic I recommend you the book I'm working on "[Getting Started with Angular](https://www.packtpub.com/web-development/getting-started-angular-second-edition)".
