@@ -1,5 +1,5 @@
 ---
-title: Announcing ngrev - Reverse Engineering for Angular
+title: Announcing ngrev - Reverse Engineering Tool for Angular
 author: minko_gechev
 layout: post
 categories:
