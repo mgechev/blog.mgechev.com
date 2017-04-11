@@ -75,17 +75,21 @@ I'd love to chat about how to make this project even more useful! In the "About"
 2. Download the latest `.dmg` file.
 3. Install the application.
 
-## Windows & Linux
+## Linux
 
-The build currently does not produce binaries for Windows and Linux; [PRs are welcome](https://github.com/mgechev/ngrev/issues/4). In order to run the application you need to:
+1. Go to the [releases page](https://github.com/mgechev/ngrev/releases).
+2. Download the latest `.AppImage` file.
+3. Run the `.AppImage` file (you may need to `chmod +x .AppImage`).
 
-1. Clone the repo - `git clone https://github.com/mgechev/ngrev`.
-2. Install the npm dependencies - `cd ngrev && npm i`.
-3. Start the application - `npm start`.
+## Windows
+
+1. Go to the [releases page](https://github.com/mgechev/ngrev/releases).
+2. Download the latest `.exe` file.
+3. Install the application.
 
 ## Application Requirements
 
-In order to be graphically represented, your application needs to be compatible with the Angular's AoT compiler (i.e. you should be able to compile it with `ngc`).
+Your application needs to be compatible with the Angular's AoT compiler (i.e. you should be able to compile it with `ngc`).
 
 ## Using with Angular CLI
 
