@@ -120,6 +120,8 @@ On [ng-conf 2017 I announced ngrev](https://youtu.be/tBV4IQwPssU?t=13m11s). This
 
 <div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/sKdsxdeLWjM?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
+Under the hood, [ngrev](https://github.com/mgechev/ngrev) uses [ngast](https://github.com/mgechev/ngast). [ngast](https://github.com/mgechev/ngast) is a project which provides a simple interface for parsing Angular projects. By playing around with it, you can build custom tools which statically analyze Angular projects for different purposes (performance, security, etc). Internally, [ngast](https://github.com/mgechev/ngast) uses the Angular compiler, which automatically allows the most efficient and complete possible metadata collection.
+
 You can find ngrev [here](https://github.com/mgechev/ngrev) and its Windows, Linux & Mac binaries [here](https://github.com/mgechev/ngrev/releases). More about [ngrev here](http://blog.mgechev.com/2017/04/09/reverse-engineering-for-angular-ngrev/).
 
 # Conclusion
