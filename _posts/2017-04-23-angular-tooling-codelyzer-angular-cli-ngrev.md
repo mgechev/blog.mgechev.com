@@ -1,5 +1,5 @@
 ---
-title: 7 Angular Tools that You Should Consider
+title: 7 Angular Tools That You Should Consider
 author: minko_gechev
 layout: post
 categories:
