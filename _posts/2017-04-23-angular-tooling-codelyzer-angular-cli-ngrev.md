@@ -16,7 +16,7 @@ In this article we're going to quickly explore 7 Angular development tools which
 
 The software below can improve our productivity as developers by providing scaffolding, static code analysis, code generation, code visualization and debugging support!
 
-# Angular CLI
+# [Angular CLI](https://github.com/angular/angular-cli)
 
 Number one tool for Angular which provides well encapsulated build and scaffolding is [Angular CLI](https://github.com/angular/angular-cli).
 
@@ -30,7 +30,7 @@ In case you're just getting started with Angular, **you should start your projec
 
 Big thanks to the guys helping to make the CLI awesome, including (but not limited to) [Hans](https://twitter.com/hanslatwork), [Mike](https://twitter.com/Brocco) and [Filipe](https://twitter.com/filipematossilv). 👏
 
-# Language Service
+# [Language Service](https://github.com/angular/angular/tree/master/packages/language-service)
 
 Very common mistakes that developers using a dynamic language (such as JavaScript) do is to misspell a method or a property name. TypeScript already can warn us about this thanks to tsc and it's type system, however, this wasn't possible within the strings representing our components' templates. The language service of Angular provides the same type checking and auto completion, that we're used to from TypeScript, in inline and external templates!
 
@@ -44,7 +44,7 @@ More about the language service can be found in the ng-conf talk by Chuck Jazdze
 
 The language service can be found [here](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template).
 
-# Compodoc & ngd
+# [Compodoc & ngd](https://github.com/compodoc)
 
 Have you ever worked on an application where you had to automatically generate the API documentation? For JavaScript we have tools like [ESDoc](https://esdoc.org/) which take the JSDoc annotations and automatically generate documentation for us. The end result usually looks something like [this](https://mgechev.github.io/ngast/).
 
@@ -58,7 +58,7 @@ Behind the scene compodoc uses [ngd](https://github.com/compodoc/compodoc) for p
 
 The guys from the Angular community working on this awesome tool are [Vincent](https://twitter.com/vogloblinsky) and [Wassim](https://twitter.com/manekinekko).
 
-# codelyzer
+# [codelyzer](https://github.com/mgechev/codelyzer)
 
 More than a year ago I started codelyzer with the motivation to automatically verify that given project follows the official [Angular Style Guide](https://angular.io/styleguide). Initially the project started as a couple of rules on top of tslint which based on the [Angular Style Guide](https://angular.io/styleguide) were validating the selectors of our components, proper implementation of life-cycle hooks, etc.
 
@@ -80,7 +80,7 @@ Behind the scene, codelyzer performs either flat (per file) or deep (per project
 
 You can find instructions of how to use codelyzer [here](https://github.com/mgechev/codelyzer#how-to-use).
 
-# Snippets for Angular
+# [Snippets for Angular](https://github.com/johnpapa/vscode-angular-snippets)
 
 Are you tired of all the boilerplates when declaring a new Angular component, directive or a service? The process is manual, slow and with the tooling available nowadays, unnecessary!
 
@@ -98,7 +98,7 @@ Are you tired of all the boilerplates when declaring a new Angular component, di
 
 You can take advantage of the snippets by installing the VSCode extension available [here](https://marketplace.visualstudio.com/items?itemName=johnpapa.Angular2).
 
-# Augury
+# [Augury](https://github.com/rangle/augury)
 
 Debugging an Angular application may get tricky. How our UI gets rendered often depends on large amount of mutable state across components, directives, services, stateful pipes. Fortunately, inspecting the state does not have to be always related to setting break point or `debugger` statements within the bodies of the individual building blocks of our app. In order to explore the dependencies of given component or a service, we don't have to always dig into our codebase!
 
@@ -108,7 +108,7 @@ Augury is a Chrome extension which will plug into our Chrome DevTools. Once load
 
 You can install Augury [here](https://chrome.google.com/webstore/detail/augury/elgalmkoelokbchhkhacckoklkejnhcd).
 
-# ngrev
+# [ngrev](https://github.com/mgechev/ngrev)
 
 Augury allows us to efficiently debug our application by performing dynamic code analysis which requires us to run the application. This way we can inspect the structure and the behavior of a project.
 
