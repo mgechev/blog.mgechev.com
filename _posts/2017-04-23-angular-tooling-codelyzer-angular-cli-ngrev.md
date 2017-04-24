@@ -1,5 +1,5 @@
 ---
-title: 7 Angular Tools that You Should Use
+title: 7 Angular Tools that You Should Consider
 author: minko_gechev
 layout: post
 categories:
@@ -123,3 +123,9 @@ On [ng-conf 2017 I announced ngrev](https://youtu.be/tBV4IQwPssU?t=13m11s). This
 You can find ngrev [here](https://github.com/mgechev/ngrev) and its Windows, Linux & Mac binaries [here](https://github.com/mgechev/ngrev/releases).
 
 # Conclusion
+
+In this article we explored a couple of tools which can improve our development experience dramatically! Starting from project scaffolding with the Angular CLI, going through efficient development with the Angular Language Service and Angular Snippets, to dynamic and static code analysis for easy debugging and reverse engineering!
+
+Most of the projects we explored are developed by the Angular community which is a great sign for how convenient for tooling the framework is.
+
+Give these tools a try! I'd love to get your feedback on using them in the comments section below.
