@@ -84,8 +84,7 @@ We can define a component called `AppNav` which receives a list of objects of th
   `
 })
 export class AppNav {
-  @Input()
-  routes: string[];
+  @Input()  routes: string[];
 }
 {% endraw %}
 ```
