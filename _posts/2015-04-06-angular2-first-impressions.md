@@ -350,3 +350,4 @@ Should I use it in production now? **No**, but you can experiment with it. If yo
 - [Localization and internationalization](https://www.youtube.com/watch?v=iBBkCA1M-mc)
 - [angular2-seed](https://github.com/mgechev/angular2-seed)
 - [Flux architecture](https://facebook.github.io/flux/)
+- [Angular 2 Books](http://angular2books.com/)
