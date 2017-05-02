@@ -115,12 +115,11 @@ For further information you can take a look at my ng-conf talk "Mad Science with
 
 <div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/tBV4IQwPssU?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
-Or if you prefer to dug into the existing tools taking advantage of static analysis:
+Or if you prefer to dig into the existing tools taking advantage of static analysis:
 
 - [angular-cli](https://github.com/angular/angular-cli)
 - [codelyzer](http://codelyzer.com/)
 - [ngmigrate](https://github.com/mgechev/ngmigrate)
 - [ngworld](https://github.com/mgechev/world)
-- [ngd](https://github.com/compodoc/ngd)
 - [compodoc](https://github.com/compodoc/compodoc)
 
