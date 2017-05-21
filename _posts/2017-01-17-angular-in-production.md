@@ -314,7 +314,7 @@ We had a few more techniques in mind:
 
 - Lazy-loading and prefetching of bundles.
 - Service workers for caching/prefetching.
-- Using a "static app".
+- Using an interactive App Shell.
 
 ## Lazy-loading
 
@@ -372,19 +372,19 @@ Unfortunately, as you can see from the tree map above **our core bundle was stil
 
 This required us to load at least ~400K of JavaScript (core bundle + main/intro) before being able to hide the loading screen and the worst part of that was that we needed to load the two bundles sequentially.
 
-## Static app
+## Interactive App Shell
 
 In the intro screen of the product we have two pages of static content which explain to the parents what the application is all about. It is completely unnecessary to make the users wait until the assets of the application have been downloaded to let parents to read a few lines of text and decide if they want to sign-up or not.
 
-What we decided to do was to take the templates of the components which represent these static pages and move them to a separate application which is not managed by Angular. We inlined the templates and wrote some custom JavaScript code which understands the basic routing directives, in particular `routerLink`. This way we were able to reuse the templates across our "static app" and our Angular app.
+What we decided to do was to take the templates of the components which represent these static pages and move them to a separate application which is not managed by Angular. We inlined the templates and wrote some custom JavaScript code which understands the basic routing directives, in particular `routerLink`. This way we were able to reuse the templates across our "interactive App Shell" and our Angular app.
 
-Conceptually the "static app" sounds similar to an application shell with the difference that it is an executable application with static content. All the JavaScript, styles and templates for these static pages were 20K in total. This way **we decreased the initial load time for new users to about 5s on 2G network**.
+Conceptually the "interactive App Shell" sounds similar to an application shell with the difference that it is an executable application with static content. All the JavaScript, styles and templates for these static pages were 20K in total. This way **we decreased the initial load time for new users to about 5s on 2G network**.
 
-What we did was to initially download the application's styles together with the "static app". Once the static application gets rendered, in background we start prefetching the core and intro bundles. Once the bundles are ready and the user decides to continue, we just bootstrap the Angular application. In case the user is ready to register but the bundles are not yet downloaded, we show a loading indicator and ask the user to hold on for a second.
+What we did was to initially download the application's styles together with the "interactive App Shell". Once the static application gets rendered, in background we start prefetching the core and intro bundles. Once the bundles are ready and the user decides to continue, we just bootstrap the Angular application. In case the user is ready to register but the bundles are not yet downloaded, we show a loading indicator and ask the user to hold on for a second.
 
 In case the users are already logged in and don't go to the main screen directly, the script files are most likely already in the cache because users have previously used the app. This makes the application's load time instantaneous.
 
-The best thing about the "static app" is that it doesn't change often. This helped us to cache its JavaScript bundle not only in service worker's cache but also aggressively in the browser's cache.
+The best thing about the "interactive App Shell" is that it doesn't change often. This helped us to cache its JavaScript bundle not only in service worker's cache but also aggressively in the browser's cache.
 
 ## Ahead-of-Time compilation
 
@@ -398,7 +398,7 @@ As I mentioned above, once Angular RC5 was released, we migrated the application
 
 The first two points are quite self explanatory but the third point is the feature which has greatest impact over the user experience.
 
-When we use our "static app" approach we bootstrap the Angular application after the "static app" has been already rendered. This means that we perform JiT compilation after we already have something onto the screen.
+When we use our "interactive App Shell" approach we bootstrap the Angular application after the "interactive App Shell" has been already rendered. This means that we perform JiT compilation after we already have something onto the screen.
 
 The images below demonstrate the delayed Angular bootstrap. The gif on the right shows the delayed bootstrap with JiT compilation enabled and the gif on the left demonstrates what happens when we've compiled the application as part of the build process, i.e. AoT compilation:
 
