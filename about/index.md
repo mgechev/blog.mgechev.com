@@ -49,6 +49,7 @@ Some of the open source projects I've developed are:
 
 - [plainvm](http://plainvm.mgechev.com/)
 - [codelyzer - static code analyzer for Angular and TypeScript projects](http://codelyzer.com)
+- [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
 - [aspect.js - Library for aspect-oriented programming in JavaScript](https://github.com/mgechev/aspect.js)
 - [data-adapter - Micro library which allows declarative data transformation](https://github.com/mgechev/data-adapter)
 - [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
