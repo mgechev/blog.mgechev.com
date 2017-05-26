@@ -58,6 +58,7 @@ Some of the open source projects I've developed are:
 - [mk.js](https://github.com/mgechev/mk.js)
 - [DistrElang - a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [movement.js](https://github.com/mgechev/movement.js) [demo here](http://movement.mgechev.com)
+- [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
 
 [And many, many others...](https://github.com/mgechev)
 
