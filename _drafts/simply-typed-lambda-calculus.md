@@ -24,7 +24,7 @@ We will have two types:
 T ::= Int | Bool
 ```
 
-As you can see we don't ave a syntactical construct for declaring a function type (like we do in Haskell - `T -> T`, for instance). This is because we're going to apply basic type inference based on the type of the function's argument and body.
+As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 -> T2`, for instance). This is because we're going to apply basic type inference based on the type of the function's argument and body.
 
 Our programs should belong to the language declared by the following grammar:
 
@@ -41,7 +41,7 @@ t ::=
   num   # a natural number
 ```
 
-Where `num ∈ ℕ`.
+Where `num ∈ ℕ, num ≥ 0`.
 
 # Semantics
 
@@ -80,7 +80,7 @@ Lets explain the evaluation step by step:
 2. Define an anonymous function which accepts a single argument of type `Int`, called `f`, and returns another anonymous function.
 3. The second anonymous function has a single argument called `g` of type `Int`.
 4. Apply `0` to the innermost function, which as result is going to produce `0`.
-5. Pass `0` as argument to the outer function and we return `0` as result of the computation (the body of the outermost function is already equal to `0`).
+5. Pass `0` as argument to the outer function which will return `0` as result of the computation (the body of the outermost function evaluates to `0`).
 6. Increment `0` and get `1`.
 
 Formally, we can show the small-step semantics of our language in the following way:
@@ -93,7 +93,7 @@ TBD
 
 # Lexer and Parser
 
-Although the implementation of a lexer and parser for this tiny language will be quite simple, I decided to use PEG.js in order to generate them.
+Although the implementation of a lexer and parser for this tiny language will be quite simple, we're going to generate them using PEG.js.
 
 Here's the Peg grammar:
 
@@ -200,7 +200,7 @@ Application = l:ExprAbs r:Application* {
 };
 ```
 
-The function application `t t` from above can be expressed with the rule above using Peg.js. In general, we can have one expression or abstraction followed by 0 or more other applications.
+The function application `t t` from above can be expressed with this Peg rule. In general, we can have one expression or abstraction followed by 0 or more other applications.
 
 We name the left term `l` and the right one `r`, after that, in case of a match, we return an object (AST node) with type `abstraction`, `left` and `right` branches.
 
