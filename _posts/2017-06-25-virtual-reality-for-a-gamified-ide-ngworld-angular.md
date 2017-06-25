@@ -221,6 +221,7 @@ The last step is the code generation. Given that we'll use [aframe](https://afra
 Let's take a look at the tree template, to get a better idea:
 
 ```typescript
+{% raw %}
 const TreeTemplate = `
 <a-entity id="{{id}}" geometry="primitive: box; depth: 0.1; height: {{height}}; width: 0.2" position="{{x}} {{y}} {{z}}" rotation="0 30 0" material="shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4" data-template-url="{{{templateUrl}}}">
   <a-entity static-body="" geometry="primitive: box; depth: 0.1; height: {{height}}; width: 0.2" position="-0.1 0 0" rotation="2 60 0" material="shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4"></a-entity>
@@ -248,6 +249,7 @@ const TreeTemplate = `
   </a-animation>¬
 </a-entity>
 `;
+{% endraw %}
 ```
 
 This is a standard [aframe](https://aframe.io) template where we have an entity with identifier. Inside of it we have declaration of three animations and also placeholder for the leaves. The animations are related to the tree-shaking simulation. The properties of the object that this template accepts, can be represented by the following interface:
@@ -268,6 +270,7 @@ interface TreeProperties {
 Notice that inside of the `TreeProperties` interface we have declaration of `templateUrl`. Now lets take a look at the leaf template and properties interface:
 
 ```typescript
+{% raw %}
 interface LeafProperties {
   color: string;
   x: number;
@@ -303,6 +306,7 @@ const LeafTemplate = `
   </a-animation>¬
 </a-entity>
 `;
+{% endraw %}
 ```
 
 There are three interesting properties that we need to consider:
