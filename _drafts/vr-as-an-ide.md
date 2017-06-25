@@ -50,6 +50,8 @@ Researching the topic further, I found that there was a published paper from the
 
 ## Conclusions
 
+TBD
+
 ## Sample Implementation
 
 Since looking in the code is always fun, in this section I'll briefly describe the implementation of the demo.
@@ -335,4 +337,10 @@ app.post('/', (request, response) => {
 Of course, we can start planting trees and creating gardens in order to turn this demo into a more complete "IDE". Another place for improvement is to drop all child leaves once a parent leaf has been shaken.
 
 There's place for a lot of improvement, however, I'm not sure if such a demo project will provide enough value to worth this investment.
+
+TBD
+
+# Conclusion
+
+TBD
 
