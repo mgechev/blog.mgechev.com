@@ -20,7 +20,7 @@ Since I heard a lot of people being interested in the actual implementation of t
 
 # VR as a gamified IDE
 
-...If you're interested in the actual implementation, you can skip to the ["Sample Implementation" section](#Sample-Implementation).
+This section leaves more questions than answers. In the next a couple of subsections I discuss the idea of abstracting manual software engineering tasks as games, and releasing them on the global market. If you're interested in the actual implementation of [ngworld tool](https://github.com/mgechev/ngworld), skip to the ["Sample Implementation" section](#Sample-Implementation).
 
 ## Background
 
@@ -73,11 +73,11 @@ Although the demo project demonstrated in this blog post doesn't have the potent
 
 # Sample Implementation
 
-Since looking in the code is always fun, in this section I'll briefly describe the implementation of the demo project. Its [source code is hosted on GitHub](https://github.com/mgechev/ngworld).
+Since looking in the code is always fun, in this section I'll briefly describe the implementation of the demo project. Its [source code is hosted on GitHub](https://github.com/mgechev/ngworld). Working demo can be found in the [end of the post](#demo) or [here](https://mgechev.github.io/ngworld)
 
-### Parsing
+## Parsing
 
-The initial part of the implementation of every compiler is its frontend. We can the phases of lexical analysis and syntax analysis for free from [ngast](https://github.com/mgechev/ngast), which delegates them to [tsc](https://github.com/Microsoft/TypeScript) and the [Angular compiler](LINK).
+The initial part of the implementation of every compiler is its frontend. We get the phases of lexical analysis and syntax analysis for free from [ngast](https://github.com/mgechev/ngast), which delegates some of the work to [ngc](https://github.com/angular/angular) and the [tsc](https://github.com/Microsoft/TypeScript).
 
 Parsing the entire project with [ngast](https://github.com/mgechev/ngast) is as simple as this:
 
@@ -89,16 +89,19 @@ export const parse = (projectPath: string) => {
       new Promise((resolve, reject) =>
         readFile(path, (error, content) => error ? reject(error) : resolve(content.toString())))
   }, (error: string, path: string) => console.error(error, path));
-
   return formatContext(project);
 };
 ```
 
-### Transforms
+All we need to do is to create a new instance of the `ProjectSymbols` class by providing a TypeScript program, a host (`ResourceResolver`) and a logger to its constructor.
 
-After we have the symbols of our project, we want to extract the ASTs of the templates of the components into the same object structure and transform it to a form convenient for code generation.
+In the end of the `parse` method we transform the project with the function `formatContext`.
 
-Here are the signatures of the methods used for this phase and the interfaces of their output:
+## Transforms
+
+After we have the symbols of the project, we need to extract the ASTs of the templates of the components and transform it to a form convenient for code generation.
+
+Here are the signatures of the methods used for the phase of AST transformation, and the interfaces of their output:
 
 ```typescript
 export interface Module {
@@ -138,13 +141,13 @@ const formatComponents = (directives: DirectiveSymbol[]) => {...};
 - `formatComponents` will transform the internal `DirectiveSymbol`s to object suitable for generation of "trees".
 - `transformTemplateAst` is used for transformation of the directive's `TemplateAst`s.
 
-The implementations of these methods are straightforward, so we don't have to go into any details, however, if you're interested them, you can see the transformers [here](LINK).
+The implementations of these methods are straightforward, so we don't have to go into any details, however, if you're interested them, you can see the transformers [here](https://github.com/mgechev/ngworld/blob/master/parser/formatters.ts#L29-L76).
 
-### Layout
+## Layout
 
-For our "special compiler", we need to provide the phase of computing the layout. We'll have a basic VR world where everything is known ahead of time and nothing is being generated lazily.
+For our compiler, we need to implement one more AST transformation phase, which put into the context of ngworld is just computation of the layout of the virtual world. For simplicity in our VR everything will be known ahead of time and nothing will be generated lazily.
 
-Here are the method declarations:
+Here are the methods declarations and the interfaces of their outputs:
 
 ```typescript
 ...
@@ -207,13 +210,13 @@ const getGardensLayout = (modules: Module[]): GardenLayout[] => {...};
 export const createWorldLayout = (modules: Module[]): WorldLayout => {...};
 ```
 
-In the snippet above we calculate the layout for the first tree of the first module, after that the second one, etc, until we calculate the layout for all the trees for the module. Since now we have the size of the module itself (based on the layouts of the nested components), we can calculate the garden's layout.
+In the snippet above we calculate the layout for the first tree of the first module, after that the second one, etc, until we calculate the layout for all the trees for the garden (module). Since at this point we already know the location of all the trees in given garden, we can just surround them with a fence which is the garden's layout.
 
 When we've calculated the layout of each individual garden, we can calculate the layout of the entire world.
 
-### Code Generation
+## Code Generation
 
-The last step is code generation. Given that we'll use [aframe](LINK), this is going to be a straightforward process. We can represent the leaves, trees and gardes as a mustache templates. Later, based on our calculations in the layout phase, we can compile the templates and fill the variables corresponding to colors, positioning, labeling, etc.
+The last step is the code generation. Given that we'll use [aframe](https://aframe.io/), this is going to be a straightforward process. We can represent the leaves, trees and gardens as a mustache templates. Later, based on our calculations in the layout phase, we can render the templates and fill the placeholders corresponding to colors, positioning, labeling, etc.
 
 Let's take a look at the tree template, to get a better idea:
 
@@ -247,7 +250,7 @@ const TreeTemplate = `
 `;
 ```
 
-This is a standard [aframe](LINK) template where we have an entity with identifier. Inside of it we have declaration of three animations and also placeholder for the leaves. The animations are related to the tree-shaking simulation. The properties of the object that this template accepts, can be represented by the following interface:
+This is a standard [aframe](https://aframe.io) template where we have an entity with identifier. Inside of it we have declaration of three animations and also placeholder for the leaves. The animations are related to the tree-shaking simulation. The properties of the object that this template accepts, can be represented by the following interface:
 
 ```typescript
 interface TreeProperties {
@@ -262,7 +265,7 @@ interface TreeProperties {
 }
 ```
 
-We can see that inside of the `TreeProperties` interface we have declaration of `templateUrl`. Now lets take a look at the leaf template and properties interface:
+Notice that inside of the `TreeProperties` interface we have declaration of `templateUrl`. Now lets take a look at the leaf template and properties interface:
 
 ```typescript
 interface LeafProperties {
@@ -302,15 +305,15 @@ const LeafTemplate = `
 `;
 ```
 
-There are three interesting properties:
+There are three interesting properties that we need to consider:
 
 - `treeId` - identifier of the tree this leaf is attached to.
-- `startOffset` - the start offset of the template element represented by this leaf.
-- `endOffset` - the end offset of the template element represented by this leaf.
+- `startOffset` - the start offset of the template element represented by this leaf. This is the start position of the opening tag of the element in the string representing the component's template.
+- `endOffset` - the end offset of the template element represented by this leaf. This is the end position of the closing tag of the element in the string representing the component's template.
 
-This is the metadata required for removal of template elements by "shaking the tree".
+This is all the metadata required for removal of template elements by "shaking the tree".
 
-### Tree-Shaking
+## Tree-Shaking
 
 When we shake the tree, we activate the following invocation:
 
@@ -328,9 +331,9 @@ fetch('http://localhost:8081', {
 });
 ```
 
-All it does is to send a post request to a Web server listening on port `8081`. All the server needs to do, is to remove the element corresponding to the given offset.
+All it does is to send a post request to an HTTP application server listening on port `8081`. All the server needs to do, is to remove the element corresponding to the given offset.
 
-However, notice that if we remove an element, the offsets of all the elements following it in the template, will require update. This will involve more complex communication protocol between the VR and the application server. Because of that, the demo application simply replaces all the different characters from the element with whitespace.
+However, notice that if we remove an element, the offsets of all the elements following it in the template, will require an update. This will involve more complex communication protocol between the VR UI and the application server. Because of that, the demo simply replaces all the different characters from the element with whitespace.
 
 ### Server
 
@@ -357,11 +360,7 @@ Of course, we can start planting trees and creating gardens in order to turn thi
 
 There's place for a lot of improvement, however, I'm not sure if such a demo project will provide enough value to worth this investment.
 
-TBD
-
-# Conclusion
-
-TBD
+# External resources
 
 1. <a href="http://www.skepticblog.org/2011/09/19/gamers-succeed-where-scientists-fail/" id="foldit">Gamers succeed where scientists fail</a>
 2. <a href="https://www.polygon.com/2017/3/31/15125824/games-companies-outsourcing" id="outsourcing">Games companies turn to outsourcers for low-cost workers</a>
