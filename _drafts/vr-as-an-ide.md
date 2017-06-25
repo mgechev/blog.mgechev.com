@@ -1,5 +1,5 @@
 ---
-title: VR as an IDE
+title: VR as gamified IDE
 author: minko_gechev
 layout: post
 categories:
@@ -14,19 +14,19 @@ tags:
   - IDE
 ---
 
-In the first part of this blog post I've discussed the idea for using virtual reality for gamification of manual tasks in the software development process. I describe a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. The initial presentation of the demo project was on [ngconf 2017](https://ng-conf.org/), and its extension on [AngularUP 2017](http://angular-up.com/) during my talks "Mad Science with the Angular Compiler"
+In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on [ngconf 2017](https://www.youtube.com/watch?v=tBV4IQwPssU), and the project's extension I presented on [AngularUP 2017](http://angular-up.com/) during my talks "[Mad Science with the Angular Compiler](https://www.youtube.com/watch?v=tBV4IQwPssU)".
 
-The second part of the post describes a simple implementation of the VR-based source code manipulator.
+Since I heard a lot of people being interested in the actual implementation of the demo, in the second part of the post we'll go through its source code, which is [hosted here, on GitHub](https://github.com/mgechev/ngworld). You can find demo of the project in the [last part of the blog post](#demo).
 
 ## Background
 
-The purpose of my "Mad Science with the Angular Compiler" talk is to demonstrate how the Angular's metadata collector and ASTs produced by the frontend of the TypeScript compiler, Angular template, expression and CSS parsers, can be used for source code analysis and visualization.
+The purpose of my "[Mad Science with the Angular Compiler](https://www.youtube.com/watch?v=tBV4IQwPssU)" talk is to demonstrate what doors the Angular compiler opens by providing us an access to the ASTs produced by the frontend of the TypeScript compiler, Angular template, expression and CSS parsers. In the talk I explain how the compiler can be used for:
 
-A few months ago, I created a wrapper around the Angular compiler, which provides higher-level API that by an entry point of a project (`tsconfig.json`), collects the metadata for all the components, pipes and providers. I called this library [ngast](https://github.com/mgechev/ngast), because on top of the metadata collection it also returns the ASTs of components' templates, styles, as well as the TypeScript AST nodes, corresponding to the individual symbols.
+- Proving that our code aligns to style-related recommendations listed in the [Angular style guide](https://angular.io/styleguide) (see [codelyzer](http://codelyzer.com))
+- Simplification of the migration process, by providing pluggable AST transformation rules, depending on the deprecations and the breaking changes introduced by the framework.
+- [Tool for reverse engineering](https://github.com/mgechev/ngrev) of Angular applications through source code visualization.
 
-Based on [ngast](https://github.com/mgechev/ngast), I created a tool for reverse engineering of Angular applications called [ngrev](https://github.com/mgechev/ngrev). An Electron application which provides different views to the project, sorted by abstraction level.
-
-[ngrev](https://github.com/mgechev/ngrev) is already useful, however, I wanted to go one step further and provide a more fun demo. That's why for [ngconf](https://ng-conf.org/), I developed an unconventional compiler which from an Angular application produces a WebVR, build with [aframe](https://aframe.org). The VR is produced by the following rules:
+[ngrev](https://github.com/mgechev/ngrev) is already useful, however, I wanted to go one step further and provide a more fun demo. That's why for [ngconf](https://ng-conf.org/), I developed an "unconventional compiler" which from an Angular application produces a Minecraft-like WebVR. The VR is produced by the following rules:
 
 - The virtual world corresponds to the entire application, composed by the Angular modules.
 - Each module is represented by a "garden".
@@ -36,21 +36,31 @@ Based on [ngast](https://github.com/mgechev/ngast), I created a tool for reverse
 
 ## Open questions
 
-While I was building this demo, I had three questions:
+While I was building this demo, I was thinking about the following three questions:
 
-- Can we make the visualization interactive and propagate changes in the virtual world to the application's source code?
+- Can we make the visualization more interactive and propagate mutations happening in the virtual world to the application's source code?
 - Can we use VR for meaningful source code visualization? Obviously, although fun, the demo application doesn't provide a lot of value.
 - Can we solve real-life problems this way?
 
-Since tree-shaking is a [big thing in the JavaScript world](LINK), and I already had the trees, for [AngularUP](https://angularup.com/) I introduced the shaking part. In order to make it more memorable, I created a lightweight server which accepts commands from the virtual reality and modifies the source code. For the purpose of the demo, we can tree-shake a tree and drop its leaves, one by one.
+Since tree-shaking is a [big thing in the JavaScript world](https://webpack.js.org/guides/tree-shaking/), and I already had the trees, for [AngularUP](http://angular-up.com/) I introduced the shaking part. In order to make it more memorable, I created a lightweight server which accepts commands from the virtual reality and modifies the source code. For the purpose of the demo, we can tree-shake a tree and drop its leaves, one by one.
 
-After one of the Angular SF meetups, I had a chat with [Shawn](LINK) who told me that after watching my talk on ngconf, he thought about extending the demo and building a Minecraft-like IDE where one can plant trees (i.e. create components), create gardens (add modules), etc. Abstractly thinking, this can be considered as gamification of parts of the software development process. After chatting with Shawn I found that through gamification, in a week, was solved an NP-complete protein folding problem <a href=""><sup>[1]</sup></a>. Although the software development process involves some creativity and cannot be completely automated, at this point, there are manual talks which do not. Is it possible to extract them and put them into a gamified environment.
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/uwBo201Dd8A?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
-Researching the topic further, I found that there was a published paper from the University of Michigan, related to visualization of object-oriented source code in the three dimensional space <a href=""><sup>[2]</sup></a>, and there's a startup working in this area <a href=""><sup>[2]</sup></a>.
+After one of the Angular SF meetups, I had a chat with [Shawn Stedman](https://twitter.com/pxwise) who told me that after watching my talk on ngconf, he thought about extending the demo and building a Minecraft-based IDE where one can plant trees (i.e. create components), create gardens (add modules), etc. Abstractly thinking, this can be considered as gamification of parts of the software development process.
+
+It turns out that gamifying the software development process is a [broadly](https://dl.acm.org/citation.cfm?id=2494589) [researched](http://www.sciencedirect.com/science/article/pii/S0950584914001980) [topic](https://scholar.google.com/scholar?q=gamification+software+development&hl=bg&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0ahUKEwjs4IvR6tjUAhUCNhoKHfLHCbwQgQMIIjAA).
+
+Gamifying the software development process looks like an interesting opportunity, however, it still requires the full engagement of very expensive asset - software engineers. In our daily work environment, as engineers we don't always have to solve exciting, challenging problems which take advantage of our full potential. Such tasks can be outsourced to people with lower expertise, even without engineering background.
+
+This is where it gets interesting. Imagine if we're able to isolate the manual, boring tasks that we need to perform every single day and present them into the form of a game released on the global market. This way hundreds of thousands of people, can solve the manual problems while consuming these games.
+
+Looking at this from slightly different perspective, it turns out that scientists already use similar technic for using gamers as computational units for solving NP-complete protein folding problems <a href="#foldit"><sup>[1]</sup></a> <a href="#outsourcing"><sup>[2]</sup></a> <a href="#hope-college"><sup>[3]</sup></a>.
+
+Meanwhile, I found that there is already research in this direction in a paper a published by the University of Memphis, related to visualization of object-oriented source code in the three dimensional space <a href="#memphis"><sup>[4]</sup></a>. In AltspaceVR experimented in moving the IDEs in a less abstracted way to virtual reality <a href="#ide-vr"><sup>[5]</sup></a>.
 
 ## Conclusions
 
-TBD
+Virtual Reality opens an entire new world of visualization which we will most likely take advantage of as part of our development process. The question that this blog post opens is to what extent we can abstract the manual tasks in th
 
 ## Sample Implementation
 
@@ -344,3 +354,13 @@ TBD
 
 TBD
 
+- [1] <a href="http://www.skepticblog.org/2011/09/19/gamers-succeed-where-scientists-fail/" id="foldit">Gamers succeed where scientists fail</a>
+- [2] <a href="https://www.polygon.com/2017/3/31/15125824/games-companies-outsourcing" id="outsourcing">Games companies turn to outsourcers for low-cost workers</a>
+- [3] <a href="http://meaningfulplay.msu.edu/proceedings2010/mp2010_paper_16.pdf" id="hope-college">Online Games as Social-Computational Systems for Solving NP-complete Problems</a>
+- [4] <a href="https://pdfs.semanticscholar.org/d574/88e55b326d95ba605dd1e7197555cbe039e1.pdf" id="memphis">Visualizing Software in an Immersive Virtual Reality Environment</a>
+- [5] <a href="http://cognitivevr.co/blog/programming-in-virtual-reality/" id="ide-fr">http://cognitivevr.co/blog/programming-in-virtual-reality/</a>
+
+
+<h2 id="demo">Demo</h2>
+
+<iframe src="https://mgechev.github.io/ngworld/" style="border: none; width: 100%; height: 600px;"></iframe>
