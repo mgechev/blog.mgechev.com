@@ -14,7 +14,7 @@ tags:
   - IDE
 ---
 
-In the first part of this blog post I've discussed the idea for using virtual reality for gamification of manual tasks in the software development process. I describe a demo project which allows source code visualization and manipulation in a generated virtual reality. The initial presentation of the demo project was on [ngconf 2017](https://ng-conf.org/), and its extension on [AngularUP 2017](https://angularup.com/) during my talk "Mad Science with the Angular Compiler"
+In the first part of this blog post I've discussed the idea for using virtual reality for gamification of manual tasks in the software development process. I describe a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. The initial presentation of the demo project was on [ngconf 2017](https://ng-conf.org/), and its extension on [AngularUP 2017](http://angular-up.com/) during my talks "Mad Science with the Angular Compiler"
 
 The second part of the post describes a simple implementation of the VR-based source code manipulator.
 
