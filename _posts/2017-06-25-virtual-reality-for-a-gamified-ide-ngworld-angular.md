@@ -1,5 +1,5 @@
 ---
-title: VR as gamified IDE
+title: VR for a Gamified IDE
 author: minko_gechev
 layout: post
 categories:
