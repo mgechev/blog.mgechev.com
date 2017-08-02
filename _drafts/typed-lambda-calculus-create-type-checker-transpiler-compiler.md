@@ -85,19 +85,6 @@ Lets explain the evaluation step by step:
 
 Formally, we can show the small-step semantics of our language in the following way:
 
-```
-t ::=
-  x   # variable
-  λ x: T → t   # abstraction
-  t t   # application
-  true   # true literal
-  false   # false literal
-  if t then t else t   # conditional expression
-  succ t   # returns the next natural number when applied to `t`
-  prev t   # returns the previous natural number when applied to `t`
-  num   # a natural number
-```
-
 ## Small-step semantics
 
 In this section I'll show the [small-step semantics](https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics) of the language.
@@ -107,11 +94,12 @@ Lets suppose `σ` is the current state of our program, which keeps what value ea
 ### Variables
 
 ```
+1)
 ────────────────
 (x, σ) -> σ(x)
 ```
 
-This simply means that for variable `x` we return its value kept in the state `σ`.
+1) simply means that for variable `x` we return its value kept in the state `σ`.
 
 ### Built-in functions
 
@@ -144,6 +132,7 @@ pred t1 -> pred t2
 If the condition of the conditional expression is `true` then we return the expression from the `then` part, otherwise, we return the one from the `else` part.
 
 ```
+1)
 if true then t2 else t3 -> t1
 if false then t2 else t3 -> t3
 ```
@@ -151,17 +140,50 @@ if false then t2 else t3 -> t3
 If given expression `t1` evaluates to `t*` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression equals to the evaluation of the conditional expression with `t*` passed as condition.
 
 ```
+2)
                    t1 -> t*
 ───────────────────────────────────────────────
 if t1 then t2 else t3 -> if t* then t2 else t3
 ```
 
-### Abstraction
+### Abstraction & Application
 
+In this section we'll explain the function evaluation.
 
-### Application
+```
+1)
+(λ x: T → t1) v2 -> { x -> v2 } t1
+
+2)
+    t1 -> t*
+────────────────
+ t1 t2 -> t* t2
+
+3)
+    t2 -> t*
+────────────────
+ v1 t2 -> t1 t*
+```
+
+1) means that if we have the abstraction `(λ x: T → t1)`, where `T` is the type of `x`, and apply it to `v2`, we need to substitute all the occurrences of `x` in `t1` with `v2`.
+
+In 2) if `t1` evaluates to `t*`, `t1 t2` evaluates to `t*` applied to `t2`.
+
+The semantics of 3) is that if `t2` evaluates to `t*`, `v1 t2` evaluates to `t1` applied to `t*`.
 
 # Type Relations
+
+Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
+
+```
+if 1 then true else 2
+```
+
+The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Anther problem with the expression is that the result of both branches of the expression should return result of the same time but this is not the case in our example.
+
+In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs in our program and **as part of the compilation process**, verify if some properties of the program are hold or not.
+
+Notice that **type checking will be performed compile-time**. The alternative is to provide runtime type checking, which will not prevent us from launching/writing invalid programs.
 
 TBD
 
