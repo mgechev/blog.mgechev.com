@@ -24,7 +24,7 @@ We will have two types:
 T ::= Int | Bool
 ```
 
-As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 -> T2`, for instance). This is because we're going to apply basic type inference based on the type of the function's argument and body.
+As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 -> T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
 
 Our programs should belong to the language declared by the following grammar:
 
@@ -41,7 +41,7 @@ t ::=
   num   # a natural number
 ```
 
-Where `num ∈ ℕ, num ≥ 0`.
+Where `num ∈ ℕ, num ≥ 0`. Note that there's no syntax construct for expressing negative numbers in our language. In order to be consistent the result of `pred 0` will return `0`.
 
 # Semantics
 
@@ -79,13 +79,87 @@ Lets explain the evaluation step by step:
 1. Apply the `succ` predefined function to the result of the evaluation of the code within the parenthesis. The semantics of this code is:
 2. Define an anonymous function which accepts a single argument of type `Int`, called `f`, and returns another anonymous function.
 3. The second anonymous function has a single argument called `g` of type `Int`.
-4. Apply `0` to the innermost function, which as result is going to produce `0`.
+4. Apply the innermost function to `0`, which as result is going to produce `0`.
 5. Pass `0` as argument to the outer function which will return `0` as result of the computation (the body of the outermost function evaluates to `0`).
 6. Increment `0` and get `1`.
 
 Formally, we can show the small-step semantics of our language in the following way:
 
-TBD
+```
+t ::=
+  x   # variable
+  λ x: T → t   # abstraction
+  t t   # application
+  true   # true literal
+  false   # false literal
+  if t then t else t   # conditional expression
+  succ t   # returns the next natural number when applied to `t`
+  prev t   # returns the previous natural number when applied to `t`
+  num   # a natural number
+```
+
+## Small-step semantics
+
+In this section I'll show the [small-step semantics](https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics) of the language.
+
+Lets suppose `σ` is the current state of our program, which keeps what value each individual variable has.
+
+### Variables
+
+```
+────────────────
+(x, σ) -> σ(x)
+```
+
+This simply means that for variable `x` we return its value kept in the state `σ`.
+
+### Built-in functions
+
+The built-in functions here are `succ` and `pred`. Here's their small-step semantics:
+
+```
+1)
+     t1 -> t2
+─────────────────
+succ t1 -> succ t2
+
+2)
+pred 0 -> 0
+
+3)
+pred succ v -> v
+
+4)
+     t1 -> t2
+─────────────────
+pred t1 -> pred t2
+```
+
+1) simply means that if expression `t1`, passed to `succ` evaluates to `t2`, `succ` evaluates to `succ t2`.
+
+2) we define that the result of `pred 0` equals `0` in order to keep the language consistent and disallow negative numbers not only syntactically but also as result of evaluation.
+
+### Conditional expressions
+
+If the condition of the conditional expression is `true` then we return the expression from the `then` part, otherwise, we return the one from the `else` part.
+
+```
+if true then t2 else t3 -> t1
+if false then t2 else t3 -> t3
+```
+
+If given expression `t1` evaluates to `t*` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression equals to the evaluation of the conditional expression with `t*` passed as condition.
+
+```
+                   t1 -> t*
+───────────────────────────────────────────────
+if t1 then t2 else t3 -> if t* then t2 else t3
+```
+
+### Abstraction
+
+
+### Application
 
 # Type Relations
 
