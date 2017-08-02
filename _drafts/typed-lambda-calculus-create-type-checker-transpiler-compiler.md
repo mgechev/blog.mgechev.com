@@ -3,13 +3,15 @@ title: Type Checker for Extended Simply Typed Lambda Calculus
 author: minko_gechev
 layout: post
 categories:
-  - Angular
-  - TypeScript
-  - React
+  - Programming languages
+  - Lambda calculus
+  - Type theory
+  - Compilers
 tags:
-  - Angular
-  - React
-  - TypeScript
+  - Programming languages
+  - Lambda calculus
+  - Type theory
+  - Compilers
 ---
 
 In this blog post we'll go through a sample implementation of a type checker, interpreter and a transpiler for a primitive purely functional programming language, which is based on the lambda calculus. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
