@@ -24,7 +24,7 @@ We will have two types:
 T ::= Int | Bool
 ```
 
-As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 -> T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
+As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 → T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
 
 Our programs should belong to the language declared by the following grammar:
 
@@ -96,7 +96,7 @@ Lets suppose `σ` is the current state of our program, which keeps what value ea
 ```
 1)
 ────────────────
-(x, σ) -> σ(x)
+(x, σ) → σ(x)
 ```
 
 1) simply means that for variable `x` we return its value kept in the state `σ`.
@@ -107,20 +107,20 @@ The built-in functions here are `succ` and `pred`. Here's their small-step seman
 
 ```
 1)
-     t1 -> t2
+     t1 → t2
 ─────────────────
-succ t1 -> succ t2
+succ t1 → succ t2
 
 2)
-pred 0 -> 0
+pred 0 → 0
 
 3)
-pred succ v -> v
+pred succ v → v
 
 4)
-     t1 -> t2
+     t1 → t2
 ─────────────────
-pred t1 -> pred t2
+pred t1 → pred t2
 ```
 
 1) simply means that if expression `t1`, passed to `succ` evaluates to `t2`, `succ` evaluates to `succ t2`.
@@ -133,17 +133,17 @@ If the condition of the conditional expression is `true` then we return the expr
 
 ```
 1)
-if true then t2 else t3 -> t1
-if false then t2 else t3 -> t3
+if true then t2 else t3 → t1
+if false then t2 else t3 → t3
 ```
 
 If given expression `t1` evaluates to `t*` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression equals to the evaluation of the conditional expression with `t*` passed as condition.
 
 ```
 2)
-                   t1 -> t*
+                   t1 → t*
 ───────────────────────────────────────────────
-if t1 then t2 else t3 -> if t* then t2 else t3
+if t1 then t2 else t3 → if t* then t2 else t3
 ```
 
 ### Abstraction & Application
@@ -152,17 +152,17 @@ In this section we'll explain the function evaluation.
 
 ```
 1)
-(λ x: T → t1) v2 -> { x -> v2 } t1
+(λ x: T → t1) v2 → { x → v2 } t1
 
 2)
-    t1 -> t*
+    t1 → t*
 ────────────────
- t1 t2 -> t* t2
+ t1 t2 → t* t2
 
 3)
-    t2 -> t*
+    t2 → t*
 ────────────────
- v1 t2 -> t1 t*
+ v1 t2 → t1 t*
 ```
 
 1) means that if we have the abstraction `(λ x: T → t1)`, where `T` is the type of `x`, and apply it to `v2`, we need to substitute all the occurrences of `x` in `t1` with `v2`.
