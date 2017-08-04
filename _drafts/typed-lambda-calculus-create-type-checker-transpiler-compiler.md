@@ -44,7 +44,7 @@ t ::=
   num   # a natural number
 ```
 
-Where `num ∈ ℕ, num ≥ 0`. Note that there's no syntax construct for expressing negative numbers in our language. In order to be consistent the result of `pred 0` will return `0`.
+Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negative numbers in our language. In order to be consistent the result of `pred 0` will return `0`.
 
 # Semantics
 
@@ -196,17 +196,55 @@ Although the small-step semantics laws above are quite descriptive and by using 
 if 1 then true else 2
 ```
 
-The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Anther problem with the expression is that the result of both branches of the expression should return result of the same time but this is not the case in our example.
+The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Anther problem with the snippet is that the result of both branches of the expression should return result of the same type but this is not the case in our example.
 
-In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs in our program and **as part of the compilation process**, verify if some properties of the program are hold or not.
+In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs in our program and **as part of the compilation process**, verify if the program is valid according to the "contract signed" with the type annotations.
 
-Notice that **type checking will be performed compile-time**. The alternative is to provide runtime type checking, which will not prevent us from launching/writing invalid programs.
+Notice that the **type checking will be performed compile-time**. The alternative is to perform runtime type checking, which will not prevent us from launching/writing invalid programs.
 
-TBD
+## Type rules
+
+Lets define that
+
+```
+    true : Bool
+    false : Bool
+    n : Bool, n ∈ ℕ
+```
+
+Based on the types of our terminals, lets declare the type rules for `succ`, `pred`, `iszero` and the conditional expression:
+
+```
+1)
+       t1 : Int
+     ─────────────
+     succ t1 : Int
+
+2)
+       t1 : Int
+     ─────────────
+     pred t1 : Int
+
+3)
+        t1 : Int
+     ───────────────
+     iszero t1 : Bool
+
+4)
+       t1 : Bool, t2: T, t3: T
+     ───────────────────────────
+      if t1 then t2 else t3 : T
+```
+
+1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t1` of type `Int`, then both `pred t1` and `succ t1` will be of type `Int`. On the other hand, `iszero` accepts an argument of type `Int` and results of a boolean.
+
+Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Int`, even `Int -> Bool`).
 
 # Lexer and Parser
 
-Although the implementation of a lexer and parser for this tiny language will be quite simple, we're going to generate them using PEG.js.
+The implementation of a lexer and parser for this small language will be quite simple. We can use traditional parsing strategy with recursive decent parsing.
+
+For diversity, this time we'll generate both the modules for lexical analysis and the one for syntax analysis by using Peg.js grammar.
 
 Here's the Peg grammar:
 
@@ -297,8 +335,7 @@ IsZero = _'iszero'_ {
 }
 ```
 
-Lets take a look at some specific terms:
-
+Lets take a look at two interesting terms:
 
 ### Application
 
@@ -313,7 +350,7 @@ Application = l:ExprAbs r:Application* {
 };
 ```
 
-The function application `t t` from above can be expressed with this Peg rule. In general, we can have one expression or abstraction followed by 0 or more other applications.
+The function application `t t` term from the "Syntax" section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by 0 or more other applications.
 
 We name the left term `l` and the right one `r`, after that, in case of a match, we return an object (AST node) with type `abstraction`, `left` and `right` branches.
 
