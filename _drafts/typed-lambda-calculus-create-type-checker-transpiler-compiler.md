@@ -23,7 +23,7 @@ The syntax of the language is going to be quite simple.
 We will have two types:
 
 ```
-T ::= Int | Bool
+T ::= Nat | Bool
 ```
 
 As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 → T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
@@ -51,10 +51,10 @@ Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negati
 Before going any further, lets show a few samples of the programming language that we're going to develop.
 
 ```
-(λ a: Int → succ succ a) 0
+(λ a: Nat → succ succ a) 0
 ```
 
-In the example above we declare an anonymous function which accepts a single argument called `a` of type `Int`. In the body of the function we apply twice the predefined function `succ` to `a`. The anonymous function we apply to `0`, which is going to produce `2` as final result.
+In the example above we declare an anonymous function which accepts a single argument called `a` of type `Nat`. In the body of the function we apply twice the predefined function `succ` to `a`. The anonymous function we apply to `0`, which is going to produce `2` as final result.
 
 The equivalent of this program in JavaScript will be:
 
@@ -72,16 +72,16 @@ A more complicated program in our programming language will look like this:
 
 ```
 succ (
-  λ f: Int →
-    (λ g: Int → g) 0
+  λ f: Nat →
+    (λ g: Nat → g) 0
 ) 0
 ```
 
 Lets explain the evaluation step by step:
 
 1. Apply the `succ` predefined function to the result of the evaluation of the code within the parenthesis. The semantics of this code is:
-2. Define an anonymous function which accepts a single argument of type `Int`, called `f`, and returns another anonymous function.
-3. The second anonymous function has a single argument called `g` of type `Int`.
+2. Define an anonymous function which accepts a single argument of type `Nat`, called `f`, and returns another anonymous function.
+3. The second anonymous function has a single argument called `g` of type `Nat`.
 4. Apply the innermost function to `0`, which as result is going to produce `0`.
 5. Pass `0` as argument to the outer function which will return `0` as result of the computation (the body of the outermost function evaluates to `0`).
 6. Increment `0` and get `1`.
@@ -216,17 +216,17 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
 
 ```
 1)
-       t1 : Int
+       t1 : Nat
      ─────────────
-     succ t1 : Int
+     succ t1 : Nat
 
 2)
-       t1 : Int
+       t1 : Nat
      ─────────────
-     pred t1 : Int
+     pred t1 : Nat
 
 3)
-        t1 : Int
+        t1 : Nat
      ───────────────
      iszero t1 : Bool
 
@@ -236,9 +236,9 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
       if t1 then t2 else t3 : T
 ```
 
-1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t1` of type `Int`, then both `pred t1` and `succ t1` will be of type `Int`. On the other hand, `iszero` accepts an argument of type `Int` and results of a boolean.
+1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t1` of type `Nat`, then both `pred t1` and `succ t1` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of a boolean.
 
-Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Int`, even `Int -> Bool`).
+Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat -> Bool`).
 
 # Lexer and Parser
 
@@ -280,7 +280,7 @@ IfThen = If expr:Application Then then:Application Else el:Application {
   return { type: 'conditional_expression', condition: expr, then: then, el: el };
 }
 
-Type =  Int / Bool
+Type =  Nat / Bool
 
 _  = [ \t\r\n]*
 
@@ -306,7 +306,7 @@ Zero = _ '0' _ {
   return { type: 'literal', value: 0 };
 }
 
-ReservedWord = If / Then / Else / Pred / Succ / Int / Bool / IsZero / False
+ReservedWord = If / Then / Else / Pred / Succ / Nat / Bool / IsZero / False
 
 If = _'if'_
 
@@ -322,8 +322,8 @@ Succ = _'succ'_ {
   return 'succ';
 }
 
-Int = _'Int'_ {
-  return 'Int';
+Nat = _'Nat'_ {
+  return 'Nat';
 }
 
 Bool = _'Bool'_ {
