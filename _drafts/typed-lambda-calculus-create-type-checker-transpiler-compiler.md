@@ -404,6 +404,54 @@ The root node is the application term (`t1 t2`), where `t1` equals the abstracti
 
 # Developing a Type Checker
 
+Now lets take a look at the type checker. First, lets declare the set of primitive types:
+
+```javascript
+const Types = {
+  Natural: 'Nat',
+  Boolean: 'Bool'
+};
+```
+
+We'll express function type using an array: `[T1, T2]`. In order to compare two types and see if they are the same, we can use:
+
+```javascript
+const typeEq = (a, b) => {
+  if (a instanceof Array && b instanceof Array) {
+    if (a.length !== b.length) {
+      return false;
+    } else {
+      for (let i = 0; i < a.length; i += 1) {
+        if (!typeEq(a[i], b[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+  } else {
+    if (typeof a === 'string' && typeof b === 'string') {
+      return a === b;
+    }
+  }
+  return false;
+};
+```
+
+The function checks first if both types are types of a function. If that's the case, we compare their components once by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
+
+```javascript
+const Check = (ast, diagnostics) => {
+  diagnostics = diagnostics || [];
+
+  // By definition empty AST is correct
+  if (!ast) {
+    return {
+      diagnostics
+    };
+  }
+  ...
+```
+
 # Developing an Interpreter
 
 # Developing a Transpiler
