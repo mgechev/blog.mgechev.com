@@ -98,7 +98,7 @@ Lets suppose `σ` is the current state of our program, which keeps what value ea
 
 ```
 1)
-    ────────────────
+    ─────────────
     (x, σ) → σ(x)
 ```
 
@@ -138,7 +138,7 @@ We're going to define `iszero` the following way:
 
 2)
           t1 → t2
-    ────────────────────
+    ─────────────────────
     iszero t1 → iszero t2
 ```
 
@@ -239,6 +239,38 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
 1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t1` of type `Nat`, then both `pred t1` and `succ t1` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of a boolean.
 
 Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat -> Bool`).
+
+# Developing the compiler
+
+Now from the formal definition of our programming language lets move to its actual implementation. In this section we can see how the compiler's implementation looks like:
+
+```javascript
+const program = readFileSync(fileName, { encoding: 'utf-8' });
+const ast = parse(program);
+const diagnostics = Check(ast).diagnostics;
+
+if (diagnostics.length) {
+  console.error(diagnostics.join('\n'));
+  process.exit(1);
+}
+
+if (compile) {
+  result = CompileJS(ast);
+  console.log(result);
+} else {
+  console.log(Eval(ast));
+}
+```
+
+In the pseudo code above, we can see that the program's compilation & interpretation happen in the following way:
+
+1. We read the file containing our program.
+2. We parse the source code and get an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
+3. We perform type checking with the `Check` function.
+4. In case the type checker has found incompatibilities from our typing rules, we report the diagnostics.
+5. We either compile to JavaScript or evaluate the program.
+
+In the last next four sections we'll explain steps 2-5.
 
 # Lexer and Parser
 
@@ -363,6 +395,12 @@ Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'
 ```
 
 We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which is an application.
+
+For instance, after parsing the AST (Abstract Syntax Tree) of the program: `(λ a: Bool → succ 0) iszero 0`, will look like:
+
+![AST](/images/typed-lambda/ast.png)
+
+The root node is the application term (`t1 t2`), where `t1` equals the abstraction (i.e. `λ a: Bool → succ 0`) and `t2` the expression `iszero 0`.
 
 # Developing a Type Checker
 
