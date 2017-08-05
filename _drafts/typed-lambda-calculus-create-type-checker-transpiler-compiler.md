@@ -195,7 +195,7 @@ In 2) if `t1` evaluates to `v`, `t1 t2` evaluates to `v` applied to `t2`.
 
 The semantics of 3) is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1` applied to `v`.
 
-# Type Relations
+# Type system
 
 Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
 
@@ -279,7 +279,7 @@ In the pseudo code above, we can see that the program's compilation & interpreta
 
 In the last next four sections we'll explain steps 2-5.
 
-# Lexer and Parser
+## Lexer and Parser
 
 The implementation of a lexer and parser for this small language will be quite simple. We can use traditional [recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser) algorithm.
 
@@ -387,7 +387,7 @@ For instance, the AST (Abstract Syntax Tree) of the program: `(λ a: Bool → su
 
 The root node is the application term (`t1 t2`), where `t1` equals the abstraction (i.e. `λ a: Bool → succ 0`) and `t2` the expression `iszero 0`.
 
-# Developing a Type Checker
+## Developing the Type Checker
 
 Now lets take a look at the type checker. First, lets declare the set of primitive types:
 
@@ -398,7 +398,7 @@ const Types = {
 };
 ```
 
-## Function type
+### Function Type
 
 We'll express the function type using an array: `[T1, T2]`. From the following example, we can notice that our language supports high-order functions:
 
@@ -412,7 +412,7 @@ We'll express the function type using an array: `[T1, T2]`. From the following e
 
 The outermost function has type `Nat -> (Nat -> Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat -> Nat`.
 
-## Type checking algorithm
+### Type Checking Algorithm
 
 The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type. Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the "Type rules" section from above.
 
@@ -426,7 +426,7 @@ Here are the basic rules that we will implement:
 
 Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
 
-## Comparing types
+### Comparing Types
 
 In order to compare two types and see if they are equivalent, we can use the following function:
 
@@ -454,7 +454,7 @@ const typeEq = (a, b) => {
 
 The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that's the case, we compare the types they are composed of one by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
 
-## Type checking implementation
+### Type Checking Implementation
 
 Now we're ready to take a look at the actual implementation of our type checker:
 
@@ -546,7 +546,7 @@ const Check = (ast, diagnostics) => {
 
 I have removed some of the code since it's not crucial for our purpose. If you're interested in the complete implementation, you can find it [here](https://github.com/mgechev/typed-calc/blob/master/check.js).
 
-# Developing an Interpreter
+## Developing an Interpreter
 
 Once the compiler goes through the phase of type checking there are a few options:
 
@@ -636,7 +636,7 @@ if (Eval(ast.condition)) {
 }
 ```
 
-# Developing a Transpiler
+## Developing a Transpiler
 
 Here's [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another one?
 
@@ -676,6 +676,6 @@ Right after that is the source code for transpilation of a function. The source 
 
 Finally, we transpile the application. For this purpose, we transpile the left sub-expression of the application which is supposed to be a function and apply it to the right hand side of the application.
 
-
 # Conclusion
+
 
