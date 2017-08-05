@@ -203,39 +203,39 @@ Although the small-step semantics laws above are quite descriptive and by using 
 if 1 then true else 2
 ```
 
-The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Anther problem with the snippet is that the result of both branches of the expression should return result of the same type but this is not the case in our example.
+The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Another problem with the snippet is that the result of both branches of the expression should return result of the same type but this is not the case in our example.
 
 In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs in our program and **as part of the compilation process**, verify if the program is valid according to the "contract signed" with the type annotations.
 
-Notice that the **type checking will be performed compile-time**. The alternative is to perform runtime type checking, which will not prevent us from launching/writing invalid programs.
+Notice that the **type checking will be performed compile-time**. The alternative is to perform runtime type checking, which will not prevent us from distributing invalid programs.
 
 ## Type rules
 
 Lets define that
 
 ```
-    true : Bool
-    false : Bool
-    n : Bool, n ∈ ℕ
+true : Bool
+false : Bool
+n : Nat, n ∈ ℕ
 ```
 
 Based on the types of our terminals, lets declare the type rules for `succ`, `pred`, `iszero` and the conditional expression:
 
 ```
 1)
-       t1 : Nat
+        t : Nat
      ─────────────
-     succ t1 : Nat
+     succ t : Nat
 
 2)
-       t1 : Nat
+        t : Nat
      ─────────────
-     pred t1 : Nat
+     pred t : Nat
 
 3)
-        t1 : Nat
+         t : Nat
      ───────────────
-     iszero t1 : Bool
+     iszero t : Bool
 
 4)
        t1 : Bool, t2: T, t3: T
@@ -243,7 +243,7 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
       if t1 then t2 else t3 : T
 ```
 
-1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t1` of type `Nat`, then both `pred t1` and `succ t1` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of a boolean.
+1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t` of type `Nat`, then both `pred t` and `succ t` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of type `Bool`.
 
 Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat -> Bool`).
 
@@ -271,23 +271,27 @@ if (compile) {
 
 In the pseudo code above, we can see that the program's compilation & interpretation happen in the following way:
 
-1. We read the file containing our program.
-2. We parse the source code and get an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
-3. We perform type checking with the `Check` function.
-4. In case the type checker has found incompatibilities from our typing rules, we report the diagnostics.
-5. We either compile to JavaScript or evaluate the program.
+1. Read the file containing our program.
+2. Parse the source code and get an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
+3. Perform type checking with the `Check` function.
+4. In case the type checker has found type errors, report the diagnostics.
+5. Either compile to JavaScript or evaluate the program.
 
 In the last next four sections we'll explain steps 2-5.
 
 # Lexer and Parser
 
-The implementation of a lexer and parser for this small language will be quite simple. We can use traditional parsing strategy with recursive decent parsing.
+The implementation of a lexer and parser for this small language will be quite simple. We can use traditional [recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser) algorithm.
 
-For diversity, this time we'll generate both the modules for lexical analysis and the one for syntax analysis by using Peg.js grammar.
+For diversity, lets generate the modules for lexical and syntax analysis by using Peg.js grammar.
 
-Here's the Peg grammar:
+Here's the grammar:
 
 ```
+Program = _'('*_ a:Application _')'?_ {
+  return a;
+}
+
 Application = l:ExprAbs r:Application* {
   if (!r || !r.length) {
     return l;
@@ -299,7 +303,7 @@ Application = l:ExprAbs r:Application* {
 
 ExprAbs = Expr / Abstraction;
 
-Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'? _ {
+Abstraction = _ '('* _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'? _ {
   return { type: 'abstraction', arg: { type: t, id: id }, body: f };
 }
 
@@ -374,6 +378,8 @@ IsZero = _'iszero'_ {
 }
 ```
 
+We'll take a look at only few grammar rules. If you're interested in the entire syntax of Peg.js, you can take a look at the official [documentation](https://pegjs.org/documentation) and experiment on the [online playground](https://pegjs.org/online).
+
 Lets take a look at two interesting terms:
 
 ### Application
@@ -389,9 +395,9 @@ Application = l:ExprAbs r:Application* {
 };
 ```
 
-The function application `t t` term from the "Syntax" section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by 0 or more other applications.
+The application term (`t t`) from the "Syntax" section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by `0` or more other applications.
 
-We name the left term `l` and the right one `r`, after that, in case of a match, we return an object (AST node) with type `abstraction`, `left` and `right` branches.
+We name the left term `l` (`l:ExprAbs`) and the right one `r` (`r:Application`), after that, in case of a match, we return an object (AST node) with type `abstraction`, `left` and `right` branches.
 
 Another interesting term is the abstraction:
 
@@ -401,9 +407,9 @@ Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'
 }
 ```
 
-We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which is an application.
+We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which we try to match with the `Application` rule from above.
 
-For instance, after parsing the AST (Abstract Syntax Tree) of the program: `(λ a: Bool → succ 0) iszero 0`, will look like:
+For instance, the AST (Abstract Syntax Tree) of the program: `(λ a: Bool → succ 0) iszero 0`, after parsing, will look like:
 
 ![AST](/images/typed-lambda/ast.png)
 
@@ -420,7 +426,19 @@ const Types = {
 };
 ```
 
-We'll express function type using an array: `[T1, T2]`. In order to compare two types and see if they are the same, we can use:
+We'll express the function type using an array: `[T1, T2]`. From the following example, we can notice that our language supports high-order functions:
+
+```
+(
+  (λ a: Nat →
+    λ b: Nat → succ a)
+  0
+) succ 0
+```
+
+The outermost function has type `Nat -> (Nat -> Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat -> Nat`.
+
+In order to compare two types and see if they are the same, we can use:
 
 ```javascript
 const typeEq = (a, b) => {
@@ -444,7 +462,7 @@ const typeEq = (a, b) => {
 };
 ```
 
-The function checks first if both types are types of a function. If that's the case, we compare their components once by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
+The function first checks if both types are types of a function (i.e. have more than one type the type is composed of). If that's the case, we compare the composite types one by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
 
 ```javascript
 const Check = (ast, diagnostics) => {
