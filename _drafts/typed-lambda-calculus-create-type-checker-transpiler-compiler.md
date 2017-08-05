@@ -1,5 +1,5 @@
 ---
-title: Type Checker for Extended Simply Typed Lambda Calculus
+title: Type Checker for Small Functional Programming Language
 author: minko_gechev
 layout: post
 categories:
@@ -14,7 +14,9 @@ tags:
   - Compilers
 ---
 
-In this blog post we'll go through a sample implementation of a type checker, interpreter and a transpiler for a primitive purely functional programming language, which is based on the lambda calculus. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
+In this blog post we'll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
+
+The source code of the implementation can be found at my [GitHub account](https://github.com/mgechev/typed-calc).
 
 # Syntax
 
@@ -26,9 +28,9 @@ We will have two types:
 T ::= Nat | Bool
 ```
 
-As you can see we don't ave a syntactical construct for declaring type of a function (like we do in Haskell - `T1 → T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
+As you can see we don't have a syntactical construct for declaring type of a function (like we do in Haskell - `T1 → T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
 
-Our programs should belong to the language declared by the following grammar:
+Our programs will belong to the language declared by the following grammar:
 
 ```
 t ::=
@@ -40,21 +42,21 @@ t ::=
   if t then t else t   # conditional expression
   succ t   # returns the next natural number when applied to `t`
   prev t   # returns the previous natural number when applied to `t`
-  iszero t # returns if the argument after evaluation equals `0`
+  iszero t # returns `true` if the argument after evaluation equals `0`, otherwise `false`
   num   # a natural number
 ```
 
-Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negative numbers in our language. In order to be consistent the result of `pred 0` will return `0`.
+Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negative numbers in our language, which means that it will operate only on natural numbers. In order to be consistent with the grammar the result of `pred 0` will return `0`.
 
 # Semantics
 
-Before going any further, lets show a few samples of the programming language that we're going to develop.
+Before going any further, lets show a few sample programs belonging to the programming language that we're going to develop.
 
 ```
 (λ a: Nat → succ succ a) 0
 ```
 
-In the example above we declare an anonymous function which accepts a single argument called `a` of type `Nat`. In the body of the function we apply twice the predefined function `succ` to `a`. The anonymous function we apply to `0`, which is going to produce `2` as final result.
+In the example above we declare an anonymous function which accepts a single argument called `a` of type `Nat`. In the body of the function we apply twice the predefined function `succ` to `a`. The anonymous function we apply to `0`. This is going to produce `2` as final result.
 
 The equivalent of this program in JavaScript will be:
 
@@ -106,11 +108,11 @@ Lets suppose `σ` is the current state of our program, which keeps what value ea
 
 ### Built-in functions
 
-The built-in functions here are `succ` and `pred`. Here's their small-step semantics:
+The built-in functions in our language are `succ`, `pred` and `iszero`. Here's the small-step semantics of `succ` and `pred`:
 
 ```
 1)
-        t1 → t2
+         t1 → t2
     ─────────────────
     succ t1 → succ t2
 
@@ -134,15 +136,20 @@ We're going to define `iszero` the following way:
 
 ```
 1)
+
     iszero 0 → true
 
 2)
-          t1 → t2
-    ─────────────────────
+
+    iszero succ v → true
+
+3)
+        t1 → t2
+    ─────────────────
     iszero t1 → iszero t2
 ```
 
-This means that `iszero` applied to `0` returns `true`. If `t1` evaluates to `t2`, then `iszero t1` equals the result of the evaluation `iszero t2`.
+This means that `iszero` applied to `0` returns `true` (by 1)). The result of the evaluation of `iszero` applied to any other number greater than `0` will equal `false` (by 2)). If `t1` evaluates to `t2`, then `iszero t1` equals the result of the evaluation `iszero t2` (by 3)).
 
 ### Conditional expressions
 
@@ -154,13 +161,13 @@ If the condition of the conditional expression is `true` then we return the expr
     if false then t2 else t3 → t3
 ```
 
-If given expression `t1` evaluates to `t*` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression equals to the evaluation of the conditional expression with `t*` passed as condition.
+If given expression `t1` evaluates to `v` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression is equivalent to the evaluation of the conditional expression with `v` passed as condition.
 
 ```
 2)
-                      t1 → t*
+                       t1 → v
     ─────────────────────────────────────────────
-    if t1 then t2 else t3 → if t* then t2 else t3
+    if t1 then t2 else t3 → if v then t2 else t3
 ```
 
 ### Abstraction & Application
@@ -169,24 +176,24 @@ In this section we'll explain the function evaluation.
 
 ```
 1)
-    (λ x: T → t1) v2 → { x → v2 } t1
+    (λ x: T → t) v → { x → v } t
 
 2)
-        t1 → t*
+        t1 → v
     ────────────────
-     t1 t2 → t* t2
+     t1 t2 → v t2
 
 3)
-        t2 → t*
+        t2 → v
     ────────────────
-      v1 t2 → t1 t*
+      v1 t2 → t1 v
 ```
 
-1) means that if we have the abstraction `(λ x: T → t1)`, where `T` is the type of `x`, and apply it to `v2`, we need to substitute all the occurrences of `x` in `t1` with `v2`.
+1) means that if we have the abstraction `(λ x: T → t)`, where `T` is the type of `x`, and apply it to `v`, we need to substitute all the occurrences of `x` in `t` with `v`.
 
-In 2) if `t1` evaluates to `t*`, `t1 t2` evaluates to `t*` applied to `t2`.
+In 2) if `t1` evaluates to `v`, `t1 t2` evaluates to `v` applied to `t2`.
 
-The semantics of 3) is that if `t2` evaluates to `t*`, `v1 t2` evaluates to `t1` applied to `t*`.
+The semantics of 3) is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1` applied to `v`.
 
 # Type Relations
 
