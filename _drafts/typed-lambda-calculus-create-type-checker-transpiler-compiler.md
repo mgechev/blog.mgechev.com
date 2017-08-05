@@ -245,7 +245,7 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
 
 1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t` of type `Nat`, then both `pred t` and `succ t` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of type `Bool`.
 
-Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat -> Bool`).
+Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat → Bool`).
 
 # Developing the compiler
 
@@ -397,7 +397,7 @@ const Types = {
 
 ### Function Type
 
-We'll express the function type using an array: `[T1, T2]`. From the following example, we can notice that our language supports high-order functions:
+We'll express the function type using an array, for instance `['Bool', 'Nat']` is a function which accepts an argument of type `Bool` and returns `Num`. From the following example, we can see that our language supports high-order functions:
 
 ```
 (
@@ -407,7 +407,7 @@ We'll express the function type using an array: `[T1, T2]`. From the following e
 ) succ 0
 ```
 
-The outermost function has type `Nat -> (Nat -> Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat -> Nat`.
+The outermost function has type `Nat → (Nat → Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat → Nat`.
 
 ### Type Checking Algorithm
 
@@ -419,7 +419,7 @@ Here are the basic rules that we will implement:
 2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them.
 3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and see if it matches with the declaration of the function.
 4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3.
-5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Int -> Bool`, we can only apply it to an argument of type `Int`.
+5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat`.
 
 Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
 
