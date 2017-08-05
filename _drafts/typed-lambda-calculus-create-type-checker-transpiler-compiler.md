@@ -301,8 +301,6 @@ Application = l:ExprAbs r:Application* {
   }
 };
 
-ExprAbs = Expr / Abstraction;
-
 Abstraction = _ '('* _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'? _ {
   return { type: 'abstraction', arg: { type: t, id: id }, body: f };
 }
@@ -313,9 +311,7 @@ ArithmeticOperation = o:Operator e:Application {
   return { type: 'arithmetic', operator: o, expression: e };
 };
 
-IsZeroCheck = IsZero e:Application {
-  return { type: 'is_zero', expression: e };
-}
+...
 
 Operator = Succ / Pred
 
@@ -337,29 +333,9 @@ ParanExpression = _'('_ expr:Expr _')'_ {
   return expr;
 }
 
-True = _ 'true' _ {
-  return { type: 'literal', value: true };
-}
-
-False = _ 'false' _ {
-  return { type: 'literal', value: false };
-}
-
-Zero = _ '0' _ {
-  return { type: 'literal', value: 0 };
-}
-
 ReservedWord = If / Then / Else / Pred / Succ / Nat / Bool / IsZero / False
 
-If = _'if'_
-
-Then = _'then'_
-
-Else = _'else'_
-
-Pred = _'pred'_ {
-  return 'pred';
-}
+...
 
 Succ = _'succ'_ {
   return 'succ';
@@ -369,14 +345,10 @@ Nat = _'Nat'_ {
   return 'Nat';
 }
 
-Bool = _'Bool'_ {
-  return 'Bool';
-}
-
-IsZero = _'iszero'_ {
-  return 'iszero';
-}
+...
 ```
+
+For simplicity I've omitted some implementation details. The entire grammar can be found [here](https://github.com/mgechev/typed-calc/blob/master/simply-typed.peg).
 
 We'll take a look at only few grammar rules. If you're interested in the entire syntax of Peg.js, you can take a look at the official [documentation](https://pegjs.org/documentation) and experiment on the [online playground](https://pegjs.org/online).
 
@@ -426,6 +398,8 @@ const Types = {
 };
 ```
 
+## Function type
+
 We'll express the function type using an array: `[T1, T2]`. From the following example, we can notice that our language supports high-order functions:
 
 ```
@@ -438,7 +412,23 @@ We'll express the function type using an array: `[T1, T2]`. From the following e
 
 The outermost function has type `Nat -> (Nat -> Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat -> Nat`.
 
-In order to compare two types and see if they are the same, we can use:
+## Type checking algorithm
+
+The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type. Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the "Type rules" section from above.
+
+Here are the basic rules that we will implement:
+
+1. Check if the condition of an if statement is of type boolean. In order to do that, we need to invoke the algorithm recursively and find out the type of the expression passed as condition of the conditional expression.
+2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them.
+3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and see if it matches with the declaration of the function.
+4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3.
+5. Verify if the types of the terms in an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Int -> Bool`, we can only apply it to an argument of type `Int`.
+
+Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
+
+## Comparing types
+
+In order to compare two types and see if they are equivalent, we can use the following function:
 
 ```javascript
 const typeEq = (a, b) => {
@@ -462,7 +452,11 @@ const typeEq = (a, b) => {
 };
 ```
 
-The function first checks if both types are types of a function (i.e. have more than one type the type is composed of). If that's the case, we compare the composite types one by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
+The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that's the case, we compare the types they are composed of one by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
+
+## Type checking implementation
+
+Now we're ready to take a look at the actual implementation of our type checker:
 
 ```javascript
 const Check = (ast, diagnostics) => {
@@ -474,8 +468,83 @@ const Check = (ast, diagnostics) => {
       diagnostics
     };
   }
+
   ...
+
+  // We get the type of identifier from the symbol table
+  } else if (ast.type === ASTNodes.Identifier) {
+    return {
+      diagnostics,
+      type: SymbolTable.lookup(ast.name)
+    };
+
+  // if-then-else block is correct if:
+  // - The condition is of type Boolean.
+  // - Then and else are of the same type.
+  } else if (ast.type === ASTNodes.Condition) {
+    if (!ast.then || !ast.el || !ast.condition) {
+      diagnostics.push('No condition for if statement');
+      return {
+        diagnostics
+      };
+    }
+    const c = Check(ast.condition);
+    diagnostics = diagnostics.concat(c.diagnostics);
+    const conditionType = c.type;
+    if (!typeEq(conditionType, Types.Boolean)) {
+      diagnostics.push('Incorrect type of condition of condition!');
+      return {
+        diagnostics
+      };
+    }
+    const thenBranch = Check(ast.then);
+    diagnostics = diagnostics.concat(thenBranch.diagnostics);
+    const thenBranchType = thenBranch.type;
+    const elseBranch = Check(ast.el);
+    diagnostics = diagnostics.concat(elseBranch.diagnostics);
+    const elseBranchType = elseBranch.type;
+    if (typeEq(thenBranchType, elseBranchType)) {
+      return thenBranch;
+    } else {
+      diagnostics.push('Incorrect type of then/else branches!');
+      return {
+        diagnostics
+      };
+    }
+
+  ...
+
+  // The type of:
+  // e1: T1, e2: T2, e1 e2: T1
+  } else if (ast.type === ASTNodes.Application) {
+    const l = Check(ast.left);
+    const leftType = l.type || [];
+    diagnostics = diagnostics.concat(l.diagnostics);
+    const r = Check(ast.right);
+    const rightType = r.type || [];
+    diagnostics = diagnostics.concat(r.diagnostics);
+    if (leftType.length) {
+      if (!ast.right || leftType[0] === rightType) {
+        return {
+          diagnostics,
+          type: leftType[1]
+        };
+      }
+      if (typeEq(leftType, rightType)) {
+        diagnostics.push('Incorrect type of application!');
+        return {
+          diagnostics
+        };
+      }
+    } else {
+      return { diagnostics };
+    }
+  }
+  return { diagnostics };
+};
 ```
+
+I have removed some of the code since it's not crucial for our purpose. If you're interested in the complete implementation, you can find it [here](https://github.com/mgechev/typed-calc/blob/master/check.js).
 
 # Developing an Interpreter
 
