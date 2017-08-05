@@ -548,7 +548,134 @@ I have removed some of the code since it's not crucial for our purpose. If you'r
 
 # Developing an Interpreter
 
+Once the compiler goes through the phase of type checking there are a few options:
+
+- Perform AST transformations in order to produce equivalent but more efficient tree for the purposes of the compiler's backend.
+- Skip the transformation phase and directly go either code generation or evaluation.
+
+In this section we'll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the grammar.
+
+Here's the entire implementation:
+
+```javascript
+const Eval = ast => {
+  // The empty program evaluates to null.
+  if (!ast) {
+    return null;
+  }
+
+  // The literals evaluate to their values.
+  if (ast.type === ASTNodes.Literal) {
+    return ast.value;
+
+  // The variables evaluate to the values
+  // that are bound to them in the SymbolTable.
+  } else if (ast.type === ASTNodes.Identifier) {
+    return SymbolTable.lookup(ast.name);
+
+  // if-then-else evaluates to the expression of the
+  // then clause if the condition is true, otherwise
+  // to the value of the else clause.
+  } else if (ast.type === ASTNodes.Condition) {
+    if (Eval(ast.condition)) {
+      return Eval(ast.then);
+    } else {
+      return Eval(ast.el);
+    }
+
+  // The abstraction creates a new context of execution
+  // and registers it's argument in the SymbolTable.
+  } else if (ast.type === ASTNodes.Abstraction) {
+    const scope = new Scope();
+    return x => {
+      scope.add(ast.arg.id.name, x);
+      SymbolTable.push(scope);
+      return Eval(ast.body);
+    };
+
+  // IsZero checks if the evaluated value of its
+  // expression equals `0`.
+  } else if (ast.type === ASTNodes.IsZero) {
+    return Eval(ast.expression) === 0;
+
+  // The arithmetic operations manipulate the value
+  // of their corresponding expressions:
+  // - `succ` adds 1.
+  // - `pred` subtracts 1.
+  } else if (ast.type === ASTNodes.Arithmetic) {
+    const op = ast.operator;
+    const val = Eval(ast.expression);
+    switch (op) {
+      case 'succ':
+        return val + 1;
+      case 'pred':
+        return (val - 1 >= 0) ? val - 1 : val;
+    }
+
+  // The application evaluates to:
+  // - Evaluation of the left expression.
+  // - Evaluation of the right expression.
+  // Application of the evaluation of the left expression over
+  // the evaluated right expression.
+  } else if (ast.type === ASTNodes.Application) {
+    const l = Eval(ast.left);
+    const r = Eval(ast.right);
+    return l(r);
+  }
+  return true;
+};
+```
+
+The implementation is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check it's condition and return the result we get from the evaluate its then or else branch, depending on the condition's value:
+
+```javascript
+if (Eval(ast.condition)) {
+  return Eval(ast.then);
+} else {
+  return Eval(ast.el);
+}
+```
+
 # Developing a Transpiler
+
+Here's [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another one?
+
+In fact, this is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L71).
+
+Let's take a look at how we are going to transpile application, abstraction and conditional expressions:
+
+```javascript
+const CompileJS = ast => {
+  ...
+  if (ast.type === ASTNodes.Literal) {
+    return ast.value;
+  } else if (ast.type === ASTNodes.Identifier) {
+    return ast.name;
+  } else if (ast.type === ASTNodes.Condition) {
+    const targetCondition = CompileJS(ast.condition);
+    const targetThen = CompileJS(ast.then);
+    const targetElse = CompileJS(ast.el);
+    return `${targetCondition} ? ${targetThen} : ${targetElse}\n`;
+  } else if (ast.type === ASTNodes.Abstraction) {
+    return `(function (${ast.arg.id.name}) {
+      return ${CompileJS(ast.body)}
+    })`;
+  } else if (ast.type === ASTNodes.Application) {
+    const l = CompileJS(ast.left);
+    const r = CompileJS(ast.right);
+    return `${l}(${r})\n`;
+  } else {
+    return '';
+  }
+};
+```
+
+Notice that when the current node is a literal (i.e. `0`, `true` or `false`) we return its value. In case we transpile a conditional statement, we first transpile its condition, then its `then` expression, right after that its `else` expression and finally, the entire conditional expression itself. For this purpose we use the ternary operator.
+
+Right after that is the source code for transpilation of a function. The source code is quite straightforward, we declare the function's argument based on the argument of our lambda and after that compile function's body and place it as the return statement.
+
+Finally, we transpile the application. For this purpose, we transpile the left sub-expression of the application which is supposed to be a function and apply it to the right hand side of the application.
+
 
 # Conclusion
 
