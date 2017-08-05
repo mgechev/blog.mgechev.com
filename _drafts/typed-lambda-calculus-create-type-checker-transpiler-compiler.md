@@ -249,7 +249,7 @@ Finally, we have the most complicated rule declared by 4). It states that the co
 
 # Developing the compiler
 
-Now from the formal definition of our programming language lets move to its actual implementation. In this section we can see how the compiler's implementation looks like:
+Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler's implementation works. Here are the high-level steps of execution:
 
 ```javascript
 const program = readFileSync(fileName, { encoding: 'utf-8' });
@@ -269,7 +269,7 @@ if (compile) {
 }
 ```
 
-In the pseudo code above, we can see that the program's compilation & interpretation happen in the following way:
+In the pseudo code above, we can notice that the program's compilation & interpretation happen the following way:
 
 1. Read the file containing our program.
 2. Parse the source code and get an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
@@ -277,17 +277,17 @@ In the pseudo code above, we can see that the program's compilation & interpreta
 4. In case the type checker has found type errors, report the diagnostics.
 5. Either compile to JavaScript or evaluate the program.
 
-In the last next four sections we'll explain steps 2-5.
+It's lovely to see a functional level of cohesion of the individual components! In the last next four sections we'll explain steps 2-5.
 
 ## Lexer and Parser
 
-The implementation of a lexer and parser for this small language will be quite simple. We can use traditional [recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser) algorithm.
+The implementation of a lexer and parser for this small language will be quite simple. We can use traditional [recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser) algorithm for producing an **A**bstract **S**yntax **T**ree (AST).
 
-For diversity, lets generate the modules for lexical and syntax analysis by using Peg.js grammar.
+For diversity, lets generate the modules for lexical and syntax analysis by using [Peg.js](https://pegjs.org/) grammar.
 
-Here's the grammar:
+Here's the grammar itself:
 
-```
+```javascript
 Program = _'('*_ a:Application _')'?_ {
   return a;
 }
@@ -311,8 +311,6 @@ ArithmeticOperation = o:Operator e:Application {
   return { type: 'arithmetic', operator: o, expression: e };
 };
 
-...
-
 Operator = Succ / Pred
 
 IfThen = If expr:Application Then then:Application Else el:Application {
@@ -335,8 +333,6 @@ ParanExpression = _'('_ expr:Expr _')'_ {
 
 ReservedWord = If / Then / Else / Pred / Succ / Nat / Bool / IsZero / False
 
-...
-
 Succ = _'succ'_ {
   return 'succ';
 }
@@ -346,13 +342,14 @@ Nat = _'Nat'_ {
 }
 
 ...
+
 ```
 
 For simplicity I've omitted some implementation details. The entire grammar can be found [here](https://github.com/mgechev/typed-calc/blob/master/simply-typed.peg).
 
-We'll take a look at only few grammar rules. If you're interested in the entire syntax of Peg.js, you can take a look at the official [documentation](https://pegjs.org/documentation) and experiment on the [online playground](https://pegjs.org/online).
+We'll take a look at only few grammar rules. If you're interested in the entire syntax of Peg.js, you can take a look at the official [documentation](https://pegjs.org/documentation) and experiment on the [online playground](https://pegjs.org/online). If you're interested into some theoretical background, I'd recommend you to find a read for [BNF form](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form).
 
-Lets take a look at two interesting terms:
+Lets take a look at two interesting nonterminals from the grammar:
 
 ### Application
 
@@ -367,11 +364,11 @@ Application = l:ExprAbs r:Application* {
 };
 ```
 
-The application term (`t t`) from the "Syntax" section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by `0` or more other applications.
+The application nonterminal (`t t`) from the ["Syntax"](#syntax) section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by `0` or more other applications.
 
-We name the left term `l` (`l:ExprAbs`) and the right one `r` (`r:Application`), after that, in case of a match, we return an object (AST node) with type `abstraction`, `left` and `right` branches.
+We name the left nonterminal `l` (`l:ExprAbs`) and the right one `r` (`r:Application`), after that, in case of a match, we return an object, which will be used as an AST node, with type `abstraction`, `left` and `right` branches.
 
-Another interesting term is the abstraction:
+Another interesting nonterminal is the abstraction:
 
 ```
 Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'? _ {
@@ -379,13 +376,13 @@ Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'
 }
 ```
 
-We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which we try to match with the `Application` rule from above.
+We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which we try to match against the `Application` rule from above.
 
-For instance, the AST (Abstract Syntax Tree) of the program: `(λ a: Bool → succ 0) iszero 0`, after parsing, will look like:
+For instance, the AST of the program: `(λ a: Bool → succ 0) iszero 0`, after parsing, will look like:
 
 ![AST](/images/typed-lambda/ast.png)
 
-The root node is the application term (`t1 t2`), where `t1` equals the abstraction (i.e. `λ a: Bool → succ 0`) and `t2` the expression `iszero 0`.
+The root node is the application nonterminal (`t1 t2`), where `t1` equals the abstraction (i.e. `λ a: Bool → succ 0`) and `t2` the expression `iszero 0`.
 
 ## Developing the Type Checker
 
@@ -422,7 +419,7 @@ Here are the basic rules that we will implement:
 2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them.
 3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and see if it matches with the declaration of the function.
 4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3.
-5. Verify if the types of the terms in an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Int -> Bool`, we can only apply it to an argument of type `Int`.
+5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Int -> Bool`, we can only apply it to an argument of type `Int`.
 
 Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
 
