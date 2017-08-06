@@ -578,7 +578,7 @@ In case the program that we want to type check is the following:
 
 The diagnostics that the compiler will produce will be the following:
 
-![Compile Error](/images/compile-error.png)
+![Compile Error](/images/typed-lambda/compile-error.png)
 
 ## Developing the Interpreter
 
