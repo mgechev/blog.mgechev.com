@@ -35,7 +35,7 @@ Our programs will belong to the language declared by the following grammar:
 ```
 t ::=
   x   # variable
-  λ x: T → t   # abstraction
+  λ x: T → t   # called an abstraction by lambda calculus. In JavaScript we call it a function.
   t t   # application
   true   # true literal
   false   # false literal
@@ -47,6 +47,8 @@ t ::=
 ```
 
 Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negative numbers in our language, which means that it will operate only on natural numbers. In order to be consistent with the grammar the result of `pred 0` will return `0`.
+
+As you can see the syntax of our programming language involves the unicode symbols `→` and `λ` for declaring an abstraction (or a function, in the context of JavaScript). In case you have a Greek keyboard layout `λ` will be easy to type (I suppose), on the other hand in order to quickly type `→` you will need some kind of a keyboard shortcut. In other words, the syntax of our language is not very ergonomic.
 
 # Semantics
 
@@ -494,7 +496,7 @@ const Check = (ast, diagnostics) => {
   // - Then and else are of the same type.
   } else if (ast.type === ASTNodes.Condition) {
     if (!ast.then || !ast.el || !ast.condition) {
-      diagnostics.push('No condition for if statement');
+      diagnostics.push('No condition for a conditional expression');
       return {
         diagnostics
       };
@@ -585,9 +587,9 @@ The diagnostics that the compiler will produce will be the following:
 Once the compiler goes through the phase of type checking there are a few options:
 
 - Perform AST transformations in order to produce equivalent but more efficient tree for the purposes of the compiler's [back end](https://en.wikipedia.org/wiki/Compiler#Back_end).
-- Skip the transformation phase and directly go either code generation or evaluation.
+- Skip the transformation phase and directly perform either code generation or evaluation.
 
-In this section we'll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the grammar.
+In this section we'll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the parser (syntax analyzer).
 
 Here's the entire implementation:
 
@@ -660,7 +662,7 @@ const Eval = ast => {
 };
 ```
 
-The implementation is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check it's condition and return the result we get from the evaluate its then or else branch, depending on the condition's value:
+The code is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check its condition and return the result we get from the evaluation of its `then` or `else` branch, depending on the condition's value:
 
 ```javascript
 if (Eval(ast.condition)) {
@@ -670,30 +672,40 @@ if (Eval(ast.condition)) {
 }
 ```
 
-## Developing a Transpiler
+## Developing a Code Generator
 
-Here's [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another one?
+Here's a [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another language?
 
-In fact, this is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1)`.
+In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1)`.
 
-Let's take a look at how we are going to transpile application, abstraction and conditional expressions:
+Let's take a look at how we are going to translate application, abstraction and conditional expressions to JavaScript:
 
 ```javascript
 const CompileJS = ast => {
   ...
+
+  // Transpile a literal
   if (ast.type === ASTNodes.Literal) {
     return ast.value;
+
+  // Transpile identifier
   } else if (ast.type === ASTNodes.Identifier) {
     return ast.name;
+
+  // Transpile a conditional expression
   } else if (ast.type === ASTNodes.Condition) {
     const targetCondition = CompileJS(ast.condition);
     const targetThen = CompileJS(ast.then);
     const targetElse = CompileJS(ast.el);
     return `${targetCondition} ? ${targetThen} : ${targetElse}\n`;
+
+  // Transpile an abstraction
   } else if (ast.type === ASTNodes.Abstraction) {
     return `(function (${ast.arg.id.name}) {
       return ${CompileJS(ast.body)}
     })`;
+
+  // Transpile an application
   } else if (ast.type === ASTNodes.Application) {
     const l = CompileJS(ast.left);
     const r = CompileJS(ast.right);
@@ -704,9 +716,9 @@ const CompileJS = ast => {
 };
 ```
 
-Notice that when the current node is a literal (i.e. `0`, `true` or `false`) we return its value. In case we transpile a conditional statement, we first transpile its condition, then its `then` expression, right after that its `else` expression and finally, the entire conditional expression itself. For this purpose we use the ternary operator.
+Notice that when the current node is a literal (i.e. `0`, `true` or `false`) we return its value. In case we transpile a conditional expression, we first transpile its condition, then its `then` expression, right after that its `else` expression and finally, the entire conditional expression itself. The result will be a JavaScript ternary operator.
 
-Right after that is the source code for transpilation of a function. The source code is quite straightforward, we declare the function's argument based on the argument of our lambda and after that compile function's body and place it as the return statement.
+Right after that is the source code for transpilation of a function (or abstraction, the way we call a function in our definitions above). The source code is quite straightforward, we declare the function's argument based on the argument of our lambda and after that compile function's body and place it as the return statement.
 
 Finally, we transpile the application. For this purpose, we transpile the left sub-expression of the application which is supposed to be a function and apply it to the right hand side of the application.
 
