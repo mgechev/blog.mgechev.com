@@ -407,9 +407,9 @@ We'll take a look at only few grammar rules. If you're interested in the entire 
 
 Lets take a look at two interesting nonterminals from the grammar:
 
-### Application
+### Application Nonterminal
 
-```
+```javascript
 Application = l:ExprAbs r:Application* {
   if (!r || !r.length) {
     return l;
@@ -426,13 +426,13 @@ We name the left nonterminal `l` (`l:ExprAbs`) and the right one `r` (`r:Applica
 
 Another interesting nonterminal is the abstraction:
 
-```
+```javascript
 Abstraction = _ '('? _ 'λ' _ id:Identifier ':' t:Type '→' f:Application _ ')'? _ {
   return { type: 'abstraction', arg: { type: t, id: id }, body: f };
 }
 ```
 
-We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have arrow (`→`) and the abstraction's body, which we try to match against the `Application` rule from above.
+We can see that it starts with an optional opening parenthesis, after that we have the lambda (`λ`) symbol, followed by the parameter declaration and its type. After that, we have the hard to type arrow (`→`) and the abstraction's body, which we try to match against the `Application` rule from above.
 
 For instance, the AST of the program: `(λ a: Bool → succ 0) iszero 0`, after parsing, will look like:
 
@@ -455,7 +455,7 @@ const Types = {
 
 ### Function Type
 
-We'll express the function type using an array, for instance `['Bool', 'Nat']` is a function which accepts an argument of type `Bool` and returns `Num`. From the following example, we can see that our language supports high-order functions:
+We'll express the function type using an array of types, for instance `['Bool', 'Nat']` is a function which accepts an argument of type `Bool` and returns `Num`. From the following example, we can see that our language supports high-order functions:
 
 ```
 (
@@ -467,7 +467,7 @@ We'll express the function type using an array, for instance `['Bool', 'Nat']` i
 
 The outermost function has type `Nat → (Nat → Nat)`, which means that it accepts an argument of type `Nat` and returns a function of type `Nat → Nat`.
 
-### Type Checking Algorithm
+### Type Checking Algorithm and Type Inference
 
 The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type according to the type rules from section ["Type System"](#type-system). Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the ["Type Rules"](#type-rules) section from above.
 
@@ -475,8 +475,8 @@ Here are the basic rules that we will implement:
 
 1. Check if the condition of a conditional expression is of type `Bool`. In order to do that, we need to invoke the algorithm recursively and find out the type of the expression passed as condition of the conditional expression *(rule `4)`)*.
 2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them *(rule `4)`)*.
-3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and check if it matches with the declaration of the function *(rule `5)`)*.
-4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3 *(rules `1)`, `2)` and `3)`)*.
+3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and check if it matches with the declaration of the function *(rule `5)`)*. In order to find the type of the function we need to find the type of its body. This is called **type inference**.
+4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3. *(rules `1)`, `2)` and `3)`)*.
 5. Check if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat` *(rule `6)`)*.
 
 From above we can see that each point includes the word "check", so it looks like, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
@@ -598,17 +598,17 @@ const Check = (ast, diagnostics) => {
 
 I have stripped some of the code since it's not crucial for our purpose. If you're interested in the complete implementation, you can find it [here](https://github.com/mgechev/typed-calc/blob/master/check.js).
 
-An interesting thing to notice is the [continuation](https://en.wikipedia.org/wiki/Continuation). We pass the `diagnostics` as part of each invocation. Since we don't want to terminate the call when we find the first type error, the `diagnostics` list contains all strings representing type errors, which our type checker has found.
+An interesting thing to notice is the [continuation](https://en.wikipedia.org/wiki/Continuation). We pass the `diagnostics` array to each invocation of the `Check` function. When we find a type error, we push a string representing a human readable message corresponding to the error in the array. This way, in the end of the invocation we have the list of all type errors found by the type checking algrithm.
 
 If we go back to the entire compiler's implementation:
 
-```
+```javascript
 ...
 const ast = parse(program);
 const diagnostics = Check(ast).diagnostics;
 
 if (diagnostics.length) {
-  console.error(diagnostics.join('\n'));
+  console.error(red(diagnostics.join('\n')));
   process.exit(`1)`;
 }
 ...
@@ -620,7 +620,7 @@ In case the program that we want to type check is the following:
 (λ a: Nat → succ succ 0) iszero true
 ```
 
-The diagnostics that the compiler will produce will be the following:
+The diagnostics that the compiler will produce will be as follows:
 
 <img src="/images/typed-lambda/compile-time-errors.png" alt="Compile-time errors"  style="display: block; margin: auto;">
 
@@ -628,12 +628,12 @@ The diagnostics that the compiler will produce will be the following:
 
 Once the compiler goes through the phase of type checking there are a few options:
 
-- Perform AST transformations in order to produce equivalent but more efficient tree for the purposes of the compiler's [back end](https://en.wikipedia.org/wiki/Compiler#Back_end).
+- Perform AST transformations in order to produce equivalent but more efficient AST for the purposes of the compiler's [back end](https://en.wikipedia.org/wiki/Compiler#Back_end).
 - Skip the transformation phase and directly perform either code generation or evaluation.
 
 In this section we'll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the parser (syntax analyzer).
 
-Here's the entire implementation:
+Here's its entire implementation:
 
 ```javascript
 const Eval = ast => {
@@ -704,7 +704,7 @@ const Eval = ast => {
 };
 ```
 
-The code is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check its condition and return the result we get from the evaluation of its `then` or `else` branch, depending on the condition's value:
+The code is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check its condition and return the result we get from the evaluation of its `then` or `else` branches, depending on the condition's value:
 
 ```javascript
 if (Eval(ast.condition)) {
@@ -716,7 +716,7 @@ if (Eval(ast.condition)) {
 
 ## Developing a Code Generator
 
-Here's a [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another language?
+Here's a [list of the languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another language?
 
 <img src="/images/typed-lambda/generation.jpg" alt="Generation"  style="display: block; margin: auto;">
 
@@ -745,7 +745,7 @@ const CompileJS = ast => {
 
   // Transpile an abstraction
   } else if (ast.type === ASTNodes.Abstraction) {
-    return `(function (${ast.arg.id.name}) {
+    return `(${ast.arg.id.name} => {
       return ${CompileJS(ast.body)}
     })`;
 
@@ -768,18 +768,18 @@ Finally, we transpile the application. For this purpose, we transpile the left s
 
 # Conclusion
 
-The purpose of this article was to explain a "full-stack" process of designing and developing a programming language. The explained language is an extension of the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus). On top of the primitives provided by the lambda calculus we added a few built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.
+The purpose of this article was to explain a "full-stack" process of design and development of a programming language. The explained language is an extension of the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus). On top of the primitives provided by the lambda calculus we added three built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.
 
-It's interesting how straightforward is the JavaScript implementation which we directly derived from the mathematical definitions. We just "translated the math" into source code. Of course, the process of designing the source code has it's own portion of creativity involved but the general algorithm is equivalent.
+It's interesting how **straightforward** is the **JavaScript implementation which we directly derived from the mathematical definitions**. We just "translated the math" into source code. Of course, the process of designing the source code has it's own portion of creativity involved but the general algorithm is equivalent.
 
-Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of dependent types the boundary between interpretation and type checking becomes even blurrier.
+Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of [dependent types](https://en.wikipedia.org/wiki/Dependent_type) the boundary between evaluation and type checking becomes even blurrier.
 
 ## Where to go from here?
 
 <img src="/images/typed-lambda/next.jpg" alt="Next"  style="display: block; margin: auto;">
 
-A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language's ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main syntaxes that they follow. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.
+A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language's ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main "syntactic camps" that they are in. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.
 
-Another direction for improvement is a better error reporting. With the grammar produced by Peg.js we can easily get the exact position in the program of the individual symbols. This will allow us to throw errors at specific locations which will make debugging much easier.
+Another direction for improvement is a better error reporting. With the grammar produced by Peg.js we can easy get the exact position in the program of the individual symbols. This will allow us to throw errors at specific locations which will make debugging much easier.
 
 Will be happy to get your thoughts and observations from the article in the comments section below.
