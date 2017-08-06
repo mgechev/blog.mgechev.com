@@ -18,11 +18,11 @@ The software below can improve our productivity as developers by providing scaff
 
 # [Angular CLI](https://github.com/angular/angular-cli)
 
-Number one tool for Angular which provides well encapsulated build and scaffolding is [Angular CLI](https://github.com/angular/angular-cli).
+
 
 ![Angular CLI](/images/ng-tools/angular-cli.png)
 
-Angular CLI is a tool developed by Google and allows us to quickly bootstrap projects by automatically providing our build configuration, testing configuration (unit with karma & jasmine and e2e with protractor), and more. The CLI is based on webpack which means that it takes advantage of the different webpack loaders available, and performs tree-shaking for producing small bundles.
+Number one tool for Angular which provides well encapsulated build and scaffolding is [Angular CLI](https://github.com/angular/angular-cli). Angular CLI is a tool developed by Google and allows us to quickly bootstrap projects by automatically providing our build configuration, testing configuration (unit with karma & jasmine and e2e with protractor), and more. The CLI is based on webpack which means that it takes advantage of the different webpack loaders available, and performs tree-shaking for producing small bundles.
 
 The Angular CLI is being developed by the Angular team which means that it provides smooth integration with other projects such as, Angular Core, Angular Material, Angular Mobile Toolkit, etc. For instance, soon Angular CLI will run the development build of our applications with ngc which will unify the production and development builds, reducing the learning curve and allowing developers to have predictable compilation behavior across different environments.
 
@@ -32,9 +32,11 @@ Big thanks to the guys helping to make the CLI awesome, including (but not limit
 
 # [Language Service](https://github.com/angular/angular/tree/master/packages/language-service)
 
-Very common mistakes that developers using a dynamic language (such as JavaScript) do is to misspell a method or a property name. TypeScript already can warn us about this thanks to tsc and it's type system, however, this wasn't possible within the strings representing our components' templates. The language service of Angular provides the same type checking and auto completion, that we're used to from TypeScript, in inline and external templates!
+
 
 ![Language Service](/images/ng-tools/language-service.gif)
+
+Very common mistakes that developers using a dynamic language (such as JavaScript) do is to misspell a method or a property name. TypeScript already can warn us about this thanks to tsc and it's type system, however, this wasn't possible within the strings representing our components' templates. The language service of Angular provides the same type checking and auto completion, that we're used to from TypeScript, in inline and external templates!
 
 The language service is developed by the Angular core team. At the time of writing, it is ready to use in VSCode, Sublime Text and WebStorm.
 
@@ -46,11 +48,13 @@ The language service can be found [here](https://marketplace.visualstudio.com/it
 
 # [Compodoc & ngd](https://github.com/compodoc)
 
-Have you ever worked on an application where you had to automatically generate the API documentation? For JavaScript we have tools like [ESDoc](https://esdoc.org/) which take the JSDoc annotations and automatically generate documentation for us. The end result usually looks something like [this](https://mgechev.github.io/ngast/).
 
-This is enough for most projects but Angular provides some extra semantics on top that can make our documentation even richer! For instance, it allows us to list all the different UI components just by grabbing all classes decorated with `@Component`. Well, compodoc already does this for us!
 
 ![Compodoc](/images/ng-tools/compodoc.gif)
+
+For JavaScript we have tools like [ESDoc](https://esdoc.org/) which take the JSDoc annotations and automatically generate documentation for us.
+
+This is enough for most projects but Angular provides some extra semantics on top that can make our documentation even richer! For instance, it allows us to list all the different UI components just by grabbing all classes decorated with `@Component`. Well, compodoc already does this for us!
 
 Compodoc has support of JSDoc light, generates search, table of content, has variety of good looking themes and is open source, [available on GitHub](https://github.com/compodoc/compodoc)!
 
@@ -60,9 +64,10 @@ The guys from the Angular community working on this awesome tool are [Vincent](h
 
 # [codelyzer](https://github.com/mgechev/codelyzer)
 
-More than a year ago I started codelyzer with the motivation to automatically verify that given project follows the official [Angular Style Guide](https://angular.io/styleguide). Initially the project started as a couple of rules on top of tslint which based on the [Angular Style Guide](https://angular.io/styleguide) were validating the selectors of our components, proper implementation of life-cycle hooks, etc.
-
 ![codelyzer](/images/ng-tools/codelyzer.gif)
+
+
+More than a year ago I started codelyzer with the motivation to automatically verify that given project follows the official [Angular Style Guide](https://angular.io/styleguide). Initially the project started as a couple of rules on top of tslint which based on the [Angular Style Guide](https://angular.io/styleguide) were validating the selectors of our components, proper implementation of life-cycle hooks, etc.
 
 Since then, the scope of codelyzer has grown! Now it uses the Angular template and CSS parsers in order to provide more sophisticated analysis of our application. On top of verifying that our project follows the style guide, codelyzer can also detect misspelled variables in our templates, find dead styles and even [automatically migrate a project between breaking changes & deprecation across Angular versions](https://twitter.com/mgechev/status/848008010630705152)!
 
@@ -82,9 +87,10 @@ You can find instructions of how to use codelyzer [here](https://github.com/mgec
 
 # [Snippets for Angular](https://github.com/johnpapa/vscode-angular-snippets)
 
-Are you tired of all the boilerplates when declaring a new Angular component, directive or a service? The process is manual, slow and with the tooling available nowadays, unnecessary!
 
 ![Snippets](/images/ng-tools/snippets.gif)
+
+Are you tired of all the boilerplates when declaring a new Angular component, directive or a service? The process is manual, slow and with the tooling available nowadays, unnecessary!
 
 [John Papa](https://twitter.com/John_Papa) created a package of snippets for VSCode which improves our productivity by reducing the amount of boilerplate work that we need to perform when:
 
@@ -100,9 +106,9 @@ You can take advantage of the snippets by installing the VSCode extension availa
 
 # [Augury](https://github.com/rangle/augury)
 
-Debugging an Angular application may get tricky. How our UI gets rendered often depends on large amount of mutable state across components, directives, services, stateful pipes. Fortunately, inspecting the state does not have to be always related to setting break point or `debugger` statements within the bodies of the individual building blocks of our app. In order to explore the dependencies of given component or a service, we don't have to always dig into our codebase!
-
 ![Augury](/images/ng-tools/augury.png)
+
+Debugging an Angular application may get tricky. How our UI gets rendered often depends on large amount of mutable state across components, directives, services, stateful pipes. Fortunately, inspecting the state does not have to be always related to setting break point or `debugger` statements within the bodies of the individual building blocks of our app. In order to explore the dependencies of given component or a service, we don't have to always dig into our codebase!
 
 Augury is a Chrome extension which will plug into our Chrome DevTools. Once loaded, it will help us explore the relations between the individual components in our application which are visible on the page. We can trace the component state and modify it from provided inputs, we can manually trigger events, directly jump to the source code for a specific symbol and much more!
 
