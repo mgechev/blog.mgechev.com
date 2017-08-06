@@ -1,5 +1,5 @@
 ---
-title: Development of Statically Typed Programming Language
+title: Developing Statically Typed Programming Language
 author: minko_gechev
 layout: post
 categories:
