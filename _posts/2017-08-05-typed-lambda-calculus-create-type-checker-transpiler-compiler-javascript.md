@@ -26,15 +26,7 @@ The syntax of the language is going to be quite simple.
 
 <img src="/images/typed-lambda/syntax.jpg" alt="Syntax"  style="display: block; margin: auto;">
 
-We will have two types:
-
-```
-T ::= Nat | Bool
-```
-
-As you can see we don't have a syntactical construct for declaring type of a function (like we do in Haskell - `T1 → T2`, for instance). This is because we're going to apply type inference in order to guess the function type based on the type of the function's argument and body.
-
-Our programs will belong to the language declared by the following grammar:
+Our programs will belong to the language defined by the following grammar:
 
 ```
 t ::=
@@ -47,12 +39,20 @@ t ::=
   succ t   # returns the next natural number when applied to `t`
   prev t   # returns the previous natural number when applied to `t`
   iszero t # returns `true` if the argument after evaluation equals `0`, otherwise `false`
-  num   # a natural number
+  0   # symbol representing the natural number zero
 ```
 
-Where `num ∈ ℕ`. Note that there's no syntax construct for expressing negative numbers in our language, which means that it will operate only on natural numbers. In order to be consistent with the grammar the result of `pred 0` will return `0`.
+The abstraction nonterminal allows us to declare functions with only one argument of type `T` and an expression `t` as a body. The syntax of the abstractions involves the unicode symbols `→` and `λ` . In case you have a Greek keyboard layout `λ` will be easy to type, however, in order to quickly type `→` you will need some kind of a keyboard shortcut. In other words, the syntax of our language is not very ergonomic.
 
-As you can see the syntax of our programming language involves the unicode symbols `→` and `λ` for declaring an abstraction (or a function, in the context of JavaScript). In case you have a Greek keyboard layout `λ` will be easy to type (I suppose), on the other hand in order to quickly type `→` you will need some kind of a keyboard shortcut. In other words, the syntax of our language is not very ergonomic.
+Note that there's no syntax construct for expressing negative numbers and on top of that `succ` and `pred` produce natural numbers. In order to be consistent with the grammar the result of `pred 0` will be `0`.
+
+Regarding the type system, we will have two primitive types:
+
+```
+T ::= Nat | Bool
+```
+
+Notice that in contrast to other statically typed programming languages, such as Haskell or Elm, we do not have a syntactical construct for declaring the type of a function. In Haskell the semantics of the annotation `T1 → T2` is a function which accepts one argument of type `T1` and returns result of type `T2`. In our grammar, we do not have this explicit type annotation because we're going to apply type inference in order to guess a function's type based on the type of its argument and body.
 
 # Semantics
 
@@ -75,32 +75,56 @@ The equivalent of this program in JavaScript will be:
 Where `succ` is defined as:
 
 ```
-succ = a => a + 1
+const succ = a => a + 1
 ```
 
 A more complicated program in our programming language will look like this:
 
 ```
-succ (
+(
   λ f: Nat →
-    (λ g: Nat → g) 0
-) 0
+    (λ g: Nat → f) 0
+) (succ 0)
 ```
 
 Lets explain the evaluation step by step:
 
-1. Apply the `succ` predefined function to the result of the evaluation of the code within the parenthesis. The semantics of this code is:
-2. Define an anonymous function which accepts a single argument of type `Nat`, called `f`, and returns another anonymous function.
-3. The second anonymous function has a single argument called `g` of type `Nat`.
-4. Apply the innermost function to `0`, which as result is going to produce `0`.
-5. Pass `0` as argument to the outer function which will return `0` as result of the computation (the body of the outermost function evaluates to `0`).
-6. Increment `0` and get `1`.
+1. Reduce the expression with left side `(λ f: Nat → (λ g: Nat → f) 0)` and right side `(succ 0)`.
+
+  ```
+  (
+    λ f: Nat →
+      (λ g: Nat → f) 0
+  ) (succ 0)
+  ```
+
+2. Substitute `g` with `0` (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression `(λ f: Nat → (λ g: Nat → f) 0)` and get `(λ f: Nat → f)`.
+
+  ```
+  (
+    λ f: Nat → f
+  ) (succ 0)
+  ```
+
+3. Increment `0` in the expression `succ 0` and pass the result to `(λ f: Nat → f)`.
+
+  ```
+  (
+    λ f: Nat → f
+  ) 1
+  ```
+
+4. Return result `1`.
+
+  ```
+  1
+  ```
 
 Formally, we can show the small-step semantics of our language in the following way:
 
 ## Small-step semantics
 
-In this section I'll show the [small-step semantics](https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics) of the language.
+In this section we'll take a look at the [small-step semantics](https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics) of the language.
 
 Lets suppose `σ` is the current state of our program, which keeps what value each individual variable has.
 
@@ -153,7 +177,7 @@ We're going to define `iszero` the following way:
 
 3)
         t1 → t2
-    ─────────────────
+    ────────────────────
     iszero t1 → iszero t2
 ```
 
@@ -161,7 +185,7 @@ This means that `iszero` applied to `0` returns `true` (by `1)`). The result of 
 
 ### Conditional expressions
 
-If the condition of the conditional expression is `true` then we return the expression from the `then` part, otherwise, we return the one from the `else` part.
+Lets take a look at the small-step semantics for the conditional expressions:
 
 ```
 1)
@@ -169,7 +193,7 @@ If the condition of the conditional expression is `true` then we return the expr
     if false then t2 else t3 → t3
 ```
 
-If given expression `t1` evaluates to `v` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression is equivalent to the evaluation of the conditional expression with `v` passed as condition.
+If the condition of the conditional expression is `true` then we return the expression from the `then` part, otherwise, we return the one from the `else` part.
 
 ```
 2)
@@ -177,6 +201,8 @@ If given expression `t1` evaluates to `v` and this expression is passed as condi
     ─────────────────────────────────────────────
     if t1 then t2 else t3 → if v then t2 else t3
 ```
+
+If given expression `t1` evaluates to `v` and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression is equivalent to the evaluation of the conditional expression with `v` passed as condition.
 
 ### Abstraction & Application
 
@@ -187,14 +213,14 @@ In this section we'll explain the function evaluation.
     (λ x: T → t) v → { x → v } t
 
 2)
-        t1 → v
-    ────────────────
-     t1 t2 → v t2
+       t1 → v
+    ────────────
+    t1 t2 → v t2
 
 3)
-        t2 → v
-    ────────────────
-      v1 t2 → t1 v
+       t2 → v
+    ────────────
+    v1 t2 → t1 v
 ```
 
 `1)` means that if we have the abstraction `(λ x: T → t)`, where `T` is the type of `x`, and apply it to `v`, we need to substitute all the occurrences of `x` in `t` with `v`.
@@ -207,21 +233,23 @@ The semantics of `3)` is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1
 
 <img src="/images/typed-lambda/type.jpg" alt="Type System"  style="display: block; margin: auto;">
 
-Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
+Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following program is a valid according to the grammar from the "[Syntax](#syntax)" section above but is semantically incorrect:
 
 ```
 if 1 then true else 2
 ```
 
-The condition of the conditional expression is expected to be of type boolean, however, above we pass a natural number. Another problem with the snippet is that the result of both branches of the expression should return result of the same type but this is not the case in our example.
+The condition of the conditional expression is expected to be of type boolean, however, we pass a natural number. Another problem with the snippet is that the result of both branches of the expression should return result with the same type but this is not the case in our example.
 
-In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs in our program and **as part of the compilation process**, verify if the program is valid according to the "contract signed" with the type annotations.
+In order to handle such invalid programs we can introduce a mechanism of program verification through **type checking**. This way, we will assign types to the individual constructs and **as part of the compilation process**, verify if the program is valid according to the "contract signed" with the type annotations.
 
 Notice that the **type checking will be performed compile-time**. The alternative is to perform runtime type checking, which will not prevent us from distributing invalid programs.
 
+An interesting question is if the type system is **sound and complete**. If the system is **sound it should prevent false negatives** (i.e. should reject all invalid programs), however, it may also reject valid programs. In order to make sure the type system **prevents false positives, it should also be complete**.
+
 ## Type Rules
 
-Lets define that
+Lets define that:
 
 ```
 true : Bool
@@ -253,9 +281,9 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
       if t1 then t2 else t3 : T
 
 5)
-      (λ x: T → t): T → Y, y: T
-     ───────────────────────────
-         (λ x: T → t) y: Y
+      (λ x: T → y): T → Y, u: T, y: Y
+     ────────────────────────────────
+            (λ x: T → y) u: Y
 
 6)
       t1: T → Y, t2: T
@@ -267,9 +295,11 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
 
 `4)` states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat → Bool`).
 
-Rule `5)` states that if a function has type `T → Y` and is applied to argument `y` of type `T` then the result of the evaluation will be of type `Y`.
+Rule `5)` states that if a function has type `T → Y` and is applied to argument `u` of type `T` then the result of the evaluation will be of type `Y`.
 
 Finally, `6)` states that if we have `t1` of type `T → Y` and `t2` of type `T` then `t1 t2` will be of type `Y`.
+
+It's interesting to see how the [type rules](#type-rules) does not explain how to evaluate the individual expressions but only define a set of rules which the expressions should hold.
 
 # Developing the Compiler
 
@@ -283,8 +313,8 @@ const ast = parse(program);
 const diagnostics = Check(ast).diagnostics;
 
 if (diagnostics.length) {
-  console.error(diagnostics.join('\n'));
-  process.exit(`1)`;
+  console.error(red(diagnostics.join('\n')));
+  process.exit(1);
 }
 
 if (compile) {
@@ -305,7 +335,7 @@ In the pseudo code above, we can notice that the program's compilation & interpr
 
 It's lovely to see a functional level of cohesion of the individual components! In the last next four sections we'll explain steps 2-5.
 
-## Lexer and Parser
+## Lexer & Parser
 
 The implementation of a lexer and parser for this small language will be quite simple. We can use traditional [recursive descent parsing](https://en.wikipedia.org/wiki/Recursive_descent_parser) algorithm for producing an **A**bstract **S**yntax **T**ree (AST).
 
