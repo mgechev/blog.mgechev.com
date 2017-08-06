@@ -724,4 +724,16 @@ Finally, we transpile the application. For this purpose, we transpile the left s
 
 # Conclusion
 
+The purpose of this article was to explain a "full-stack" process of designing and developing a programming language. The explained language is an extension of the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus). On top of the primitives provided by the lambda calculus we added a few built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.
 
+It's interesting how straightforward is the JavaScript implementation which we directly derived from the mathematical definitions. We just "translated the math" into source code. Of course, the process of designing the source code has it's own portion of creativity involved but the general algorithm is equivalent.
+
+Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of dependent types the boundary between interpretation and type checking becomes even blurrier.
+
+## Where to go from here?
+
+A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language's ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main syntaxes that they follow. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.
+
+Another direction for improvement is a better error reporting. With the grammar produced by Peg.js we can easily get the exact position in the program of the individual symbols. This will allow us to throw errors at specific locations which will make debugging much easier.
+
+Will be happy to get your thoughts and observations from the article in the comments section below.
