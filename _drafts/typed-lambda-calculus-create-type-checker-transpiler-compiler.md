@@ -104,7 +104,7 @@ Lets suppose `σ` is the current state of our program, which keeps what value ea
     (x, σ) → σ(x)
 ```
 
-1) simply means that for variable `x` we return its value kept in the state `σ`.
+`1)` simply means that for variable `x` we return its value kept in the state `σ`.
 
 ### Built-in functions
 
@@ -128,9 +128,9 @@ The built-in functions in our language are `succ`, `pred` and `iszero`. Here's t
     pred t1 → pred t2
 ```
 
-1) simply means that if expression `t1`, passed to `succ` evaluates to `t2`, `succ` evaluates to `succ t2`.
+`1)` simply means that if expression `t1`, passed to `succ` evaluates to `t2`, `succ` evaluates to `succ t2`.
 
-2) we define that the result of `pred 0` equals `0` in order to keep the language consistent and disallow negative numbers not only syntactically but also as result of evaluation.
+`2)` we define that the result of `pred 0` equals `0` in order to keep the language consistent and disallow negative numbers not only syntactically but also as result of evaluation.
 
 We're going to define `iszero` the following way:
 
@@ -149,7 +149,7 @@ We're going to define `iszero` the following way:
     iszero t1 → iszero t2
 ```
 
-This means that `iszero` applied to `0` returns `true` (by 1)). The result of the evaluation of `iszero` applied to any other number greater than `0` will equal `false` (by 2)). If `t1` evaluates to `t2`, then `iszero t1` equals the result of the evaluation `iszero t2` (by 3)).
+This means that `iszero` applied to `0` returns `true` (by `1)`). The result of the evaluation of `iszero` applied to any other number greater than `0` will equal `false` (by `2)`). If `t1` evaluates to `t2`, then `iszero t1` equals the result of the evaluation `iszero t2` (by `3)`).
 
 ### Conditional expressions
 
@@ -189,13 +189,13 @@ In this section we'll explain the function evaluation.
       v1 t2 → t1 v
 ```
 
-1) means that if we have the abstraction `(λ x: T → t)`, where `T` is the type of `x`, and apply it to `v`, we need to substitute all the occurrences of `x` in `t` with `v`.
+`1)` means that if we have the abstraction `(λ x: T → t)`, where `T` is the type of `x`, and apply it to `v`, we need to substitute all the occurrences of `x` in `t` with `v`.
 
-In 2) if `t1` evaluates to `v`, `t1 t2` evaluates to `v` applied to `t2`.
+In `2)` if `t1` evaluates to `v`, `t1 t2` evaluates to `v` applied to `t2`.
 
-The semantics of 3) is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1` applied to `v`.
+The semantics of `3)` is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1` applied to `v`.
 
-# Type system
+# Type System
 
 Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
 
@@ -209,7 +209,7 @@ In order to handle such invalid programs we can introduce a mechanism of program
 
 Notice that the **type checking will be performed compile-time**. The alternative is to perform runtime type checking, which will not prevent us from distributing invalid programs.
 
-## Type rules
+## Type Rules
 
 Lets define that
 
@@ -241,13 +241,27 @@ Based on the types of our terminals, lets declare the type rules for `succ`, `pr
        t1 : Bool, t2: T, t3: T
      ───────────────────────────
       if t1 then t2 else t3 : T
+
+5)
+      (λ x: T → t): T → Y, y: T
+     ───────────────────────────
+         (λ x: T → t) y: Y
+
+6)
+      t1: T → Y, t2: T
+     ──────────────────
+         t1 t2: Y
 ```
 
-1), 2) and 3) are quite similar. In 1) and 2) we declare that if we have an expression `t` of type `Nat`, then both `pred t` and `succ t` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of type `Bool`.
+`1)`, `2)` and `3)` are quite similar. In `1)` and `2)` we declare that if we have an expression `t` of type `Nat`, then both `pred t` and `succ t` will be of type `Nat`. On the other hand, `iszero` accepts an argument of type `Nat` and results of type `Bool`.
 
-Finally, we have the most complicated rule declared by 4). It states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat → Bool`).
+`4)` states that the condition of the conditional expression should be of type `Bool` and the expressions in the `then` and `else` branches should be the of the same type `T`, where we can think of `T` as a generic type (placeholder which can be filled with any type, for instance `Bool` or `Nat`, even `Nat → Bool`).
 
-# Developing the compiler
+Rule `5)` states that if a function has type `T → Y` and is applied to argument `y` of type `T` then the result of the evaluation will be of type `Y`.
+
+Finally, `6)` states that if we have `t1` of type `T → Y` and `t2` of type `T` then `t1 t2` will be of type `Y`.
+
+# Developing the Compiler
 
 Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler's implementation works. Here are the high-level steps of execution:
 
@@ -258,7 +272,7 @@ const diagnostics = Check(ast).diagnostics;
 
 if (diagnostics.length) {
   console.error(diagnostics.join('\n'));
-  process.exit(1);
+  process.exit(`1)`;
 }
 
 if (compile) {
@@ -411,15 +425,15 @@ The outermost function has type `Nat → (Nat → Nat)`, which means that it acc
 
 ### Type Checking Algorithm
 
-The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type. Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the "Type rules" section from above.
+The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type according to the type rules from section ["Type System"](#type-system). Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the ["Type Rules"](#type-rules) section from above.
 
 Here are the basic rules that we will implement:
 
-1. Check if the condition of an if statement is of type boolean. In order to do that, we need to invoke the algorithm recursively and find out the type of the expression passed as condition of the conditional expression.
-2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them.
-3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and see if it matches with the declaration of the function.
-4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3.
-5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat`.
+1. Check if the condition of a conditional expression is of type `Bool`. In order to do that, we need to invoke the algorithm recursively and find out the type of the expression passed as condition of the conditional expression *(rule `4)`)*.
+2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them *(rule `4)`)*.
+3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and check if it matches with the declaration of the function *(rule `5)`)*.
+4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3 *(rules `1)`, `2)` and `3)`)*.
+5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat` *(rule `6)`)*.
 
 Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
 
@@ -433,7 +447,7 @@ const typeEq = (a, b) => {
     if (a.length !== b.length) {
       return false;
     } else {
-      for (let i = 0; i < a.length; i += 1) {
+      for (let i = 0; i < a.length; i += `1)` {
         if (!typeEq(a[i], b[i])) {
           return false;
         }
@@ -637,7 +651,7 @@ if (Eval(ast.condition)) {
 
 Here's [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another one?
 
-In fact, this is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L71).
+In fact, this is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1)`.
 
 Let's take a look at how we are going to transpile application, abstraction and conditional expressions:
 
