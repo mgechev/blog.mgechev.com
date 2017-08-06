@@ -1,5 +1,5 @@
 ---
-title: Type Checker for Small Functional Programming Language
+title: Development Type Checker for Programming Language
 author: minko_gechev
 layout: post
 categories:
@@ -14,7 +14,9 @@ tags:
   - Compilers
 ---
 
-In this blog post we'll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
+In this blog post we'll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus). We will do a "full-stack" programming language development by going through formal definition of the language's syntax, semantics and type system. After that we'll demonstrate how we can "translate" these definitions to JavaScript.
+
+Although the article doesn't require any mathematical background, it'll be useful to have very high-level understanding of how compilers work. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
 
 The source code of the implementation can be found at my [GitHub account](https://github.com/mgechev/typed-calc).
 
