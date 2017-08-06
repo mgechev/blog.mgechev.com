@@ -18,11 +18,13 @@ In this blog post we'll go through a sample implementation of a type checker, in
 
 Although the article doesn't require any mathematical background, it'll be useful to have very high-level understanding of how compilers work. The article is inspired by the book "[Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/)".
 
-The source code of the implementation can be found at my [GitHub account](https://github.com/mgechev/typed-calc).
+The source code of the implementation can be found at my [GitHub profile](https://github.com/mgechev/typed-calc).
 
 # Syntax
 
 The syntax of the language is going to be quite simple.
+
+![Syntax](/images/typed-lambda/syntax.jpg)
 
 We will have two types:
 
@@ -55,6 +57,8 @@ As you can see the syntax of our programming language involves the unicode symbo
 # Semantics
 
 Before going any further, lets show a few sample programs belonging to the programming language that we're going to develop.
+
+![Semantics](/images/typed-lambda/semantics.jpg)
 
 ```
 (λ a: Nat → succ succ a) 0
@@ -201,6 +205,8 @@ The semantics of `3)` is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1
 
 # Type System
 
+![Type System](/images/typed-lambda/type.jpg)
+
 Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
 
 ```
@@ -266,6 +272,8 @@ Rule `5)` states that if a function has type `T → Y` and is applied to argumen
 Finally, `6)` states that if we have `t1` of type `T → Y` and `t2` of type `T` then `t1 t2` will be of type `Y`.
 
 # Developing the Compiler
+
+![Develop](/images/typed-lambda/develop.jpg)
 
 Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler's implementation works. Here are the high-level steps of execution:
 
@@ -412,6 +420,8 @@ const Types = {
   Boolean: 'Bool'
 };
 ```
+
+![Guard](/images/typed-lambda/guard.jpg)
 
 ### Function Type
 
@@ -677,6 +687,8 @@ if (Eval(ast.condition)) {
 ## Developing a Code Generator
 
 Here's a [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another language?
+
+![Generation](/images/typed-lambda/codegen.jpg)
 
 In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1)`.
 
