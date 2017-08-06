@@ -1,5 +1,5 @@
 ---
-title: Development Type Checker for Programming Language
+title: Development Statically Typed Programming Language
 author: minko_gechev
 layout: post
 categories:
