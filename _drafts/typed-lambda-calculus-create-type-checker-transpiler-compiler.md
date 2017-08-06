@@ -433,9 +433,9 @@ Here are the basic rules that we will implement:
 2. Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them *(rule `4)`)*.
 3. Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and check if it matches with the declaration of the function *(rule `5)`)*.
 4. Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3 *(rules `1)`, `2)` and `3)`)*.
-5. Verify if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat` *(rule `6)`)*.
+5. Check if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type `Nat → Bool`, we can only apply it to an argument of type `Nat` *(rule `6)`)*.
 
-Obviously, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
+From above we can see that each point includes the word "check", so it looks like, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:
 
 ### Comparing Types
 
@@ -463,7 +463,7 @@ const typeEq = (a, b) => {
 };
 ```
 
-The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that's the case, we compare the types they are composed of one by one by invoking the function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
+The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that's the case, we compare the types they are composed of one by one by invoking the `typeEq` function recursively. Otherwise, in case `a` and `b` are primitive types, we just compare them by their value (`a === b`).
 
 ### Type Checking Implementation
 
@@ -503,7 +503,7 @@ const Check = (ast, diagnostics) => {
     diagnostics = diagnostics.concat(c.diagnostics);
     const conditionType = c.type;
     if (!typeEq(conditionType, Types.Boolean)) {
-      diagnostics.push('Incorrect type of condition of condition!');
+      diagnostics.push('Incorrect type of condition of condition');
       return {
         diagnostics
       };
@@ -517,13 +517,11 @@ const Check = (ast, diagnostics) => {
     if (typeEq(thenBranchType, elseBranchType)) {
       return thenBranch;
     } else {
-      diagnostics.push('Incorrect type of then/else branches!');
+      diagnostics.push('Incorrect type of then/else branches');
       return {
         diagnostics
       };
     }
-
-  ...
 
   // The type of:
   // e1: T1, e2: T2, e1 e2: T1
@@ -540,9 +538,8 @@ const Check = (ast, diagnostics) => {
           diagnostics,
           type: leftType[1]
         };
-      }
-      if (typeEq(leftType, rightType)) {
-        diagnostics.push('Incorrect type of application!');
+      } else {
+        diagnostics.push('Incorrect type of application');
         return {
           diagnostics
         };
@@ -555,13 +552,39 @@ const Check = (ast, diagnostics) => {
 };
 ```
 
-I have removed some of the code since it's not crucial for our purpose. If you're interested in the complete implementation, you can find it [here](https://github.com/mgechev/typed-calc/blob/master/check.js).
+I have stripped some of the code since it's not crucial for our purpose. If you're interested in the complete implementation, you can find it [here](https://github.com/mgechev/typed-calc/blob/master/check.js).
 
-## Developing an Interpreter
+An interesting thing to notice is the [continuation](https://en.wikipedia.org/wiki/Continuation). We pass the `diagnostics` as part of each invocation. Since we don't want to terminate the call when we find the first type error, the `diagnostics` list contains all strings representing type errors, which our type checker has found.
+
+If we go back to the entire compiler's implementation:
+
+```
+...
+const ast = parse(program);
+const diagnostics = Check(ast).diagnostics;
+
+if (diagnostics.length) {
+  console.error(diagnostics.join('\n'));
+  process.exit(`1)`;
+}
+...
+```
+
+In case the program that we want to type check is the following:
+
+```
+(λ a: Nat → succ succ 0) iszero true
+```
+
+The diagnostics that the compiler will produce will be the following:
+
+![Compile Error](/images/compile-error.png)
+
+## Developing the Interpreter
 
 Once the compiler goes through the phase of type checking there are a few options:
 
-- Perform AST transformations in order to produce equivalent but more efficient tree for the purposes of the compiler's backend.
+- Perform AST transformations in order to produce equivalent but more efficient tree for the purposes of the compiler's [back end](https://en.wikipedia.org/wiki/Compiler#Back_end).
 - Skip the transformation phase and directly go either code generation or evaluation.
 
 In this section we'll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the grammar.
