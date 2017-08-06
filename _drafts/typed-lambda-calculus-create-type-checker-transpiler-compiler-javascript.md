@@ -24,7 +24,7 @@ The source code of the implementation can be found at my [GitHub profile](https:
 
 The syntax of the language is going to be quite simple.
 
-![Syntax](/images/typed-lambda/syntax.jpg)
+<img src="/images/typed-lambda/syntax.jpg" alt="Syntax"  style="display: block; margin: auto;">
 
 We will have two types:
 
@@ -58,7 +58,7 @@ As you can see the syntax of our programming language involves the unicode symbo
 
 Before going any further, lets show a few sample programs belonging to the programming language that we're going to develop.
 
-![Semantics](/images/typed-lambda/semantics.jpg)
+<img src="/images/typed-lambda/semantics.jpg" alt="Semantics"  style="display: block; margin: auto;">
 
 ```
 (λ a: Nat → succ succ a) 0
@@ -205,7 +205,7 @@ The semantics of `3)` is that if `t2` evaluates to `v`, `v1 t2` evaluates to `t1
 
 # Type System
 
-![Type System](/images/typed-lambda/type.jpg)
+<img src="/images/typed-lambda/type.jpg" alt="Type System"  style="display: block; margin: auto;">
 
 Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following is invalid:
 
@@ -273,7 +273,7 @@ Finally, `6)` states that if we have `t1` of type `T → Y` and `t2` of type `T`
 
 # Developing the Compiler
 
-![Develop](/images/typed-lambda/develop.jpg)
+<img src="/images/typed-lambda/develop.jpg" alt="Develop"  style="display: block; margin: auto;">
 
 Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler's implementation works. Here are the high-level steps of execution:
 
@@ -406,7 +406,7 @@ We can see that it starts with an optional opening parenthesis, after that we ha
 
 For instance, the AST of the program: `(λ a: Bool → succ 0) iszero 0`, after parsing, will look like:
 
-![AST](/images/typed-lambda/ast.png)
+<img src="/images/typed-lambda/ast.png" alt="AST"  style="display: block; margin: auto;">
 
 The root node is the application nonterminal (`t1 t2`), where `t1` equals the abstraction (i.e. `λ a: Bool → succ 0`) and `t2` the expression `iszero 0`.
 
@@ -421,7 +421,7 @@ const Types = {
 };
 ```
 
-![Guard](/images/typed-lambda/guard.jpg)
+<img src="/images/typed-lambda/guard.jpg" alt="Guard"  style="display: block; margin: auto;">
 
 ### Function Type
 
@@ -592,7 +592,7 @@ In case the program that we want to type check is the following:
 
 The diagnostics that the compiler will produce will be the following:
 
-![Compile Error](/images/typed-lambda/compile-error.png)
+<img src="/images/typed-lambda/compile-time-errors.png" alt="Compile-time errors"  style="display: block; margin: auto;">
 
 ## Developing the Interpreter
 
@@ -688,7 +688,7 @@ if (Eval(ast.condition)) {
 
 Here's a [list of languages](https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js) which compile to JavaScript. Why not create another language?
 
-![Generation](/images/typed-lambda/codegen.jpg)
+<img src="/images/typed-lambda/generation.jpg" alt="Generation"  style="display: block; margin: auto;">
 
 In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our "to JavaScript compiler" is on less than 40 lines of code. The entire transpiler can be found [here](https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1)`.
 
@@ -745,6 +745,8 @@ It's interesting how straightforward is the JavaScript implementation which we d
 Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of dependent types the boundary between interpretation and type checking becomes even blurrier.
 
 ## Where to go from here?
+
+<img src="/images/typed-lambda/next.jpg" alt="Next"  style="display: block; margin: auto;">
 
 A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language's ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main syntaxes that they follow. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.
 
