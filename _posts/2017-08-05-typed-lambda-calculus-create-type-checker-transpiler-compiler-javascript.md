@@ -91,39 +91,55 @@ Lets explain the evaluation step by step:
 
 <ol>
   <li>
-Reduce the expression with left side `(λ f: Nat → (λ g: Nat → f) 0)` and right side `(succ 0)`.
+Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
 
-```
+<div class="highlighter-rouge">
+<pre>
+<code>
 (
   λ f: Nat →
     (λ g: Nat → f) 0
 ) (succ 0)
-```
+</code>
+</pre>
+</div>
   </li>
   <li>
-Substitute `g` with `0` (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression `(λ f: Nat → (λ g: Nat → f) 0)` and get `(λ f: Nat → f)`.
+Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
-```
+<div class="highlighter-rouge">
+<pre>
+<code>
 (
   λ f: Nat → f
 ) (succ 0)
-```
+</code>
+</pre>
+</div>
   </li>
   <li>
-Increment `0` in the expression `succ 0` and pass the result to `(λ f: Nat → f)`.
+Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
-```
+<div class="highlighter-rouge">
+<pre>
+<code>
 (
   λ f: Nat → f
 ) 1
-```
+</code>
+</pre>
+</div>
   </li>
   <li>
-Return result `1`.
+Return result <code class="highlighter-rouge">1</code>.
 
-```
+<div class="highlighter-rouge">
+<pre>
+<code>
 1
-```
+</code>
+</pre>
+</div>
   </li>
 </ol>
 
