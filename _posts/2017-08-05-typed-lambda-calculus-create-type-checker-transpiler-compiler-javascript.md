@@ -76,7 +76,7 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
   <button id="add-arrow-btn">→</button>
   <button id="eval-btn">Evaluate</button>
 </div>
-<script src="/assets/js/typed-calc/index.js"></script>
+<script src="/assets/js/typed-calc/calc.js"></script>
 <script src="/assets/js/typed-calc/run.js"></script>
 
 # Semantics
