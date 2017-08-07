@@ -129,7 +129,7 @@ Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat 
 </div>
   </li>
   <li>
-Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
+Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply <a href="https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction">beta reduction</a>) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
 <div class="highlighter-rouge">
 <pre class="highlight">
