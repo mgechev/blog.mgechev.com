@@ -67,8 +67,7 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
     (λ a: Nat → succ a)
   else
     (λ a: Nat → pred a))
-  0
-  </textarea>
+  0</textarea>
 </div>
 <div style="padding-top: 10px;">
   <button id="add-lambda-btn">λ</button>
