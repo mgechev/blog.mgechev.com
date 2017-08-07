@@ -89,36 +89,43 @@ A more complicated program in our programming language will look like this:
 
 Lets explain the evaluation step by step:
 
-1. Reduce the expression with left side `(λ f: Nat → (λ g: Nat → f) 0)` and right side `(succ 0)`.
+<ol>
+  <li>
+Reduce the expression with left side `(λ f: Nat → (λ g: Nat → f) 0)` and right side `(succ 0)`.
 
-  ```
-  (
-    λ f: Nat →
-      (λ g: Nat → f) 0
-  ) (succ 0)
-  ```
+```
+(
+  λ f: Nat →
+    (λ g: Nat → f) 0
+) (succ 0)
+```
+  </li>
+  <li>
+Substitute `g` with `0` (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression `(λ f: Nat → (λ g: Nat → f) 0)` and get `(λ f: Nat → f)`.
 
-2. Substitute `g` with `0` (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression `(λ f: Nat → (λ g: Nat → f) 0)` and get `(λ f: Nat → f)`.
+```
+(
+  λ f: Nat → f
+) (succ 0)
+```
+  </li>
+  <li>
+Increment `0` in the expression `succ 0` and pass the result to `(λ f: Nat → f)`.
 
-  ```
-  (
-    λ f: Nat → f
-  ) (succ 0)
-  ```
+```
+(
+  λ f: Nat → f
+) 1
+```
+  </li>
+  <li>
+Return result `1`.
 
-3. Increment `0` in the expression `succ 0` and pass the result to `(λ f: Nat → f)`.
-
-  ```
-  (
-    λ f: Nat → f
-  ) 1
-  ```
-
-4. Return result `1`.
-
-  ```
-  1
-  ```
+```
+1
+```
+  </li>
+</ol>
 
 Formally, we can show the small-step semantics of our language in the following way:
 
