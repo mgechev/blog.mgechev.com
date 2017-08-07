@@ -59,7 +59,7 @@ Notice that in contrast to other statically typed programming languages, such as
 Now after we're familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button "Evaluate" to see the result:
 
 <div>
-  <textarea id="code">
+  <textarea id="code" style="width: 100%; height: 200px;">
 (λ a: Nat → a)
   (if
     (λ a: Nat → iszero a) pred 0
@@ -70,7 +70,7 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
   0
   </textarea>
 </div>
-<div>Result: <span id="result"></span></div>
+<div style="padding: 10px;">Result: <span id="result"></span></div>
 <div>
   <button id="add-lambda-btn">λ</button>
   <button id="add-arrow-btn">→</button>
