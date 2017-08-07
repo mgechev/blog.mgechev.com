@@ -70,12 +70,12 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
   0
   </textarea>
 </div>
-<div style="padding: 10px;">Result: <span id="result"></span></div>
 <div>
   <button id="add-lambda-btn">λ</button>
   <button id="add-arrow-btn">→</button>
   <button id="eval-btn">Evaluate</button>
 </div>
+<div style="padding-top: 10px;">Result: <span id="result"></span></div>
 <script src="/assets/js/typed-calc/calc.js"></script>
 <script src="/assets/js/typed-calc/run.js"></script>
 
