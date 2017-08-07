@@ -766,6 +766,35 @@ Right after that is the source code for transpilation of a function (or abstract
 
 Finally, we transpile the application. For this purpose, we transpile the left sub-expression of the application which is supposed to be a function and apply it to the right hand side of the application.
 
+Now if we transpile the following program to JavaScript:
+
+```
+(
+  λ x: Nat →
+    (λ y: Nat → x) 0
+)
+succ (
+  λ f: Nat →
+    (λ g: Nat → g) 0
+) 0
+```
+
+We will get:
+
+```javascript
+(x => {
+  return (y => {
+    return x;
+  })(0);
+})(
+  (f => {
+    return (g => {
+      return g;
+    })(0);
+  })(0) + 1
+);
+```
+
 # Conclusion
 
 The purpose of this article was to explain a "full-stack" process of design and development of a programming language. The explained language is an extension of the [lambda calculus](https://en.wikipedia.org/wiki/Lambda_calculus). On top of the primitives provided by the lambda calculus we added three built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.
