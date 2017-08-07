@@ -99,7 +99,7 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
         result = Eval(ast);
       }
     } catch (e) {
-      result = 'Syntax error. Unable to parse the program';
+      result = 'Syntax error. Unable to parse the program.';
     }
     document.getElementById('result').innerText = result;
   };
