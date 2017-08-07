@@ -94,7 +94,7 @@ Lets explain the evaluation step by step:
 Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
 
 <div class="highlighter-rouge">
-<pre>
+<pre class="highlight">
 <code>
 (
   λ f: Nat →
@@ -108,7 +108,7 @@ Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat 
 Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply [beta reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction)) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
 <div class="highlighter-rouge">
-<pre>
+<pre class="highlight">
 <code>
 (
   λ f: Nat → f
@@ -121,7 +121,7 @@ Substitute <code class="highlighter-rouge">g</code> with <code class="highlighte
 Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
 <div class="highlighter-rouge">
-<pre>
+<pre class="highlight">
 <code>
 (
   λ f: Nat → f
@@ -134,7 +134,7 @@ Increment <code class="highlighter-rouge">0</code> in the expression <code class
 Return result <code class="highlighter-rouge">1</code>.
 
 <div class="highlighter-rouge">
-<pre>
+<pre class="highlight">
 <code>
 1
 </code>
