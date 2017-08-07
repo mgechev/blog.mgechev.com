@@ -54,6 +54,50 @@ T ::= Nat | Bool
 
 Notice that in contrast to other statically typed programming languages, such as Haskell or Elm, we do not have a syntactical construct for declaring the type of a function. In Haskell the semantics of the annotation `T1 → T2` is a function which accepts one argument of type `T1` and returns result of type `T2`. In our grammar, we do not have this explicit type annotation because we're going to apply type inference in order to guess a function's type based on the type of its argument and body.
 
+# Playground
+
+Now after we're familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button "Evaluate" to see the result:
+
+<div>
+  <textarea id="code">
+(λ a: Nat → a)
+  (if
+    (λ a: Nat → iszero a) pred 0
+  then
+    (λ a: Nat → succ a)
+  else
+    (λ a: Nat → pred a))
+  0
+  </textarea>
+</div>
+<div>Result: <span id="result"></span></div>
+<div>
+  <button id="eval-btn">Evaluate</button>
+</div>
+<script src="/assets/js/typed-calc/index.js"></script>
+<script>
+(function () {
+  document.getElementById('eval-btn').onclick = function () {
+    var code = document.getElementById('code').value;
+    var ast = null;
+    var result = '';
+    try {
+      var ast = peg$parse(code);
+      var diagnostics = Check(ast).diagnostics;
+
+      if (diagnostics.length) {
+        result = diagnostics.join('. ');
+      } else {
+        result = Eval(ast);
+      }
+    } catch (e) {
+      result = 'Syntax error. Unable to parse the program';
+    }
+    document.getElementById('result').innerText = result;
+  };
+}());
+</script>
+
 # Semantics
 
 Before going any further, lets show a few sample programs belonging to the programming language that we're going to develop.
