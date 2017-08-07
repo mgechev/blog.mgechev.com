@@ -72,11 +72,19 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
 </div>
 <div>Result: <span id="result"></span></div>
 <div>
+  <button id="add-lambda-btn">λ</button>
+  <button id="add-arrow-btn">→</button>
   <button id="eval-btn">Evaluate</button>
 </div>
 <script src="/assets/js/typed-calc/index.js"></script>
 <script>
 (function () {
+  document.getElementById('add-lambda-btn').onclick = function () {
+    document.getElementById('code').value += 'λ';
+  };
+  document.getElementById('add-arrow-btn').onclick = function () {
+    document.getElementById('code').value += '→';
+  };
   document.getElementById('eval-btn').onclick = function () {
     var code = document.getElementById('code').value;
     var ast = null;
