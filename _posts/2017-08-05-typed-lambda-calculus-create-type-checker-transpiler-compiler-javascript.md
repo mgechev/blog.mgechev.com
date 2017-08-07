@@ -77,34 +77,7 @@ Now after we're familiar with the syntax, we can try to write some code. In the 
   <button id="eval-btn">Evaluate</button>
 </div>
 <script src="/assets/js/typed-calc/index.js"></script>
-<script>
-(function () {
-  document.getElementById('add-lambda-btn').onclick = function () {
-    document.getElementById('code').value += 'λ';
-  };
-  document.getElementById('add-arrow-btn').onclick = function () {
-    document.getElementById('code').value += '→';
-  };
-  document.getElementById('eval-btn').onclick = function () {
-    var code = document.getElementById('code').value;
-    var ast = null;
-    var result = '';
-    try {
-      var ast = peg$parse(code);
-      var diagnostics = Check(ast).diagnostics;
-
-      if (diagnostics.length) {
-        result = diagnostics.join('. ');
-      } else {
-        result = Eval(ast);
-      }
-    } catch (e) {
-      result = 'Syntax error. Unable to parse the program.';
-    }
-    document.getElementById('result').innerText = result;
-  };
-}());
-</script>
+<script src="/assets/js/typed-calc/run.js"></script>
 
 # Semantics
 
