@@ -1760,12 +1760,12 @@ var Eval = function Eval(ast) {
   document.getElementById('add-lambda-btn').onclick = function () {
     var cp = getCursorPos(document.getElementById('code'));
     var val = document.getElementById('code').value;
-    document.getElementById('code').value += val.substring(0, cp) + 'λ' + val.substring(cp, val.length);
+    document.getElementById('code').value = val.substring(0, cp) + 'λ' + val.substring(cp, val.length);
   };
   document.getElementById('add-arrow-btn').onclick = function () {
     var cp = getCursorPos(document.getElementById('code'));
     var val = document.getElementById('code').value;
-    document.getElementById('code').value += val.substring(0, cp) + '→' + val.substring(cp, val.length);
+    document.getElementById('code').value = val.substring(0, cp) + '→' + val.substring(cp, val.length);
   };
   document.getElementById('eval-btn').onclick = function () {
     var code = document.getElementById('code').value;
