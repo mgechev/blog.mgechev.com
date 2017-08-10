@@ -219,7 +219,7 @@ We're going to define `iszero` the following way:
 
 2)
 
-    iszero succ v → true
+    iszero succ v → false
 
 3)
         t1 → t2
