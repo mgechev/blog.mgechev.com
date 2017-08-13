@@ -235,7 +235,7 @@ Lets take a look at the small-step semantics for the conditional expressions:
 
 ```
 1)
-    if true then t2 else t3 → t1
+    if true then t2 else t3 → t2
     if false then t2 else t3 → t3
 ```
 
