@@ -584,7 +584,7 @@ const Check = (ast, diagnostics) => {
   // - Then and else are of the same type.
   } else if (ast.type === ASTNodes.Condition) {
     if (!ast.then || !ast.el || !ast.condition) {
-      diagnostics.push('No condition for a conditional expression');
+      diagnostics.push('No condition of a conditional expression');
       return {
         diagnostics
       };
@@ -593,7 +593,7 @@ const Check = (ast, diagnostics) => {
     diagnostics = diagnostics.concat(c.diagnostics);
     const conditionType = c.type;
     if (!typeEq(conditionType, Types.Boolean)) {
-      diagnostics.push('Incorrect type of condition of condition');
+      diagnostics.push('Incorrect type of the condition of a conditional expression');
       return {
         diagnostics
       };
