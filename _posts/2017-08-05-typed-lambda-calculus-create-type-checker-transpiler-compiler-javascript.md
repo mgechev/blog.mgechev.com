@@ -537,7 +537,7 @@ const typeEq = (a, b) => {
     if (a.length !== b.length) {
       return false;
     } else {
-      for (let i = 0; i < a.length; i += `1)` {
+      for (let i = 0; i < a.length; i += 1) {
         if (!typeEq(a[i], b[i])) {
           return false;
         }
