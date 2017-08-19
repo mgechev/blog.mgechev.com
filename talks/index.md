@@ -8,9 +8,11 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
+- ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), ngHouston (online, 18th August, 2017)
 - ["Angular Unplugged" Q&A session](https://speakerdeck.com/mgechev/angular-unplugged), Q&A session organized for the Bulgarian JavaScript community, [slides](https://speakerdeck.com/mgechev/angular-unplugged) (Sofia, Bulgaria, 13th of July, 2017)
 - ["Mad Science with the Angular Compiler"](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler), [slides](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler) (AngularUP, Tel Aviv, Israel, 25th of June, 2017)
 - ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), ngcruise (cruise ship, Bahamas, 31st May, 2017)
+- ["Mad Science with the Angular Compiler"](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler), Angular Bolivia (online, 30th of April, 2017)
 - ["Mad Science with the Angular Compiler"](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler), [video (en)](https://www.youtube.com/watch?v=tBV4IQwPssU), ng-conf (Salt Lake City, Utah, 5th of April, 2017)
 - ["Linting Angular"](https://speakerdeck.com/mgechev/linting-angular-1), Modern Web (Mountain View, California, 9th of March 2017)
 - ["Angular as Integrated Development Platform"](https://speakerdeck.com/mgechev/angular-as-integrated-development-platform), Angular Sofia (Sofia, Bulgaria, 12th of January 2017)
