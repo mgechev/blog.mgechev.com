@@ -43,6 +43,7 @@ I like talking about software development. I've spoken in San Francisco, Las Veg
 - ["AngularJS in Patterns"](https://github.com/mgechev/angularjs-in-patterns-slides-plovdev), PlovDev (Plovdiv, Bulgaria, 18th of October, 2014)
 - ["What can JavaScript do?"](https://github.com/mgechev/what-js-can-do-slides), HackBulgaria (Sofia, Bulgaria, 31st of October, 2014)
 - ["Aspect-Oriented Programming with AngularJS"](https://github.com/mgechev/angular-aop-talk), AngularJS-SF user group (San Francisco, USA, 5th of May, 2014)
+- ["Single-Page Applications и AngularJS" (BG)](https://www.youtube.com/watch?v=G35xa-LuR8Q), OpenFest (Sofia, Bulgaria, 9th of November, 2013).
 - ["JavaScript Patterns" (BG)](https://www.youtube.com/watch?v=a23oYdqQVvM), Telerik (Sofia, Bulgaria, 22nd of April, 2013)
 
 And a few others, which could be found at my [GitHub account](https://github.com/mgechev).
