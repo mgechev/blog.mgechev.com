@@ -20,32 +20,26 @@ A way to get some high level of confidence that everything will work properly is
 
 An obvious solution to these problem is transitioning to TypeScript. Of course, unit tests are not optional when I have a strict type system; the good news is that they can be used the way they are supposed to - for testing and catching logical errors, nothing else.
 
-We can apply the same approach the back end. We can use a language which type system will guard us from common mistakes and will provide some basic correctness verification of our programs. For both front end and back end there are plenty of different factors which can determine the use of a specific technology. For instance, in case of front end such factors can be:
+We can apply the same approach the back end. We can use a language which type system will guard us from common mistakes and will provide some basic correctness verification of our programs. However, the type system is not the only criteria for choosing a programming language.
 
-- Support of the language by third party libraries we use (in terms of ambient type definitions, for instance).
-- Experience of the team.
-- Opportunity to hire specialist who understand the language.
+Anyhow, at the moment it's easy to find a statically typed language in both front end and back end which covers most common requirements software project have.
 
-In the back end, the requirements in our case were:
-
-- Ease of deployment.
-- Handling a lot of concurrent connections.
-- Performance.
+In this essay, I'll describe the decisions we took in the project I'm working on for making sure we have static verification not only in front end and back end but also in the communication between the client and the server.
 
 # Communication Contract
 
-Now we're statically typed both in the front end and in the back end, however, there's one missing piece - the protocol for communication between the client and the server.
-
-We can take a look at this from two different perspectives:
+We can take a look at the protocol for communication from two different perspectives:
 
 - Sending a network request with payload.
 - Parsing a received from the network payload.
 
 There are different protocols which solve these two issues. For instance, GraphQL does solve them, unfortunately it's not applicable for applications which as requirement has to provide a RESTful interface. Providing a statically typed communication protocol which allows data validation is commonly used since the days when SOAP was mainstream. The WSDL files were solving the exact same problem, however, nowadays they are considered very verbose and impractical.
 
+That's why we considered Swagger. It was the intersection between strictness, expressiveness and brevity.
+
 ## Swagger
 
-This is how decided to use Swagger. Swagger is based on the [OpenAPI](https://www.openapis.org/) specification. In general, it provides a way to describe a communication protocol in terms of YAML schema, which can be used as source for generation of end points for RESTful service and client. On top of that, OpenAPI has some features specific for HTTP:
+Swagger is based on the [OpenAPI](https://www.openapis.org/) specification. In general, it provides a way to describe a communication protocol in terms of YAML schema, which can be used as source for generation of end points for RESTful service and client. On top of that, OpenAPI has some features specific for HTTP:
 
 - Declaration of response codes.
 - Typed URL parameters.
