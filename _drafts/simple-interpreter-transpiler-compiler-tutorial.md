@@ -26,6 +26,8 @@ In this blog post we'll cover the basics from end-to-end! We'll develop an extre
 
 The language that we're going to explore is not a fully functional programming language but it can be easily extended to one.
 
+<img src="/images/simple-compiler/simple.jpg" alt="Simplicity"  style="display: block; margin: auto;">
+
 # Introducing a Simple Prefix Language
 
 Here's how a sample expression in our language is going to look like:
@@ -140,6 +142,8 @@ Now lets go to the phase of syntax analysis!
 # Developing a Parser
 
 The syntax analyzer (often know as parser) is the module of a compiler which out of a list (or stream) of tokens produces an [Abstract Syntax Tree](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)<sup>[5]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.
+
+<img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;">
 
 Usually, the parser is implemented base on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[6]</sup>. Here's the grammar of our language:
 
@@ -347,6 +351,8 @@ transpile(parse(lex(program)));
 ```
 
 We invoke `lex(program)`, which produces the list of tokens, after that we pass the tokens to the `parse` function, which produces the AST and finally, we `transpile` the AST to JavaScript!
+
+<img src="/images/simple-compiler/wire.jpg" alt="Connecting"  style="display: block; margin: auto;">
 
 # Conclusion
 
