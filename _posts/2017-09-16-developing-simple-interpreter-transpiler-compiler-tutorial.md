@@ -24,7 +24,9 @@ In this blog post we'll cover the basics from end-to-end! We'll develop an extre
 - Module for syntax analysis
 - Code generator
 
-The language that we're going to explore is not a fully functional programming language but it can be easily extended to one.
+The language that we're going to explore is not particularly useful for developing meaningful software programs but it can be easily extended to one.
+
+[The entire implementation can be found at my GitHub profile](https://github.com/mgechev/tiny-compiler)<sup>[3]</sup>.
 
 <img src="/images/simple-compiler/simple.jpg" alt="Simplicity"  style="display: block; margin: auto;">
 
@@ -73,7 +75,7 @@ _**Note**: Similar prefix expressions can be simply evaluated with a stack-based
 
 # Developing Compiler's Front End
 
-The front end of any compiler usually has the modules for [Lexical Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)<sup>[3]</sup> and [Syntax Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)<sup>[4]</sup>. In this section we'll build both modules in a few lines of JavaScript!
+The front end of any compiler usually has the modules for [Lexical Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)<sup>[4]</sup> and [Syntax Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)<sup>[5]</sup>. In this section we'll build both modules in a few lines of JavaScript!
 
 ## Developing a Lexical Analyzer
 
@@ -141,11 +143,11 @@ Now lets go to the phase of syntax analysis!
 
 # Developing a Parser
 
-The syntax analyzer (often know as parser) is the module of a compiler which out of a list (or stream) of tokens produces an [Abstract Syntax Tree](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)<sup>[5]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.
+The syntax analyzer (often know as parser) is the module of a compiler which out of a list (or stream) of tokens produces an [Abstract Syntax Tree](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)<sup>[6]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.
 
 <img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;">
 
-Usually, the parser is implemented base on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[6]</sup>. Here's the grammar of our language:
+Usually, the parser is implemented base on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[7]</sup>. Here's the grammar of our language:
 
 ```
 digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
@@ -307,7 +309,7 @@ op = sum | sub | mul | div
 expr = num | op expr+
 ```
 
-Now they may make a bit more sense? `expr` looks very much like `parseExpr`, where we parse either a `num`ber or an `op`eration. Similarly, `op expr+` looks very much like `parseOp` and `num` like `parseNum`. In fact, very often parsers are generated directly from the grammars since there's a direct connection between both with the [recursive descent parsing algorithm](https://en.wikipedia.org/wiki/Recursive_descent_parser)<sup>[7]</sup>.
+Now they may make a bit more sense? `expr` looks very much like `parseExpr`, where we parse either a `num`ber or an `op`eration. Similarly, `op expr+` looks very much like `parseOp` and `num` like `parseNum`. In fact, very often parsers are generated directly from the grammars since there's a direct connection between both with the [recursive descent parsing algorithm](https://en.wikipedia.org/wiki/Recursive_descent_parser)<sup>[8]</sup>.
 
 And in fact, we just developed a simple recursive descent parser! Our parser was quite simple (well, we have only 4 **production rules** in the grammar) but you can imagine how complex the parser of a real-life programming language is.
 
@@ -375,8 +377,9 @@ If you're interested in further reading, I'd recommend you:
 
 1. [Static Code Analysis of Angular 2 and TypeScript Projects - http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/).
 2. [Developing Statically Typed Programming Language - http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)
-3. [Lexical Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)
-4. [Syntax Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)
-5. [Abstract Syntax Tree - https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)
-6. [EBNF grammar - https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
-7. [Recursive Descent Parsing - https://en.wikipedia.org/wiki/Recursive_descent_parser](https://en.wikipedia.org/wiki/Recursive_descent_parser)
+3. [Tiny Compiler - https://github.com/mgechev/tiny-compiler](https://github.com/mgechev/tiny-compiler)
+4. [Lexical Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)
+5. [Syntax Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)
+6. [Abstract Syntax Tree - https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)
+7. [EBNF grammar - https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+8. [Recursive Descent Parsing - https://en.wikipedia.org/wiki/Recursive_descent_parser](https://en.wikipedia.org/wiki/Recursive_descent_parser)
