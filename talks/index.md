@@ -8,7 +8,8 @@ layout: page
 
 I like talking about software development. I've spoken in San Francisco, Las Vegas, London, Berlin, Kiev, etc. Here you can find links to some of my recent talks:
 
-- ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), ngHouston (online, 18th August, 2017)
+- ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), [Angular Dev Summit](https://angulardevsummit.com/) (online, 11th of September, 2017)
+- ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), ngHouston (online, 18th of August, 2017)
 - ["Angular Unplugged" Q&A session](https://speakerdeck.com/mgechev/angular-unplugged), Q&A session organized for the Bulgarian JavaScript community, [slides](https://speakerdeck.com/mgechev/angular-unplugged) (Sofia, Bulgaria, 13th of July, 2017)
 - ["Mad Science with the Angular Compiler"](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler), [slides](https://speakerdeck.com/mgechev/mad-science-with-the-angular-compiler) (AngularUP, Tel Aviv, Israel, 25th of June, 2017)
 - ["Angular Performance Checklist"](https://speakerdeck.com/mgechev/angular-performance-checklist-1), ngcruise (cruise ship, Bahamas, 31st May, 2017)
