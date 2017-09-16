@@ -14,9 +14,9 @@ tags:
   - Computer Science
 ---
 
-I already wrote a couple of essays related to the development of programming languages that I was extremely excited about! For instance, in "[Static Code Analysis of Angular 2 and TypeScript Projects](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/)"<sup>[1]</sup> I explored the basics of the front-end of the compilers, explaining the phases of lexical analysis, syntax analysis and abstract-syntax trees.
+I already wrote a couple of essays related to the development of programming languages that I was extremely excited about! For instance, in "[Static Code Analysis of Angular 2 and TypeScript Projects](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/)"<sup>[1]</sup> I explored the basics of the front end of the compilers, explaining the phases of lexical analysis, syntax analysis and abstract-syntax trees.
 
-Recently I published "[Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)"<sup>[2]</sup>. This post shown a simple, statically typed, functional programming language inspired by lambda calculus. There I outsourced the front-end part of the compiler development to a parser generator and focused on the back-end in the faces of a module for type checking and one for code generation.
+Recently I published "[Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)"<sup>[2]</sup>. This post shown a simple, statically typed, functional programming language inspired by lambda calculus. There I outsourced the front end part of the compiler development to a parser generator and focused on the back end in the faces of a module for type checking and one for code generation.
 
 In this blog post we'll cover the basics from end-to-end! We'll develop an extremely simple compiler on 25 lines of JavaScript! Our compiler will have:
 
@@ -68,12 +68,12 @@ or...
 3 * (2 - (1 + 3 + 4))
 ```
 
-Now, after we have understanding of the semantics, lets start with the front-end of the compiler!
+Now, after we have understanding of the semantics, lets start with the front end of the compiler!
 
 
 _**Note**: Similar prefix expressions can be simply evaluated with a stack-based algorithm, however, in this case we'll focus on concepts rather than implementation._
 
-# Developing Compiler's Front End
+# Developing the Compiler's Front End
 
 The front end of any compiler usually has the modules for [Lexical Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)<sup>[4]</sup> and [Syntax Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)<sup>[5]</sup>. In this section we'll build both modules in a few lines of JavaScript!
 
