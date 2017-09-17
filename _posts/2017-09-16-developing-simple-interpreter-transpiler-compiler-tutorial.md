@@ -26,7 +26,7 @@ In this blog post we'll cover the basics from end-to-end! We'll develop an extre
 
 The language that we're going to explore is not particularly useful for developing meaningful software programs but it can be easily extended to one.
 
-[The entire implementation can be found at my GitHub profile](https://github.com/mgechev/tiny-compiler)<sup>[3]</sup>.
+[**The entire implementation can be found at my GitHub profile**](https://github.com/mgechev/tiny-compiler)<sup>[3]</sup>.
 
 <img src="/images/simple-compiler/simple.jpg" alt="Simplicity"  style="display: block; margin: auto;">
 
