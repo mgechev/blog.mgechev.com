@@ -26,12 +26,14 @@ You might be now wondering "*Why would I need to know how to develop a compiler?
 - Often, you'll have to reuse pieces of the modules described below for different purposes (for instance, parsing of configuration files, parsing of network messages, etc.).
 - Creating a DSL. Creating a Domain Specific Language in your project could be quite handy in order to simplify tasks which otherwise take a lot of time to solve with a general purpose programming language.
 
-# What we will cover?
+# What are we going to cover?
 
 In this blog post we'll cover the basics from end-to-end! We'll develop an extremely simple compiler on 25 lines of JavaScript! Our compiler will have:
 
 - Module for lexical analysis
 - Module for syntax analysis
+  - The parser will be based on an EBNF grammar
+  - We will develop the parser by using a recursive descent parsing algorithm
 - Code generator
 
 The language that we're going to explore is not particularly useful for developing meaningful software programs but it can be easily extended to one.
