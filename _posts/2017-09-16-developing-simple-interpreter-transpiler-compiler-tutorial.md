@@ -18,6 +18,16 @@ I already wrote a couple of essays related to the development of programming lan
 
 Recently I published "[Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)"<sup>[2]</sup>. This post shown a simple, statically typed, functional programming language inspired by lambda calculus. There I outsourced the front end part of the compiler development to a parser generator and focused on the back end in the faces of a module for type checking and one for code generation.
 
+# Why do I need this?
+
+You might be now wondering *Why would I need to know how to develop a compiler?*. There are a few important reasons:
+
+- You will get a better understanding of how the programming languages you're using work. This will allow you to develop more efficient programs with them.
+- Often, you'll have to reuse pieces of the modules described below for different purposes (for instance, parsing of configuration files, parsing of network messages, etc.).
+- Creating a DSL. Creating a Domain Specific Language in your project could be quite handy in order to simplify tasks which otherwise take a lot of time to solve with a general purpose programming language.
+
+# What we will cover?
+
 In this blog post we'll cover the basics from end-to-end! We'll develop an extremely simple compiler on 25 lines of JavaScript! Our compiler will have:
 
 - Module for lexical analysis
