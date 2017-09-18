@@ -20,7 +20,7 @@ Recently I published "[Developing Statically Typed Programming Language](http://
 
 # Why do I need this?
 
-You might be now wondering *Why would I need to know how to develop a compiler?*. There are a few important reasons:
+You might be now wondering "*Why would I need to know how to develop a compiler?*". There are a few important reasons:
 
 - You will get a better understanding of how the programming languages you're using work. This will allow you to develop more efficient programs with them.
 - Often, you'll have to reuse pieces of the modules described below for different purposes (for instance, parsing of configuration files, parsing of network messages, etc.).
