@@ -239,7 +239,16 @@ The operator `sum`, applied to `2`, `3`, `4` will look like this:
 {
   type: Op,
   val: 'sum',
-  expr: [2, 3, 4]
+  expr: [{
+    type: Num,
+    va: 2
+  }, {
+    type: Num,
+    va: 3
+  }, {
+    type: Num,
+    va: 4
+  }]
 }
 ```
 
