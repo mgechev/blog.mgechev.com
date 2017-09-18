@@ -1,23 +1,23 @@
 ---
-title: Using Stripe with Angular 2
+title: Using Stripe with Angular
 author: minko_gechev
 layout: post
 categories:
   - JavaScript
-  - Angular 2
+  - Angular
 tags:
   - stripe
   - JavaScript
-  - Angular 2
+  - Angular
 ---
 
 Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you're offering using Stripe as a mediator.
 
 ![Angular & Stripe](/images/stripe/angular-and-stripe.png)
 
-On the other hand, Angular 2 is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.
+On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.
 
-In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular 2 and how you can solve them.
+In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.
 
 So lets begin!
 
@@ -260,9 +260,9 @@ export class CustomFormComponent {
 
 ## Conclusion
 
-In this short blog post we described how we can easily use Stripe with Angular 2. We went through the default Stripe checkout and after that we built a custom form!
+In this short blog post we described how we can easily use Stripe with Angular. We went through the default Stripe checkout and after that we built a custom form!
 
-The only tricky thing that we found in the first part of our experiment was the sanitization of the components' templates by Angular 2. It prevents us from using:
+The only tricky thing that we found in the first part of our experiment was the sanitization of the components' templates by Angular. It prevents us from using:
 
 ```html
 <form action="/charge" method="POST">
@@ -279,7 +279,7 @@ The only tricky thing that we found in the first part of our experiment was the 
 ```
 and instead makes to be a bit more creative :-).
 
-With the custom form we faced another issue related to not triggering the Angular 2 change detection once we get the card token. We discovered that this is due the uncommon way Stripe performs the Ajax request for registering the user's card.
+With the custom form we faced another issue related to not triggering the Angular change detection once we get the card token. We discovered that this is due the uncommon way Stripe performs the Ajax request for registering the user's card.
 
 We solved the issue simply by wrapping the callback inside of a `zone.run(() => {...})` call!
 
