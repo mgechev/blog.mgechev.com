@@ -387,11 +387,12 @@ If you're interested in further reading, I'd recommend you:
 
 # References
 
-1. [Static Code Analysis of Angular 2 and TypeScript Projects - http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/).
-2. [Developing Statically Typed Programming Language - http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)
-3. [Tiny Compiler - https://github.com/mgechev/tiny-compiler](https://github.com/mgechev/tiny-compiler)
-4. [Lexical Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Lexical_analysis)
-5. [Syntax Analysis - https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis](https://en.wikibooks.org/wiki/Compiler_Construction/Syntax_Analysis)
-6. [Abstract Syntax Tree - https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)
-7. [EBNF grammar - https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
-8. [Recursive Descent Parsing - https://en.wikipedia.org/wiki/Recursive_descent_parser](https://en.wikipedia.org/wiki/Recursive_descent_parser)
+1. [Static Code Analysis of Angular 2 and TypeScript Projects - https://mgv.io/ng-static-analysis](https://mgv.io/ng-static-analysis).
+2. [Developing Statically Typed Programming Language - https://mgv.io/typed-lambda](https://mgv.io/typed-lambda)
+3. [Tiny Compiler - https://mgv.io/tiny-compiler](https://mgv.io/tiny-compiler)
+4. [Lexical Analysis - https://mgv.io/wiki-lex](https://mgv.io/wiki-lex)
+5. [Syntax Analysis - https://mgv.io/wiki-parser](https://mgv.io/wiki-parser)
+6. [Abstract Syntax Tree - https://mgv.io/wiki-case-ast](https://mgv.io/wiki-case-ast)
+7. [EBNF grammar - https://mgv.io/wiki-ebnf](https://mgv.io/wiki-ebnf)
+8. [Recursive Descent Parsing - https://mgv.io/wiki-recursive-descent-parser](https://mgv.io/wiki-recursive-descent-parser)
+
