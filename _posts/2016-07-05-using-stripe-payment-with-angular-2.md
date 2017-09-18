@@ -13,7 +13,7 @@ tags:
 
 Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you're offering using Stripe as a mediator.
 
-![Angular & Stripe](/images/stripe/angular-and-stripe.png)
+<img src="/images/stripe/angular-and-stripe.png" alt="Angular & Stripe" style="display: block; margin: auto">
 
 On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.
 
