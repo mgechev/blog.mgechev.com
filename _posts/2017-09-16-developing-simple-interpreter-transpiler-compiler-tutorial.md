@@ -371,6 +371,7 @@ Here's how we can wire everything together:
 const program = 'mul 3 sub 2 sum 1 3 4';
 
 transpile(parse(lex(program)));
+// (3 * (2 - (1 + 3 + 4)))
 ```
 
 We invoke `lex(program)`, which produces the list of tokens, after that we pass the tokens to the `parse` function, which produces the AST and finally, we `transpile` the AST to JavaScript!
