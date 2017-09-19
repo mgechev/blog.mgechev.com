@@ -338,7 +338,7 @@ It's extremely convenient to develop the grammar of a language before write the 
 
 # Developing the Transpiler
 
-In this part of the post we'll traverse the AST of the language and produce JavaScript. The entire transpiler is on 7 lines of JavaScript (literary!):
+In this part of the post we'll traverse the AST of the language and produce JavaScript. The entire transpiler is on 7 lines of JavaScript (literally!):
 
 ```javascript
 const transpile = ast => {
