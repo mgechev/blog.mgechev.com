@@ -196,18 +196,18 @@ const parse = tokens => {
 
   let c = 0;
 
-  const cur = () => tokens[c];
-  const next = () => tokens[c++];
+  const peek = () => tokens[c];
+  const consume = () => tokens[c++];
 
-  const parseNum = () => ({ val: parseInt(next()), type: Num });
+  const parseNum = () => ({ val: parseInt(consume()), type: Num });
 
   const parseOp = () => {
-    const node = { val: next(), type: Op, expr: [] };
-    while (cur()) node.expr.push(parseExpr());
+    const node = { val: consume(), type: Op, expr: [] };
+    while (peek()) node.expr.push(parseExpr());
     return node;
   };
 
-  const parseExpr = () => /\d/.test(cur()) ? parseNum() : parseOp();
+  const parseExpr = () => /\d/.test(peek()) ? parseNum() : parseOp();
 
   return parseExpr();
 };
@@ -258,9 +258,9 @@ That's how simple is that!
 
 After we declare the node types, we define a function called `parse` which accepts a single argument called `tokens`. Inside of it we define five more functions:
 
-- `cur` - returns the element of `tokens` associated with the current value of the `c` local variable.
-- `next` - returns the element of `tokens` associated with the current value of the `c` local variable and increments `c`.
-- `parseNum` - gets the current token (i.e. invokes `cur()`), parses it to a natural number and returns a new number token.
+- `peek` - returns the element of `tokens` associated with the current value of the `c` local variable.
+- `consume` - returns the element of `tokens` associated with the current value of the `c` local variable and increments `c`.
+- `parseNum` - gets the current token (i.e. invokes `peek()`), parses it to a natural number and returns a new number token.
 - `parseOp` - we'll explore in a little bit.
 - `parseExpr` - checks of the current token matches the regular expression `/\d/` (i.e. is a number) and invokes `parseNum` if the match was successful, otherwise returns `parseOp`.
 
@@ -270,17 +270,17 @@ The `parseOp` is maybe the most complicated function from the parser above. That
 
 ```javascript
 const parseOp = () => {
-  const node = { val: next(), type: Op, expr: [] };
-  while (cur()) node.expr.push(parseExpr());
+  const node = { val: consume(), type: Op, expr: [] };
+  while (peek()) node.expr.push(parseExpr());
   return node;
 };
 ```
 
-Since `parseOp` has been invoked by `parseExpr` when the value of `cur()` is not a number we know that it is an operator so we create a new operation node. Note that we don't perform any further validation, however, in a real-world programming language we'd want to do that and eventually throw a syntax error in case of unexpected token.
+Since `parseOp` has been invoked by `parseExpr` when the value of `peek()` is not a number we know that it is an operator so we create a new operation node. Note that we don't perform any further validation, however, in a real-world programming language we'd want to do that and eventually throw a syntax error in case of unexpected token.
 
-Anyhow, in the node declaration we set the list of "sub-expressions" to be the empty list (i.e. `[]`), the operation name to the value of `cur()` and the type of the node to `Op`. Later, while we don't reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of "sub-expressions` of the given node. Finally, we return the node.
+Anyhow, in the node declaration we set the list of "sub-expressions" to be the empty list (i.e. `[]`), the operation name to the value of `peek()` and the type of the node to `Op`. Later, while we don't reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of "sub-expressions` of the given node. Finally, we return the node.
 
-Keep in mind that `while (cur()) node.expr.push(parseExpr());` performs an indirect recursion. In case we have the expression:
+Keep in mind that `while (peek()) node.expr.push(parseExpr());` performs an indirect recursion. In case we have the expression:
 
 ```
 sum sum 2
@@ -289,14 +289,14 @@ sum sum 2
 This will
 
 - First, invoke `parseExpr`, which will find that the current token (i.e. `tokens[0]`) is not a number (it's `sum`) so it'll invoke `parseOp`.
-- After that `parseOp` will create the operation node and because of the `next()` call, increment the value of `c`.
+- After that `parseOp` will create the operation node and because of the `consume()` call, increment the value of `c`.
 - Next `parseOp` will iterate over the nodes, and for `tokens[c]`, where `c` now equals `1` will invoke `parseExpr`.
 - `parseExpr` will find that the current node is not a number so it'll invoke `parseOp`.
 - `parseOp` will create another operation node and increment `c` and will start looping over all the tokens again.
 - `parseOp` will invoke `parseExpr` where `c` will not equal `2`.
 - Since `tokens[2] === "2"`, `parseExpr` will invoke `parseNum` which will create a number node, incrementing the `c` variable.
 - `parseNum` will return the number node and it will be pushed into the `expr` array of the last operation node produced by the latest `parseOp` invocation.
-- The last `parseOp` invocation will return the operation node since `cur()` will return `undefined` (`parseNum` has incremented `c` to `3` and `tokens[3] === undefined`).
+- The last `parseOp` invocation will return the operation node since `peek()` will return `undefined` (`parseNum` has incremented `c` to `3` and `tokens[3] === undefined`).
 - The node returned by the last invocation of `parseOp` will be returned to the outermost invocation of `parseOp` which will return its operation node as well.
 - Finally, `parseExpr` will return the root operation node.
 
