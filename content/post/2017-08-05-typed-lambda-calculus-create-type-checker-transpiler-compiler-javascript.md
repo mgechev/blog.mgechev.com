@@ -60,7 +60,7 @@ Notice that in contrast to other statically typed programming languages, such as
 Now after we're familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button "Evaluate" to see the result:
 
 <div>
-  <textarea id="code" style="width: 100%; height: 150px;">
+  <textarea id="code" style="width: 100%; height: 140px; padding: 5px; font-size: 13px;">
 (λ a: Nat → a)
   (if
     (λ a: Nat → iszero a) pred 0
@@ -117,47 +117,43 @@ Lets explain the evaluation step by step:
   <li>
 Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
 
-<div class="highlighter-rouge">
-<pre class="highlight">
+<div class="highlight">
+<pre>
 <code>(
   λ f: Nat →
     (λ g: Nat → f) 0
-) (succ 0)
-</code>
+) (succ 0)</code>
 </pre>
 </div>
   </li>
   <li>
 Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply <a href="https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction">beta reduction</a>) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
-<div class="highlighter-rouge">
-<pre class="highlight">
+<div class="highlight">
+<pre>
 <code>(
   λ f: Nat → f
-) (succ 0)
-</code>
+) (succ 0)</code>
 </pre>
 </div>
   </li>
   <li>
 Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
-<div class="highlighter-rouge">
-<pre class="highlight">
+<div class="highlight>
+<pre>
 <code>(
   λ f: Nat → f
-) 1
-</code>
+) 1</code>
 </pre>
 </div>
   </li>
   <li>
 Return result <code class="highlighter-rouge">1</code>.
 
-<div class="highlighter-rouge">
-<pre class="highlight">
-<code>1
-</code>
+<div class="highlight">
+<pre>
+<code>1</code>
 </pre>
 </div>
   </li>
