@@ -368,7 +368,7 @@ On the last line of `transpile`'s body, we return the result of `transpileNode` 
 
 Here's how we can wire everything together:
 
-```
+```javascript
 const program = 'mul 3 sub 2 sum 1 3 4';
 
 transpile(parse(lex(program)));
