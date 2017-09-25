@@ -201,11 +201,7 @@ In this section we'll use very important property of the ES2015 modules - they a
 
 <img src="/images/ng2-build/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
 <img src="/images/ng2-build/tree-shaking.gif" style="width: 0; height: 0; border: none;">
-<script>
-document.getElementById('tree-img').onclick = function () {
-  this.src = '/images/ng2-build/tree-shaking.gif';
-};
-</script>
+<script src="/assets/js/shake/index.js"></script>
 
 What does tree-shaking means:
 
