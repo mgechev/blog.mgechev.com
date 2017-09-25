@@ -140,7 +140,7 @@ Substitute <code class="highlighter-rouge">g</code> with <code class="highlighte
   <li>
 Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(λ f: Nat → f)</code>.
 
-<div class="highlight>
+<div class="highlight">
 <pre>
 <code>(
   λ f: Nat → f
@@ -149,7 +149,7 @@ Increment <code class="highlighter-rouge">0</code> in the expression <code class
 </div>
   </li>
   <li>
-Return result <code class="highlighter-rouge">1</code>.
+Return result.
 
 <div class="highlight">
 <pre>
