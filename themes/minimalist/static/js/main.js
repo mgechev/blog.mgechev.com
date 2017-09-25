@@ -22,14 +22,14 @@
 		if (!isRetina())
 			return;
 
-		[].slice.call(document.querySelectorAll('img.x2')).map(function (i, image) {
+		[].slice.call(document.querySelectorAll('img.x2')).map(function (image) {
 
-			var path = $(image).attr("src");
+			var path = image.getAttribute("src");
 
 			path = path.replace(".png", "@2x.png");
 			path = path.replace(".jpg", "@2x.jpg");
 
-			$(image).attr("src", path);
+			image.setAttribute("src", path);
 		});
 	};
 
