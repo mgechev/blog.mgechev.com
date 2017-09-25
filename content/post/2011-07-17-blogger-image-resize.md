@@ -13,7 +13,7 @@ title: Blogger image resize
 url: /2011/07/17/blogger-image-resize/
 ---
 
-That&#8217;s my second post here and the first one which is going to have any sense. Today a friend of mine was fighting with Google&#8217;s blog system&#8230;He was posting some data with images in it. When he was setting width and height of images in the html editor they were being resized later after he post the article. When he tried to put any CSS restriction about picture&#8217;s width the effect was &#8211; picture flattened (because blogger was setting the picture height). I looked at the source for few minutes, stopped the JavaScript because I thought that it is the problem but there was no result&#8230;So I wrote a tiny script which deals with the problem. And here is it:
+That’s my second post here and the first one which is going to have any sense. Today a friend of mine was fighting with Google’s blog system...He was posting some data with images in it. When he was setting width and height of images in the html editor they were being resized later after he post the article. When he tried to put any CSS restriction about picture’s width the effect was – picture flattened (because blogger was setting the picture height). I looked at the source for few minutes, stopped the JavaScript because I thought that it is the problem but there was no result...So I wrote a tiny script which deals with the problem. And here is it:
 
 {{< highlight JavaScript >}}   
 /*

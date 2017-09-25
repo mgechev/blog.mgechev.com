@@ -25,11 +25,11 @@ title: Looking for performance? Probably you should NOT use [].sort (V8)
 url: /2012/11/24/javascript-sorting-performance-quicksort-v8/
 ---
 
-A few days ago, I&#8217;ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It&#8217;s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones &#8211; sorting (insertion, selection, bubble sort..). After that I implemented few &#8220;more advance&#8221; like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
+A few days ago, I’ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
 
 {{< highlight javascript >}}function sort() { [native code] }{{< / highlight >}}
 
-That&#8217;s why I&#8217;ve wrote not optimized version of mergesort and I&#8217;ve run it with generated array with 500k elements. I waited&#8230;waited&#8230;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I&#8217;ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google&#8217;s V8 engine</a>). After merge sort I&#8217;ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I&#8217;ve generated another array with 500k elements using a simple perl script. The result was very interesting&#8230;In the chart below you can see mergesort compared to heapsort for array with 50k elements.
+That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements. I waited...waited...and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I’ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google’s V8 engine</a>). After merge sort I’ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I’ve generated another array with 500k elements using a simple perl script. The result was very interesting...In the chart below you can see mergesort compared to heapsort for array with 50k elements.
 
 <div id="attachment_237" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -37,7 +37,7 @@ That&#8217;s why I&#8217;ve wrote not optimized version of mergesort and I&#8217
   </p>
 </div>
 
-In the X-axis it&#8217;s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).
+In the X-axis it’s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).
 
 Here is the implementation of the Mergesort:
 
@@ -143,8 +143,8 @@ var heapSort = (function () {
 }());
 {{< / highlight >}}
 
-If you find any mistakes in any of the implementations I&#8217;ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.
-After I&#8217;ve made the test between merge and heap sorts I noticed that there&#8217;s a quite big difference&#8230;So that&#8217;s why I started heap vs the default sort to see how faster the native sort will be:
+If you find any mistakes in any of the implementations I’ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.
+After I’ve made the test between merge and heap sorts I noticed that there’s a quite big difference...So that’s why I started heap vs the default sort to see how faster the native sort will be:
 
 <div id="attachment_239" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/500k-heap-vs-default.png"><img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-heap-vs-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -152,7 +152,7 @@ After I&#8217;ve made the test between merge and heap sorts I noticed that there
   </p>
 </div>
 
-As you see the result is quite unexpected&#8230;I&#8217;ve checked my algorithm many times because I thought that it isn&#8217;t correct&#8230;In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays. The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.
+As you see the result is quite unexpected...I’ve checked my algorithm many times because I thought that it isn’t correct...In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays. The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.
 
 That is the perl script which I used for the test:
 
@@ -295,17 +295,17 @@ arrays with size $array_size, maximum size of each element $max.\n";
 }
 {{< / highlight >}}
 
-If you find any issue in the script please let me know, I&#8217;ll fix it as soon as possible.
-For the test cases I used both &#8211; different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn&#8217;t found any difference between both alternatives that&#8217;s why I choose to generate a single array for each test (for faster testing).
+If you find any issue in the script please let me know, I’ll fix it as soon as possible.
+For the test cases I used both – different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn’t found any difference between both alternatives that’s why I choose to generate a single array for each test (for faster testing).
 
-So let me tell you few words about the script because not everyone is familiar with perl and it&#8217;s syntax. I have three configuration variables: $max, $array\_size and $tests\_count. $max defines the maximum size of the array&#8217;s elements, $array\_size is the size of the arrays we want to test with and $tests\_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort => &#8216;heapsort.js&#8217;, Default => &#8216;default.js&#8217; ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I&#8217;ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven&#8217;t mentioned explicitly that I use something different). In all test cases I&#8217;ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven&#8217;t mentioned explicity different CPU) with Fedora 18, x86_64. The content of default.js is:
+So let me tell you few words about the script because not everyone is familiar with perl and it’s syntax. I have three configuration variables: $max, $array\_size and $tests\_count. $max defines the maximum size of the array’s elements, $array\_size is the size of the arrays we want to test with and $tests\_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort => ‘heapsort.js’, Default => ‘default.js’ ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I’ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven’t mentioned explicitly that I use something different). In all test cases I’ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven’t mentioned explicitly different CPU) with Fedora 18, x86_64. The content of default.js is:
 
 {{< highlight javascript >}}array.sort(function (a, b) {
     return a - b;
 });{{< / highlight >}}
 
-Let start&#8230;
-In the charts below there&#8217;s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
+Let start...
+In the charts below there’s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
 
 <div id="attachment_240" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/100-all.png"><img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="/images/legacy/uploads2012/11/100-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -313,7 +313,7 @@ In the charts below there&#8217;s a statistic for Selection sort, Insertion sort
   </p>
 </div>
 
-In this first chart there&#8217;s a statistic with 100 elements. In this case there&#8217;s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.
+In this first chart there’s a statistic with 100 elements. In this case there’s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.
 
 <div id="attachment_241" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/10k-all.png"><img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="/images/legacy/uploads2012/11/10k-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -321,7 +321,7 @@ In this first chart there&#8217;s a statistic with 100 elements. In this case th
   </p>
 </div>
 
-In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let&#8217;s increase the array&#8230;Let&#8217;s try with 250k elements:
+In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let’s increase the array...Let’s try with 250k elements:
 
 <div id="attachment_242" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/250k-heap-merge-default.png"><img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="/images/legacy/uploads2012/11/250k-heap-merge-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -329,10 +329,10 @@ In the chart above the leaders are almost clear. The default sort is with speed 
   </p>
 </div>
 
-From the chart it&#8217;s easy to see that the default sort is slower than the merge and the heap sorts&#8230;It&#8217;s very unusual. If you&#8217;ve ever tried to beat the default sort in Java or STL&#8230;well it&#8217;s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible.
-If we increase the array to more than 300k elements mergesort&#8217;s performance becomes very bad (more than 10 minutes) so I&#8217;ll just exclude the mergesort from the next tests.
+From the chart it’s easy to see that the default sort is slower than the merge and the heap sorts...It’s very unusual. If you’ve ever tried to beat the default sort in Java or STL...well it’s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible.
+If we increase the array to more than 300k elements mergesort’s performance becomes very bad (more than 10 minutes) so I’ll just exclude the mergesort from the next tests.
 
-Let me include one more algorithm implementation. It will be quicksort. Its&#8217; implementation is like taken from a book, nothing special:
+Let me include one more algorithm implementation. It will be quicksort. Its’ implementation is like taken from a book, nothing special:
 
 {{< highlight javascript >}}var quickSort = (function () {
 

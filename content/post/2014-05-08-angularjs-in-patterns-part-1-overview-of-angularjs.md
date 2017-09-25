@@ -24,7 +24,7 @@ title: AngularJS in Patterns (Part 1). Overview of AngularJS
 url: /2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/
 ---
 
-In this series of blog posts I&#8217;m going to cover the paper I&#8217;m writing at [GitHub][1].
+In this series of blog posts I’m going to cover the paper I’m writing at [GitHub][1].
 
 It aims to provide a bit more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
 
@@ -32,7 +32,7 @@ Part one includes only a high level overview of AngularJS, enjoy it.
 
 # AngularJS overview
 
-AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better &#8211; the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:
+AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better – the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:
 
 *   two-way data binding
 *   dependency injection
@@ -48,11 +48,11 @@ The separation of concerns is achieved by dividing each AngularJS application in
 *   services
 *   filters
 
-These components can be grouped inside different modules, which helps to achieve higher level of abstraction and handle complexity. Each of the components encapsulates specific piece of the application&#8217;s logic.
+These components can be grouped inside different modules, which helps to achieve higher level of abstraction and handle complexity. Each of the components encapsulates specific piece of the application’s logic.
 
 ## Partials
 
-The partials are HTML strings. They may contain AngularJS expressions inside the elements or their attributes. One of the distinctions between AngularJS and the others frameworks is the fact that AngularJS&#8217; templates are not in an intermediate format, which needs to be turned into HTML (which is the case with mustache.js and handlebars, for example).
+The partials are HTML strings. They may contain AngularJS expressions inside the elements or their attributes. One of the distinctions between AngularJS and the others frameworks is the fact that AngularJS’ templates are not in an intermediate format, which needs to be turned into HTML (which is the case with mustache.js and handlebars, for example).
 
 Initially each SPA loads index.html file. In the case of AngularJS this file contains a set of standard and custom HTML attributes, elements and comments, which configure and bootstrap the application. Each sub-sequenced user action requires only load of another partial or change of the state of the application, for example through the data binding provided by the framework.
 
@@ -97,7 +97,7 @@ All the custom elements, attributes, comments or classes could be recognized as 
 
 ## Scope
 
-In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contain different properties &#8211; primitives, objects or methods. All methods attached to the scope can be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
+In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contain different properties – primitives, objects or methods. All methods attached to the scope can be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
 
 Another important characteristic of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke methods of its parents since they are properties of its direct or indirect prototype.
 
@@ -134,7 +134,7 @@ Each directive has a name and logic associated with it. In the simplest case the
 *   template
 *   compile function
 *   link function
-*   etc&#8230;
+*   etc...
 
 By citing the name of the directives they can be used inside the declarative partials.
 
@@ -178,7 +178,7 @@ Here is definition of a sample filter, which turns given string to uppercase:
 });
 {{< / highlight >}}
 
-Inside a partial this filter could be used using the Unix&#8217;s piping syntax:
+Inside a partial this filter could be used using the Unix’s piping syntax:
 
 {{< highlight html >}}<div>{{ "{{ name | uppercase " }}}}</div>
 {{< / highlight >}}
@@ -192,7 +192,7 @@ Inside a controller the filter could be used as follows:
 
 ## Services
 
-Every piece of logic, which doesn&#8217;t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too &#8220;fat&#8221; the repetitive code should be placed inside a service.
+Every piece of logic, which doesn’t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too “fat” the repetitive code should be placed inside a service.
 
 {{< highlight javascript >}}myModule.service('Developer', function () {
   this.name = 'Foo';

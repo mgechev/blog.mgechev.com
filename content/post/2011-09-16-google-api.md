@@ -19,7 +19,7 @@ url: /2011/09/16/google-api/
 > 
 > Greetings developers,
 > 
-> Thank you for showing your interest in the Google+ platform on our developer interest form. We promised to let you know when we had more details to share. Well, that time has come&#8230;
+> Thank you for showing your interest in the Google+ platform on our developer interest form. We promised to let you know when we had more details to share. Well, that time has come...
 > 
 > Today, we’re launching the first of the Google+ APIs. This initial API release is focused on public data only — it lets you read information that people have shared publicly on Google+. Read our blog post for more details.
 > 
@@ -43,9 +43,9 @@ url: /2011/09/16/google-api/
 
 Въпреки афинитета ми към .NET си свалих PHP скриптовете, които са достъпни на следния [адрес.][1]
 
-А в [това][2] HowTo можете да видите какво трябва да направите, за да подкарате вашето Google+ приложение. А какво да бъде то&#8230;?
+А в [това][2] HowTo можете да видите какво трябва да направите, за да подкарате вашето Google+ приложение. А какво да бъде то...?
 
-Определено познатите ни facebook приложения, които ни спамят News Feed-a всеки ден ще бъдат достъпни&#8230;Хиляди хора (или по-скоро програмисти), видяли успешните приложения от facebook, използвани от милиони хора всеки ден, ще се опитат да &#8220;пробият&#8221; с нещо старо :)&#8230;Ще се появят поне 50 варианта на..примерно добрите стари късметчета :). Като 1, 2&#8230;най-много 3 от тези варианти ще бъдат използвани, което разбира се зависи от бързината на developer-ите, които по всяка вероятност още след пускането на API-то (преди 12 часа) са били в готовност, както и от &#8220;рекламата&#8221;. Искренно се съмнявам и тук да се появи нещо ново и уникално, което да бъде по-полезно от facebook фермите, мафиите and all other bullshits.
+Определено познатите ни facebook приложения, които ни спамят News Feed-a всеки ден ще бъдат достъпни...Хиляди хора (или по-скоро програмисти), видяли успешните приложения от facebook, използвани от милиони хора всеки ден, ще се опитат да “пробият” с нещо старо :)...Ще се появят поне 50 варианта на..примерно добрите стари късметчета :). Като 1, 2...най-много 3 от тези варианти ще бъдат използвани, което разбира се зависи от бързината на developer-ите, които по всяка вероятност още след пускането на API-то (преди 12 часа) са били в готовност, както и от “рекламата”. Искренно се съмнявам и тук да се появи нещо ново и уникално, което да бъде по-полезно от facebook фермите, мафиите and all other bullshits.
 
 **Happy Codding :)**
 

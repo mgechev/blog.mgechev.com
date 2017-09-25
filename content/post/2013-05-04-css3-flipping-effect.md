@@ -15,7 +15,7 @@ title: CSS3 flipping effect
 url: /2013/05/04/css3-flipping-effect/
 ---
 
-As you know because of the SIMD nature of the GPU it&#8217;s extremely good for graphical calculations. Since HTML5 and CSS3 are here we have a couple of ways for efficient and smooth animations one of them are the CSS3 transitions.
+As you know because of the SIMD nature of the GPU it’s extremely good for graphical calculations. Since HTML5 and CSS3 are here we have a couple of ways for efficient and smooth animations one of them are the CSS3 transitions.
 
 Before few days I needed a CSS3 flipping effect which should works at least in IE10, Chrome 25+ and Firefox. I tried different demos which I found in the web but there were couple of issues with them. The lack of support of **preserve-3d** in IE10 was one major thing, issues with **backface-visibility** in Chrome were also a bit frustrating. It looks like Firefox was the champion in the CSS3 flipping effects because most of the demos were failing in IE10 or Chrome but working on Firefox.
 
@@ -78,7 +78,7 @@ Here is the CSS:
 }
 {{< / highlight >}}
 
-You can see that it&#8217;s extremely simple &#8211; just rotating the front and back panes with difference 180 degrees when the user hover the panel.
+You can see that it’s extremely simple – just rotating the front and back panes with difference 180 degrees when the user hover the panel.
 
 The HTML is even simpler:
 
@@ -95,6 +95,6 @@ The HTML is even simpler:
 </div>
 {{< / highlight >}}
 
-And of course, there&#8217;s no JavaScript. You just don&#8217;t need it.
+And of course, there’s no JavaScript. You just don’t need it.
 
 I hope that it was useful.

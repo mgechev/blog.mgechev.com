@@ -80,9 +80,9 @@
 
 <p>At first sight AngularJS seems like a magical framework, which does some weird but awesome things like dependency injection, data binding only by setting a single property to the magical object named $scope and many other things.</p>
 
-<p>If you look at the source code of Angular you&#8217;ll see a lot of smart and simple solutions for these magical problems. In this blog post I&#8217;ll describe the magic which stays behind <code>$resource</code>. I decided to write this blog post because of my recent experience in StackOverflow. One of the most misunderstood components of AngularJS was exactly the <code>$resource</code> service. <code>$resource</code> is two levels of abstraction above the XMLHttpRequest object (ok, may be three if we count <code>$httpBackend</code>). I&#8217;ve illustrated the usage of <code>$resource</code> through example which can be found at <a href="https://github.com/mgechev/angularjs-resource">GitHub</a>.</p>
+<p>If you look at the source code of Angular you’ll see a lot of smart and simple solutions for these magical problems. In this blog post I’ll describe the magic which stays behind <code>$resource</code>. I decided to write this blog post because of my recent experience in StackOverflow. One of the most misunderstood components of AngularJS was exactly the <code>$resource</code> service. <code>$resource</code> is two levels of abstraction above the XMLHttpRequest object (ok, may be three if we count <code>$httpBackend</code>). I’ve illustrated the usage of <code>$resource</code> through example which can be found at <a href="https://github.com/mgechev/angularjs-resource">GitHub</a>.</p>
 
-<p>Before continuing with <code>$resource</code> I&#8217;m going to explain few important concepts. The first one is:</p>
+<p>Before continuing with <code>$resource</code> I’m going to explain few important concepts. The first one is:</p>
 
 <h3 id="active-record">Active Record</h3>
 
@@ -126,7 +126,7 @@
 </code></pre></div>
 
 
-<p>In the client-side JavaScript everything is a little bit different but the concepts are the same. What are the problems of this pattern? Well, in the relational databases we work with relations, which are represented as tables. We don&#8217;t have the standard OO concepts such as inheritance or association. Of course, we can emulate them by using tables but this leads to a problem &#8211; we don&#8217;t have 1:1 mapping between our tables and classes. Thats why sometimes for ORM is preferred the pattern <a href="http://www.martinfowler.com/eaaCatalog/dataMapper.html">Data Mapper</a>, but topic is out of the scope of the current post. Fortunately, in the Single-Page Applications, usually we have back-end, which probably uses ORM framework and provides us a nice JSON API, so we don&#8217;t have to worry about complex mapping, we can just use client-side Active Record.</p>
+<p>In the client-side JavaScript everything is a little bit different but the concepts are the same. What are the problems of this pattern? Well, in the relational databases we work with relations, which are represented as tables. We don’t have the standard OO concepts such as inheritance or association. Of course, we can emulate them by using tables but this leads to a problem – we don’t have 1:1 mapping between our tables and classes. Thats why sometimes for ORM is preferred the pattern <a href="http://www.martinfowler.com/eaaCatalog/dataMapper.html">Data Mapper</a>, but topic is out of the scope of the current post. Fortunately, in the Single-Page Applications, usually we have back-end, which probably uses ORM framework and provides us a nice JSON API, so we don’t have to worry about complex mapping, we can just use client-side Active Record.</p>
 
 <h3 id="lexical-functional-scope">Lexical functional scope</h3>
 
@@ -151,7 +151,7 @@
 
 <h3 id="digest-loop">$digest loop</h3>
 
-<p>The last thing we will look at before continuing with <code>$resource</code> is AngularJS&#8217;s <code>$digest</code> loop. Probably you&#8217;re aware that when AngularJS finds some &#8220;special&#8221; directives in our templates it automatically registers watchers for the expressions used in these directives. Such &#8220;special&#8221; directives are <code>{{ }}</code>, <code>ng-model</code>, <code>ng-bind</code>. When something cause call of the digest loop AngularJS iterates over all watched expressions and calculates their values until there are no more changes (when we have wider support of <code>Object.observe</code>, probably the <code>$digest</code> loop will be more smarter and efficient).</p>
+<p>The last thing we will look at before continuing with <code>$resource</code> is AngularJS’s <code>$digest</code> loop. Probably you’re aware that when AngularJS finds some “special” directives in our templates it automatically registers watchers for the expressions used in these directives. Such “special” directives are <code>{{ }}</code>, <code>ng-model</code>, <code>ng-bind</code>. When something cause call of the digest loop AngularJS iterates over all watched expressions and calculates their values until there are no more changes (when we have wider support of <code>Object.observe</code>, probably the <code>$digest</code> loop will be more smarter and efficient).</p>
 
 <p>So if we have:</p>
 
@@ -183,7 +183,7 @@
 
 <h1 id="resource">$resource</h1>
 
-<p>We won&#8217;t cover the whole API of <code>$resource</code> but we will look at how we can implement our model (<strong>not</strong> view model) with it. First of all, lets suppose we have a nice RESTful API for creating, retrieving, updating and deleting users:</p>
+<p>We won’t cover the whole API of <code>$resource</code> but we will look at how we can implement our model (<strong>not</strong> view model) with it. First of all, lets suppose we have a nice RESTful API for creating, retrieving, updating and deleting users:</p>
 
 <div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>POST   /users
 POST   /users/:id # We won&#39;t use PUT, but we can
@@ -199,7 +199,7 @@ GET    /users/:id
 </code></pre></div>
 
 
-<p><code>$resource</code> will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operation&#8230;and that&#8217;s all?! We implemented the communication with the back-end by invoking <code>$resource</code> with a single parameter!</p>
+<p><code>$resource</code> will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operation&hellip;and that’s all?! We implemented the communication with the back-end by invoking <code>$resource</code> with a single parameter!</p>
 
 <p>But how about custom actions like <code>login</code>, for example? The <code>$resource</code> API allows us to <a href="http://docs.angularjs.org/api/ngResource.$resource">include them</a> explicitly.</p>
 
@@ -211,7 +211,7 @@ GET    /users/:id
 </code></pre></div>
 
 
-<p>Now let&#8217;s get all users:</p>
+<p>Now let’s get all users:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">resourceDemo</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">users</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
@@ -219,7 +219,7 @@ GET    /users/:id
 </code></pre></div>
 
 
-<p>And now visualize all users&#8230;:</p>
+<p>And now visualize all users&hellip;:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="o">&lt;</span><span class="nx">table</span><span class="o">&gt;</span>
   <span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">ng</span><span class="o">-</span><span class="nx">repeat</span><span class="o">=</span><span class="s2">&quot;user in users&quot;</span><span class="o">&gt;</span>
@@ -234,7 +234,7 @@ GET    /users/:id
 <p>You might think that the operation <code>query</code> is synchronous because of the way we set the value of <code>$scope.users</code>. This will be very bad, right? Well, it is asynchronous, <code>MainCtrl</code> simply uses two of the concepts we discussed above: functional lexical scope, <code>$digest</code> loop.<br />
 When the <code>query</code> method is invoked it returns a reference to an empty array, the array has just a single property called <code>$promise</code>, you can use it if you want to manipulate the users after the request was successful, or not. When the request completes AngularJS populates the array with all users and calls the <code>$digest</code> loop. The <code>query</code> action will make a GET request to <code>/users</code>.</p>
 
-<p>There is something cool in AngularJS&#8217;s route definition, which allows us to change the current page once all dependencies of the next page are resolved &#8211; the <code>resolve</code> hash. This feature is very helpful especially if we want to open a page with single user view:</p>
+<p>There is something cool in AngularJS’s route definition, which allows us to change the current page once all dependencies of the next page are resolved – the <code>resolve</code> hash. This feature is very helpful especially if we want to open a page with single user view:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//...</span>
 <span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/users/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
@@ -250,7 +250,7 @@ When the <code>query</code> method is invoked it returns a reference to an empty
 </code></pre></div>
 
 
-<p>As I mentioned above, when we invoke &#8220;static&#8221; method of the constructor function, it returns an empty object with property <code>$promise</code>, which will be resolved once the request is completed. This way we make sure the user will see the page once the user with id <code>$route.current.params.userid</code> is available.</p>
+<p>As I mentioned above, when we invoke “static” method of the constructor function, it returns an empty object with property <code>$promise</code>, which will be resolved once the request is completed. This way we make sure the user will see the page once the user with id <code>$route.current.params.userid</code> is available.</p>
 
 <p>And this is our <code>User</code> controller:</p>
 
@@ -260,7 +260,7 @@ When the <code>query</code> method is invoked it returns a reference to an empty
 </code></pre></div>
 
 
-<p>You may noticed the <code>setTimeout</code> which is added in the express web app. It cause slower response, only to illustrate how useful could be our next enhancement &#8211; cache. We can cache some requests by passing additional parameters to the <code>$resource</code> function. For example:</p>
+<p>You may noticed the <code>setTimeout</code> which is added in the express web app. It cause slower response, only to illustrate how useful could be our next enhancement – cache. We can cache some requests by passing additional parameters to the <code>$resource</code> function. For example:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">resourceDemo</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$cacheFactory</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:userid&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span>
@@ -271,17 +271,17 @@ When the <code>query</code> method is invoked it returns a reference to an empty
 </code></pre></div>
 
 
-<p>The example above will make each call of the <code>get</code> method cachable (it won&#8217;t affect the <code>query</code> method). After adding this line you&#8217;ll notice that, after the first time, on each subsequent click on somebody&#8217;s name you&#8217;ll be immediately redirected to the user&#8217;s view, you won&#8217;t have to wait the request to complete because AngularJS does not make any requests &#8211; it takes the value from the cache.</p>
+<p>The example above will make each call of the <code>get</code> method cachable (it won’t affect the <code>query</code> method). After adding this line you’ll notice that, after the first time, on each subsequent click on somebody’s name you’ll be immediately redirected to the user’s view, you won’t have to wait the request to complete because AngularJS does not make any requests – it takes the value from the cache.</p>
 
 <p>Most of these methods also accept callbacks, but I would recommend you to stick to the promisee usage.</p>
 
-<p>Once again &#8211; you can grab the <a href="https://github.com/mgechev/angularjs-resource">sample application here</a>.</p>
+<p>Once again – you can grab the <a href="https://github.com/mgechev/angularjs-resource">sample application here</a>.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p><code>$resource</code> allows us to use Active Record like pattern of communication with our RESTful service. It will definitely save you a lot of lines of code, if your back-end provides proper API. It gives you features like caching, interceptors, specifying response type and timeout, it even provides flag &#8220;<a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS?redirectlocale=en-US&amp;#038;redirectslug=HTTP_access_control#Requests_with_credentials">with credentials</a>&#8220;.</p>
+<p><code>$resource</code> allows us to use Active Record like pattern of communication with our RESTful service. It will definitely save you a lot of lines of code, if your back-end provides proper API. It gives you features like caching, interceptors, specifying response type and timeout, it even provides flag “<a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS?redirectlocale=en-US&amp;redirectslug=HTTP_access_control#Requests_with_credentials">with credentials</a>“.</p>
 
-<p>However, when you have more complex/custom back-end API, you may consider to implement all the communication by your own since, otherwise, you&#8217;ll need to override most of the methods of <code>$resource</code>, anyway.</p>
+<p>However, when you have more complex/custom back-end API, you may consider to implement all the communication by your own since, otherwise, you’ll need to override most of the methods of <code>$resource</code>, anyway.</p>
 
                 </section>
             </article>

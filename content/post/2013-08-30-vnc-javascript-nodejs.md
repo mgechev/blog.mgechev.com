@@ -27,15 +27,15 @@ title: VNC client on 200 lines of JavaScript
 url: /2013/08/30/vnc-javascript-nodejs/
 ---
 
-In this quick blog post I&#8217;ll show you how to create a simple VNC client in about 200 lines of JavaScript.
-For our goal we&#8217;re going to use only HTML5 and JavaScript (client and server side).
+In this quick blog post I’ll show you how to create a simple VNC client in about 200 lines of JavaScript.
+For our goal we’re going to use only HTML5 and JavaScript (client and server side).
 The end result will be something like this:
 
 [<img src="/images/legacy/uploads2013/08/js-vnc-1024x946.png" alt="js-vnc" width="600" height="554" class="alignnone size-large wp-image-500" />][1]
 
-So, let&#8217;s begin!
+So, let’s begin!
 
-Our application will have very simple architecture &#8211; a proxy server written in Node.js and a client in HTML5 and JavaScript. The Node.js server will stay between the browser and the VNC server. We need it because the client-side JavaScript does not supports TCP sockets so we can&#8217;t connect directly to the VNC server. The HTML5 client will have a canvas on which we will draw the frames we receive from the server.
+Our application will have very simple architecture – a proxy server written in Node.js and a client in HTML5 and JavaScript. The Node.js server will stay between the browser and the VNC server. We need it because the client-side JavaScript does not supports TCP sockets so we can’t connect directly to the VNC server. The HTML5 client will have a canvas on which we will draw the frames we receive from the server.
 For VNC server you can use the free version of [RealVNC][2].
 
 First lets start with the server. Make sure you have node.js installed. We will use four node modules: [rfb2][3], [connect][4], [socket.io][5] and [node-png][6].
@@ -47,7 +47,7 @@ mkdir js-vnc
 cd js-vnc
 npm init{{< / highlight >}}
 
-Now you should have folder called &#8220;js-vnc&#8221; with file named &#8220;package.json&#8221; in it.
+Now you should have folder called “js-vnc” with file named “package.json” in it.
 Use the following line of code to install almost all the dependencies:
 
 {{< highlight bash >}}npm install rfb2 connect socket.io --save{{< / highlight >}}
@@ -61,8 +61,8 @@ git clone git@github.com:pkrumins/node-png.git
 cd node-png
 node-gyp configure build{{< / highlight >}}
 
-and that was all&#8230;Now we can start creating our server.
-Let&#8217;s include all the required modules and initialize an array which will contains all the connected clients. Create a file called &#8220;server.js&#8221; in your project base directory and add the following content in it:
+and that was all...Now we can start creating our server.
+Let’s include all the required modules and initialize an array which will contains all the connected clients. Create a file called “server.js” in your project base directory and add the following content in it:
 
 {{< highlight javascript >}}var rfb = require('rfb2'),
     socketio = require('socket.io').listen(8091, { log: false }),
@@ -70,7 +70,7 @@ Let&#8217;s include all the required modules and initialize an array which will 
     connect = require('connect'),
     clients = [];{{< / highlight >}}
 
-and now let&#8217;s create a static directory for our static resources:
+and now let’s create a static directory for our static resources:
 
 {{< highlight bash >}}mkdir static{{< / highlight >}}
 
@@ -85,11 +85,11 @@ Now you can execute the following lines of code:
 node server.js
 {{< / highlight >}}
 
-Now open: <http://localhost:8091/index.html>. If everything went well you should see the text: &#8220;Hello, world!&#8221;.
+Now open: <http://localhost:8091/index.html>. If everything went well you should see the text: “Hello, world!”.
 
 So far, so good! Now lets create a socket.io server.
-We want the client to connect to our proxy server and exchange data through socket.io with it. When the client is connected (i.e. the connection is established) it sends &#8220;init&#8221; message which contains the data required for the proxy server to connect to the VNC server &#8211; host, port and password.
-So let&#8217;s handle these events:
+We want the client to connect to our proxy server and exchange data through socket.io with it. When the client is connected (i.e. the connection is established) it sends “init” message which contains the data required for the proxy server to connect to the VNC server – host, port and password.
+So let’s handle these events:
 
 {{< highlight javascript >}}socketio.sockets.on('connection', function (socket) {
   socket.on('init', function (config) {
@@ -107,7 +107,7 @@ So let&#8217;s handle these events:
 });
 {{< / highlight >}}
 
-We already listen for incoming connections with socket.io on port 8091 so now we just subscribe to the &#8220;connection&#8221; event. When the client connects to our socket.io server we subscribe the server to the &#8220;init&#8221; event. It&#8217;s the message I told about earlier. Its parameters will contains data required for the proxy server to connect to the VNC server. In the callback associated with the &#8220;init&#8221; event we first create new RFB (remote framebuffer) connection. This method will return a RFB handler, we can use it to exchange data with the VNC server. After initialising the RFB connection we subscribe to three more events: &#8220;mouse&#8221;, &#8220;keyboard&#8221; and &#8220;disconnect&#8221;. The mouse event has parameter containing the position of the cursor and button state (1 for mouse down 0 for mouse up). For this demo we will support only the first mouse button. The keyboard event accepts as parameters the key code of the button which have triggered the event and flag which indicates whether the button is down or up. When the disconnect event happens we disconnect from the VNC server and release all the data for the current connection.
+We already listen for incoming connections with socket.io on port 8091 so now we just subscribe to the “connection” event. When the client connects to our socket.io server we subscribe the server to the “init” event. It’s the message I told about earlier. Its parameters will contains data required for the proxy server to connect to the VNC server. In the callback associated with the “init” event we first create new RFB (remote framebuffer) connection. This method will return a RFB handler, we can use it to exchange data with the VNC server. After initialising the RFB connection we subscribe to three more events: “mouse”, “keyboard” and “disconnect”. The mouse event has parameter containing the position of the cursor and button state (1 for mouse down 0 for mouse up). For this demo we will support only the first mouse button. The keyboard event accepts as parameters the key code of the button which have triggered the event and flag which indicates whether the button is down or up. When the disconnect event happens we disconnect from the VNC server and release all the data for the current connection.
 
 Here is posted the function createRfbConnection:
 
@@ -122,7 +122,7 @@ Here is posted the function createRfbConnection:
 }
 {{< / highlight >}}
 
-In the method &#8220;addEventHandlers&#8221; we add event handlers to the RFB handler we received from the &#8220;createConnection&#8221; method:
+In the method “addEventHandlers” we add event handlers to the RFB handler we received from the “createConnection” method:
 
 {{< highlight javascript >}}function addEventHandlers(r, socket) {
   r.on('connect', function () {
@@ -141,10 +141,10 @@ In the method &#8220;addEventHandlers&#8221; we add event handlers to the RFB ha
 }
 {{< / highlight >}}
 
-When the RFB connection is established we send &#8220;init&#8221; event to the client (our browser) with the size of the screen. For simplicity we won&#8217;t scale the screen in the browser.
-After sending the &#8220;init&#8221; event to the browser we add the client to our connected clients and subscribe to the event &#8220;rect&#8221;. The &#8220;rect&#8221; event will trigger when there is a screen update. For extra simplicity we will use raw encoding.
+When the RFB connection is established we send “init” event to the client (our browser) with the size of the screen. For simplicity we won’t scale the screen in the browser.
+After sending the “init” event to the browser we add the client to our connected clients and subscribe to the event “rect”. The “rect” event will trigger when there is a screen update. For extra simplicity we will use raw encoding.
 
-The last method from our Node.js proxy we will look at is the &#8220;handleFrame&#8221; method.
+The last method from our Node.js proxy we will look at is the “handleFrame” method.
 
 {{< highlight javascript >}}function handleFrame(socket, rect, r) {
   var rgb = new Buffer(rect.width * rect.height * 3, 'binary'),

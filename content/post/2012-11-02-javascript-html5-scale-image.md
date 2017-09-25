@@ -21,8 +21,8 @@ title: JavaScript image scaling
 url: /2012/11/02/javascript-html5-scale-image/
 ---
 
-I haven&#8217;t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in <a title="StackOverflow" href="http://stackoverflow.com/questions/13177698/select-an-image-and-manipulate-it-in-javascript-no-form-submission/13178084#13178084" target="_blank">stackoverflow</a>. The post is connected with pure client side image scaling. While you&#8217;re reading the example I hope that you&#8217;ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.  
-So firstly I&#8217;ll post the source code with the example in JSFiddle, after that I&#8217;m going to explain everything step by step.
+I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in <a title="StackOverflow" href="http://stackoverflow.com/questions/13177698/select-an-image-and-manipulate-it-in-javascript-no-form-submission/13178084#13178084" target="_blank">stackoverflow</a>. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.  
+So firstly I’ll post the source code with the example in JSFiddle, after that I’m going to explain everything step by step.
 
 **The HTML form**
 

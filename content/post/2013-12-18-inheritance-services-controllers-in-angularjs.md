@@ -14,7 +14,7 @@ title: AngularJS Inheritance Patterns
 url: /2013/12/18/inheritance-services-controllers-in-angularjs/
 ---
 
-Since AngularJS does not provide any built-in features for using inheritance, in this blog post I&#8217;ll describe how the general JavaScript inheritance patterns can be applied to AngularJS components.
+Since AngularJS does not provide any built-in features for using inheritance, in this blog post I’ll describe how the general JavaScript inheritance patterns can be applied to AngularJS components.
 
 ## Controllers inheritance
 
@@ -31,7 +31,7 @@ myModule.controller('ChildCtrl', function ($scope) {
 });
 {{< / highlight >}}
 
-Of course, the inheritance creates very strong coupling but only in a single direction (i.e. the child is strongly coupled to its parent), so you can&#8217;t directly call children methods from your parent controller. For doing this you need to use event dispatching:
+Of course, the inheritance creates very strong coupling but only in a single direction (i.e. the child is strongly coupled to its parent), so you can’t directly call children methods from your parent controller. For doing this you need to use event dispatching:
 
 {{< highlight javascript >}}myModule.controller('ParentCtrl', function ($scope) {
   $scope.$broadcast('event', args);
@@ -48,9 +48,9 @@ myModule.controller('ChildCtrl', function ($scope) {
 });
 {{< / highlight >}}
 
-I&#8217;m providing this snippet with only informative purpose, if you need to call children methods from your parent controller, you might be doing something wrong.
+I’m providing this snippet with only informative purpose, if you need to call children methods from your parent controller, you might be doing something wrong.
 
-OK, but now let&#8217;s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which encapsulates the common logic, and two children controllers which inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:
+OK, but now let’s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which encapsulates the common logic, and two children controllers which inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:
 
 {{< highlight javascript >}}function BaseCtrl($scope, $location, ...) {
   $scope.commonScopeMethod = function () {
@@ -86,7 +86,7 @@ myModule.controller('ChildCtrl1', ChildCtrl1);
 
 {{< / highlight >}}
 
-As you can see we directly apply the &#8220;Klassical&#8221; inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
+As you can see we directly apply the “Klassical” inheritance pattern. We can do the same for the second child controller. You can check example [right here][1].
 
 ### Controller as syntax
 
@@ -219,9 +219,9 @@ This pattern is definitely much more useful when you need to inject some depende
 
 ### module.service
 
-Usually I call the variables attached to my scope View Models and the special services, which encapsulate the business logic &#8211; Models. I implement these services with something close to the [Active Record Pattern][4]. My models are usually responsible for talking to the server, sometimes directly but usually through a [Gateway][5]. For the creation of these models I prefer to use `module.service` method. Internally these services are created through the `instantiate` [method][6].
+Usually I call the variables attached to my scope View Models and the special services, which encapsulate the business logic – Models. I implement these services with something close to the [Active Record Pattern][4]. My models are usually responsible for talking to the server, sometimes directly but usually through a [Gateway][5]. For the creation of these models I prefer to use `module.service` method. Internally these services are created through the `instantiate` [method][6].
 
-Why I prefer using service instead of factory? Well, may be I&#8217;m a confused developer who doesn&#8217;t understand the true power of the prototypal inheritance used with object literals, however I prefer to use the classical one for my models. By using it I can create a set of constructor functions which model my domain pretty well. One day I may decide to use MDD and generate all my models from some fancy UML diagrams&#8230;
+Why I prefer using service instead of factory? Well, may be I’m a confused developer who doesn’t understand the true power of the prototypal inheritance used with object literals, however I prefer to use the classical one for my models. By using it I can create a set of constructor functions which model my domain pretty well. One day I may decide to use MDD and generate all my models from some fancy UML diagrams...
 
 Here is an example of how you can take advantage of the Klassical inheritance pattern for AngularJS services created with `module.service`:
 

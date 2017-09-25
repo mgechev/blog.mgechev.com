@@ -94,20 +94,20 @@
                 <section id="post-body">
                     
 
-<p>This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are &#8220;safe&#8221;, they will not make side effect i.e. evaluating an expression won&#8217;t change something in the internal state and lead to different result of the same expression when called next time. It seems very strange and useless to &#8220;imperative&#8221; guys like me, but actually there&#8217;s a list of benefits:</p>
+<p>This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time. It seems very strange and useless to “imperative” guys like me, but actually there’s a list of benefits:</p>
 
 <ol>
-<li>Concurrency. We won&#8217;t have deadlocks or race conditions simply because we won&#8217;t need locks &#8211; the data is immutable. It starts to look very promising&#8230;</li>
-<li>Unit testing. We can write unit tests without worry about the state simply because there&#8217;s no such thing. We should care only about the arguments of the functions we test.</li>
+<li>Concurrency. We won’t have deadlocks or race conditions simply because we won’t need locks – the data is immutable. It starts to look very promising&hellip;</li>
+<li>Unit testing. We can write unit tests without worry about the state simply because there’s no such thing. We should care only about the arguments of the functions we test.</li>
 <li>Debugging. Simple stack trace is absolutely enough.</li>
 <li>Solid theoretical base. Functional languages are based on the lambda calculus which is a formal system. This theoretical foundation makes the prove of correctness of the programs very straightforward (for example using induction).</li>
 </ol>
 
-<p>I hope these arguments are enough for you to look at the next sections. Now I&#8217;ll describe the functional elements in JavaScript and also provide implementations of aspects which are not native but their implementation won&#8217;t cost us much.</p>
+<p>I hope these arguments are enough for you to look at the next sections. Now I’ll describe the functional elements in JavaScript and also provide implementations of aspects which are not native but their implementation won’t cost us much.</p>
 
 <h2 id="anonymous-functions">Anonymous functions</h2>
 
-<p>It seems that the functional programming becomes more and more popular. Even in Java 8 we&#8217;re going to have anonymous functions, in C# we have them since a long time. The anonymous function is a function which is defined without being bound to an identifier. JavaScript is familiar with this concept. If you&#8217;ve used JavaScript for more than simple exercises I&#8217;m sure that you&#8217;re familiar with them. When you use jQuery that&#8217;s probably one of the first things you type:</p>
+<p>It seems that the functional programming becomes more and more popular. Even in Java 8 we’re going to have anonymous functions, in C# we have them since a long time. The anonymous function is a function which is defined without being bound to an identifier. JavaScript is familiar with this concept. If you’ve used JavaScript for more than simple exercises I’m sure that you’re familiar with them. When you use jQuery that’s probably one of the first things you type:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="c1">//do some stuff</span>
@@ -117,11 +117,11 @@
 
 <p>The function passed to $(document).ready is exactly an anonymous function. This concept give as great benefits some times especially when we want to keep things DRY.</p>
 
-<p>More about passing functions in the next section&#8230;</p>
+<p>More about passing functions in the next section&hellip;</p>
 
 <h2 id="high-order-functions">High-order functions</h2>
 
-<p>High-order functions are functions which accepts functions as arguments or returns functions. We can return and pass functions as arguments in C#, Java 8, Python, Perl, Ruby&#8230; The most popular language &#8211; JavaScript has these functional elements built-in for a long time. Here is a basic example:</p>
+<p>High-order functions are functions which accepts functions as arguments or returns functions. We can return and pass functions as arguments in C#, Java 8, Python, Perl, Ruby&hellip; The most popular language – JavaScript has these functional elements built-in for a long time. Here is a basic example:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">property</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">endCallback</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">//Animation here...</span>
@@ -146,7 +146,7 @@
 
 <p>Callbacks are everywhere in JavaScript, they are just perfect for asynchronous programming like event handling, ajax requests, clients handling (Node.js) and so on. As I mentioned above you can avoid repeating yourself by using callbacks. They are extremely useful when you want a piece of your code to behave differently based on condition.</p>
 
-<p>We have one more type of high-order functions &#8211; ones that return functions. There are many cases in JavaScript when returning a function is great approach. For example when we want to use caching:</p>
+<p>We have one more type of high-order functions – ones that return functions. There are many cases in JavaScript when returning a function is great approach. For example when we want to use caching:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* From Asen Bozhilov&#39;s lz library */</span>
 <span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
@@ -162,7 +162,7 @@
 </code></pre></div>
 
 
-<p>We have a variable cache defined in the local scope of the parent function. In each call first will be checked whether the function have been already called with these arguments, if so the result will be returned immediately, otherwise the result will be cached and returned. Even the suggestion that the function will return the same result if it&#8217;s called with the same arguments is extremely functional way of thinking&#8230;</p>
+<p>We have a variable cache defined in the local scope of the parent function. In each call first will be checked whether the function have been already called with these arguments, if so the result will be returned immediately, otherwise the result will be cached and returned. Even the suggestion that the function will return the same result if it’s called with the same arguments is extremely functional way of thinking&hellip;</p>
 
 <p>Imagine we have this case:</p>
 
@@ -177,11 +177,11 @@
 </code></pre></div>
 
 
-<p>We have function called bar which accepts a single argument &#8211; baz and returns the sum of baz and the global foo. When we use memo we make bar cacheable and save a reference to the cacheable copy in the variable cached. When we call cached for first time its being evaluated for first time with argument 1 so it&#8217;s body is invoked and the result is 2. After that we increment foo and call the cached again. Now we get the same result (as we must in the pure functional languages) but it&#8217;s not the correct one. That&#8217;s because we have some kind of state. The state is something which will be considered lately in the Monads section (not the same type of state). Now lets keep our focus on the high-order functions and especially these which return functions.</p>
+<p>We have function called bar which accepts a single argument – baz and returns the sum of baz and the global foo. When we use memo we make bar cacheable and save a reference to the cacheable copy in the variable cached. When we call cached for first time its being evaluated for first time with argument 1 so it’s body is invoked and the result is 2. After that we increment foo and call the cached again. Now we get the same result (as we must in the pure functional languages) but it’s not the correct one. That’s because we have some kind of state. The state is something which will be considered lately in the Monads section (not the same type of state). Now lets keep our focus on the high-order functions and especially these which return functions.</p>
 
 <h2 id="closures">Closures</h2>
 
-<p>Let&#8217;s look at memo again. We have variable called cache which is defined in the lexical scope of the function which returns the cacheable function. This variable is also accessible from the returned function because a closure is created. This is one more element from the functional programming. It&#8217;s very wide spread. One of the ways we can implement privacy in JavaScript is using closures:</p>
+<p>Let’s look at memo again. We have variable called cache which is defined in the lexical scope of the function which returns the cacheable function. This variable is also accessible from the returned function because a closure is created. This is one more element from the functional programming. It’s very wide spread. One of the ways we can implement privacy in JavaScript is using closures:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">articles</span> <span class="o">=</span> <span class="p">[];</span>
@@ -205,9 +205,9 @@
 </code></pre></div>
 
 
-<p>In the example above we have object called timeline. It&#8217;s the result of the Immediately-Invoked Function Expression (IIFE) which returns an object with properties getArticles and setArticles which is the actual public interface of timeline. Inside of the lexical scope of the IIFE there&#8217;s definition of the articles array and sort function, which cannot be called directly using the timeline object.</p>
+<p>In the example above we have object called timeline. It’s the result of the Immediately-Invoked Function Expression (IIFE) which returns an object with properties getArticles and setArticles which is the actual public interface of timeline. Inside of the lexical scope of the IIFE there’s definition of the articles array and sort function, which cannot be called directly using the timeline object.</p>
 
-<p>I&#8217;ll end the topic about the high-order functions with ECMAScript 5. Along the years JavaScript gets even more functional elements. One of the things which appear first in our minds when we hear something about functional programming is the map function. It accept as arguments an anonymous function and a list. It applies the function to all elements from the list. map is officially part of ECMAScript 5.</p>
+<p>I’ll end the topic about the high-order functions with ECMAScript 5. Along the years JavaScript gets even more functional elements. One of the things which appear first in our minds when we hear something about functional programming is the map function. It accept as arguments an anonymous function and a list. It applies the function to all elements from the list. map is officially part of ECMAScript 5.</p>
 
 <p>Here is a basic usage of it:</p>
 
@@ -222,7 +222,7 @@
 
 <h2 id="recursion">Recursion</h2>
 
-<p>Another element which is common for almost all modern programming languages is the recursion. It&#8217;s function which calls itself inside it&#8217;s body:</p>
+<p>Another element which is common for almost all modern programming languages is the recursion. It’s function which calls itself inside it’s body:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -231,11 +231,11 @@
 </code></pre></div>
 
 
-<p>Above there&#8217;s a basic example which shows implementation of factorial using recursion. This concept is very popular so I&#8217;ll skip more detailed description.</p>
+<p>Above there’s a basic example which shows implementation of factorial using recursion. This concept is very popular so I’ll skip more detailed description.</p>
 
 <h2 id="managing-the-state-monads">Managing the state (Monads)</h2>
 
-<p>Of course, as we saw in the example with memoization, JavaScript is not purely functional language (probably that&#8217;s one of the reasons that the language is so popular&#8230;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here&#8217;s one by Douglas Crockford:</p>
+<p>Of course, as we saw in the example with memoization, JavaScript is not purely functional language (probably that’s one of the reasons that the language is so popular&hellip;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here’s one by Douglas Crockford:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* Code by Douglas Crockford */</span>
 <span class="kd">function</span> <span class="nx">MONAD</span><span class="p">(</span><span class="nx">modifier</span><span class="p">)</span> <span class="p">{</span>
@@ -290,7 +290,7 @@
 
 <h2 id="schönfinkelization-or-simply-curring">Schönfinkelization (or simply Curring)</h2>
 
-<p>Schönfinkelization is a functional transformation which allows as to fill function&#8217;s arguments step by step. When the function accept it&#8217;s last argument it returns a result. It was originated by Moses Schönfinkel and later re-discovered by Haskell Curry. Here is a sample implementation in JavaScript, by Stoyan Stefanov:</p>
+<p>Schönfinkelization is a functional transformation which allows as to fill function’s arguments step by step. When the function accept it’s last argument it returns a result. It was originated by Moses Schönfinkel and later re-discovered by Haskell Curry. Here is a sample implementation in JavaScript, by Stoyan Stefanov:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* By Stoyan Stafanov */</span>
 <span class="kd">function</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
@@ -321,7 +321,7 @@
 </code></pre></div>
 
 
-<p>If we want to fill the function&#8217;s arguments one by one we use:</p>
+<p>If we want to fill the function’s arguments one by one we use:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">quadraticEquation</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">temp</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
@@ -329,7 +329,7 @@
 </code></pre></div>
 
 
-<p>If you want to use built in the language features instead of using the schonfinkelize function, you can use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind</a>. Since it&#8217;s defined in the prototype of the constructor function of all functions you can use it as method of each function. bind creates a new function with specific context and parameters. For example we may have the function:</p>
+<p>If you want to use built in the language features instead of using the schonfinkelize function, you can use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind</a>. Since it’s defined in the prototype of the constructor function of all functions you can use it as method of each function. bind creates a new function with specific context and parameters. For example we may have the function:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
@@ -347,20 +347,20 @@
 </code></pre></div>
 
 
-<p>You have to be careful with bind because it&#8217;s not that spread supported. Based on <a href="http://kangax.github.io/es5-compat-table/">kagax ES5 compatibility table</a> IE9+ supports bind.</p>
+<p>You have to be careful with bind because it’s not that spread supported. Based on <a href="http://kangax.github.io/es5-compat-table/">kagax ES5 compatibility table</a> IE9+ supports bind.</p>
 
-<p>This has practical application in some cases. Imagine you have a session object. The session key can be generated using complex time-expensive algorithm, it&#8217;s generation is required once the user visit our web site. Our session object also should store some kind of information about the user, for example current skin of the web page chosen by the client. Using currying you can call the session generating function, with it&#8217;s parameters, once the page load, this will produce the key. After that we can call the function for the user skin. This will produce the session object after the user select a skin but we won&#8217;t have overhead because of the complex algorithm which have generated the session key generation (it won&#8217;t be sensible by the user).</p>
+<p>This has practical application in some cases. Imagine you have a session object. The session key can be generated using complex time-expensive algorithm, it’s generation is required once the user visit our web site. Our session object also should store some kind of information about the user, for example current skin of the web page chosen by the client. Using currying you can call the session generating function, with it’s parameters, once the page load, this will produce the key. After that we can call the function for the user skin. This will produce the session object after the user select a skin but we won’t have overhead because of the complex algorithm which have generated the session key generation (it won’t be sensible by the user).</p>
 
 <h2 id="pattern-matching">Pattern matching</h2>
 
-<p>One of the coolest things I&#8217;ve met in the functional programming is the pattern matching. Actually, if I have to be honest I&#8217;m not completely sure why I love it so much, probably because of it&#8217;s simplicity and the way it breaks the problem into smaller pieces. For example in Haskell you can define factorial like this:</p>
+<p>One of the coolest things I’ve met in the functional programming is the pattern matching. Actually, if I have to be honest I’m not completely sure why I love it so much, probably because of it’s simplicity and the way it breaks the problem into smaller pieces. For example in Haskell you can define factorial like this:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">factorial</span> <span class="mi">0</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="nx">factorial</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span> <span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
 
 
-<p>It looks pretty cool. You divide a large task to smaller ones and make your solution simpler. When I started to write this article I&#8217;ve got an idea to implement something like this in JavaScript but I found out that it&#8217;s already implemented. Here is an example from <a href="https://github.com/bramstein/funcy">Bram Stein&#8217;s funcy</a>:</p>
+<p>It looks pretty cool. You divide a large task to smaller ones and make your solution simpler. When I started to write this article I’ve got an idea to implement something like this in JavaScript but I found out that it’s already implemented. Here is an example from <a href="https://github.com/bramstein/funcy">Bram Stein’s funcy</a>:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">.</span><span class="nx">parameter</span><span class="p">,</span>
     <span class="nx">fact</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">(</span>
@@ -370,7 +370,7 @@
 </code></pre></div>
 
 
-<p>We have special variable for parameters which is inside fun &#8211; fun.parameter. When we call fact with &#8220; &#8211; function () { return 1; } will be called, otherwise function (n) { return n * fact(n &#8211; 1); }. So cool, right?</p>
+<p>We have special variable for parameters which is inside fun – fun.parameter. When we call fact with “ – function () { return 1; } will be called, otherwise function (n) { return n * fact(n – 1); }. So cool, right?</p>
 
 <p>I hope that I showed you clear enough all the functional aspects of JavaScript and how beautiful and simple they could be.</p>
 

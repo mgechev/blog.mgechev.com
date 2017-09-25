@@ -23,9 +23,9 @@ url: /2014/02/05/angularjs-resource-active-record-http/
 
 At first sight AngularJS seems like a magical framework, which does some weird but awesome things like dependency injection, data binding only by setting a single property to the magical object named $scope and many other things.
 
-If you look at the source code of Angular you&#8217;ll see a lot of smart and simple solutions for these magical problems. In this blog post I&#8217;ll describe the magic which stays behind `$resource`. I decided to write this blog post because of my recent experience in StackOverflow. One of the most misunderstood components of AngularJS was exactly the `$resource` service. `$resource` is two levels of abstraction above the XMLHttpRequest object (ok, may be three if we count `$httpBackend`). I&#8217;ve illustrated the usage of `$resource` through example which can be found at [GitHub][1].
+If you look at the source code of Angular you’ll see a lot of smart and simple solutions for these magical problems. In this blog post I’ll describe the magic which stays behind `$resource`. I decided to write this blog post because of my recent experience in StackOverflow. One of the most misunderstood components of AngularJS was exactly the `$resource` service. `$resource` is two levels of abstraction above the XMLHttpRequest object (ok, may be three if we count `$httpBackend`). I’ve illustrated the usage of `$resource` through example which can be found at [GitHub][1].
 
-Before continuing with `$resource` I&#8217;m going to explain few important concepts. The first one is:
+Before continuing with `$resource` I’m going to explain few important concepts. The first one is:
 
 ### Active Record
 
@@ -67,7 +67,7 @@ User.query()
 });
 {{< / highlight >}}
 
-In the client-side JavaScript everything is a little bit different but the concepts are the same. What are the problems of this pattern? Well, in the relational databases we work with relations, which are represented as tables. We don&#8217;t have the standard OO concepts such as inheritance or association. Of course, we can emulate them by using tables but this leads to a problem &#8211; we don&#8217;t have 1:1 mapping between our tables and classes. Thats why sometimes for ORM is preferred the pattern [Data Mapper][2], but topic is out of the scope of the current post. Fortunately, in the Single-Page Applications, usually we have back-end, which probably uses ORM framework and provides us a nice JSON API, so we don&#8217;t have to worry about complex mapping, we can just use client-side Active Record.
+In the client-side JavaScript everything is a little bit different but the concepts are the same. What are the problems of this pattern? Well, in the relational databases we work with relations, which are represented as tables. We don’t have the standard OO concepts such as inheritance or association. Of course, we can emulate them by using tables but this leads to a problem – we don’t have 1:1 mapping between our tables and classes. Thats why sometimes for ORM is preferred the pattern [Data Mapper][2], but topic is out of the scope of the current post. Fortunately, in the Single-Page Applications, usually we have back-end, which probably uses ORM framework and provides us a nice JSON API, so we don’t have to worry about complex mapping, we can just use client-side Active Record.
 
 ### Lexical functional scope
 
@@ -91,7 +91,7 @@ In this case when `User.query()` is called it immediately returns an empty array
 
 ### $digest loop
 
-The last thing we will look at before continuing with `$resource` is AngularJS&#8217;s `$digest` loop. Probably you&#8217;re aware that when AngularJS finds some &#8220;special&#8221; directives in our templates it automatically registers watchers for the expressions used in these directives. Such &#8220;special&#8221; directives are `{{ }}`, `ng-model`, `ng-bind`. When something cause call of the digest loop AngularJS iterates over all watched expressions and calculates their values until there are no more changes (when we have wider support of `Object.observe`, probably the `$digest` loop will be more smarter and efficient).
+The last thing we will look at before continuing with `$resource` is AngularJS’s `$digest` loop. Probably you’re aware that when AngularJS finds some “special” directives in our templates it automatically registers watchers for the expressions used in these directives. Such “special” directives are `{{ }}`, `ng-model`, `ng-bind`. When something cause call of the digest loop AngularJS iterates over all watched expressions and calculates their values until there are no more changes (when we have wider support of `Object.observe`, probably the `$digest` loop will be more smarter and efficient).
 
 So if we have:
 
@@ -120,7 +120,7 @@ which will cause rendering of a single list item with the value `"foo"`.
 
 # $resource
 
-We won&#8217;t cover the whole API of `$resource` but we will look at how we can implement our model (**not** view model) with it. First of all, lets suppose we have a nice RESTful API for creating, retrieving, updating and deleting users:
+We won’t cover the whole API of `$resource` but we will look at how we can implement our model (**not** view model) with it. First of all, lets suppose we have a nice RESTful API for creating, retrieving, updating and deleting users:
 
 {{< highlight text >}}POST   /users
 POST   /users/:id # We won't use PUT, but we can
@@ -134,7 +134,7 @@ Now we can create our model by:
 {{< highlight javascript >}}var User = $resource('/users/:id');
 {{< / highlight >}}
 
-`$resource` will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operation&#8230;and that&#8217;s all?! We implemented the communication with the back-end by invoking `$resource` with a single parameter!
+`$resource` will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operation...and that’s all?! We implemented the communication with the back-end by invoking `$resource` with a single parameter!
 
 But how about custom actions like `login`, for example? The `$resource` API allows us to [include them][3] explicitly.
 
@@ -145,14 +145,14 @@ I would recommend you to wrap the constructor function produced by `$resource` i
 });
 {{< / highlight >}}
 
-Now let&#8217;s get all users:
+Now let’s get all users:
 
 {{< highlight javascript >}}resourceDemo.controller('MainCtrl', function ($scope, User) {
   $scope.users = User.query();
 });
 {{< / highlight >}}
 
-And now visualize all users&#8230;:
+And now visualize all users...:
 
 {{< highlight javascript >}}<table>
   <tr ng-repeat="user in users">
@@ -166,7 +166,7 @@ And now visualize all users&#8230;:
 You might think that the operation `query` is synchronous because of the way we set the value of `$scope.users`. This will be very bad, right? Well, it is asynchronous, `MainCtrl` simply uses two of the concepts we discussed above: functional lexical scope, `$digest` loop.  
 When the `query` method is invoked it returns a reference to an empty array, the array has just a single property called `$promise`, you can use it if you want to manipulate the users after the request was successful, or not. When the request completes AngularJS populates the array with all users and calls the `$digest` loop. The `query` action will make a GET request to `/users`.
 
-There is something cool in AngularJS&#8217;s route definition, which allows us to change the current page once all dependencies of the next page are resolved &#8211; the `resolve` hash. This feature is very helpful especially if we want to open a page with single user view:
+There is something cool in AngularJS’s route definition, which allows us to change the current page once all dependencies of the next page are resolved – the `resolve` hash. This feature is very helpful especially if we want to open a page with single user view:
 
 {{< highlight javascript >}}//...
 .when('/users/:userid', {
@@ -181,7 +181,7 @@ There is something cool in AngularJS&#8217;s route definition, which allows us t
 //...
 {{< / highlight >}}
 
-As I mentioned above, when we invoke &#8220;static&#8221; method of the constructor function, it returns an empty object with property `$promise`, which will be resolved once the request is completed. This way we make sure the user will see the page once the user with id `$route.current.params.userid` is available.
+As I mentioned above, when we invoke “static” method of the constructor function, it returns an empty object with property `$promise`, which will be resolved once the request is completed. This way we make sure the user will see the page once the user with id `$route.current.params.userid` is available.
 
 And this is our `User` controller:
 
@@ -190,7 +190,7 @@ And this is our `User` controller:
 });
 {{< / highlight >}}
 
-You may noticed the `setTimeout` which is added in the express web app. It cause slower response, only to illustrate how useful could be our next enhancement &#8211; cache. We can cache some requests by passing additional parameters to the `$resource` function. For example:
+You may noticed the `setTimeout` which is added in the express web app. It cause slower response, only to illustrate how useful could be our next enhancement – cache. We can cache some requests by passing additional parameters to the `$resource` function. For example:
 
 {{< highlight javascript >}}resourceDemo.factory('User', function ($cacheFactory, $resource) {
   var User = $resource('/users/:userid', {}, {
@@ -200,19 +200,19 @@ You may noticed the `setTimeout` which is added in the express web app. It cause
 })
 {{< / highlight >}}
 
-The example above will make each call of the `get` method cachable (it won&#8217;t affect the `query` method). After adding this line you&#8217;ll notice that, after the first time, on each subsequent click on somebody&#8217;s name you&#8217;ll be immediately redirected to the user&#8217;s view, you won&#8217;t have to wait the request to complete because AngularJS does not make any requests &#8211; it takes the value from the cache.
+The example above will make each call of the `get` method cachable (it won’t affect the `query` method). After adding this line you’ll notice that, after the first time, on each subsequent click on somebody’s name you’ll be immediately redirected to the user’s view, you won’t have to wait the request to complete because AngularJS does not make any requests – it takes the value from the cache.
 
 Most of these methods also accept callbacks, but I would recommend you to stick to the promisee usage.
 
-Once again &#8211; you can grab the [sample application here][1].
+Once again – you can grab the [sample application here][1].
 
 ## Conclusion
 
-`$resource` allows us to use Active Record like pattern of communication with our RESTful service. It will definitely save you a lot of lines of code, if your back-end provides proper API. It gives you features like caching, interceptors, specifying response type and timeout, it even provides flag &#8220;[with credentials][4]&#8220;.
+`$resource` allows us to use Active Record like pattern of communication with our RESTful service. It will definitely save you a lot of lines of code, if your back-end provides proper API. It gives you features like caching, interceptors, specifying response type and timeout, it even provides flag “[with credentials][4]“.
 
-However, when you have more complex/custom back-end API, you may consider to implement all the communication by your own since, otherwise, you&#8217;ll need to override most of the methods of `$resource`, anyway.
+However, when you have more complex/custom back-end API, you may consider to implement all the communication by your own since, otherwise, you’ll need to override most of the methods of `$resource`, anyway.
 
  [1]: https://github.com/mgechev/angularjs-resource
  [2]: http://www.martinfowler.com/eaaCatalog/dataMapper.html
  [3]: http://docs.angularjs.org/api/ngResource.$resource
- [4]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS?redirectlocale=en-US&#038;redirectslug=HTTP_access_control#Requests_with_credentials
+ [4]: https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS?redirectlocale=en-US&redirectslug=HTTP_access_control#Requests_with_credentials

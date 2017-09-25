@@ -20,7 +20,7 @@ title: Remote Desktop Client with AngularJS and Yeoman
 url: /2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/
 ---
 
-In this blog post I&#8217;m going to show you how to build a VNC client using [AngularJS][2] and [Yeoman][3]. The source code used in the post is available at my [GitHub][4]. Click [here][5] to see the final result.
+In this blog post I’m going to show you how to build a VNC client using [AngularJS][2] and [Yeoman][3]. The source code used in the post is available at my [GitHub][4]. Click [here][5] to see the final result.
 
 [<img src="/images/legacy/uploads2014/02/yeoman-vnc-angular.png" alt="yeoman-vnc-angular" width="600" height="200" class="aligncenter size-full wp-image-647" />][1]
 
@@ -34,11 +34,11 @@ First, lets take a look at our architecture:
 
 [<img class="aligncenter size-full wp-image-629" alt="angular-vnc" src="/images/legacy/uploads2014/02/angular-vnc.png" width="572" height="232" />][9]
 
-We should have a VNC server on the machine we want to control. This machine provides interface accessible through the [RFB protocol][10]. The proxy in the middle has RFB client, which knows how to talk to the RFB server. The proxy also provides HTTP server, which is responsible for serving static files to the client and also allows communication through [socket.io][11]. The last component in our diagram is the &#8220;AngularJS VNC client&#8221;, which consists few HTML and JavaScript files provided to the browser by the proxy. This is what actually the user of our VNC client sees. He or she use the form provided in the &#8220;AngularJS VNC client&#8221; in order to enter connection details and connect to the machine he or she wants to control
+We should have a VNC server on the machine we want to control. This machine provides interface accessible through the [RFB protocol][10]. The proxy in the middle has RFB client, which knows how to talk to the RFB server. The proxy also provides HTTP server, which is responsible for serving static files to the client and also allows communication through [socket.io][11]. The last component in our diagram is the “AngularJS VNC client”, which consists few HTML and JavaScript files provided to the browser by the proxy. This is what actually the user of our VNC client sees. He or she use the form provided in the “AngularJS VNC client” in order to enter connection details and connect to the machine he or she wants to control
 
 ## Proxy
 
-*If you&#8217;re not interested in the Node.js stuff, you can [skip it][12] and just copy and paste the code for the proxy from [GitHub][13].*
+*If you’re not interested in the Node.js stuff, you can [skip it][12] and just copy and paste the code for the proxy from [GitHub][13].*
 
 We can now continue with our proxy server. Create a directory called `angular-vnc`. Inside it create another one called `proxy`:
 
@@ -205,7 +205,7 @@ With the received by the client configuration we initialize new RFB connection a
   });
 }{{< / highlight >}}
 
-Lets take a look at the handler of the `raw` event. It takes very important role in the initialization of the connection. When we receive a `raw` event for first time the value of `initialized` is `false`, because of the way boolean expressions are being evaluated (see [Lazy evaluation][14]), `!initialized` is evaluated to `true`, which leads to the call of `handleConnection`. `handleConnection` is responsible for notifying the AngularJS client that now we are connected to the VNC server. It also adds the client to the `clients` collection and changes the value of `initialized` to `true`, so when next time we receive new frame this won&#8217;t lead to call of `handleConnection`.
+Lets take a look at the handler of the `raw` event. It takes very important role in the initialization of the connection. When we receive a `raw` event for first time the value of `initialized` is `false`, because of the way boolean expressions are being evaluated (see [Lazy evaluation][14]), `!initialized` is evaluated to `true`, which leads to the call of `handleConnection`. `handleConnection` is responsible for notifying the AngularJS client that now we are connected to the VNC server. It also adds the client to the `clients` collection and changes the value of `initialized` to `true`, so when next time we receive new frame this won’t lead to call of `handleConnection`.
 
 In other words, `!initialized && handleConnection(rect.width, rect.height);` is short version of:
 
@@ -228,7 +228,7 @@ The next method of our proxy, we are going to look at is `encodeFrame`:
   return image.encodeSync();
 }{{< / highlight >}}
 
-Don&#8217;t forget to require `node-png`:
+Don’t forget to require `node-png`:
 
 {{< highlight javascript >}}var Png = require('../node_modules/png/build/Release/png').Png;{{< / highlight >}}
 
@@ -254,7 +254,7 @@ And now we are done with the proxy! Lets continue with the fun part, AngularJS a
 
 ## AngularJS & Yeoman VNC client {#angular-vnc}
 
-First, of all you will need to install Yeoman, if you don&#8217;t already have it on your computer:
+First, of all you will need to install Yeoman, if you don’t already have it on your computer:
 
 {{< highlight bash >}}# Installs Yeoman
 npm install -g yeoman
@@ -386,7 +386,7 @@ and open <http://localhost:8090>, you should see something like this:
 
 [<img class="aligncenter size-full wp-image-641" alt="VNC Login Form" src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-08-at-20.43.44.png" width="374" height="369" />][16]
 
-The awesome thing is that we already have validation for the form! Did you notice that we added selector `form.ng-invalid.ng-dirty input.ng-invalid`? AngularJS is smart enough to validate the fields in our form by seeing their type (for example `input type="number"`, for the port) and their attributes (`required`, `ng-minlength`). When AngularJS detects that any field is not valid it adds the class: `ng-invalid` to the field, it also adds the class `ng-invalid` to the form, where this field is located. We, simply, take advantage, of this functionality provided by AngularJS, and define the styles: `form.ng-invalid.ng-dirty input.ng-invalid`. If you&#8217;re still not aware how the validation works checkout [Form Validation in NG-Tutorial][17].
+The awesome thing is that we already have validation for the form! Did you notice that we added selector `form.ng-invalid.ng-dirty input.ng-invalid`? AngularJS is smart enough to validate the fields in our form by seeing their type (for example `input type="number"`, for the port) and their attributes (`required`, `ng-minlength`). When AngularJS detects that any field is not valid it adds the class: `ng-invalid` to the field, it also adds the class `ng-invalid` to the form, where this field is located. We, simply, take advantage, of this functionality provided by AngularJS, and define the styles: `form.ng-invalid.ng-dirty input.ng-invalid`. If you’re still not aware how the validation works checkout [Form Validation in NG-Tutorial][17].
 
 We already have attached controller, to our view (because of Yeoman), so we only need to change its behavior.
 
@@ -417,7 +417,7 @@ angular.module('clientApp')
 
   });{{< / highlight >}}
 
-The most interesting part of `MainCtrl` is the `login` method. In it, we first check wether the form is invalid (`form.$invalid`), if it is we make the it &#8220;dirty&#8221;. We do this in order to remove the `ng-pristine` class from the form and force the validation. This scenario will happen if the user does not enter anything in the form and press the &#8220;Login&#8221; button. If the form is valid, we call the `connect` method of the service `VNCClient`. As you see it returns promise, when the promise is resolved we redirect the user to the page <http://localhost:8090/#/vnc>, otherwise we show him or her the message: `'Connection timeout. Please, try again.'` (checkout `<div class="form-error" ng-bind="errorMessage"></div>`).
+The most interesting part of `MainCtrl` is the `login` method. In it, we first check wether the form is invalid (`form.$invalid`), if it is we make the it “dirty”. We do this in order to remove the `ng-pristine` class from the form and force the validation. This scenario will happen if the user does not enter anything in the form and press the “Login” button. If the form is valid, we call the `connect` method of the service `VNCClient`. As you see it returns promise, when the promise is resolved we redirect the user to the page <http://localhost:8090/#/vnc>, otherwise we show him or her the message: `'Connection timeout. Please, try again.'` (checkout `<div class="form-error" ng-bind="errorMessage"></div>`).
 
 The next component we are going to look at is the service `VNCClient`. Before that, lets create it using Yeoman:
 
@@ -524,7 +524,7 @@ VNCClient.keyMap = [[8,65288,65288],[9,65289,65289],[13,65293,65293],[16,65505,6
 
 angular.module('clientApp').service('VNCClient', VNCClient);{{< / highlight >}}
 
-I know it is a lot of code but we will look only at the most important methods. You might noticed that we don&#8217;t follow the best practices for defining constructor functions &#8211; we don&#8217;t add the methods to the function&#8217;s prototype. Don&#8217;t worry about this, AngularJS will create a single instance of this constructor function and keep it in the services cache.
+I know it is a lot of code but we will look only at the most important methods. You might noticed that we don’t follow the best practices for defining constructor functions – we don’t add the methods to the function’s prototype. Don’t worry about this, AngularJS will create a single instance of this constructor function and keep it in the services cache.
 
 Lets take a quick look at `connect`:
 
@@ -553,7 +553,7 @@ Lets take a quick look at `connect`:
     return deferred.promise;
   };{{< / highlight >}}
 
-`connect` accepts a single argument &#8211; a configuration object. When the method is called it creates new socket using the service `Io`, which is simple wrapper of the global `io` provided by socket.io. We need this wrapper in order to be able to test the application easier and prevent monkey patching. After the socket is created we send new `init` message to the proxy (do you remember the init message?), with the required configuration for connecting to the VNC server. We also create a connection timeout. The connection timeout is quite important, if we receive a late response by the proxy or don&#8217;t receive any response at all. The next important part of the `connect` method is the handler of the response `init` message, by the proxy. When we receive the response within the acceptable time limit (remember the timeout) we resolve the promise, which was instantiated earlier in the beginning of the `connect` method.
+`connect` accepts a single argument – a configuration object. When the method is called it creates new socket using the service `Io`, which is simple wrapper of the global `io` provided by socket.io. We need this wrapper in order to be able to test the application easier and prevent monkey patching. After the socket is created we send new `init` message to the proxy (do you remember the init message?), with the required configuration for connecting to the VNC server. We also create a connection timeout. The connection timeout is quite important, if we receive a late response by the proxy or don’t receive any response at all. The next important part of the `connect` method is the handler of the response `init` message, by the proxy. When we receive the response within the acceptable time limit (remember the timeout) we resolve the promise, which was instantiated earlier in the beginning of the `connect` method.
 
 This way we transform a callback interface (by socket.io) into a promise based interface.
 
@@ -566,7 +566,7 @@ This is the implementation of the `addHandlers` method:
     });
   };{{< / highlight >}}
 
-Actually we add a single handler, which handles the `frame` events, which carries new (changed) screen fragments. When new frame is received we invoke the `update` method. It may look familiar to you &#8211; this is actually the [observer pattern][18]. We add/remove callbacks using the following methods:
+Actually we add a single handler, which handles the `frame` events, which carries new (changed) screen fragments. When new frame is received we invoke the `update` method. It may look familiar to you – this is actually the [observer pattern][18]. We add/remove callbacks using the following methods:
 
 {{< highlight javascript >}}this.addFrameCallback = function (fn) {
     this.frameCallbacks.push(fn);
@@ -585,7 +585,7 @@ And in `update` we simply:
     });
   };{{< / highlight >}}
 
-Since we need to capture events in the browsers (like pressing keys, mouse events&#8230;) and send them to the server we need methods for this:
+Since we need to capture events in the browsers (like pressing keys, mouse events...) and send them to the server we need methods for this:
 
 {{< highlight javascript >}}this.sendMouseEvent = function (x, y, mask) {
     this.socket.emit('mouse', {
@@ -606,7 +606,7 @@ Since we need to capture events in the browsers (like pressing keys, mouse event
 
 The [VNC screen][19] directive is responsible for calling these methods. In the `sendKeyboardEvent` we transform the `keyCode`, received by handling the keydown/up event with JavaScript, to one, which is understandable by the RFB protocol. We do this using the array `keyMap` defined above. 
 
-Since we didn&#8217;t create the `Io` service, you can instantiate it by:
+Since we didn’t create the `Io` service, you can instantiate it by:
 
 {{< highlight bash >}}yo angular:factory Io{{< / highlight >}}
 
@@ -622,7 +622,7 @@ angular.module('clientApp').factory('Io', function () {
   };
 });{{< / highlight >}}
 
-Don&#8217;t forget to include the line:
+Don’t forget to include the line:
 
 {{< highlight html >}}<script src="/socket.io/socket.io.js"></script>
 {{< / highlight >}}
@@ -652,13 +652,13 @@ angular.module('clientApp')
     };
   });{{< / highlight >}}
 
-`VncCtrl` is already located in `app/scripts/controllers/vnc.js`. You don&#8217;t have to worry about it because when we instantiated the `vnc` route, Yeoman was smart enough to create this controller for us.
+`VncCtrl` is already located in `app/scripts/controllers/vnc.js`. You don’t have to worry about it because when we instantiated the `vnc` route, Yeoman was smart enough to create this controller for us.
 
 Now lets create the VNC screen directive:
 
 {{< highlight bash >}}yo angular:directive vnc-screen{{< / highlight >}}
 
-&#8230;and now open `app/scripts/directives/vnc-screen.js`. This is our directive definition:
+...and now open `app/scripts/directives/vnc-screen.js`. This is our directive definition:
 
 {{< highlight javascript >}}var VNCScreenDirective = function (VNCClient) {
   return {
@@ -673,7 +673,7 @@ Now lets create the VNC screen directive:
 angular.module('clientApp').directive('vncScreen', VNCScreenDirective);
 {{< / highlight >}}
 
-The show is in the link function in, which we will look at later. Now lets take a quick look at the other properties of the directive. The template of our directive is simple canvas with class `vnc-screen`, it should replace the directive. We define that the user of the `vnc-screen` directive should use it as element. It is also quite important to notice that we have a single dependency &#8211; the `VNCClient` service, we described above.
+The show is in the link function in, which we will look at later. Now lets take a quick look at the other properties of the directive. The template of our directive is simple canvas with class `vnc-screen`, it should replace the directive. We define that the user of the `vnc-screen` directive should use it as element. It is also quite important to notice that we have a single dependency – the `VNCClient` service, we described above.
 
 Now lets look what happens in the link function:
 
@@ -716,7 +716,7 @@ scope.$on('$destroy', function () {
   bufferCanvas.remove();
 });{{< / highlight >}}
 
-As first step the link function checks whether the `VNCClient` is connected, if it isn&#8217;t the directive simply adds the text `"No VNC connection."` and hides the template (actually now a DOM element). We can also take more advanced approach here, we can watch the `connected` property and undertake different actions depending on its value. Doing this will make our directive more dynamic. But for simplicity lets stick to the current implementation.
+As first step the link function checks whether the `VNCClient` is connected, if it isn’t the directive simply adds the text `"No VNC connection."` and hides the template (actually now a DOM element). We can also take more advanced approach here, we can watch the `connected` property and undertake different actions depending on its value. Doing this will make our directive more dynamic. But for simplicity lets stick to the current implementation.
 
 The line `var bufferCanvas = createHiddenCanvas(VNCClient.screenWidth, VNCClient.screenHeight)` creates new hidden canvas. It is responsible for capturing the current state of the remote screen in size the same as the screen itself. So if the size of the remote screen is 1024x768px this hidden canvas will be with 1024px width and 768px height. We instantiate new instance of `VNCClientScreen` with parameter the hidden canvas. The constructor function `VNCClientScreen` wraps the canvas and provides method for drawing on it:
 
@@ -746,7 +746,7 @@ VNCClientScreen.prototype.getCanvas = function () {
 
 As next step we create new instance of `Screen`. This is the last component we are going to look at in the current tutorial but before taking a look at it lets see how we use it.
 
-We instantiate the `Screen` instance by passing our &#8220;visible&#8221; canvas and the VNC screen buffer (the wrapper of the &#8220;hidden&#8221; canvas) to it. For each received frame we are going to draw the buffer canvas over the VNC screen. We do this because the VNC screen could be scaled (i.e. with size different from the one of the remote machine&#8217;s screen) and we simplify our work by using this approach. Otherwise, we should calculate the relative position of each received frame before drawing it onto the canvas, taking in account the scale factor.
+We instantiate the `Screen` instance by passing our “visible” canvas and the VNC screen buffer (the wrapper of the “hidden” canvas) to it. For each received frame we are going to draw the buffer canvas over the VNC screen. We do this because the VNC screen could be scaled (i.e. with size different from the one of the remote machine’s screen) and we simplify our work by using this approach. Otherwise, we should calculate the relative position of each received frame before drawing it onto the canvas, taking in account the scale factor.
 
 In the `frameCallback` we draw the received rectangle (changed part of the screen) on the buffer screen and after that draw the buffer screen over the `Screen` instance.
 

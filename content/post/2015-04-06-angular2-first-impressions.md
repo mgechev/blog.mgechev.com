@@ -146,7 +146,7 @@ No. The binding mechanism is completely different. It provides wider functionali
 
 ## WebComponents
 
-<blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn&#39;t seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
+<blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn't seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 What exactly is framework and what is a library? Lets take a look at AngularJS' docs:

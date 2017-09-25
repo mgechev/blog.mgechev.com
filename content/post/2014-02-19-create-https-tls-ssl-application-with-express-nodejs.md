@@ -25,7 +25,7 @@ Here are two simple steps, which can be used to achieve this result:
 
 ### Generate self-signed certificate
 
-If you don&#8217;t already have certificate you need to generate one:
+If you don’t already have certificate you need to generate one:
 
 {{< highlight bash >}}
 
@@ -34,7 +34,7 @@ If you don&#8217;t already have certificate you need to generate one:
 {{< / highlight >}}
 
 
-You will be asked a couple of questions&#8230;
+You will be asked a couple of questions...
 <img src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675" />
 
 In this case we generated a self-signed certificate for 365 days.
@@ -67,10 +67,10 @@ Run the application:
     $ node index.js
 {{< / highlight >}}
 
-Enter the passphrase you entered during the creation of the certificate&#8230;
+Enter the passphrase you entered during the creation of the certificate...
 
 Now open your browser: <https://localhost:55555/>.
-After trusting the certificate you&#8217;d be done!
+After trusting the certificate you’d be done!
 
 ---
 
