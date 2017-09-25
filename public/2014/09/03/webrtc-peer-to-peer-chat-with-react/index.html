@@ -1,0 +1,784 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>WebRTC chat with React.js &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.comimages/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.comabout'>About</a>
+	<a href='http://blog.mgechev.comtalks'>Talks</a>
+	<a href='http://blog.mgechev.compost'>Archive</a>
+
+	
+
+	
+	<a class="cta" href="http://blog.mgechev.com/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        WebRTC chat with React.js
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/post/2014-09-03-webrtc-peer-to-peer-chat-with-react.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Sep 3, 2014 00:00
+                    · 2908 words
+                    · 14 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.comtags/React.js">React.js</a>
+                          
+                              <a href="http://blog.mgechev.comtags/JavaScript">JavaScript</a>
+                          
+                              <a href="http://blog.mgechev.comtags/WebRTC">WebRTC</a>
+                          
+                              <a href="http://blog.mgechev.comtags/p2p">p2p</a>
+                          
+                              <a href="http://blog.mgechev.comtags/Peer-to-Peer">Peer to Peer</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>In this blog post I&rsquo;m going to share how could be build WebRTC chat with <a href="https://facebook.github.io/react/">React.js</a>. Before we continue lets describe briefly what React.js and WebRTC are.</p>
+
+<p>The application from this tutorial is <a href="https://github.com/mgechev/ReactChat">available at GitHub</a>.</p>
+
+<h4 id="react-js">React.js</h4>
+
+<p>React.js is <a href="https://en.wikipedia.org/wiki/Reactive_programming">reactive</a> JavaScript framework, which helps you to build user interface. Facebook states that we can think of React as the &ldquo;V&rdquo; in MVC. React&rsquo;s main aspect is the state. When the state of the application changes this automatically propagates through the application&rsquo;s components. A React component is a self-contained module, which is composed by one or more other components. Usually the component depends on state, which is being provided by a parent component. May be the explanation seems quite abstract now, but during the tutorial the picture will get much more clear.</p>
+
+<h4 id="webrtc">WebRTC</h4>
+
+<p>RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server between them (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE, we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is <a href="http://dev.w3.org/2011/webrtc/editor/webrtc.html">already published</a> by W3C.</p>
+
+<h4 id="nat">NAT</h4>
+
+<p>Before we continue with the tutorial, lets say a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public ones and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in <a href="https://en.wikipedia.org/wiki/Network_address_translation">this wiki article</a>.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Now lets get starting with the actual implementation of our WebRTC based chat.</p>
+
+<h3 id="architecture">Architecture</h3>
+
+<h4 id="high-level-overview">High-level overview</h4>
+
+<p>Since I&rsquo;m kind of traditionalist I&rsquo;ll start by providing a basic, high-level overview of the architecture of our p2p (peer to peer) chat.</p>
+
+<p><img src="/images/architecture.png" alt="Architecture" title="Architecture" /></p>
+
+<p>The dashed arrows, in the diagram, indicate <a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol">signaling</a> WebSocket connections. Each client initiates such connection with the server. With these connections each client aims to register itself on the server and use the server as a proxy during the NAT traversal procedures, defined by the signaling protocol (for now we can think of the signaling protocol as <a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol">SIP</a> or <a href="https://en.wikipedia.org/wiki/Jingle_(protocol)">XMPP Jingle</a>). Actually the signaling protocol in our case is provided by Peer.js.</p>
+
+<p>The solid arrow stands for peer-to-peer TCP or UDP (TCP in our case) data channel between the browsers. We use full mesh, which scales badly especially when we use video or audio streaming. For the purpose of our chat full mesh is good enough.</p>
+
+<h4 id="low-level-overview">Low-level overview</h4>
+
+<p>In the beginning of the blog post I mentioned that React.js application contains a finite amount of React.js components composed together. In this subsection I&rsquo;ll illustrate, which are the different components of our application and how they are composed together. The diagram below isn&rsquo;t following the UML standard, it only illustrate, as clearly as possible, our micro-architecture.</p>
+
+<p><img src="/images/react-p2p.png" alt="Micro-architecture" title="Micro-architecture" /></p>
+
+<p>Lets concentrate on the left-hand side of the diagram. As you see we have a set of nested components. The most outer, non-named, component (the rectangle, which contains all other rectangles), is the <code>ChatBox</code> component. In its left-hand side is positioned the <code>MessagesList</code> component, which is composition of <code>ChatMessage</code> components. Each <code>ChatMessage</code> component contains a different chat message, which has author, date when published and content. On the right-hand side of the <code>ChatBox</code> is positioned the <code>UsersList</code> component. This component lists all users, which are currently in the chat session. The last component is the <code>MessageInput</code> component. The <code>MessageInput</code> component is a simple text input, which once detect a press of the Enter key triggers an event, with data - its value.</p>
+
+<p>The <code>ChatBox</code> component uses <code>ChatProxy</code>. The <code>ChatProxy</code> is responsible for registering the current client on the server and talking with the other peers. For simplicity I&rsquo;ve used <a href="http://peerjs.com/">Peer.js</a>, which provides nice high-level API, wrapping the browser&rsquo;s WebRTC API.</p>
+
+<h3 id="getting-started">Getting started</h3>
+
+<p>In this section we are going to setup our project&hellip;</p>
+
+<p>Create a directory called <code>react-p2p</code> and enter it:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>mkdir react-p2p <span class="o">&amp;&amp;</span> <span class="nb">cd</span> react-p2p
+</code></pre></div>
+
+
+<p>Create a <code>package.json</code> file with the content:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;react-peerjs&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;ReactJS chat with PeerJS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;main&quot;</span><span class="o">:</span> <span class="s2">&quot;index.js&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;keywords&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;webrtc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nodejs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;react&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;javascript&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;awesome&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;mgechev&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;license&quot;</span><span class="o">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;express&quot;</span><span class="o">:</span> <span class="s2">&quot;~4.8.4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;peer&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.2.6&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;socket.io&quot;</span><span class="o">:</span> <span class="s2">&quot;~1.0.6&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>This file defines primitive information for our server, like name, version, keywords and dependencies. The dependencies of our server are:</p>
+
+<ul>
+<li><code>express</code> - we are going to use express as a static server</li>
+<li><code>peer</code> - A server, which implements the signaling of our application</li>
+<li><code>socket.io</code></li>
+</ul>
+
+<p>Now lets take a look at <code>./bower.json</code>:</p>
+
+<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;react-peerjs&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;main&quot;</span><span class="o">:</span> <span class="s2">&quot;index.js&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;authors&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;mgechev&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;license&quot;</span><span class="o">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;ignore&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s2">&quot;**/.*&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;node_modules&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bower_components&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;public/lib&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tests&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;react&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.11.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;jquery&quot;</span><span class="o">:</span> <span class="s2">&quot;~2.1.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bootstrap&quot;</span><span class="o">:</span> <span class="s2">&quot;~3.2.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eventEmitter&quot;</span><span class="o">:</span> <span class="s2">&quot;~4.2.7&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;peerjs&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.3.9&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+The <code>bower.json</code> file defines primitive information and dependencies for the client-side of the application.
+The required dependencies are:</p>
+
+<ul>
+<li><code>react</code> - the framework, we are going to use for building our UI.</li>
+<li><code>eventEmitter</code> - our components are going to fire events, which later are going to be handled by other components. EventEmitter will be used as based class for our &ldquo;event-driven&rdquo; components.</li>
+<li><code>peerjs</code> - wraps the browser&rsquo;s WebRTC API into high-level, easier to use API.</li>
+<li><code>jquery</code></li>
+<li><code>bootstrap</code></li>
+</ul>
+
+<p>And&hellip; <code>.bowerrc</code></p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+  <span class="s2">&quot;directory&quot;</span><span class="o">:</span> <span class="s2">&quot;public/lib&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>In <code>.bowerrc</code> we define that we want all bower dependencies to be saved at <code>/public/lib</code>.</p>
+
+<p>Now, in order to resolve all dependencies, run:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>bower install <span class="o">&amp;&amp;</span> npm install
+</code></pre></div>
+
+
+<p>Now lets start with our implementation.</p>
+
+<h3 id="server-side">Server-side</h3>
+
+<p>We have a few lines of Node.js, which are required for signaling and establishing p2p connection between the peers.</p>
+
+<p>Create a file called <code>index.js</code> in the root of our application and add the following content:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">PeerServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;peer&#39;</span><span class="p">).</span><span class="nx">PeerServer</span><span class="p">,</span>
+    <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">),</span>
+    <span class="nx">Topics</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./public/src/Topics.js&#39;</span><span class="p">),</span>
+    <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
+    <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3001</span><span class="p">;</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/public&#39;</span><span class="p">));</span>
+
+<span class="kd">var</span> <span class="nx">expressServer</span> <span class="o">=</span> <span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">expressServer</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on port&#39;</span><span class="p">,</span> <span class="nx">port</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">peerServer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PeerServer</span><span class="p">({</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">9000</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/chat&#39;</span> <span class="p">});</span>
+
+<span class="nx">peerServer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">io</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User connected with #&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">peerServer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;disconnect&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">io</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_DISCONNECTED</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User disconnected with #&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>In the snippet above, we create a simple express server, which servers static files from the directory <code>/public</code>, located in the root folder. After that we create a <code>PeerServer</code>, which on the other hand is responsible for handling the signaling between the different peers. In our case we can think of the <code>PeerServer</code> and the protocol, which it implements as alternative of <a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol">SIP</a> or <a href="https://en.wikipedia.org/wiki/Jingle_(protocol)">XMPP Jingle</a>.</p>
+
+<p>Once our <code>PeerServer</code> detects that a peer has been connected to it, it triggers the event <code>USER_CONNECTED</code> to all peers. Once a client disconnects from the <code>PeerServer</code> we trigger <code>USER_DISCONNECTED</code>. These two events are very important for handling the list of currently available users.</p>
+
+<h3 id="client-side">Client-side</h3>
+
+<h4 id="chatproxy-js">ChatProxy.js</h4>
+
+<p>Now lets take a look at the component responsible for communication between our peers and registering them on the server.</p>
+
+<p>The biggest advantage of putting the logic for p2p communication and signaling out of the react components is achieving separation of concerns. This way we achieve highly coherent components, which are reusable and testable.</p>
+
+<p>Inside <code>/public/src/models/</code> create a file called <code>ChatProxy.js</code>.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">ChatProxy</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_peers</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="p">}</span>
+
+<span class="nx">ChatProxy</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p>Our <code>ChatProxy</code> extends <code>EventEmitter</code>. We use inheritance because we want to reuse the functionality provided by the <code>EventEmitter</code> and fire events when we receive new message, client connects or disconnects.</p>
+
+<p>The most complex method, which <code>ChatProxy</code> implements is the <code>connect</code> method. Lets take a look at it:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">ChatProxy</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">connect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setUsername</span><span class="p">(</span><span class="nx">username</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">userId</span> <span class="o">===</span> <span class="nx">self</span><span class="p">.</span><span class="nx">getUsername</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">_connectTo</span><span class="p">(</span><span class="nx">userId</span><span class="p">);</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User connected&#39;</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_DISCONNECTED</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">userId</span> <span class="o">===</span> <span class="nx">self</span><span class="p">.</span><span class="nx">getUsername</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">_disconnectFrom</span><span class="p">(</span><span class="nx">userId</span><span class="p">);</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_DISCONNECTED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User disconnected&#39;</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Connecting with username&#39;</span><span class="p">,</span> <span class="nx">username</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">peer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Peer</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">host</span><span class="o">:</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">,</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">9000</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/chat&#39;</span>
+  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">peer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">setUsername</span><span class="p">(</span><span class="nx">userId</span><span class="p">);</span>
+  <span class="p">});</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">peer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">conn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">_registerPeer</span><span class="p">(</span><span class="nx">conn</span><span class="p">.</span><span class="nx">peer</span><span class="p">,</span> <span class="nx">conn</span><span class="p">);</span>
+    <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="nx">conn</span><span class="p">.</span><span class="nx">peer</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>If the client have passed username to the <code>connect</code> call we set the current username, after that with <code>io()</code> we establish new socket.io connection. The socket.io connection is going to be used for receiving <code>USER_CONNECTED</code> and <code>USER_DISCONNECTED</code> events. Once we have been connected to the socket.io server, we bind to these events. We need extra, socket.io, connection here because the API of Peer.js doesn&rsquo;t provide all required events by its public API.</p>
+
+<p>In the snippet:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">self</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">userId</span> <span class="o">===</span> <span class="nx">self</span><span class="p">.</span><span class="nx">getUsername</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">_connectTo</span><span class="p">(</span><span class="nx">userId</span><span class="p">);</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;User connected&#39;</span><span class="p">,</span> <span class="nx">userId</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Once we receive event, which indicates that new user is connected, we make sure that the connected peer is not us. In this case, we establish connection with it by calling the &ldquo;private&rdquo; method <code>_connectTo</code>.</p>
+
+<p>The callback for <code>USER_DISCONNECTED</code> is almost analogous so we won&rsquo;t take a further look at it.</p>
+
+<p>The next interesting part of the <code>connect</code> method is the snippet where we establish new <code>Peer.js</code> connection:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">peer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Peer</span><span class="p">(</span><span class="nx">username</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">host</span><span class="o">:</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">,</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">9000</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/chat&#39;</span>
+<span class="p">});</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">peer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;open&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">userId</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">setUsername</span><span class="p">(</span><span class="nx">userId</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">peer</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">conn</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">_registerPeer</span><span class="p">(</span><span class="nx">conn</span><span class="p">.</span><span class="nx">peer</span><span class="p">,</span> <span class="nx">conn</span><span class="p">);</span>
+  <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">Topics</span><span class="p">.</span><span class="nx">USER_CONNECTED</span><span class="p">,</span> <span class="nx">conn</span><span class="p">.</span><span class="nx">peer</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Once we invoke the constructor function <code>Peer</code>, provided by Peer.js, with the appropriate parameters, we bind to the <code>open</code> event. When the callback passed for the open event is being invoked, we receive the unique identifier of the current user, in the ideal case it will be the username entered in the home screen. Once we receive the user identifier we can save it.</p>
+
+<p>When we receive <code>connection</code> event we register the connected peer and emit <code>USER_CONNECTED</code> event. The <code>USER_CONNECTED</code> event will be handled by the <code>ChatBox</code>, which will lead to change of the state of the UI.</p>
+
+<p>The full content of <code>ChatProxy</code> could be <a href="https://github.com/mgechev/ReactChat/blob/master/public/src/models/ChatProxy.js">found at GitHub</a>.</p>
+
+<h4 id="app-jsx">app.jsx</h4>
+
+<p>The initial view of the user would be:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;container&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;reg-form-container&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;username-input&quot;</span><span class="p">&gt;</span>Username<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;username-input&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-control&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">br</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;connect-btn&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary&quot;</span><span class="p">&gt;</span>Connect<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>Once rendered in the browser, this would be a simple text box asking the client for optional username. In order to see what happens once the user click on the <code>#connect-btn</code>, lets take a look at the <code>app.jsx</code> file, which is located at <code>/public/app.jsx</code>:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/** @jsx React.DOM */</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#connect-btn&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">initChat</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#container&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#username-input&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">());</span>
+  <span class="p">});</span>
+
+  <span class="kd">function</span> <span class="nx">initChat</span><span class="p">(</span><span class="nx">container</span><span class="p">,</span> <span class="nx">username</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">ChatBox</span> <span class="nx">chatProxy</span><span class="o">=</span><span class="p">{</span><span class="k">new</span> <span class="nx">ChatProxy</span><span class="p">()}</span>
+      <span class="nx">username</span><span class="o">=</span><span class="p">{</span><span class="nx">username</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/ChatBox&gt;, container);</span>
+  <span class="p">}</span>
+
+  <span class="nb">window</span><span class="p">.</span><span class="nx">onbeforeunload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">&#39;Are you sure you want to leave this page?&#39;</span><span class="p">;</span>
+  <span class="p">};</span>
+
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>When the user clicks on <code>#connect-btn</code> we render the <code>ChatBox</code> component inside the <code>#container</code> element. So now lets see what the <code>ChatBox</code> does:</p>
+
+<h4 id="chatbox-jsx">ChatBox.jsx</h4>
+
+<p>At <code>/public/src/components/chat/</code> create a file called <code>ChatBox.jsx</code> and add the following content:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/** @jsx React.DOM */</span>
+
+<span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">ChatBox</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">users</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onMessage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">addMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onUserConnected</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">userConnected</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onUserDisconnected</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">userDisconnected</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+  <span class="p">},</span>
+
+  <span class="nx">userConnected</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+    <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">users</span><span class="o">:</span> <span class="nx">users</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="nx">userDisconnected</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+    <span class="nx">users</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">users</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">users</span><span class="o">:</span> <span class="nx">users</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="nx">messageHandler</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">message</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messageInput</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">value</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">addMessage</span><span class="p">({</span>
+      <span class="nx">content</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span>
+      <span class="nx">author</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">getUsername</span><span class="p">()</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">broadcast</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">addMessage</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">message</span><span class="p">.</span><span class="nx">date</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messagesList</span><span class="p">.</span><span class="nx">addMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-box&quot;</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-header ui-widget-header&quot;</span><span class="o">&gt;</span><span class="nx">React</span> <span class="nx">p2p</span> <span class="nx">Chat</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-content-wrapper row&quot;</span><span class="o">&gt;</span>
+          <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messagesList&quot;</span><span class="o">&gt;&lt;</span><span class="err">/MessagesList&gt;</span>
+          <span class="o">&lt;</span><span class="nx">UsersList</span> <span class="nx">users</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">}</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;usersList&quot;</span><span class="o">&gt;&lt;</span><span class="err">/UsersList&gt;</span>
+        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+        <span class="o">&lt;</span><span class="nx">MessageInput</span>
+          <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messageInput&quot;</span>
+          <span class="nx">messageHandler</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">messageHandler</span><span class="p">}</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="err">/MessageInput&gt;</span>
+      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Lets take a look at the <code>render</code> method:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-box&quot;</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;root&quot;</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-header ui-widget-header&quot;</span><span class="o">&gt;</span><span class="nx">React</span> <span class="nx">p2p</span> <span class="nx">Chat</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-content-wrapper row&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messagesList&quot;</span><span class="o">&gt;&lt;</span><span class="err">/MessagesList&gt;</span>
+        <span class="o">&lt;</span><span class="nx">UsersList</span> <span class="nx">users</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">}</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;usersList&quot;</span><span class="o">&gt;&lt;</span><span class="err">/UsersList&gt;</span>
+      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+      <span class="o">&lt;</span><span class="nx">MessageInput</span>
+        <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messageInput&quot;</span>
+        <span class="nx">messageHandler</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">messageHandler</span><span class="p">}</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="err">/MessageInput&gt;</span>
+    <span class="o">&lt;</span><span class="err">/div&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>The <code>render</code> method returns the markup, which should be rendered. We use components, which are already defined and available in the given scope (components like <code>MessagesList</code> and <code>MessageInput</code>).</p>
+
+<p>Once the component has been mounted the <code>componentDidMount</code> method is being invoked:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">username</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onMessage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">addMessage</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onUserConnected</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">userConnected</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">chatProxy</span><span class="p">.</span><span class="nx">onUserDisconnected</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">userDisconnected</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+<span class="p">},</span>
+</code></pre></div>
+
+
+<p>In this method we create new <code>ChatProxy</code>, invoke its method <code>connect</code> and add event handlers. Once we receive a new message the callback registered for <code>onMessage</code> will be invoked, once a user is connected the callback <code>userConnected</code> will be invoked and once a peer is being disconnected the callback <code>userDisconnected</code> will be invoked. We use <code>Function.prototype.bind</code> in order to change the context for the callbacks with appropriate one.</p>
+
+<p><code>userConnected</code> and <code>userDisconnected</code> are similar:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">userConnected</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+  <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+    <span class="nx">users</span><span class="o">:</span> <span class="nx">users</span>
+  <span class="p">});</span>
+<span class="p">},</span>
+
+<span class="nx">userDisconnected</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+  <span class="nx">users</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">users</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">user</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+    <span class="nx">users</span><span class="o">:</span> <span class="nx">users</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>They both change the state, which leads to call of the <code>render</code> method with the new state, which reflects on other components and respectively on the current UI.</p>
+
+<p>In the <code>addMessage</code> method we have:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">addMessage</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">message</span><span class="p">.</span><span class="nx">date</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messagesList</span><span class="p">.</span><span class="nx">addMessage</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>The interesting part here is the line: <code>this.refs.messagesList.addMessage(message);</code>, where we use <code>this.refs</code>. This is built-in React.js feature, which allows us to reference to existing child components. Once we set the <code>ref</code> attribute of given component (like <code>&lt;MessagesList ref=&quot;messagesList&quot;&gt;&lt;/MessagesList&gt;</code>) we can later access the component by using <code>this.refs.REF_ATTRIBUTE_VALUE</code>.</p>
+
+<h4 id="messageslist-jsx">MessagesList.jsx</h4>
+
+<p>Inside <code>/public/src/components/chat/</code> add file called <code>MessagesList.jsx</code> and add the following content:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/** @jsx React.DOM */</span>
+
+<span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">MessagesList</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">messages</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">addMessage</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">messages</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">,</span>
+        <span class="nx">container</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messageContainer</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+    <span class="nx">messages</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">messages</span><span class="o">:</span> <span class="nx">messages</span> <span class="p">});</span>
+    <span class="c1">// Smart scrolling - when the user is</span>
+    <span class="c1">// scrolled a little we don&#39;t want to return him back</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollHeight</span> <span class="o">-</span>
+        <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">+</span> <span class="nx">container</span><span class="p">.</span><span class="nx">offsetHeight</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentDidUpdate</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messageContainer</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+    <span class="nx">container</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="nx">container</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">messages</span><span class="p">;</span>
+    <span class="nx">messages</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">(</span>
+        <span class="o">&lt;</span><span class="nx">ChatMessage</span> <span class="nx">message</span><span class="o">=</span><span class="p">{</span><span class="nx">m</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/ChatMessage&gt;</span>
+      <span class="p">);</span>
+    <span class="p">});</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">messages</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">messages</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-no-messages&quot;</span><span class="o">&gt;</span><span class="nx">No</span> <span class="nx">messages</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messageContainer&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-messages col-xs-9&quot;</span><span class="o">&gt;</span>
+        <span class="p">{</span><span class="nx">messages</span><span class="p">}</span>
+      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Lets take a look at the <code>render</code> method of this component:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">messages</span><span class="p">;</span>
+  <span class="nx">messages</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">ChatMessage</span> <span class="nx">message</span><span class="o">=</span><span class="p">{</span><span class="nx">m</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/ChatMessage&gt;</span>
+    <span class="p">);</span>
+  <span class="p">});</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">messages</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">messages</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-no-messages&quot;</span><span class="o">&gt;</span><span class="nx">No</span> <span class="nx">messages</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messageContainer&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;chat-messages col-xs-9&quot;</span><span class="o">&gt;</span>
+      <span class="p">{</span><span class="nx">messages</span><span class="p">}</span>
+    <span class="o">&lt;</span><span class="err">/div&gt;</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Initially we iterate over all messages from the state of the current component (<code>this.state.messages</code>). Using <code>Array.prototype.map</code> we turn our messages array into <code>ChatMessages</code> and later render them into the <code>div.chat-messages</code>.</p>
+
+<p>In <code>addMessage</code> we add new chat messages by appending them to the list of all messages:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">addMessage</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">messages</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">,</span>
+      <span class="nx">container</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messageContainer</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+  <span class="nx">messages</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">messages</span><span class="o">:</span> <span class="nx">messages</span> <span class="p">});</span>
+  <span class="c1">// Smart scrolling - when the user is</span>
+  <span class="c1">// scrolled a little we don&#39;t want to return him back</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollHeight</span> <span class="o">-</span>
+      <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">+</span> <span class="nx">container</span><span class="p">.</span><span class="nx">offsetHeight</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>The interesting part here is:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="k">if</span> <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollHeight</span> <span class="o">-</span>
+    <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">+</span> <span class="nx">container</span><span class="p">.</span><span class="nx">offsetHeight</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Basically, this snippet checks whether the user have scrolled more than 50pxs. If he did, we don&rsquo;t want to scroll to bottom once he have started reading messages from the history of the chat. Thats why depending on whether the user have or haven&rsquo;t scrolled we set <code>this.scrolled</code> to <code>true</code> or <code>false</code>.</p>
+
+<p>We use <code>this.scrolled</code> in <code>componentDidUpdate</code>:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">componentDidUpdate</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">scrolled</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">messageContainer</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+  <span class="nx">container</span><span class="p">.</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="nx">container</span><span class="p">.</span><span class="nx">scrollHeight</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Once the component is going to be updated (for example because of new message added), we check whether the user have scrolled and if he had, we set <code>scrollTop</code> to the appropriate value. For getting the scroll container we use <code>this.refs</code>, as explained above.</p>
+
+<h4 id="messageinput-jsx">MessageInput.jsx</h4>
+
+<p>This is the last component we will look at.</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/** @jsx React.DOM */</span>
+
+<span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">MessageInput</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">LinkedStateMixin</span><span class="p">],</span>
+
+  <span class="nx">keyHandler</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">13</span> <span class="o">&amp;&amp;</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">messageHandler</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;&#39;</span> <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;&#39;</span> <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span>
+        <span class="nx">className</span> <span class="o">=</span> <span class="s2">&quot;form-control&quot;</span>
+        <span class="nx">placeholder</span><span class="o">=</span><span class="s2">&quot;Enter a message...&quot;</span>
+        <span class="nx">valueLink</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">linkState</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)}</span>
+        <span class="nx">onKeyUp</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">keyHandler</span><span class="p">}</span><span class="o">/&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>In this component we use the mixin <code>React.addons.LinkedStateMixin</code>, which adds the method <code>linkState</code> to our component. Once the <code>linkState</code> method is called we can create two-way data binding between given input and property of our state. The name of the property depends on the value we pass to the <code>linkState</code> call. For example if we invoke <code>this.linkState('value')</code>, once the value of the input is being changed, this will reflect on <code>this.state.value</code>.</p>
+
+<p>Another interesting moment here is the key handler. On key up of <code>input.form-control</code> the <code>keyHandler</code> method will be called. The method checks whether the event was called by pressing enter and whether the length of the trimmed value of the current message is more than zero, if it is, it updates the value of the current message to be the empty string and invokes <code>this.props.messageHandler</code>. <code>this.props.messageHandler</code> is passed by the <code>ChatBox</code> component as property of the <code>MessageInput</code>:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="o">&lt;</span><span class="nx">MessageInput</span>
+  <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;messageInput&quot;</span>
+  <span class="nx">messageHandler</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">messageHandler</span><span class="p">}</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="err">/MessageInput&gt;</span>
+</code></pre></div>
+
+
+<h2 id="run-the-project">Run the project&hellip;</h2>
+
+<p>The next step is to run the project by:</p>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>node index.js <span class="o">&amp;&amp;</span> open http://localhost:3001
+</code></pre></div>
+
+
+<p>Fin!</p>
+
+<p>I hope the blog post was fun and useful! :-)</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.comjs/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

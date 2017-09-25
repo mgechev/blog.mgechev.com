@@ -1,0 +1,58 @@
+    {{ partial "head.html" . }}
+    <body>
+       {{ partial "nav.html" . }}
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        {{ .Title }}
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/{{ .FullFilePath }}">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · {{ .Date.Format "Jan 2, 2006 15:04" }}
+                    · {{ if lt 1 .WordCount }}{{ .WordCount }} words{{ else }}{{ .WordCount }} word{{ end }}
+                    · {{ if eq 1 .ReadingTime }}{{ .ReadingTime }} minute read{{ else }}{{ .ReadingTime }} minutes read{{ end }}
+                      <span class="tags">
+                      {{ with .Params.tags }}
+                      {{ if ge (len .) 1 }}
+                          {{ range . }}
+                              <a href="{{ $.Site.BaseURL }}tags/{{ . | urlize }}">{{ . }}</a>
+                          {{ end }}
+                      {{ end }}
+                      {{ end}}
+                      </span>
+                    </h2>
+                </header>
+                {{ if .Site.Params.enableToc }}
+                  {{ if .TableOfContents }}
+                    <div id="toc">
+                      {{ .TableOfContents }}
+                    </div>
+                  {{ end }}
+                {{ end }}
+                <section id="post-body">
+                    {{ .Content }}
+                </section>
+            </article>
+
+            {{ if .Site.Params.enableGithubIssuesTips }}
+                {{ partial "github-issues-tip.html" . }}
+            {{ end }}
+
+            {{ if .Site.Params.enableDisqus }}
+                {{ partial "disqus.html" . }}
+            {{ end }}
+
+            {{ if .Site.Params.enableDuoshuo }}
+                {{ partial "duoshuo.html" . }}
+            {{ end }}
+
+            {{ partial "footer.html" . }}
+        </section>
+
+        {{ partial "js.html" . }}
+    </body>
+</html>

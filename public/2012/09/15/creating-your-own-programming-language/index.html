@@ -1,0 +1,259 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>ELang &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.comimages/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.comabout'>About</a>
+	<a href='http://blog.mgechev.comtalks'>Talks</a>
+	<a href='http://blog.mgechev.compost'>Archive</a>
+
+	
+
+	
+	<a class="cta" href="http://blog.mgechev.com/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        ELang
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/post/2012-09-15-creating-your-own-programming-language.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Sep 15, 2012 00:00
+                    · 875 words
+                    · 5 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.comtags/elang">elang</a>
+                          
+                              <a href="http://blog.mgechev.comtags/java">java</a>
+                          
+                              <a href="http://blog.mgechev.comtags/Programming">Programming</a>
+                          
+                              <a href="http://blog.mgechev.comtags/programming-languages">programming languages</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>And one more blog post by me! It&#8217;s going to be in brand new topic than the others. For about an year and a half I&#8217;ve got an idea which I wanted to accomplish&#8230;To create my own simple programming language. Actually it&#8217;s very useful task and quite interesting. Creating it you can get better understanding how the compilers and interpreters work and probably write better code. Unfortunately there were two problems&#8230;I didn&#8217;t have enough time for such task and&#8230;I&#8217;ve not studied formal grammars (and as I mentioned I don&#8217;t have enough time to study them&#8230;there are just so much more interesting things to read about :-P ). Last weekend I wasn&#8217;t in very good health condition. I think that I have a tradition to make different cool stuffs when I don&#8217;t feel very well :-)&#8230;Soo for two days I&#8217;ve wrote about forty Java classes which actually were ELang.</p>
+
+<p>I opened my Java IDE (I decided to not write the language in JavaScript) and I created few different classes&#8230;Actually I had idea to create something very basic, just variables, if, while, number expressions and boolean expressions. Oh&#8230;I almost forgot to tell that my language is interpreted so that&#8217;s why I decided to have three different stages in the execution process: lexing, parsing and interpreting. The lexing process was straight-forward so there&#8217;s nothing interesting about it&#8230;I&#8217;ve just created different tokens from the long string which is the actual program. Here&#8217;s more information about that <a href="https://en.wikipedia.org/wiki/Tokenization">https://en.wikipedia.org/wiki/Tokenization</a>. After I finished with the lexing&#8230;ahh after that&#8230;it was the Parsing&#8230;Actually that was the process which has been scaring me :-). I&#8217;ve created an interface IStatement which was something that has a void method called &#8220;execute&#8221;. Here&#8217;s the interface:</p>
+
+<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IStatement</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">execute</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div>
+
+
+<div>
+</div>
+
+<div>
+  Another key part is the interface IExpression which was something similar but:
+</div>
+
+<div>
+</div>
+
+<div>
+  <div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IExpression</span> <span class="o">{</span>
+    <span class="n">Value</span> <span class="nf">evaluate</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div>
+
+</div>
+
+<div>
+</div>
+
+<div>
+  As you might guess Value is a terminal which is a class defined by myself. The statement actually is a list of IStatement-s (Composite). Well it&#8217;s not exactly accurate because the if statement, for example, which also implements IStatement has a list of  IStatements and a condition which is actually an IExpression :-). Depending on the current token I make decisions what kind of statement (or expression) should I create. Very important moment is that the variables must be variables in the statements even after the statement is evaluated! Why? Because there&#8217;s a while statement. The statements inside the while statement are executed multiple times so if we substitute the variable with it&#8217;s value we will loose our statement and possibly create an infinite loop. All expressions are parsed into a <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">reverse polish notation</a>. This is an easy algorithm which can be found just everywhere&#8230;Expressions are lists of symbols. A single symbol could be &#8211; variable, value (boolean/string/number) or an operator. After an expression is created it can be evaluated with it&#8217;s method evaluate (implemented because of the implementation of IExpression). Evaluating expressions in reverse polish notation is quite easy.
+</div>
+
+<div>
+</div>
+
+<div>
+  With this construction the interpreting process is extremely simple:
+</div>
+
+<div>
+</div>
+
+<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kt">void</span> <span class="nf">interpret</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">Iterator</span> <span class="n">iter</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">statements</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+    <span class="n">IStatement</span> <span class="n">current</span><span class="o">;</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">iter</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+        <span class="n">current</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+
+<p>I also want to have interaction with the user. So there are also implementations of read and print methods. That&#8217;s why I&#8217;ve created special kind of IExpression (actually there&#8217;s nothing special but just separated in different package :-) ). The print function is a list of IExpressions. After the list is evaluated everything is just put on the user&#8217;s screen&#8230;Here is the implementation:</p>
+
+<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="n">Value</span> <span class="nf">evaluate</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">Value</span> <span class="n">result</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">toPrint</span><span class="o">.</span><span class="na">evaluate</span><span class="o">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div>
+
+
+<p>Easy, right? With this kind of language I&#8217;ve achieved programs like that:</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>def fibonacci(n)
+    if n &gt;= 0:
+        a1 = 0;
+        a2 = 1;
+        current = 0;
+        while n &gt; current:
+            temp = a2;
+            a2 = a1 + a2;
+            a1 = temp;
+            current = current + 1;
+        endwhile;
+        result = a1;
+    else: 
+        result = 0;
+    endif;
+    return result;
+enddef;
+
+def factorial(n)
+    result = 1;
+    current = 1;
+    while current &lt;= n:
+        result = result * current;
+        current = current + 1;
+    endwhile;
+    return result;
+enddef;
+
+print &#39;Enter n for fibonacci number: &#39;;
+n = read;
+print &#39;The result for the fibonacci number entered is: &#39;;
+print fibonacci(n);
+print &#39;\n&#39;;
+
+print &#39;Enter n for factorial: &#39;;
+n = read;
+print &#39;The result for the number you entered for factorial is: &#39;;
+print factorial(n);
+print &#39;\n&#39;;
+</code></pre></div>
+
+
+<p>It also allows recursion:</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>def recursiveFibonacci(n)
+    if n == 0:
+        return 0;
+    endif;
+    if n == 1:
+        return 1;
+    endif;
+    return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
+enddef;
+</code></pre></div>
+
+
+<p>The github repository can be found here: <a href="https://github.com/mgechev/ELang/">https://github.com/mgechev/ELang/</a></p>
+
+<p>After I finished with that I have a desire to improve it a little&hellip;Including feature for importing external files will be very useful and may make the language even useful :D. The language can be extended to object-oriented easy by adding hash. If the hash values can be primitives, other hashes and methods this extension can be accomplished without much troubles.</p>
+
+<p>Actually now ELang is quite useful for writing simple programs and teaching beginner programmers how to write different basic constructs but it&rsquo;s potential ends very quickly after these programmers learn how to use if, while, print, read and declare different functions. :-).</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.comjs/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,570 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>Angular in Production &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.comimages/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.comabout'>About</a>
+	<a href='http://blog.mgechev.comtalks'>Talks</a>
+	<a href='http://blog.mgechev.compost'>Archive</a>
+
+	
+
+	
+	<a class="cta" href="http://blog.mgechev.com/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Angular in Production
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/post/2017-01-17-angular-in-production.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Jan 17, 2017 00:00
+                    · 4016 words
+                    · 19 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.comtags/Angular">Angular</a>
+                          
+                              <a href="http://blog.mgechev.comtags/TypeScript">TypeScript</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>In this informal essay I&rsquo;ll go through a case study of my experience in using Angular (2 and above) in production.</p>
+
+<p>Last April, together with a small team, we started working on an educational application; the second version of a product that I developed about 3 years ago using Angular 1.</p>
+
+<p>The product targets young kids and their parents. It&rsquo;s purpose is to motivate kids to learn maths by earning rewards. The application had an iOS version with hundreds of thousands of users and we wanted to provide similar experience in the browser. We bet on mobile-first approach, since we were targeting kids playing on their tablets and phones.</p>
+
+<p>The application has two main modules:</p>
+
+<ul>
+<li>An intro flow which includes a few screen explaining what the application is all about, sign-in and sign-up.</li>
+<li>Main application which includes a quiz functionality, screen for choosing a reward, module for parent supervision, etc.</li>
+</ul>
+
+<p>In the end because of various business reasons the project&rsquo;s development was discontinued.</p>
+
+<h1 id="choosing-the-tech-stack">Choosing the tech stack</h1>
+
+<p>Once the entire team got familiar with the business goals and the requirements we had to choose the tech stack. Our main criteria behind it were:</p>
+
+<ul>
+<li>A good fit for the business goals.</li>
+<li>Help us to reuse previous experience we had.</li>
+<li>Fun to work with.</li>
+</ul>
+
+<p>In the backend we stopped on Rails. We were considering GraphQL as a communication protocol between frontend and backend but in the end we decided to be a bit more conservative and bet on our good old friend REST. If I could go back, probably I&rsquo;d choose GraphQL because I really enjoy its statically typed schema.</p>
+
+<h2 id="going-statically-typed">Going statically typed</h2>
+
+<p>One of the biggest flaws we experienced in the first version of the product were caused by the use of dynamically typed language. Different typos were caught after the application has been deployed to staging which made us feel the tech stack quite fragile. This prompted us consider a statically typed language for the development of the new version.</p>
+
+<p>Our choice was limited to either Flow or TypeScript. Although Elm sounds hot, it was going to limit our team scalability - it&rsquo;s hard to find developers with sufficient knowledge in this language.</p>
+
+<h2 id="the-framework">The framework&hellip;</h2>
+
+<p>I had a successful experience with React in a few past projects where I used it with flux and redux. On the other hand, at this time I was contributing to the Angular&rsquo;s core and a couple of other projects in the Angular organization. I was also working on <a href="https://github.com/mgechev/angular-seed">angular-seed</a>, <a href="https://github.com/mgechev/codelyzer">codelyzer</a> and writing a <a href="https://www.packtpub.com/web-development/getting-started-angular-second-edition">book about Angular</a>. We also had another team member with experience in Angular.</p>
+
+<p>Given this Angular may sound like the right solution but, on the other hand, the framework was still in beta and we knew that a lot of breaking changes are about to come.</p>
+
+<p>Well, in the end we bet on Angular based on the following reasons:</p>
+
+<ul>
+<li>I maintain one of the most popular <a href="https://github.com/mgechev/angular-seed">Angular starters</a>. <a href="https://github.com/mgechev/angular-seed">Angular Seed</a> was already quite mature thanks to the effort that a lot of people put into it. Furthermore, for the project it was going to be good to use it in a real project and fix the flaws I find.</li>
+<li>From our previous experience with Angular 1, we knew that the dependency injection mechanism of the framework is something that we&rsquo;re going to miss.</li>
+<li>Even being still in beta, Angular was providing everything we need - router, DI, change detection, view encapsulation, rendering, etc.</li>
+<li>It was a new, fun technology we wanted to explore in real-life projects.</li>
+</ul>
+
+<p>Although initially we weren&rsquo;t sure which statically typed dialect of JavaScript to use, Angular made the choice obvious and we bet on TypeScript. It&rsquo;s unsoundness was something we weren&rsquo;t really bothered about because it&rsquo;s quite limited and well thought out.</p>
+
+<p>If at this time I wasn&rsquo;t familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write <a href="http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/">custom functionality for the Angular&rsquo;s router</a>. In the end, this is the risk you take when you start using a technology in a beta version. The good thing is that once the framework got stable almost no breaking changes were introduced, although it has a decent API.</p>
+
+<h1 id="architecture">Architecture</h1>
+
+<p>Flux and redux, both, are architectural approaches I was really satisfied with in my past projects. On top of that, Angular plays really well with immutable data. Later, we found <code>@ngrx/store</code>. It&rsquo;s a micro library which provides a reactive state management inspired by redux and plays really well with Angular.</p>
+
+<p>In short, with <code>@ngrx/store</code> we can think of the redux&rsquo;s store as a stream of immutable objects. Each time you emit an action which gets handled by a reducer, the new state will be emitted through a stream. The different streams can be filtered, merged, mapped, etc. in a very elegant way. On top of that, Angular provides a nice, declarative way to bind to observables using the <code>async</code> pipe:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;counter-cmp&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;{{ counter | async }}&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">CounterComponent</span> <span class="p">{</span>
+  <span class="nx">counter</span> <span class="o">=</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">interval</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Based on a couple of other constraints, we came up with the <strong><a href="http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/">&ldquo;Scalable Application Architecture&rdquo;</a></strong> that I talked about on a couple of <a href="https://www.youtube.com/watch?v=gtOPAj9_FSM">conferences</a>. Although even now it has some edges that could be polished, the entire team was happy using it. We were able to <strong>scale the application to about 40k SLOC (source line of code)</strong> and didn&rsquo;t experience any issues with state inconsistencies, neither scalability and separation of concerns.</p>
+
+<p>The only drawback we experienced was that the architecture was a bit too verbose (for state change you need to define an action, action creator a model method, eventually store property). However, I&rsquo;m not sure being explicit to this level is a bad thing.</p>
+
+<p>Another learned lesson from our implementation is that we weren&rsquo;t 100% reactive all the time. Quite often we had code like:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">userModel</span>
+  <span class="p">.</span><span class="nx">getUser$</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">u</span> <span class="o">=&gt;</span> <span class="nx">u</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">take</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">toPromise</span><span class="p">(</span><span class="nx">Promise</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">name</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="p">...</span>
+  <span class="p">});</span>
+</code></pre></div>
+
+<p>Which is quite an imperative style of programming and doesn&rsquo;t always fit well in the FRP (Functional Reactive Paradigm) paradigm</p>
+
+<h1 id="runtime-performance">Runtime performance</h1>
+
+<p>A serious issue that we met initially were a couple of <strong>memory leaks</strong>. Observables are awesome and you can write very elegant code with them but sometimes you forget to clean after yourself. There&rsquo;s a bit of a learning curve until you get conscious and disciplined enough to start cleaning all of your subscriptions.</p>
+
+<p>Some of the most painful and frustrating experiences I had were about finding leaking global event handlers. The sure thing is that you&rsquo;re going to notice them. A <strong>few leaking click handlers can slow your application down dramatically</strong>. They will cause Angular to run it&rsquo;s change detection mechanism over the entire component tree on each click as many times as leaking callbacks you have. This happens because zone.js monkey patches <code>addEventListener</code> and automatically runs dirty checking over the entire component tree (if you haven&rsquo;t applied any advanced optimizations) for you.</p>
+
+<p>Although it was a bit frustrating initially we were able to eliminate these problems. On top of that, both, Angular and rxjs do amazing job cleaning unused subscriptions. But it&rsquo;s still worth mentioning it one more time - <strong>clean after yourself</strong>.</p>
+
+<h2 id="optimize-your-bindings">Optimize your bindings</h2>
+
+<p>Although the <strong>Angular&rsquo;s change detection is really well optimized</strong>, running VM-friendly code, in a very complex user interface you may feel lag. Lets suppose we have the following component:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;fancy-button&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;button (click)=&quot;n++&quot;&gt;Totally {{n}} clicks&lt;/button&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">FancyButtonComponent</span> <span class="p">{</span>
+  <span class="nx">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And now imagine that this component is somewhere deep into our component tree. Each time we click the button Angular has to perform change detection over all rendered components. This happens because the framework doesn&rsquo;t have any guarantees that this leaf component won&rsquo;t modify an object used somewhere else.</p>
+
+<p>Again, <strong>the code which performs the change detection is generated by Angular and really well optimized but still, if you have bound to a computationally insensitive getter, for instance, you will feel slowdowns.</strong></p>
+
+<p>Now imagine, instead of a button we have the following input:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;name-input&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;input [(ngModel)]=&quot;name&quot;&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">NameInputComponent</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>[(ngModel)]</code> is the so-called banana in a box syntax and allows two-way data-binding.</p>
+
+<p>It is really convenient to use it, however, <strong>each character you type will trigger multiple change detection checks</strong>. If somewhere in your component tree you have:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">fib-cmp</span> <span class="err">[</span><span class="na">n</span><span class="err">]=&quot;</span><span class="na">1e100</span><span class="err">&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">fib-n</span><span class="p">&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;fib-cmp&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;{{ fibonacci(n) }}&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">FibonacciComponent</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span> <span class="nx">n</span>: <span class="kt">number</span><span class="p">;</span>
+
+  <span class="c1">// Unoptimized Fibonacci implementation</span>
+  <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">n</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">fibonacci</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">fibonacci</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>You&rsquo;ll feel a serious lag. Of course, we weren&rsquo;t calculating the n<sup>th</sup> Fibonacci number but we had some other heavy computations.</p>
+
+<p>As a learned lesson here - <strong>optimize your bindings</strong>.</p>
+
+<h2 id="immutability-is-your-best-friend">Immutability is your best friend</h2>
+
+<p>Sometimes bindings are just heavy and we weren&rsquo;t able to do anything about it. For instance, we had to show the progress for each kid, and compute it based on given formula. In the same screen we had a screen for editing the kid&rsquo;s profile and a bunch of other components. Given that on each key press in an input which uses <code>[(ngModel)]</code> Angular performs change detection over the entire component tree, typing got really slow:</p>
+
+<p><img src="/images/ng-prod/slow-typing.gif" alt="Unoptimized change detection" style="display: block; margin: auto;"></p>
+
+<p>But should we go through all the kid&rsquo;s performance computations in case the kid&rsquo;s instance hasn&rsquo;t changed? Yes, we should since we don&rsquo;t know if the object we own a reference to hasn&rsquo;t changed.</p>
+
+<p>Fortunately, we used <a href="https://facebook.github.io/immutable-js/docs/#/Record">immutable records</a> for representing our domain objects. Immutable records are something like immutable maps but allow to take advantage of the static typing in TypeScript. Although they are pretty cool, they are also quite verbose. For instance, our <code>Kid</code> domain class looks something like:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">kidRecord</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">Record</span><span class="p">({</span>
+  <span class="nx">id</span>: <span class="kt">null</span><span class="p">,</span>
+  <span class="nx">name</span>: <span class="kt">null</span><span class="p">,</span>
+  <span class="nx">gender</span>: <span class="kt">0</span><span class="p">,</span>
+  <span class="nx">grade</span>: <span class="kt">0</span><span class="p">,</span>
+<span class="p">});</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">IKid</span> <span class="p">{</span>
+  <span class="nx">id?</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">name?</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">gender?</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">grade?</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Kid</span> <span class="kr">extends</span> <span class="nx">kidRecord</span> <span class="kr">implements</span> <span class="nx">IKid</span> <span class="p">{</span>
+  <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">gender</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">grade</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="nx">config</span>: <span class="kt">IKid</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This way we define:</p>
+
+<ul>
+<li>Immutable record with default values.</li>
+<li>Class which extends the immutable record and declares the properties that the kid has.</li>
+<li>Interface in order to be able to pass object literals as arguments to the <code>Kid</code>&rsquo;s constructor and have static typing.</li>
+</ul>
+
+<p>In the end all we did in order to optimize the entire screen was:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;kid-statistics&#39;</span><span class="p">,</span>
+  <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`...`</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">KidStatisticsComponent</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span> <span class="nx">kid</span>: <span class="kt">Kid</span><span class="p">;</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This way Angular performs change detection in the component subtree with root <code>KidStatisticsComponent</code> only if it gets different reference to any of its inputs.</p>
+
+<p>Here&rsquo;s what impact this had over the application:</p>
+
+<p><img src="/images/ng-prod/fast-typing.gif" alt="Optimized with OnPush" style="display: block; margin: auto;"></p>
+
+<p>The lesson got from here is - <strong>perform the optimal change detection strategy</strong>.</p>
+
+<h2 id="when-immutability-doesn-t-help">When Immutability doesn&rsquo;t help</h2>
+
+<p>We applied this optimization strategy wherever we could. Unfortunately, sometimes Angular was still performing unnecessary checks.</p>
+
+<p><img src="/images/ng-prod/increment-bp.gif" alt="Increase animation" style="display: block; margin: auto;"></p>
+
+<p>On the image above, a kid in kindergarten is solving a test. Once it answers correctly we want to increase it&rsquo;s points with the result it got from the last answer. The component which animates the points increase looks something like:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;point-counter&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;{{ boundPoints }}&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">PointCounterComponent</span> <span class="kr">implements</span> <span class="nx">OnChange</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span> <span class="nx">earnedPoints</span><span class="p">;</span>
+  <span class="p">...</span>
+
+  <span class="nx">ngOnChanges() {</span>
+    <span class="p">...</span>
+    <span class="kr">const</span> <span class="nx">increase</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">currentPoints</span> <span class="o">&gt;=</span> <span class="nx">finalPoints</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">boundPoints</span> <span class="o">=</span> <span class="nx">finalPoints</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">boundPoints</span> <span class="o">+=</span> <span class="nx">stepSize</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">timeout</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">increase</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Remember we mentioned zone.js? <strong>Zone.js monkey patches not only <code>addEventListener</code> but all the async APIs in the browser</strong>, including <code>setTimeout</code>. This means that Angular will perform change detection every 10ms and it should since we modify the <code>boundPoints</code> property to which we have bound in the template.</p>
+
+<p>Fortunately, Angular provides us a solution. We can inject the <code>NgZone</code> and run the points increase animation outside the Angular&rsquo;s zone which won&rsquo;t trigger the change detection mechanism:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;point-counter&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;span #counter&gt;&lt;/span&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">PointCounterComponent</span> <span class="kr">implements</span> <span class="nx">OnChange</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">zone</span>: <span class="kt">NgZone</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">ngOnChanges() {</span>
+    <span class="p">...</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">zone</span><span class="p">.</span><span class="nx">runOutsideAngular</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">animatePoints</span><span class="p">();</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>However, note that in this case you have to manually manipulate the DOM. In order to keep your component decoupled from DOM you should manipulate elements indirectly using the <code>Renderer</code> from <code>@angular/core</code>.</p>
+
+<p>One more problem solved. Running code outside Angular helped in this limited case but keep in mind that you should <strong>use <code>runOutsideAngular</code> in very rare cases</strong> since this way you&rsquo;re giving up the data-binding mechanism of the framework.</p>
+
+<h1 id="network-performance">Network performance</h1>
+
+<p>Although we experienced some issues with runtime performance, it wasn&rsquo;t a big concern. Unfortunately, we noticed that a huge percentage of our users didn&rsquo;t have enough patience to wait for the application to load.</p>
+
+<p>Our initial production build process was to rsync the <code>dist/prod</code> directory produced by <a href="https://github.com/mgechev/angular-seed">Angular Seed</a> to the remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the end users but our gzipped bundle size was still about 800k.</p>
+
+<p>Later we migrated the application to RC.5 to took advantage of the <strong><a href="http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">Ahead-of-Time compilation</a>. This increased our bundle size</strong> even further - now it was close to 1M. Loading the bundle was not the only problem. On low-end devices it&rsquo;s parsing was taking up to a few seconds.</p>
+
+<p><em>In fact, although you&rsquo;re able to get rid of the compiler, AoT can increases your bundle size. What AoT does is to generate code for your templates and DI, so if you have a lot of components the JavaScript generated for the templates may exceed the size of the compiler.</em></p>
+
+<p>We took advantage of techniques such as:</p>
+
+<ul>
+<li>Bundling.</li>
+<li>Minification.</li>
+<li>Tree-shaking.</li>
+</ul>
+
+<p>And later I blogged about this in <a href="http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">&ldquo;Building an Angular 2 Application for Production&rdquo;</a>.</p>
+
+<p>Although we applied everything from the list we still didn&rsquo;t have satisfying results.</p>
+
+<p>We had a few more techniques in mind:</p>
+
+<ul>
+<li>Lazy-loading and prefetching of bundles.</li>
+<li>Service workers for caching/prefetching.</li>
+<li>Using an interactive App Shell.</li>
+</ul>
+
+<h2 id="lazy-loading">Lazy-loading</h2>
+
+<p>After we migrated to the latest Angular router from our custom fork of it&rsquo;s previous version, we tried to apply lazy loading. The technique sounds quite clear:</p>
+
+<ul>
+<li>Spread the functionality of the entire application among:
+
+<ul>
+<li>Main bundle which includes functionality used across the entire application.</li>
+<li>Feature bundles which capture functionality from separate &ldquo;bounded contexts&rdquo;.</li>
+</ul></li>
+</ul>
+
+<p>This could be applied recursively for each feature bundle, so we can have different sub-feature bundles, etc.</p>
+
+<p>Although the idea was clear, achieving it wasn&rsquo;t as simple as we expected. One of the main reasons why I still haven&rsquo;t provided out-of-the-box solution for lazy loading in <a href="https://github.com/mgechev/angular-seed">Angular Seed</a> was the fact that it&rsquo;s hard to implement a solution which works for any application. Fortunately, in our team we are able to agree on specific constraints and implement a build process which relays that given preconditions are met.</p>
+
+<p>In the end, after a day of struggle with suffix trees and other graph algorithms, we came up with a solution which splits our application into three bundles. We load the bundles with SystemJS which is the default module loader for Angular.</p>
+
+<h3 id="prefetching-of-bundles">Prefetching of bundles</h3>
+
+<p>One of the bundles we built represents the intro screen of the application (which includes the sign-up flow), there&rsquo;s a bundle for the main functionality and finally, the core bundle which contains Angular and the common functionality among the first two.</p>
+
+<p><img src="/images/ng-prod/bundles.png" alt="Bundles relation" style="display: block; margin: auto;"></p>
+
+<p>In the prefetch scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for <a href="http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">prefetching templates</a>.</p>
+
+<p>Luckily, <strong>Angular provides a solution for prefetching of lazy-loaded modules out of the box</strong>. All we had to do was:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">let</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[...];</span>
+
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">appRoutes</span> <span class="o">=</span> <span class="nx">RouterModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">(</span><span class="nx">routes</span><span class="p">,</span> <span class="p">{</span> <span class="nx">preloadingStrategy</span>: <span class="kt">PreloadAllModules</span> <span class="p">});</span>
+</code></pre></div>
+
+<h2 id="service-workers">Service workers</h2>
+
+<p>Service workers provide a new API which allows us to achieve advanced network control over all requests going from the browser to the network.</p>
+
+<p>The Angular team maintains the <strong><a href="https://github.com/angular/mobile-toolkit">mobile toolkit</a></strong> which allows automatic management of service workers and generation of application shell. It <strong>uses some framework specifics which allow further automation of the entire process</strong>.</p>
+
+<p>Thanks to the mobile toolkit we were able to generate a manifest file as part of our build process. Later the mobile toolkit reads this file and based on it&rsquo;s content configures a service worker for management of static assets.</p>
+
+<p>A few of it&rsquo;s features we used are:</p>
+
+<ul>
+<li>Cache static assets in the service worker&rsquo;s cache.</li>
+<li>Update only the assets which have changed.</li>
+</ul>
+
+<p>The mobile toolkit helped us get additional performance boost for browsers which support the modern standards.</p>
+
+<p><img src="/images/ng-prod/sourcemap.png" alt="Source tree map" style="display: block; margin: auto;"></p>
+
+<p><em>The image above shows tree map of the non-optimized core bundle which is used for bootstrapping the application. Its optimized and gzipped size is about ~200K.</em></p>
+
+<p>Unfortunately, as you can see from the tree map above <strong>our core bundle was still too big and loading the application on 2G network required about 20s</strong>. This happens because in order to render any of the screens we needed at least two of the bundles:</p>
+
+<ul>
+<li>Core bundle which bootstraps the application.</li>
+<li>Main or intro bundle which is loaded after the core bundle decides which view needs to be rendered.</li>
+</ul>
+
+<p>This required us to load at least ~400K of JavaScript (core bundle + main/intro) before being able to hide the loading screen and the worst part of that was that we needed to load the two bundles sequentially.</p>
+
+<h2 id="interactive-app-shell">Interactive App Shell</h2>
+
+<p>In the intro screen of the product we have two pages of static content which explain to the parents what the application is all about. It is completely unnecessary to make the users wait until the assets of the application have been downloaded to let parents to read a few lines of text and decide if they want to sign-up or not.</p>
+
+<p>What we decided to do was to take the templates of the components which represent these static pages and move them to a separate application which is not managed by Angular. We inlined the templates and wrote some custom JavaScript code which understands the basic routing directives, in particular <code>routerLink</code>. This way we were able to reuse the templates across our &ldquo;interactive App Shell&rdquo; and our Angular app.</p>
+
+<p>Conceptually the &ldquo;interactive App Shell&rdquo; sounds similar to an application shell with the difference that it is an executable application with static content. All the JavaScript, styles and templates for these static pages were 20K in total. This way <strong>we decreased the initial load time for new users to about 5s on 2G network</strong>.</p>
+
+<p>What we did was to initially download the application&rsquo;s styles together with the &ldquo;interactive App Shell&rdquo;. Once the static application gets rendered, in background we start prefetching the core and intro bundles. Once the bundles are ready and the user decides to continue, we just bootstrap the Angular application. In case the user is ready to register but the bundles are not yet downloaded, we show a loading indicator and ask the user to hold on for a second.</p>
+
+<p>In case the users are already logged in and don&rsquo;t go to the main screen directly, the script files are most likely already in the cache because users have previously used the app. This makes the application&rsquo;s load time instantaneous.</p>
+
+<p>The best thing about the &ldquo;interactive App Shell&rdquo; is that it doesn&rsquo;t change often. This helped us to cache its JavaScript bundle not only in service worker&rsquo;s cache but also aggressively in the browser&rsquo;s cache.</p>
+
+<h2 id="ahead-of-time-compilation">Ahead-of-Time compilation</h2>
+
+<p>This optimization is more related to improvements of the runtime performance, however, I&rsquo;ll explain it here because using the static application we can clearly illustrate the performance boost we get. If you&rsquo;re not familiar with the Ahead-of-Time compilation in Angular, you can take a look at <a href="http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">this post</a>.</p>
+
+<p>As I mentioned above, once Angular RC5 was released, we migrated the application and introduced AoT compilation as part of the build process. In short, the core benefits of AoT compilation are:</p>
+
+<ul>
+<li>We no longer need the Angular compiler as part of the production bundle. This reduces the size a bit (but on the other hand we get all the ngfactories).</li>
+<li>The code becomes tree-shakable since the templates are compiled to JavaScript with static imports.</li>
+<li>We don&rsquo;t have the runtime overhead of the Just-in-Time (JiT) compilation.</li>
+</ul>
+
+<p>The first two points are quite self explanatory but the third point is the feature which has greatest impact over the user experience.</p>
+
+<p>When we use our &ldquo;interactive App Shell&rdquo; approach we bootstrap the Angular application after the &ldquo;interactive App Shell&rdquo; has been already rendered. This means that we perform JiT compilation after we already have something onto the screen.</p>
+
+<p>The images below demonstrate the delayed Angular bootstrap. The gif on the right shows the delayed bootstrap with JiT compilation enabled and the gif on the left demonstrates what happens when we&rsquo;ve compiled the application as part of the build process, i.e. AoT compilation:</p>
+
+<div style="display: flex; justify-content: space-around;">
+  <div style="text-align: center;">
+    <img src="/images/ng-prod/aot.gif"><br>
+    <span>AoT</span>
+  </div>
+  <div style="text-align: center;">
+    <img src="/images/ng-prod/jit.gif"><br>
+    <span>JiT</span>
+  </div>
+</div>
+
+<p>Lets consider the JiT case. Suppose the user had waited 10 seconds to download our entire application. Right after that Angular will have to perform JiT compilation which means that the user won&rsquo;t see anything on the screen. Once the code for the templates and DI has been generated by the compiler, the user still needs to wait since the code needs to be parsed and just then the view could be rendered. On top of that, <strong>in some cases (Chrome extensions, strict CSP) JiT compilation is not possible since <code>eval</code> is not permitted</strong>.</p>
+
+<p><strong>It&rsquo;s definitely worth it to use AoT compilation in your application.</strong></p>
+
+<h2 id="further-improvements">Further improvements</h2>
+
+<p>A few other network performance improvements we did are:</p>
+
+<h3 id="offline-store">Offline store</h3>
+
+<p>We were storing the entire application state into a big immutable object. This helped us apply additional optimization regarding the communication with the API server. Since it&rsquo;s very unlikely to have change in the data model between frequent refreshes of the app, we were able to serialize the entire application&rsquo;s store and save it in localStorage/indexDB.</p>
+
+<p>This way, when the user comes back to the application before some predefined interval of time, we deserialize the state and feed our store. This helped us reduce the number of requests to the server even further.</p>
+
+<h3 id="svg-sprites">SVG sprites</h3>
+
+<p>Since H2 and server push are not widely supported yet, we used SVG sprites in order to reduce the number of requests we send to the server. We automatically generated a sprite as part of our build process which contains a number of <code>defs</code>. Later, by using <code>&lt;use xlink:href=&quot;...&quot;&gt;&lt;/use&gt;</code> we were referencing the individual images within an Angular component.</p>
+
+<p>Since this approach doesn&rsquo;t work very well in old versions of IE, we were fetching the sprite using XHR and inlining the individual defs within the component representing the SVG image. This is an approach similar to the one used by the polyfill <a href="https://github.com/jonathantneal/svg4everybody">svg4everybody</a>.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>In conclusion I can say that <strong>we really enjoyed the process of using the framework</strong>. The combination of TypeScript and Angular allows development of scalable applications with consistent codebase.</p>
+
+<p>One of the most impactful runtime optimizations that we applied was the <code>OnPush</code> change detection strategy, which plays really well with immutable.js.</p>
+
+<p>In terms of network performance, the bundle size is the biggest struggle. Although the &ldquo;static app&rdquo; approach was quite hacky, it help us achieve nice final results by loading the &ldquo;real application&rdquo; in background.</p>
+
+<p>Last but not least, applying Ahead-of-Time compilation as part of our build process, helped us improve the initial rendering time.</p>
+
+<p>Using Web Workers also sound quite tempting. Unfortunately, at the time of writing this article they are still not production ready. On top of that, <strong>I would not recommend using Web Workers in development since you will loose sense of how your application behaves when running in the main UI thread.</strong></p>
+
+<h1 id="resources">Resources</h1>
+
+<ol>
+<li><a href="http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">Ahead-of-Time compilation in Angular</a></li>
+<li><a href="http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">Building an Angular Application for Production</a></li>
+<li><a href="http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/">Scalable Single-Page Application Architecture</a></li>
+<li><a href="https://github.com/mgechev/angular-seed">Angular Seed</a></li>
+<li><a href="https://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/">An Overview of SVG Sprite Creation Techniques</a></li>
+<li><a href="https://github.com/angular/mobile-toolkit">Angular Mobile Toolkit</a></li>
+<li><a href="https://developers.google.com/web/progressive-web-apps/">Progressive Web Apps</a></li>
+<li><a href="https://vsavkin.com/change-detection-in-angular-2-4f216b855d4c">Change Detection in Angular 2</a></li>
+<li><a href="https://github.com/ngrx">ngrx</a></li>
+<li><a href="https://facebook.github.io/immutable-js/">immutable.js</a></li>
+<li><a href="https://angularjs.blogspot.com/2016/08/angular-2-rc5-ngmodules-lazy-loading.html">Angular 2 RC5 - NgModules, Lazy Loading and AoT compilation</a></li>
+<li><a href="http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/">Implementing the Missing &ldquo;resolve&rdquo; Feature of the Angular 2 Router</a></li>
+</ol>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.comjs/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

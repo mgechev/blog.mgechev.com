@@ -1,0 +1,338 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>The magic of $resource (or simply a client-side Active Record) &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.comimages/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.comabout'>About</a>
+	<a href='http://blog.mgechev.comtalks'>Talks</a>
+	<a href='http://blog.mgechev.compost'>Archive</a>
+
+	
+
+	
+	<a class="cta" href="http://blog.mgechev.com/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        The magic of $resource (or simply a client-side Active Record)
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/post/2014-02-05-angularjs-resource-active-record-http.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Feb 5, 2014 00:00
+                    · 1485 words
+                    · 7 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.comtags/active-record">active record</a>
+                          
+                              <a href="http://blog.mgechev.comtags/AngularJS">AngularJS</a>
+                          
+                              <a href="http://blog.mgechev.comtags/Design-patterns">Design patterns</a>
+                          
+                              <a href="http://blog.mgechev.comtags/Development">Development</a>
+                          
+                              <a href="http://blog.mgechev.comtags/JavaScript">JavaScript</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>At first sight AngularJS seems like a magical framework, which does some weird but awesome things like dependency injection, data binding only by setting a single property to the magical object named $scope and many other things.</p>
+
+<p>If you look at the source code of Angular you&#8217;ll see a lot of smart and simple solutions for these magical problems. In this blog post I&#8217;ll describe the magic which stays behind <code>$resource</code>. I decided to write this blog post because of my recent experience in StackOverflow. One of the most misunderstood components of AngularJS was exactly the <code>$resource</code> service. <code>$resource</code> is two levels of abstraction above the XMLHttpRequest object (ok, may be three if we count <code>$httpBackend</code>). I&#8217;ve illustrated the usage of <code>$resource</code> through example which can be found at <a href="https://github.com/mgechev/angularjs-resource">GitHub</a>.</p>
+
+<p>Before continuing with <code>$resource</code> I&#8217;m going to explain few important concepts. The first one is:</p>
+
+<h3 id="active-record">Active Record</h3>
+
+<p>This is architectural pattern named by Martin Fowler. The Active Record object is an object, which carries both data and behavior. Usually most of the data in these objects is persistent, responsibility of the Active Record object is to take care of the communication with the database in order to create, update, retrieve or delete the data. It may delegate this responsibility to lower level classes but calls to instance or static methods of the active record object cause the database communication.</p>
+
+<p>For example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">User</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">age</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">age</span> <span class="o">=</span> <span class="nx">age</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">User</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">save</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="s1">&#39;INSERT INTO User (name, age) VALUES (&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">age</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">self</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">User</span><span class="p">.</span><span class="nx">query</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+   <span class="k">return</span> <span class="nx">db</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM User&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>In the example above we have <code>User</code> constructor function, which also has methods <code>query</code> and <code>save</code>. We can use it by:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+<span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">//user.id is now available</span>
+<span class="p">});</span>
+
+<span class="nx">User</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">//all users</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>In the client-side JavaScript everything is a little bit different but the concepts are the same. What are the problems of this pattern? Well, in the relational databases we work with relations, which are represented as tables. We don&#8217;t have the standard OO concepts such as inheritance or association. Of course, we can emulate them by using tables but this leads to a problem &#8211; we don&#8217;t have 1:1 mapping between our tables and classes. Thats why sometimes for ORM is preferred the pattern <a href="http://www.martinfowler.com/eaaCatalog/dataMapper.html">Data Mapper</a>, but topic is out of the scope of the current post. Fortunately, in the Single-Page Applications, usually we have back-end, which probably uses ORM framework and provides us a nice JSON API, so we don&#8217;t have to worry about complex mapping, we can just use client-side Active Record.</p>
+
+<h3 id="lexical-functional-scope">Lexical functional scope</h3>
+
+<p>This is very basic JavaScript concept but also one used in <code>$resource</code>. As you see in the <code>save</code> method, in example above, we keep reference to <code>this</code> in <code>self</code>. This reference is visible in the callback we pass to the promise returned by <code>db.process</code>. When the promise is resolved we just populate the missing data (in this case <code>id</code>) and return the object.</p>
+
+<p>We can do something similar in <code>query</code></p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">User</span><span class="p">.</span><span class="nx">query</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="p">[];</span>
+   <span class="nx">users</span><span class="p">.</span><span class="nx">$promise</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM User&#39;</span><span class="p">)</span>
+     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">collection</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">collection</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+        <span class="p">});</span>
+      <span class="p">});</span>
+   <span class="k">return</span> <span class="nx">users</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>In this case when <code>User.query()</code> is called it immediately returns an empty array with property <code>$promise</code>. When the promise is resolved (i.e. database request successfully completed), we just push each of the users into our array <code>users</code>. Note that the user of our code already has reference to this variable, so when we populate it he will be able to use all the data immediately.</p>
+
+<h3 id="digest-loop">$digest loop</h3>
+
+<p>The last thing we will look at before continuing with <code>$resource</code> is AngularJS&#8217;s <code>$digest</code> loop. Probably you&#8217;re aware that when AngularJS finds some &#8220;special&#8221; directives in our templates it automatically registers watchers for the expressions used in these directives. Such &#8220;special&#8221; directives are <code>{{ }}</code>, <code>ng-model</code>, <code>ng-bind</code>. When something cause call of the digest loop AngularJS iterates over all watched expressions and calculates their values until there are no more changes (when we have wider support of <code>Object.observe</code>, probably the <code>$digest</code> loop will be more smarter and efficient).</p>
+
+<p>So if we have:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">users</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>with the following markup:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;MainCtrl&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;user in users&quot;</span><span class="p">&gt;</span>{{user.name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>Now if somewhere else, something keeps the reference to the <code>users</code> array it can simply:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">$apply</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">users</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>which will cause rendering of a single list item with the value <code>&quot;foo&quot;</code>.</p>
+
+<h1 id="resource">$resource</h1>
+
+<p>We won&#8217;t cover the whole API of <code>$resource</code> but we will look at how we can implement our model (<strong>not</strong> view model) with it. First of all, lets suppose we have a nice RESTful API for creating, retrieving, updating and deleting users:</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>POST   /users
+POST   /users/:id # We won&#39;t use PUT, but we can
+DELETE /users/:id
+GET    /users
+GET    /users/:id
+</code></pre></div>
+
+
+<p>Now we can create our model by:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p><code>$resource</code> will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operation&#8230;and that&#8217;s all?! We implemented the communication with the back-end by invoking <code>$resource</code> with a single parameter!</p>
+
+<p>But how about custom actions like <code>login</code>, for example? The <code>$resource</code> API allows us to <a href="http://docs.angularjs.org/api/ngResource.$resource">include them</a> explicitly.</p>
+
+<p>I would recommend you to wrap the constructor function produced by <code>$resource</code> in a service. You will be able to reuse it across the application, mock it easier when writing tests and extend its functionality without modifying additional code (we follow the open-closed principle):</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Now let&#8217;s get all users:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">resourceDemo</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">users</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>And now visualize all users&#8230;:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="o">&lt;</span><span class="nx">table</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nx">tr</span> <span class="nx">ng</span><span class="o">-</span><span class="nx">repeat</span><span class="o">=</span><span class="s2">&quot;user in users&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/td&gt;</span>
+    <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">ng</span><span class="o">-</span><span class="nx">href</span><span class="o">=</span><span class="s2">&quot;#/users/{{user.id}}&quot;</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/td&gt;</span>
+    <span class="o">&lt;</span><span class="nx">td</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">user</span><span class="p">.</span><span class="nx">job</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/td&gt;</span>
+  <span class="o">&lt;</span><span class="err">/tr&gt;</span>
+<span class="o">&lt;</span><span class="err">/table&gt;</span>
+</code></pre></div>
+
+
+<p>You might think that the operation <code>query</code> is synchronous because of the way we set the value of <code>$scope.users</code>. This will be very bad, right? Well, it is asynchronous, <code>MainCtrl</code> simply uses two of the concepts we discussed above: functional lexical scope, <code>$digest</code> loop.<br />
+When the <code>query</code> method is invoked it returns a reference to an empty array, the array has just a single property called <code>$promise</code>, you can use it if you want to manipulate the users after the request was successful, or not. When the request completes AngularJS populates the array with all users and calls the <code>$digest</code> loop. The <code>query</code> action will make a GET request to <code>/users</code>.</p>
+
+<p>There is something cool in AngularJS&#8217;s route definition, which allows us to change the current page once all dependencies of the next page are resolved &#8211; the <code>resolve</code> hash. This feature is very helpful especially if we want to open a page with single user view:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//...</span>
+<span class="p">.</span><span class="nx">when</span><span class="p">(</span><span class="s1">&#39;/users/:userid&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/user.html&#39;</span><span class="p">,</span>
+  <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;UserCtrl&#39;</span><span class="p">,</span>
+  <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">user</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$route</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">userid</span><span class="o">:</span> <span class="nx">$route</span><span class="p">.</span><span class="nx">current</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">userid</span> <span class="p">}).</span><span class="nx">$promise</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+<span class="c1">//...</span>
+</code></pre></div>
+
+
+<p>As I mentioned above, when we invoke &#8220;static&#8221; method of the constructor function, it returns an empty object with property <code>$promise</code>, which will be resolved once the request is completed. This way we make sure the user will see the page once the user with id <code>$route.current.params.userid</code> is available.</p>
+
+<p>And this is our <code>User</code> controller:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">resourceDemo</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;UserCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">user</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>You may noticed the <code>setTimeout</code> which is added in the express web app. It cause slower response, only to illustrate how useful could be our next enhancement &#8211; cache. We can cache some requests by passing additional parameters to the <code>$resource</code> function. For example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">resourceDemo</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$cacheFactory</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:userid&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="p">{</span>
+    <span class="nx">get</span><span class="o">:</span> <span class="p">{</span> <span class="nx">cache</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;get&#39;</span> <span class="p">}</span>
+  <span class="p">});</span>
+  <span class="k">return</span> <span class="nx">User</span><span class="p">;</span>
+<span class="p">})</span>
+</code></pre></div>
+
+
+<p>The example above will make each call of the <code>get</code> method cachable (it won&#8217;t affect the <code>query</code> method). After adding this line you&#8217;ll notice that, after the first time, on each subsequent click on somebody&#8217;s name you&#8217;ll be immediately redirected to the user&#8217;s view, you won&#8217;t have to wait the request to complete because AngularJS does not make any requests &#8211; it takes the value from the cache.</p>
+
+<p>Most of these methods also accept callbacks, but I would recommend you to stick to the promisee usage.</p>
+
+<p>Once again &#8211; you can grab the <a href="https://github.com/mgechev/angularjs-resource">sample application here</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p><code>$resource</code> allows us to use Active Record like pattern of communication with our RESTful service. It will definitely save you a lot of lines of code, if your back-end provides proper API. It gives you features like caching, interceptors, specifying response type and timeout, it even provides flag &#8220;<a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS?redirectlocale=en-US&amp;#038;redirectslug=HTTP_access_control#Requests_with_credentials">with credentials</a>&#8220;.</p>
+
+<p>However, when you have more complex/custom back-end API, you may consider to implement all the communication by your own since, otherwise, you&#8217;ll need to override most of the methods of <code>$resource</code>, anyway.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.comjs/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>

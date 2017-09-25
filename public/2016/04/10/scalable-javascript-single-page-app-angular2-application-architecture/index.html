@@ -1,0 +1,732 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>Scalable Single-Page Application Architecture &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.comimages/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.comcss/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog" />
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.comabout'>About</a>
+	<a href='http://blog.mgechev.comtalks'>Talks</a>
+	<a href='http://blog.mgechev.compost'>Archive</a>
+
+	
+
+	
+	<a class="cta" href="http://blog.mgechev.com/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Scalable Single-Page Application Architecture
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/post/2016-04-10-scalable-javascript-single-page-app-angular2-application-architecture.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Apr 10, 2016 00:00
+                    · 4465 words
+                    · 21 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.comtags/JavaScript">JavaScript</a>
+                          
+                              <a href="http://blog.mgechev.comtags/Angular-2">Angular 2</a>
+                          
+                              <a href="http://blog.mgechev.comtags/TypeScript">TypeScript</a>
+                          
+                              <a href="http://blog.mgechev.comtags/redux">redux</a>
+                          
+                              <a href="http://blog.mgechev.comtags/flux">flux</a>
+                          
+                              <a href="http://blog.mgechev.comtags/dependency-injection">dependency injection</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p><em>In order to have better understanding of the following blog post you should be familiar with the fundamentals of the <a href="https://en.wikipedia.org/wiki/Software_design_pattern">object-oriented</a> and functional programming. I also strongly encourage you to explore the <a href="http://redux.js.org/">redux pattern</a>.</em></p>
+
+<p>A couple of months ago I started working on the first version of a Silicon Valley-based startup. The project is a single-page application with quite dynamic business requirements. As in most modern single-page applications we have a fat client which encapsulates decent amount of business logic and state.</p>
+
+<h2 id="requirements">Requirements</h2>
+
+<p>From my past experience working on startup projects, it was clear that the product will have quite <strong>dynamic requirements</strong>. It&rsquo;s in early stage of development and in quite competitive business environment.</p>
+
+<h3 id="scalable-communication-layer">Scalable Communication Layer</h3>
+
+<p>We have relatively stable business domain, however, there are several external actors which will mutate the state of the application. We have the usual:</p>
+
+<ul>
+<li>User of the application.</li>
+<li>RESTful API.</li>
+</ul>
+
+<p>On top of that we may (or may not) have the following:</p>
+
+<ul>
+<li>Other parties who have established p2p connection with the current user.</li>
+<li>Real-time communication with application server.</li>
+</ul>
+
+<p>Given the <strong>multiple communication protocols</strong> (HTTP, WebSocket, UDP via WebRTC) we need different package formats:</p>
+
+<ul>
+<li>JSON-based for HTTP and/or WebSocket</li>
+<li><a href="http://jsonrpc.org">JSON-RPC</a> for WebSocket</li>
+<li><a href="http://bert-rpc.org/">BERT or BERT-RTC</a> for WebRTC and/or WebSocket</li>
+</ul>
+
+<p>The BERT protocol is essential for efficient p2p communication, especially when transferring binary data, such as images or any other which textual representation is generally redundant and inefficient.</p>
+
+<p>Given all the services we need to communicate with, RxJS seems like a perfect fit for organization of all the asynchronous events that the application needs to handle. We can multiplex several data streams over the same communication channel using hot-observers and declaratively filter, transform, process them, etc.</p>
+
+<h3 id="predictable-and-explicit-state-management">Predictable and Explicit State Management</h3>
+
+<p>As we already mentioned, there are multiple state mutation sources. The user is the most obvious one, the push notifications that we will get from the real-time services is another and the other peers we communicate with using WebRTC are a third source. Having a predictable state management is quite essential in order to not reach a point where we have different versions of the store, containing different data.</p>
+
+<p>Another requirement for the state management being predictable is to make the mutations explicit. We want to have a single place where the we modify the domain objects happens; we definitely don&rsquo;t want to allow owning a reference to a domain object and modify its properties from any place in the application.</p>
+
+<p>And finally, we want to own a single reference for given business entity. We don&rsquo;t want to have several domain objects representing different business entities. This way we&rsquo;ll introduce additional inconsistencies, especially if the objects differ.</p>
+
+<p>There are many patterns which help us achieve predictable state management. Currently the most popular one is <a href="http://redux.js.org/">redux</a>. In order to have type safety and good tooling we bet on TypeScript.</p>
+
+<p>Some may argue that empowering purely functional language will help us reduce the side effects inside of the applications even further compared to an imperative language like TypeScript. I completely agree with this, and I am a big fan of Elm and ClojureScript myself. However, <strong>our team needs to scale</strong>.</p>
+
+<p>Given the current demand of software engineers on the market it is hard to find suitable specialists. We&rsquo;d be limiting the circle of possible candidates even further if I set the requirements &ldquo;experience in Elm and ClojureScript&rdquo;.</p>
+
+<p>We found the golden mean between purity and scalable team in redux with TypeScript. Redux helps us with the predictable state management and TypeScript helps us with type checking and easier refactoring. Owning a single instance of the domain objects is a problem which could be solved with the <a href="http://www.martinfowler.com/eaaCatalog/identityMap.html">identity map</a> pattern. It can be easily integrated in redux, given that our entire state is represented as a directed-acyclic graph.</p>
+
+<p>Talking about team&hellip;</p>
+
+<h3 id="modular-design">Modular Design</h3>
+
+<p>As mentioned, the team will scale. The level of experience of the team members will differ. This means that <strong>multiple developers with different level of expertise</strong> need to work together on the same project. In a typical scenario, most junior team members will be unfamiliar with the functional paradigm. However, this should not drag the project down by making them unproductive. In order to help them get started easier with the project we can provide a high-level abstractions which makes them feel they are using something that they are already familiar with. Such abstraction can make them feel building a typical MVC application.</p>
+
+<p>The layered diagram below shows the core modules of the architecture we stopped on:</p>
+
+<p><img src="/images/scalable-app/layers.png" alt="Architecture Layers" /></p>
+
+<p>The top layer includes the <strong>UI components</strong> that the user is going to directly interact with, for instance, dialogs, forms, etc.</p>
+
+<p>The <strong>facade</strong> below the UI components&rsquo; layer represents &ldquo;a set of objects that provide a simplified interface to a larger body of code&rdquo;. Basically, the main purpose of this layer is to provide a set of classes that allow us to trigger application specific actions that will augment the reducers&rsquo; calls, and forward actions to <strong>async services</strong>. The reducers and the state from the diagram above are the exact same components known from the redux pattern.</p>
+
+<p>From now on, for simplicity lets call our facades <strong>models</strong>. For instance, if we are developing a game, inside of our <code>GameComponent</code> we will use the <code>GameModel</code> which abstracts the store mutation, as well as the <strong>async services</strong>.</p>
+
+<p>Another core role of the facades is to forward the actions used by the reducers to a set of <strong>async services</strong>. Once a given action is being triggered, it will be passed to a set of async services which will handle it. On higher-level the models look exactly like <a href="http://www.martinfowler.com/eaaCatalog/activeRecord.html">Active Record</a> because they are <a href="https://en.wikipedia.org/wiki/Mediator_pattern">mediators</a> between the UI and the data layer. However, note that <strong>the model delegates the business logic to the reducers, and the communication with external services to the <code>AsyncService</code>s</strong>.</p>
+
+<p>We can think of the async services as <a href="https://en.wikipedia.org/wiki/Proxy_pattern">remote proxies</a> to external services. They map the application specific actions to remote commands. Then why is this component called async service instead of remote service? Async services should handle all calls to asynchronous APIs,including WebRTC, WebSocket, as well as IndexDB.</p>
+
+<p>In case we have an async service that represents a proxy to a RESTful API, it will hold a reference to an HTTP gateway. Once the async service receives an instance of an action, it will map the action to a RESTful command and sent it through the gateway.</p>
+
+<p>Notice that given model (facade) should not be coupled to any specific communication channel, neither an async service. This means that the facade should invoke specific set of async services depending on the context it is used in.</p>
+
+<h4 id="context-dependent-implementations">Context Dependent Implementations</h4>
+
+<p>The context of the facades in our application is going to be determined by the components they are used in. For instance, lets suppose we are developing a game which allows multi-player and single-player modes. In case of single-player we want to send metadata to the game server; in case of multi-player we want to send metadata between players as well as to the server.</p>
+
+<p>This means that inside of the <code>SinglePlayerComponent</code> we want our <code>GameModel</code> (the facade) to use the <code>GameServer</code> async service; inside of <code>MultiPlayerComponent</code> the <code>GameModel</code> should use <code>GameServer</code> as well as <code>GameP2PService</code>.</p>
+
+<p>Having such <strong>context dependent dependency instantiation</strong> is a perfect candidate for using <a href="https://en.wikipedia.org/wiki/Dependency_injection"><strong>Dependency Injection Pattern</strong></a>.</p>
+
+<h3 id="lazy-loading">Lazy-loading</h3>
+
+<p>The application&rsquo;s codebase will grow a lot. It may become more than 100k lines of JavaScript, which means that <strong>lazy-loading of the individual <a href="http://martinfowler.com/bliki/BoundedContext.html">bounded contexts</a></strong> is essential.</p>
+
+<p>If we think in terms of the game we mentioned earlier, we want to have the following directory structure:</p>
+<div class="highlight"><pre><span></span>.
+└── src
+    ├── multi-player
+    │   ├── commands
+    │   ├── components
+    │   └── gateways
+    ├── single-player
+    │   └── components
+    ├── home
+    │   └── components
+    └── shared
+</pre></div>
+
+<p>Once the user opens the home screen we want to load all files from the <code>home</code> directory, together with the <code>shared</code> directory. If right after that the user navigates to the single-player page we want to download only the content of the <code>single-player</code> directory, etc.</p>
+
+<p>Using this directory structure, we can easily <strong>distribute the application development among the individual team members</strong> by providing one such bounded context per a developer, for instance.</p>
+
+<h3 id="other-requirements">Other requirements</h3>
+
+<p>For the architecture we also have the standard set of requirements including:</p>
+
+<ul>
+<li><strong>Testability</strong>. The business layer&rsquo;s complexity may grow which means that we need to have easy way to test it.</li>
+<li><strong>Maintability</strong>. We don&rsquo;t want to rewrite our front-end when we have new requirements.</li>
+<li><a href="https://en.wikipedia.org/wiki/Open/closed_principle"><strong>Open/closed</strong></a>. This way we&rsquo;ll be able to react easier on the dynamically changing requirements.</li>
+</ul>
+
+<h2 id="technology-stack">Technology Stack</h2>
+
+<p>After discussion of the architecture and potential extension points of the application, we considered different technologies. Our prime candidates were React and Angular 2. We have previous successful experience with React and a redux-like architecture.</p>
+
+<p>The only things we struggled with in our React project were lazy-loading and context dependent dependency instantiation. The <a href="https://github.com/reactjs/react-router">react-router</a> supports lazy-loading, however, we still miss the lack of dependency injection. Another great selling point of Angular 2, for us, is its <a href="https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/docs/web_workers/web_workers.md">WebWorkers support</a>.</p>
+
+<p>Our final tech stack we choose is as follow:</p>
+
+<ul>
+<li><a href="https://github.com/angular/angular">Angular 2</a>.</li>
+<li><a href="https://github.com/ReactiveX/rxjs">rxjs</a>.</li>
+<li><a href="https://github.com/ngrx">ngrx</a>.</li>
+</ul>
+
+<p>Before going any further I want to mention that the architecture that I am going to explain below is <strong>framework agnostic</strong>, this means that you can apply it in Angular 2, React or any other framework. There could be slight differences in terms of syntax and lack of dependency injection.</p>
+
+<h2 id="disclaimer">Disclaimer</h2>
+
+<p>The explained architecture is abstract. This means that it doesn&rsquo;t define specific interfaces but a concepts which will help you structure your application.</p>
+
+<p>It works great for us but I cannot promise that it will be perfect fit for you, the way I&rsquo;ve described it here. You may need to reshape it, bend it and play with it to make sure it will fulfill your needs.</p>
+
+<p>Finally, the architecture <strong>doesn&rsquo;t provide rules</strong> that you must follow. Instead, it <strong>provides guidelines and suggestions</strong> of how you can spread the responsibilities across the individual pieces it defines.</p>
+
+<h2 id="sample-application">Sample Application</h2>
+
+<p>A sample application which implements the architecture we&rsquo;re going to talk about can be found <a href="https://github.com/mgechev/scalable-architecture-demo">here</a>. It uses Angular 2 and rxjs, but as mentioned, you can apply it successfully in React as well.</p>
+
+<p>In order to be able to explain the concepts easier, I&rsquo;ll put them into the context of the application from above. Basically the app is a game which helps you improve your typing speed. It has two modes:</p>
+
+<ul>
+<li>Single player - allows you to practice typing. This mode gives you text and measures how fast you can reproduce it.</li>
+</ul>
+
+<p><img src="/images/scalable-app/single.gif" alt="Single Player" /></p>
+
+<ul>
+<li>Multi player - allows you to compete with another player through the network. Both players connect to each other through WebRTC. Once the connection is established they start exchanging messages related to the game progress of one another. When any of the players completes her challenge she is declared as the winner:</li>
+</ul>
+
+<p><img src="/images/scalable-app/multi.gif" alt="Multi Player" /></p>
+
+<h2 id="introducing-the-architecture">Introducing the Architecture</h2>
+
+<p>Now lets go through the layers from the diagram above, starting with the:</p>
+
+<h3 id="ui-components">UI Components</h3>
+
+<p>The UI components layer contains framework-specific components (in our case Angular 2). The components can hold some state but it must be clear what part of the application state belongs to the store and what can be left inside of the components.</p>
+
+<p>The entire component tree is nothing more than the <a href="https://en.wikipedia.org/wiki/Composite_pattern">composite pattern</a> and we have <a href="http://martinfowler.com/eaaCatalog/pageController.html">controllers</a> associated to the individual components.</p>
+
+<p><img src="/images/legacy/uploadspatterns/composite.png" alt="" /></p>
+
+<p>Here&rsquo;s a sample implementation of the <code>GameComponent</code> from the sample application explained above:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="c1">// Some component-specific declarations</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">GameModel</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">GameComponent</span> <span class="kr">implements</span> <span class="nx">AfterViewInit</span> <span class="p">{</span>
+  <span class="c1">// declarations...</span>
+  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="err">@</span><span class="nx">Output</span><span class="p">()</span> <span class="nx">end</span><span class="o">:</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">();</span>
+  <span class="err">@</span><span class="nx">Output</span><span class="p">()</span> <span class="nx">change</span><span class="o">:</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">();</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_model</span><span class="o">:</span> <span class="nx">GameModel</span><span class="p">,</span> <span class="kr">private</span> <span class="nx">_renderer</span><span class="o">:</span> <span class="nx">Renderer</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">ngAfterViewInit</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// other UI related logic</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_model</span><span class="p">.</span><span class="nx">startGame</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="nx">changeHandler</span><span class="p">(</span><span class="nx">data</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="o">===</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">end</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">.</span><span class="nx">time</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_model</span><span class="p">.</span><span class="nx">completeGame</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">.</span><span class="nx">time</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_model</span><span class="p">.</span><span class="nx">onProgress</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+      <span class="c1">// other UI related logic</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nx">reset</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">invalid</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_model</span><span class="p">.</span><span class="nx">game$</span>
+      <span class="p">.</span><span class="nx">scan</span><span class="p">((</span><span class="nx">accum</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="nx">current</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nx">current</span> <span class="o">&amp;&amp;</span> <span class="nx">current</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span> <span class="o">||</span> <span class="nx">accum</span><span class="p">;</span>
+      <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The component above has the following important characteristics:</p>
+
+<ul>
+<li>It has a set of inputs and outputs that define its API, i.e. how it can be used in other components in the component tree.</li>
+<li>It encapsulates some component-specific state that is not important for the rest of the application, i.e. not included in the application&rsquo;s store (for instance the current <code>text</code> that the user has entered).</li>
+<li>It uses the <code>GameModel</code> which is a sample instance from the Facade layer.</li>
+</ul>
+
+<p>The <code>GameModel</code> provides access to specific part of the application&rsquo;s state that is important for given cluster of components. For instance, the <code>GameComponent</code> is interested in the current game, so the <code>GameModel</code> provides access to this part of the state through the <code>game$</code> property.</p>
+
+<p>Notice that above the state is represented as a <strong>stream of immutable objects</strong>. This means that once the state changes the <code>GameComponent</code> will get new instance of it immediately, and this instance will be an immutable object. Basically the <code>game$</code> property of the <code>GameModel</code>&rsquo;s instance is of type <code>Observable&lt;Game&gt;</code> where <code>Game</code> is an immutable record. The model will map the entire state tree and select (and provide) only the part of it which is relevant. For instance, if our state tree contains a set of users as well, the <code>GameModel</code> will take only the part of the store representing game, ignoring the users. On the diagram below you can see how the model mediates between the state tree and the component tree:</p>
+
+<p><img src="/images/scalable-app/state-model-components.png" alt="Model as mediator" /></p>
+
+<p>Using high-level abstraction such as the <code>GameModel</code> allows new team members to become productive quickly. They can start developing UI components that use the model for propagating state changes. All the new team members need to be familiar with is how to develop Angular 2 components and have basic experience with RxJS data streams. They don&rsquo;t have to be aware of any communication protocol, packages&rsquo; data format, redux, etc.</p>
+
+<h3 id="model-definition">Model Definition</h3>
+
+<p>The facade used by the game component is the <code>GameModel</code>. Here&rsquo;s its definition:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Injectable</span><span class="p">()</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">GameModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+
+  <span class="nx">games$</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">game$</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">protected</span> <span class="nx">_store</span><span class="o">:</span> <span class="nx">Store</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">,</span>
+              <span class="err">@</span><span class="nx">Optional</span><span class="p">()</span> <span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="nx">AsyncService</span><span class="p">)</span> <span class="nx">_services</span><span class="o">:</span> <span class="nx">AsyncService</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">_services</span> <span class="o">||</span> <span class="p">[]);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">games$</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">game$</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;game&#39;</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">startGame</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">GameActions</span><span class="p">.</span><span class="nx">startGame</span><span class="p">());</span>
+  <span class="p">}</span>
+
+  <span class="nx">onProgress</span><span class="p">(</span><span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">performAsyncAction</span><span class="p">(</span><span class="nx">GameActions</span><span class="p">.</span><span class="nx">gameProgress</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">()))</span>
+      <span class="p">.</span><span class="nx">subscribe</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Do nothing, we&#39;re all good</span>
+      <span class="p">},</span> <span class="p">(</span><span class="nx">data</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">invalidGame</span><span class="p">)</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">GameActions</span><span class="p">.</span><span class="nx">invalidateGame</span><span class="p">());</span>
+      <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="nx">completeGame</span><span class="p">(</span><span class="nx">time</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">GameActions</span><span class="p">.</span><span class="nx">completeGame</span><span class="p">(</span><span class="nx">time</span><span class="p">,</span> <span class="nx">text</span><span class="p">);</span>
+
+    <span class="c1">// We perform an optimistic update here,</span>
+    <span class="c1">// which we may want to undo if the async action fails.</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">performAsyncAction</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">subscribe</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The class accepts as dependency an instances of the <code>Store</code> as the <code>_store</code> variable, which is the <a href="https://github.com/ngrx/store"><code>ngrx store</code></a>, and a set of <code>AsyncServices</code>.</p>
+
+<p>The model can mutate the store by dispatching <a href="http://redux.js.org/docs/basics/Actions.html">actions, created by the action creators</a>. We can think of the actions as <a href="https://en.wikipedia.org/wiki/Command_pattern">commands</a>, or even a simply <strong>dummy instructions that have meaning only within the boundaries of our application</strong>. They contain an action type (a string) and a payload which provides enough information to the <code>reducers</code> in order to update the store.</p>
+
+<p>The <code>GameModel</code> can start the game by dispatching the <code>startGame</code> action, created by the <code>GameActions</code> action creator:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">GameActions</span><span class="p">.</span><span class="nx">startGame</span><span class="p">());</span>
+</code></pre></div>
+
+<p>Calling the <code>dispatch</code> method of the store with given action will apply all the registered reducers to the store, with the passed action as an argument and will produce a new store. This store will be then emitted to the view through the <code>game$</code> observable. The entire flow represents something like:</p>
+
+<p><img src="/images/scalable-app/ngrx.png" alt="Flow in ngrx" /></p>
+
+<p>First, the action will go to the store. After that the store will invoke all the reducers and produce a new state. This state will be emitted by the observable <code>game$</code> which will be handled by the components inside of the UI.</p>
+
+<p>The reducer is simply a <strong>pure function</strong> which produces the same output when given the same input. Here&rsquo;s the implementation of the reducer that will handle the <code>startGame</code> action:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">gameReducer</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="o">:</span> <span class="nx">any</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;game&#39;</span><span class="p">),</span> <span class="nx">action</span><span class="o">:</span> <span class="nx">Action</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="nx">START_GAME</span><span class="o">:</span>
+      <span class="nx">state</span> <span class="o">=</span> <span class="nx">fromJS</span><span class="p">({});</span>
+    <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="nx">INVALID_GAME</span><span class="o">:</span>
+      <span class="nx">state</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="nx">GAME_PROGRESS</span><span class="o">:</span>
+      <span class="nx">state</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;currentText&#39;</span><span class="p">,</span> <span class="nx">action</span><span class="p">.</span><span class="nx">payload</span><span class="p">.</span><span class="nx">text</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">state</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>Now let&rsquo;s trace what will happen when we emit the <code>invalidGame</code> action.</p>
+
+<ul>
+<li>The store will invoke all the reducers associated to it, including the <code>gameReducer</code> defined above.</li>
+<li>The <code>gameReducer</code> will produce a new state by setting the <code>invalid</code> property to <code>true</code> of the <code>state</code> object.</li>
+<li>The observer associated to the <code>game$</code> observable will trigger a new value.</li>
+<li>The <code>GameComponent</code> above will handle the change in the state with:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span>    <span class="nx">invalid</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_model</span><span class="p">.</span><span class="nx">game$</span>
+        <span class="p">.</span><span class="nx">scan</span><span class="p">((</span><span class="nx">accum</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="nx">current</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="p">(</span><span class="nx">current</span> <span class="o">&amp;&amp;</span> <span class="nx">current</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span> <span class="o">||</span> <span class="nx">accum</span><span class="p">;</span>
+        <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div>
+
+<ul>
+<li>Inside of the template of the game we will use the value producer by <code>invalid()</code> by using:</li>
+</ul>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span>    <span class="p">&lt;</span><span class="nt">div</span> <span class="err">[</span><span class="na">hide</span><span class="err">]=&quot;!(</span><span class="na">invalid</span><span class="err">()</span> <span class="err">|</span> <span class="na">async</span><span class="err">)&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>The game is invalid...<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The last sections above are mostly related to ngrx/redux specific details. Now let&rsquo;s take a look at how we use the:</p>
+
+<h3 id="async-services">Async Services</h3>
+
+<p><code>AsyncService</code> is an abstract class which looks the following way:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">AsyncService</span> <span class="p">{</span>
+  <span class="kr">abstract</span> <span class="nx">process</span><span class="p">(</span><span class="nx">data</span><span class="o">:</span> <span class="nx">Action</span><span class="p">)</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>When the <code>onProgress</code> method of the <code>GameModel</code> is invoked, we&rsquo;ll <code>performAsyncAction</code> which in this case is the <code>gameProgress</code> action gotten from the <code>GameActions</code> action creator. <code>performAsyncAction</code> will iterate over the <code>_services</code> and invoke their <code>process</code> methods:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_services</span><span class="o">:</span> <span class="nx">AsyncService</span><span class="p">[])</span> <span class="p">{}</span>
+
+  <span class="kr">protected</span> <span class="nx">performAsyncAction</span><span class="p">(</span><span class="nx">action</span><span class="o">:</span> <span class="nx">Action</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">merge</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">Observable</span><span class="p">,</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_services</span> <span class="o">||</span> <span class="p">[]).</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span> <span class="p">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">process</span><span class="p">(</span><span class="nx">action</span><span class="p">)));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once the services&rsquo; call completes we can handle the result returned by them. For instance, above when the services&rsquo; call fails we emit the <code>gameInvalid</code> action and change the state of the game. Notice that in case of multiple services making the model responsible for handling their responses won&rsquo;t be practical because it doesn&rsquo;t know anything about the services it uses. In this case the logic for handling responses by an async service should be moved to the service itself.</p>
+
+<p>The different services can use different communication protocol, which means different data packages. For instance, the <code>GameServer</code> can use JSON-RPC-like messages but in multi-player mode we may want to exchange binary date through BERT packages.
+Also, the format of the data can be different. For instance, lets say we want to send the entire text that the user has typed in case of the <code>GameServer</code> but we want to send only the change between the current text value and the previous value in case of the <code>GameP2PService</code> (used in multi-player mode).</p>
+
+<p><strong>The responsibility of mapping the domain model to the remote service&rsquo;s model representation, as well as taking care of the format of the packages belongs to the <code>AsyncService</code> itself.</strong> It is the only module which &ldquo;understands&rdquo; the remote service.</p>
+
+<p>For instance, lets take a look at the implementation of the <code>GameP2PService</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Injectable</span><span class="p">()</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">GameP2PService</span> <span class="kr">extends</span> <span class="nx">AsyncService</span> <span class="p">{</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_rtcGateway</span><span class="o">:</span> <span class="nx">WebRTCGateway</span><span class="p">,</span> <span class="kr">private</span> <span class="nx">_store</span><span class="o">:</span> <span class="nx">Store</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">();</span>
+    <span class="nx">_rtcGateway</span><span class="p">.</span><span class="nx">dataStream</span>
+      <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">data</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">()))</span>
+      <span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">command</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nx">command</span><span class="p">.</span><span class="nx">method</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">case</span> <span class="nx">PROGRESS</span><span class="o">:</span>
+            <span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">P2PGameActions</span><span class="p">.</span><span class="nx">partnerProgress</span><span class="p">(</span><span class="nx">command</span><span class="p">.</span><span class="nx">payload</span><span class="p">.</span><span class="nx">text</span><span class="p">));</span>
+            <span class="k">break</span><span class="p">;</span>
+          <span class="k">case</span> <span class="nx">COMPLETE</span><span class="o">:</span>
+            <span class="nx">_store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">P2PGameActions</span><span class="p">.</span><span class="nx">partnerCompleted</span><span class="p">());</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="nx">process</span><span class="p">(</span><span class="nx">action</span><span class="o">:</span> <span class="nx">Action</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">baseCommand</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RPCCommand</span><span class="p">();</span>
+    <span class="nx">baseCommand</span><span class="p">.</span><span class="nx">payload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JsonPayload</span><span class="p">();</span>
+    <span class="nx">baseCommand</span><span class="p">.</span><span class="nx">gateway</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_rtcGateway</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">commandBuilder</span> <span class="o">=</span> <span class="nx">buildP2PCommand</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">commandBuilder</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&#39;This command is not supported&#39;</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">((</span><span class="nx">obs</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">obs</span><span class="p">.</span><span class="nx">complete</span><span class="p">());</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">commandBuilder</span><span class="p">(</span><span class="nx">baseCommand</span><span class="p">).</span><span class="nx">invoke</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Inside of this service&rsquo;s constructor we have subscribed to the messages received by the WebRTC gateway and we are transforming it by using the RxJS&rsquo;s <code>map</code> operator. We process the individual packages we&rsquo;ve received by mapping them to actions and emitting them using the store.</p>
+
+<p>Inside of the <code>process</code> method we need to do two things:</p>
+
+<ul>
+<li>Map the received as parameter action to the corresponding command that will be processed by the remote service.</li>
+<li>Dispatch command using the proper gateway.</li>
+</ul>
+
+<p>Note that we delegate the mapping between application-specific actions and remote commands to a command builder. The command builder defines a set of functions which map the individual actions to a specific command which serialized version is understandable by the remote service.</p>
+
+<h3 id="gateways">Gateways</h3>
+
+<p>Gateway is nothing more than a concrete implementation of the following abstract class:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">Gateway</span> <span class="p">{</span>
+
+  <span class="c1">// Emits responses or push messages</span>
+  <span class="c1">// from the remote service.</span>
+  <span class="nx">dataStream</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="c1">// Emits true in case we&#39;ve established</span>
+  <span class="c1">// connection to the remote machine, otherwise false.</span>
+  <span class="nx">connectionEvents</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="kr">protected</span> <span class="nx">_emitter</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="kr">protected</span> <span class="nx">_connectionEventsEmitter</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="c1">// Initializes the Gateway&#39;s properties</span>
+  <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dataStream</span> <span class="o">=</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">((</span><span class="nx">emitter</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_emitter</span> <span class="o">=</span> <span class="nx">emitter</span><span class="p">;</span>
+    <span class="p">}).</span><span class="nx">share</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">connectionEvents</span> <span class="o">=</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">((</span><span class="nx">obs</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_connectionEventsEmitter</span> <span class="o">=</span> <span class="nx">obs</span><span class="p">;</span>
+    <span class="p">}).</span><span class="nx">share</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="c1">// An abstract method which should be implemented by a specific</span>
+  <span class="c1">// concrete implementation.</span>
+  <span class="kr">abstract</span> <span class="nx">send</span><span class="p">(</span><span class="nx">command</span><span class="o">:</span> <span class="nx">Command</span><span class="p">)</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We declare two <code>Observables</code>:</p>
+
+<ul>
+<li><code>dataStream</code> - emits new received packages. The gateway only emits these packages but does not handle them. The async service is responsible for decoding (in fact the specific command payload, described below, will decode them) and processing them.</li>
+<li><code>connectionEvents</code> - emits events when we connect/disconnect from the gateway (useful in case of WebSockets and WebRTC).</li>
+</ul>
+
+<p>And a single public method:</p>
+
+<ul>
+<li><code>send</code> - sends data and returns an observable. <a href="https://github.com/angular/angular/issues/5876">Why I decided to return observable instead of promise</a>?</li>
+</ul>
+
+<p>Now let&rsquo;s see what we actually send through the network:</p>
+
+<h3 id="commands-and-payloads">Commands and Payloads</h3>
+
+<p>We want to <strong>not couple the individual commands to the transport protocol</strong>. This means that we should be able to:</p>
+
+<ul>
+<li>Send RPC commands through an HTTP, WebSockets, WebRTC gateways.</li>
+<li>Use BERT/JSON or whatever for payloads of RESTful/RPC commands.</li>
+</ul>
+
+<p>This brings great flexibility and reusability by allowing us to use different command types (REST, RPC, etc.), with different payloads (JSON, BERT, etc.), via different gateways (WebSocket, HTTP, WebRTC, etc.).</p>
+
+<p>The <code>Command</code> class looks like:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">Command</span> <span class="p">{</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="nx">payload</span><span class="o">?:</span> <span class="nx">CommandPayload</span><span class="p">)</span> <span class="p">{...}</span>
+
+  <span class="nx">get</span> <span class="nx">id</span><span class="p">()</span><span class="o">:</span> <span class="nx">number</span> <span class="p">{...}</span>
+
+  <span class="nx">get</span> <span class="nx">payload</span><span class="p">()</span><span class="o">:</span> <span class="nx">CommandPayload</span> <span class="p">{...}</span>
+
+  <span class="nx">set</span> <span class="nx">payload</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span> <span class="nx">CommandPayload</span><span class="p">)</span> <span class="p">{...}</span>
+
+  <span class="nx">get</span> <span class="nx">method</span><span class="p">()</span><span class="o">:</span> <span class="nx">any</span> <span class="p">{...}</span>
+
+  <span class="nx">set</span> <span class="nx">method</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">{...}</span>
+
+  <span class="nx">set</span> <span class="nx">gateway</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span> <span class="nx">Gateway</span><span class="p">)</span> <span class="p">{...}</span>
+
+  <span class="nx">get</span> <span class="nx">mimeType</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_payload</span><span class="p">.</span><span class="nx">mimeType</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">concat</span><span class="p">(</span><span class="nx">command</span><span class="o">:</span> <span class="nx">Command</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_payload</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">command</span><span class="p">.</span><span class="nx">payload</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">serialize</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span> <span class="o">|</span> <span class="nx">Blob</span> <span class="o">|</span> <span class="nx">ArrayBuffer</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_payload</span><span class="p">.</span><span class="nx">serialize</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="nx">parse</span><span class="p">(</span><span class="nx">response</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span><span class="o">:</span> <span class="nx">any</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_payload</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">invoke</span><span class="p">(</span><span class="nx">context</span><span class="o">?:</span> <span class="nx">Command</span><span class="p">)</span><span class="o">:</span> <span class="nx">Observable</span><span class="o">&lt;</span><span class="nx">CommandResult</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span> <span class="o">||</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">context</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">CommandState</span><span class="p">.</span><span class="nx">EXECUTING</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">((</span><span class="nx">observer</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="nx">CommandResult</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_gateway</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">context</span><span class="p">).</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">response</span><span class="o">:</span> <span class="nx">Observer</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="nx">context</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">CommandState</span><span class="p">.</span><span class="nx">INVOKED</span><span class="p">;</span>
+        <span class="nx">observer</span><span class="p">.</span><span class="nx">next</span><span class="p">({</span>
+          <span class="nx">command</span><span class="o">:</span> <span class="nx">context</span><span class="p">,</span>
+          <span class="nx">payload</span><span class="o">:</span> <span class="nx">context</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span>
+        <span class="p">});</span>
+      <span class="p">},</span> <span class="p">(</span><span class="nx">error</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">observer</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">error</span><span class="p">)),</span>
+        <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">observer</span><span class="p">.</span><span class="nx">complete</span><span class="p">());</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">set</span> <span class="nx">state</span><span class="p">(</span><span class="nx">value</span><span class="o">:</span> <span class="nx">CommandState</span><span class="p">)</span> <span class="p">{...}</span>
+
+  <span class="nx">get</span> <span class="nx">state</span><span class="p">()</span><span class="o">:</span> <span class="nx">CommandState</span> <span class="p">{...}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>_payload</code> of the command is the piece of data that holds the information that the command sends through the network. Since the payload of the command is the only thing which knows how the data within the command is represented, the <code>Command</code> delegates the <code>concat</code> and <code>serialize</code> method calls to the <code>payload</code> itself.</p>
+
+<p>The relation between <code>Command</code> and <code>Payload</code> takes advantage of the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator pattern</a>.</p>
+
+<p>Thanks to the current architecture we can implement:</p>
+
+<ul>
+<li><strong>Batching of the commands</strong>. Imagine we are using an HTTP gateway and we want to batch several commands. The async service will batch the commands depending on their corresponding actions. The actual concatenation of the commands will be implemented in the <code>Payload</code> class. This is due the reason that JSON commands will be concatenated differently compared to BERT commands, for instance.</li>
+<li><strong>Prioritization</strong>. We can build a priority queue of the incoming actions and dispatch the corresponding commands based on the assigned priority. In such case higher priority commands (such as RESTful calls) can be invoked before lower priority commands (such as assets fetching) no matter of the order they arrive.</li>
+</ul>
+
+<h3 id="configuration-of-dependencies">Configuration of Dependencies</h3>
+
+<p>Now let&rsquo;s take a step back and look at the single-player component:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="c1">// More component-specific declarations</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">AsyncService</span><span class="p">,</span> <span class="p">{</span> <span class="nx">multi</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">useClass</span><span class="o">:</span> <span class="nx">GameServer</span> <span class="p">})</span>
+    <span class="c1">//...</span>
+  <span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">SinglePlayerComponent</span> <span class="p">{</span>
+  <span class="c1">// Some basic logic here</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Inside of the <code>providers</code> property we define a single provider, one for the <code>AsyncService</code> token. This means that inside of the <code>GameModel</code>, requested in the <code>GameComponent</code>, will be injected an instance of the <code>GameServer</code>. But notice that we&rsquo;re declaring the provider as <strong>multi-provider</strong>. Multi-providers in Angular allow us to have multiple providers associated to the same token.</p>
+
+<p>In case of single-player game, once we invoke the <code>onProgress</code> method of the <code>GameModel</code> a new <code>gameProgress</code> action will be triggered. This action will be passed to the set of async services (<code>_services</code>) which will map it to commands with specific payload, and send it through the network, using specific gateway. In this case the only async service will be the <code>GameServer</code>.</p>
+
+<p>In the multi-player screen we want to not only use the <code>GameServer</code> but also to send notification to the connected peer with the player&rsquo;s progress. This can happen with adding a single line of code:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="c1">// More component-specific declarations</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">AsyncService</span><span class="p">,</span> <span class="p">{</span> <span class="nx">multi</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">useClass</span><span class="o">:</span> <span class="nx">GameServer</span> <span class="p">}),</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">AsyncService</span><span class="p">,</span> <span class="p">{</span> <span class="nx">multi</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">useClass</span><span class="o">:</span> <span class="nx">GameP2PService</span> <span class="p">}),</span>
+    <span class="c1">//...</span>
+  <span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">MultiPlayerComponent</span> <span class="p">{</span>
+  <span class="c1">// Some basic logic here</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This way, when the <code>GameModel</code> is used in the context of the <code>MultiPlayerComponent</code>, it will receive two async services: <code>GameServer</code> and <code>GameP2PService</code>.</p>
+
+<h2 id="recap">Recap</h2>
+
+<p>The diagram below illustrates a sample use case of the application - user registration scenario.</p>
+
+<p><img src="/images/scalable-app/arch.png" alt="" /></p>
+
+<p>The image is divided into six different sectors:</p>
+
+<ul>
+<li>Component tree - encapsulates the UI related logic.</li>
+<li>Model - provides facade for the state management and data communication layers.</li>
+<li>State - immutable tree which contains the application state.</li>
+<li>Service layer - encapsulates the communication logic with external services.</li>
+<li>Communication logic - encapsulates the communication protocols and package formats of external services.</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The proposed architecture above has the following properties:</p>
+
+<ul>
+<li><strong>Predictable state management</strong> thanks to the redux-like pattern it is based on. All the gateways, models, async services, commands, payloads <strong>must be stateless</strong>.</li>
+<li><strong>Testability</strong>. For resolving any of the services we&rsquo;re using the dependency injection mechanism of Angular 2 so we can easily mock any of them for our testing environment. On top of that, our entire business logic is in pure functions (the reducers) which are easy to test.</li>
+<li><strong>Easy for newcomers to join the project</strong>. When a developer who is not familiar with the architecture joins the team she can start developing components in the UI layer and use the facades which abstract the async services layer, and the state management. To new developers the architecture will look like traditional MVC.</li>
+<li><strong>Context dependent dependencies</strong>. We can reuse the models across components since they are not dependent by the async services they use. Therefore we follow the open-closed principle by using context specific async services.</li>
+<li><strong>Explicitness</strong>. The async services layer is explicit and each async service implements the action-to-command mapping by itself. Across async services we can have shared <a href="http://npmjs.org/package/data-adapter">data adapters</a>. We can also easily map service responses to our domain model representation by another set of adapters.</li>
+<li><strong>Easy management of asynchronous events</strong>. Thanks to RxJS we can treat such events as streams and apply high-order functions over them.</li>
+</ul>
+
+<h2 id="slides-from-my-talk">Slides from my talk</h2>
+
+<p>Here you can find slides from a talk I did on this subject:</p>
+
+<script async class="speakerdeck-embed" data-slide="2" data-id="f4ea5093eaf241e3b4a45f40ab10dc03" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.comjs/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>
