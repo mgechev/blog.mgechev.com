@@ -33,7 +33,7 @@ In user interface we can apply composition in a similar way. We can think of the
 
 We can illustrate this graphically by the following structural diagram:
 
-![](/images/component-directive-angular2.png)
+<img alt="" src="/images/component-directive-angular2.png" style="display: block; margin: auto">
 
 In the figure above we have two elements:
 
@@ -42,7 +42,7 @@ In the figure above we have two elements:
 
 This means that using the preceding abstractions we can build structures of the following form:
 
-![](/images/component-tree-angular2.png)
+<img alt="" src="/images/component-tree-angular2.png" style="display: block; margin: auto">
 
 On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don't hold references to other directives.
 
