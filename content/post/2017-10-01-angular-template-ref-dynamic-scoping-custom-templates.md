@@ -9,7 +9,6 @@ tags:
 - TemplateRef
 - Semantics of programming languages
 - Dynamic Scoping
-- Scope of name bindings
 title: Understanding Dynamic Scoping and TemplateRef
 url: /2017/10/01/angular-template-ref-dynamic-scoping-custom-templates/
 ---
