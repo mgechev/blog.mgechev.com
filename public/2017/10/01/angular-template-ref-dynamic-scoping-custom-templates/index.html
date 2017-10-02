@@ -1,0 +1,497 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="The official blog of Minko Gechev">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>Understanding Dynamic Scoping and TemplateRef &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='http://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.com/about'>About</a>
+	<a href='http://blog.mgechev.com/talks'>Talks</a>
+	<a href='http://blog.mgechev.com/post'>Posts</a>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#70B7FD; color:#fff; position: fixed; top: 0; border: 0; left: 0; transform: scale(-1, 1);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Understanding Dynamic Scoping and TemplateRef
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2017-10-01-angular-template-ref-dynamic-scoping-custom-templates.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Oct 1, 2017 00:00
+                    · 2007 words
+                    · 10 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.com/tags/dynamic-scoping">Dynamic Scoping</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/angular">Angular</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/templateref">templateRef</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>This post will be dedicated to template references in Angular and dynamic scoping. Although the main focus of the article will be <strong>understanding <code>TemplateRef</code></strong> we will also touch semantics of programming languages by introducing the concept of <strong>scope of name binding</strong>.</p>
+
+<p>The code samples for this article can be found in my <a href="https://github.com/mgechev/puppy-list">GitHub account</a>.</p>
+
+<h1 id="introducing-template-references">Introducing Template References</h1>
+
+<p>In order to understand <code>TemplateRef</code> lets take a look at the <code>NgForOf</code> directive. Suppose we have a list of puppies and we want to iterate over it in the <code>PuppyListComponent</code>. The <code>Puppy</code> interface will look like this:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">interface</span> <span class="nx">Puppy</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">photo</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">age</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">breed</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Here&rsquo;s a sample implementation of the <code>PuppyListComponent</code>:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-list&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">  &lt;md-list&gt;</span>
+<span class="sb">    &lt;md-list-item *ngFor=&quot;let puppy of puppies&quot;&gt;</span>
+<span class="sb">      &lt;img mdListAvatar [src]=&quot;puppy.photo&quot; alt=&quot;...&quot;&gt;</span>
+<span class="sb">      &lt;h3 mdLine&gt; {{puppy.name}} &lt;/h3&gt;</span>
+<span class="sb">      &lt;p mdLine&gt;</span>
+<span class="sb">        &lt;span&gt;Age: {{puppy.age}} &lt;/span&gt;</span>
+<span class="sb">        &lt;span&gt;Breed: {{puppy.breed}} &lt;/span&gt;</span>
+<span class="sb">      &lt;/p&gt;</span>
+<span class="sb">    &lt;/md-list-item&gt;</span>
+<span class="sb">  &lt;/md-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyListComponent</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span> <span class="nx">puppies</span>: <span class="kt">Puppy</span><span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the snippet above we define a component with an input called <code>puppies</code>. Inside of the component&rsquo;s template we iterate over the individual puppies and visualize them on the screen. For this purpose we use the <code>*ngFor</code> directive.</p>
+
+<p><em>We will refer to directives and components by using their controller names or their selectors</em>.</p>
+
+<p>Later, we can use the component in the following way:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppies-cmp&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;&lt;/puppy-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">PuppiesComponent</span> <span class="p">{</span>
+  <span class="nx">puppies</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Dino&#39;</span><span class="p">,</span> <span class="nx">age</span>: <span class="kt">1</span><span class="p">,</span> <span class="nx">photo</span><span class="o">:</span> <span class="s1">&#39;...&#39;</span><span class="p">,</span> <span class="nx">breed</span><span class="o">:</span> <span class="s1">&#39;Rottweiler&#39;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Max&#39;</span><span class="p">,</span> <span class="nx">age</span>: <span class="kt">2</span><span class="p">,</span> <span class="nx">photo</span><span class="o">:</span> <span class="s1">&#39;...&#39;</span><span class="p">,</span> <span class="nx">breed</span><span class="o">:</span> <span class="s1">&#39;Beagle&#39;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Lucy&#39;</span><span class="p">,</span> <span class="nx">age</span>: <span class="kt">1</span><span class="p">,</span> <span class="nx">photo</span><span class="o">:</span> <span class="s1">&#39;...&#39;</span><span class="p">,</span> <span class="nx">breed</span><span class="o">:</span> <span class="s1">&#39;Golden Retriever&#39;</span> <span class="p">}</span>
+  <span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the <code>PuppiesComponent</code> we declare the individual puppies and pass them as an input to the <code>puppy-list</code>. Now our application looks like this:</p>
+
+<p><img src="/images/template-ref/layout-1.png" style="display: block; margin: auto;" alt="Layout"></p>
+
+<h2 id="template-directives">Template Directives</h2>
+
+<p>Lets take a step back and look at the <code>PuppyListComponent</code> template again:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="c1">// ...</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">  &lt;md-list&gt;</span>
+<span class="sb">    &lt;md-list-item *ngFor=&quot;let puppy of puppies&quot;&gt;</span>
+<span class="sb">      ...</span>
+<span class="sb">    &lt;/md-list-item&gt;</span>
+<span class="sb">  &lt;/md-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyListComponent</span> <span class="p">{...}</span>
+</code></pre></div>
+
+<p>It&rsquo;s important to notice that this template is equivalent to:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="c1">// ...</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">  &lt;md-list&gt;</span>
+<span class="sb">    &lt;ng-template ngFor let-puppy [ngForOf]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;md-list-item&gt;</span>
+<span class="sb">        ...</span>
+<span class="sb">      &lt;/md-list-item&gt;</span>
+<span class="sb">    &lt;/ng-template&gt;</span>
+<span class="sb">  &lt;/md-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyListComponent</span> <span class="p">{...}</span>
+</code></pre></div>
+
+<p>The only difference from the previous example is that instead of placing the <code>*ngFor</code> directive on the <code>md-list-item</code> component, we create a template element with the attributes <code>ngFor</code>, <code>let-puppy</code> and <code>[ngForOf]=&quot;puppies&quot;</code>. The meaning of the attributes on the <code>ng-template</code> element is as follows:</p>
+
+<ul>
+<li><code>ngFor</code> - hints Angular that we use the <code>NgForOf</code> directive here.</li>
+<li><code>let-puppy</code> - creates a new local variable for the template that we can create bindings to. This way we can reference the individual <code>puppies</code> via the <code>puppy</code> variable. We will explain the <code>let-</code> attribute in details later in the article.</li>
+<li><code>[ngForOf]</code> - points the collection we are going to iterate over.</li>
+</ul>
+
+<p>In fact, each time Angular sees an attribute prefixed with a <code>*</code> it will desuger the markup to <code>ng-template</code>. That&rsquo;s what we call a <strong>template directive</strong>. By default Angular will use the markup between the opening and closing <code>ng-template</code> tags as template for the template directive itself. There are a few template directives that Angular provides, for instance:</p>
+
+<ul>
+<li><code>NgForOf</code> - allows us to iterate over a collection.</li>
+<li><code>NgIf</code> - conditionally includes a template based on the value of an expression.</li>
+<li><code>NgSwitch</code> - adds / removes DOM sub-trees when the nest match expressions matches the switch expression.</li>
+<li>etc.</li>
+</ul>
+
+<p>All of them use <code>TemplateRef</code>s internally. We can develop custom template directives as well but that&rsquo;s a topic of another discussion.</p>
+
+<p>Now, lets suppose we want to define a different page in our application which again, iterates over the individual puppies but this time visualizes them differently. An obvious implementation strategy for such component is to copy the <code>PuppyListComponent</code> and after that update it&rsquo;s template accordingly in order to align to the requirements of the new layout. Angular, however, allows us to approach more elegantly to the problem.</p>
+
+<h2 id="passing-a-custom-templateref">Passing a Custom <code>TemplateRef</code></h2>
+
+<p>Now, instead of placing the <code>*ngFor</code> directive directly on top of the <code>md-list-item</code> component, lets use an <code>ng-template</code> element and inject the template that <code>NgForOf</code> will use from the outside:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">ng-template</span> <span class="na">ngFor</span> <span class="na">let-puppy</span> <span class="err">[</span><span class="na">ngForOf</span><span class="err">]=&quot;</span><span class="na">puppies</span><span class="err">&quot;</span> <span class="err">[</span><span class="na">ngForTemplate</span><span class="err">]=&quot;</span><span class="na">puppyTemplate</span><span class="err">&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ng-template</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The only difference from the last snippet is that we explicitly pass the template that Angular will use to render the individual puppies. For the purpose we use the <code>ngForTemplate</code> input of the <code>NgForOf</code> directive. It&rsquo;s interesting to point out that <strong>we can pass <code>TemplateRef</code>s as inputs</strong>. In contrast to this, in the initial example Angular would use the markup which is between the opening and closing <code>ng-template</code> tags.</p>
+
+<p>Angular will get the template for <code>NgForOf</code> from the value of the <code>puppyTemplate</code> property declared in the controller of the <code>PuppyListComponent</code>. This will change the definition of <code>PuppyListComponent</code> to:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Puppy</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./../puppy/puppy&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">Input</span><span class="p">,</span> <span class="nx">TemplateRef</span><span class="p">,</span> <span class="nx">ContentChild</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">NgForOfContext</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/common&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-list&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">  &lt;md-list&gt;</span>
+<span class="sb">    &lt;ng-template ngFor let-puppy [ngForOf]=&quot;puppies&quot; [ngForTemplate]=&quot;puppyTemplate&quot;&gt;</span>
+<span class="sb">    &lt;/ng-template&gt;</span>
+<span class="sb">  &lt;/md-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyListComponent</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span> <span class="nx">puppies</span>: <span class="kt">Puppy</span><span class="p">[];</span>
+
+  <span class="kd">@ContentChild</span><span class="p">(</span><span class="nx">TemplateRef</span><span class="p">)</span> <span class="nx">puppyTemplate</span>: <span class="kt">TemplateRef</span><span class="o">&lt;</span><span class="nx">NgForOfContext</span><span class="o">&lt;</span><span class="nx">Puppy</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now things are getting interesting. Notice that in the class definition we have decorated the <code>puppyTemplate</code> property with the <code>@ContentChild</code> decorator and we pass <code>TemplateRef</code> as its argument. This argument is a selector that Angular will match against the content children of the given component (more about content and view children can be found <a href="http://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/">here</a>). The type of the <code>puppyTemplate</code> property is <code>TemplateRef&lt;NgForOfContext&lt;Puppy&gt;&gt;</code> we&rsquo;ll explain this in details in the final section of this article.</p>
+
+<p>In short, this means that Angular will get the template reference, that <code>NgForOf</code> will use, as content child passed to the <code>PuppyListComponent</code> from its parent.</p>
+
+<p>Now, lets see how the template of the parent component needs to be changed in order to reflect the update:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app-root&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;ng-template let-puppy&gt;</span>
+<span class="sb">        &lt;md-list-item&gt;</span>
+<span class="sb">          &lt;img mdListAvatar [src]=&quot;puppy.photo&quot; alt=&quot;...&quot;&gt;</span>
+<span class="sb">          &lt;h3 mdLine&gt; {{puppy.name}} &lt;/h3&gt;</span>
+<span class="sb">          &lt;p mdLine&gt;</span>
+<span class="sb">            &lt;span&gt;Age: {{puppy.age}} &lt;/span&gt;</span>
+<span class="sb">            &lt;span&gt;Breed: {{puppy.breed}} &lt;/span&gt;</span>
+<span class="sb">          &lt;/p&gt;</span>
+<span class="sb">        &lt;/md-list-item&gt;</span>
+<span class="sb">      &lt;/ng-template&gt;</span>
+<span class="sb">    &lt;/puppy-list&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppiesComponent</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice how as content child of the <code>puppy-list</code> element we pass an <code>ng-template</code> element. This <code>ng-template</code> element will become the value of the <code>puppyTemplate</code> declared inside of the <code>PuppyListComponent</code>.</p>
+
+<p>Now if in another component, lets say, <code>PuppyAvatarsComponent</code>, we want to show only the avatars, we can do that by reusing the <code>PuppyListComponent</code>:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-avatars&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;ng-template let-puppy&gt;</span>
+<span class="sb">        &lt;img mdListAvatar [src]=&quot;puppy.photo&quot; alt=&quot;...&quot;&gt;</span>
+<span class="sb">      &lt;/ng-template&gt;</span>
+<span class="sb">    &lt;/puppy-list&gt;</span>
+<span class="sb">  `</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyAvatarsComponent</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This way we just pass a reference to a different template. In this template instead of showing detailed information about the individual puppies we just visualize their avatars.</p>
+
+<p>Here&rsquo;s how this layout is going to look like:</p>
+
+<p><img src="/images/template-ref/layout-2.png" style="display: block; margin: auto;" alt="Layout"></p>
+
+<h1 id="introducing-dynamic-scoping">Introducing Dynamic Scoping</h1>
+
+<p>In programming languages there are two main scopes of name bindings:</p>
+
+<ul>
+<li>Lexical scoping.</li>
+<li>Dynamic scoping.</li>
+</ul>
+
+<p>You might have heard about the first one from JavaScript - <strong>with <code>var</code> we can declare variables wit functional lexical scope, compared to <code>let</code> where the variables are with block lexical scope</strong>.</p>
+
+<p>This simply means that in the following case, the variable <code>foo</code> will be visible within the entire function (functional lexical scope):</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">baz</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// 42</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>&hellip;compared to this snippet (block lexical scope), where the variable will be visible only inside of the if-statement&rsquo;s block:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">baz</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// undefined</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Both, lexical and dynamic scoping, address the &ldquo;scope&rdquo; of a variable declaration and both of them refer to it as &ldquo;the place of the program where given variable is visible&rdquo;, however, we can refer to &ldquo;place of the program&rdquo; as both - location in the source code or location at runtime.</p>
+
+<p>Lets take a look at an example:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">let</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">baz</span><span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mf">1.618</span><span class="p">;</span>
+  <span class="nx">cb</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In this case, since we have lexical scoping in JavaScript once we invoke <code>baz(foo)</code> we&rsquo;ll get <code>42</code> printed on the screen. However, if JavaScript was language with dynamic scoping, the result was going to be <code>1.618</code>.</p>
+
+<p>In contrast to JavaScript, Angular&rsquo;s template references use dynamic scoping. Lets take a look why!</p>
+
+<h2 id="dynamic-scoping-in-angular">Dynamic Scoping in Angular</h2>
+
+<p>Here&rsquo;s our <code>PuppyAvatarComponent</code>:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-avatars&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;ng-template let-puppy&gt;</span>
+<span class="sb">        &lt;img mdListAvatar [src]=&quot;puppy.photo&quot; alt=&quot;...&quot;&gt;</span>
+<span class="sb">      &lt;/ng-template&gt;</span>
+<span class="sb">    &lt;/puppy-list&gt;</span>
+<span class="sb">  `</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyAvatarsComponent</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>As you may already know, the <code>NgForOf</code> directive provides a few more properties such as:</p>
+
+<ul>
+<li><code>index</code> - the index of the current element.</li>
+<li><code>odd</code> - whether the current index is an odd number.</li>
+<li><code>even</code> - whether the current index is an even number.</li>
+<li><code>first</code> - has value <code>true</code> if that&rsquo;s the first item from the collection, has value <code>false</code> otherwise.</li>
+<li><code>last</code> - has value <code>true</code> if that&rsquo;s the last item from the collection, has value <code>false</code> otherwise.</li>
+</ul>
+
+<p>If we want to get the value of any of these properties all we need to do is declare a variable in our template:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-avatars&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;ng-template let-puppy let-odd=&quot;odd&quot; let-f=&quot;first&quot;&gt;</span>
+<span class="sb">        ...</span>
+<span class="sb">      &lt;/ng-template&gt;</span>
+<span class="sb">    &lt;/puppy-list&gt;</span>
+<span class="sb">  `</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyAvatarsComponent</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>With <code>let-odd=&quot;odd&quot;</code> we set the value of the <code>odd</code> variable in the template to the value of the <code>odd</code> variable from the <code>NgForOf</code> directive and with <code>let-f=&quot;first&quot;</code> we set the value of the <code>f</code> variable in the template to the value of the <code>first</code> variable from the <code>NgForOf</code> directive.</p>
+
+<p>You might be wondering, what about <code>let-puppy</code>? What&rsquo;s the magic which happens there and why we don&rsquo;t specify what variable from the <code>NgForOf</code> directive we want to get its value from? In fact, <code>NgForOf</code> has one more property called <code>$implicit</code>. This property is assigned to all the template variables which we declare with attributes with no value. So if we have:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">ng-template</span> <span class="na">let-puppy</span> <span class="na">let-dog</span> <span class="na">let-odd</span><span class="o">=</span><span class="s">&quot;odd&quot;</span> <span class="na">let-f</span><span class="o">=</span><span class="s">&quot;first&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ng-template</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<ul>
+<li>Both <code>puppy</code> and <code>dog</code> will point to the current item we&rsquo;re iterating over (i.e. <code>$implicit</code>)</li>
+<li><code>odd</code> will point to the <code>odd</code> property of <code>NgForOf</code>.</li>
+<li><code>f</code> will point to the <code>first</code> property of <code>NgForOf</code>.</li>
+</ul>
+
+<p>Now, in order to be more precise - <strong><code>odd</code>, <code>even</code>, <code>first</code>, <code>last</code> and <code>$implicit</code> are not properties of <code>NgForOf</code> itself but instead, of its context</strong>. The implementation of <code>NgForOfContext</code> can be found <a href="https://github.com/angular/angular/blob/56238fe94e5022f2a4c450ba9a23022bfff81eb9/packages/common/src/directives/ng_for_of.ts#L14-L26">here</a></p>
+
+<p>Now lets go back to the <code>PuppyListComponent</code>:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">(...)</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyListComponent</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+  <span class="kd">@ContentChild</span><span class="p">(</span><span class="nx">TemplateRef</span><span class="p">)</span> <span class="nx">puppyTemplate</span>: <span class="kt">TemplateRef</span><span class="o">&lt;</span><span class="nx">NgForOfContext</span><span class="o">&lt;</span><span class="nx">Puppy</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice the type of the <code>puppyTemplate</code> property - <code>TemplateRef&lt;NgForOfContext&lt;Puppy&gt;&gt;</code>. This has the following semantics:</p>
+
+<blockquote>
+<p><code>TemplateRef</code> element which should be used in context of type <code>NgForOfContext</code> where the <code>$implicit</code> element has type <code>Puppy</code>.</p>
+</blockquote>
+
+<p>Similarly the other template directives have their own context since they use <code>TemplateRef</code>s which need to be interpreted in given context. For instance, <code>NgIf</code>&rsquo;s context declared by the class:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">NgIfContext</span> <span class="p">{</span>
+  <span class="kr">public</span> <span class="nx">$implicit</span>: <span class="kt">any</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="kr">public</span> <span class="nx">ngIf</span>: <span class="kt">any</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>As you can see, unlike <code>NgForOfContext</code>, <code>NgIfContext</code> doesn&rsquo;t have a type parameter because there&rsquo;s nothing we may want to refer to with the <code>$implicit</code> property.</p>
+
+<p>Now, <strong>how exactly does Angular has dynamic scoping of <code>TemplateRef</code>s`</strong>?</p>
+
+<p>Lets take a step back and look at our <code>PuppyAvatarsComponent</code> implementation:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;puppy-avatars&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;puppy-list [puppies]=&quot;puppies&quot;&gt;</span>
+<span class="sb">      &lt;ng-template let-puppy=&quot;$implicit&quot;&gt;</span>
+<span class="sb">        &lt;img mdListAvatar [src]=&quot;puppy.photo&quot; alt=&quot;...&quot;&gt;</span>
+<span class="sb">      &lt;/ng-template&gt;</span>
+<span class="sb">    &lt;/puppy-list&gt;</span>
+<span class="sb">  `</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PuppyAvatarsComponent</span> <span class="p">{</span>
+  <span class="nx">puppies</span> <span class="o">=</span> <span class="nx">Puppies</span><span class="p">;</span>
+
+  <span class="nx">$implicit</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Danny&#39;</span><span class="p">,</span>
+    <span class="nx">age</span>: <span class="kt">12</span><span class="p">,</span>
+    <span class="nx">breed</span><span class="o">:</span> <span class="s1">&#39;Poodle&#39;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice that in the <code>ng-template</code> we&rsquo;ve bound to the <code>$implicit</code> property and in the body of the component <code>PuppyAvatarsComponent</code> we declare a property called <code>$implicit</code>. Although property named <code>$implicit</code> exists in the <strong>current lexical scope</strong> of the template, it&rsquo;s value will be ignored and since <code>puppy</code> has <strong>dynamic scope</strong> and will be bound to the value of <code>$implicit</code> where we use it, i.e. the component with selector <code>puppy-list</code>.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>With <code>TemplateRef</code>s Angular allows us to not only perform advanced content projection but also to reuse templates across our application.</p>
+
+<p>Unlike the lexical scoping which is used in most programming languages we&rsquo;re familiar with, Angular uses <strong>dynamic scoping</strong> for its template references since we&rsquo;re interested in the context where given <code>TemplateRef</code> is used, rather than declared.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2017  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+
+
+    </body>
+</html>
