@@ -121,7 +121,7 @@ The only difference from the previous example is that instead of placing the `*n
 - `let-puppy` - creates a new local variable for the template that we can create bindings to. This way we can reference the individual `puppies` via the `puppy` variable. We will explain the `let-` attribute in details later in the article.
 - `[ngForOf]` - points the collection we are going to iterate over.
 
-In fact, each time Angular sees an attribute prefixed with a `*` it will desuger the markup to `ng-template`. That's what we call a **template directive**. By default Angular will use the markup between the opening and closing `ng-template` tags as template for the template directive itself. There are a few template directives that Angular provides, for instance:
+In fact, each time Angular sees an attribute prefixed with a `*` it will desugar the markup to `ng-template`. That's what we call a **template directive**. By default Angular will use the markup between the opening and closing `ng-template` tags as template for the template directive itself. There are a few template directives that Angular provides, for instance:
 
 - `NgForOf` - allows us to iterate over a collection.
 - `NgIf` - conditionally includes a template based on the value of an expression.
