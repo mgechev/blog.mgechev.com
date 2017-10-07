@@ -231,7 +231,7 @@ In programming languages there are two main scopes of name bindings:
 - Lexical scoping.
 - Dynamic scoping.
 
-You might have heard about the first one from JavaScript - **with `var` we can declare variables wit functional lexical scope, compared to `let` where the variables are with block lexical scope**.
+You might have heard about the first one from JavaScript - **with `var` we can declare variables with functional lexical scope, compared to `let` where the variables are with block lexical scope**.
 
 This simply means that in the following case, the variable `foo` will be visible within the entire function (functional lexical scope):
 
