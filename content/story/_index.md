@@ -5,7 +5,7 @@ author: minko_gechev
 layout: page
 ---
 
-<h1 class="timeline-header">My Story</h1>
+<h1 class="timeline-my-story-header">My Story</h1>
 
 <div class="timeline-intro">
 The following page contains a structured information about myself over the past a couple of years. The timeline is in descending order since I believe the recent facts might be more interesting for the reader.
