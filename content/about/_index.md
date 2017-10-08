@@ -21,7 +21,7 @@ My name is
 
 <ul>
   <li>Currently co-founder & CTO at <a href="https://rhyme.com">Rhyme.com</a>, former member of the Angular mobile team.</li>
-  <li>At the moment I’m based in <strike>Sofia, Bulgaria</strike> San Francisco, California.</li>
+  <li>At the moment I’m based in San Francisco, California.</li>
   <li>Read <a href="/story">my story</a>.</li>
   <li>See <a href="/talks">my talks</a>.</li>
   <li>You can contact me at <strong>minko at gechev dot io</strong>.</li>
