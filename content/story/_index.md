@@ -17,6 +17,24 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2017</header>
     <section class="timeline-event">
+      <h1>Two awards by the President of the Republic of Bulgaria</h1>
+      <section>
+        <img src="/images/story/john-atanasoff.jpg">
+        <p>
+          On 10th of October, 2017, I became the first laureate, in the history of the the award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
+        </p>
+        <p>
+          President Rumen Radev, awarded me with diploma for the award "John Atanasoff", which is given to young scientists with globally impactful contributions to the development of computer science and software engineering.
+        </p>
+        <p>
+          The second award, that the President awarded me with, is for the development of a project with wide social impact.
+        </p>
+        <p>
+          A few of the listed achievements are my contributions to open source software, books that I authored, presentations on major international conferences, and influential publications.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>codelyzer with 1,000,000 monthly downloads</h1>
       <section>
         <img src="/images/story/codelyzer.png">
