@@ -88,7 +88,7 @@ This way the services are actually singletons but not implemented through the Si
 - It improves the testability of your source code
 - You can control the creation of singleton objects (in our case the IoC container controls it for us, by instantiating the singletons lazy)
 
-For further discussion on this topic Misko Hevery's [article](http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html) in the Google Testing blog could be considered.
+For further discussion on this topic Miško Hevery's [article](http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html) in the Google Testing blog could be considered.
 
 #### Factory Method
 
