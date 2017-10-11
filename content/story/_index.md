@@ -21,7 +21,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/john-atanasoff.jpg">
         <p>
-          On 10th of October, 2017, I became the first laureate, in the history of the the award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
+          On 10th of October, 2017, I became the first laureate, in the history of the award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
         </p>
         <p>
           President Rumen Radev, awarded me with diploma for the award "John Atanasoff", which is given to young scientists with globally impactful contributions to the development of computer science and software engineering.
