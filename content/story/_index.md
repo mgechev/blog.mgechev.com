@@ -17,6 +17,22 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2017</header>
     <section class="timeline-event">
+      <h1>Switching to Angular got published</h1>
+      <section>
+        <img src="/images/sta.png">
+        <p>
+          A day before my birthday, on 1st of November 2017, the third edition of my book "Switching to Angular" got published!
+        </p>
+        <p>
+          It incorporated the latest changes introduced by Angular version 5 and introduced additional improvements such as introduction to structural typing, alignment to the new `StaticInjector` API and many others.
+        </p>
+        <p>
+          I am very thankful to the Angular team for their assistence during the alignment to the latest changes introduced to the framework. They are constant inspiration!
+        </p>
+      </section>
+    </section>
+
+    <section class="timeline-event">
       <h1>Two awards by the President of the Republic of Bulgaria</h1>
       <section>
         <img src="/images/story/john-atanasoff.jpg">
