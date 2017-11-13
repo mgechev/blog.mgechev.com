@@ -17,7 +17,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2017</header>
     <section class="timeline-event">
-      <h1>Switching to Angular got published</h1>
+      <h1>"Switching to Angular" got published</h1>
       <section>
         <img src="/images/sta.png">
         <p>
