@@ -19,6 +19,7 @@ The code for this blog post is available at my [GitHub account](https://github.c
 
 - ["Purely Fast"](https://github.com/mgechev/purely-fast)
 - ["Purely Fast - Benchmarks"](https://github.com/mgechev/purely-fast-benchmarks)
+- ["Faster Angular Applications - Part 2"](/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/)
 
 # Why runtime performance
 
