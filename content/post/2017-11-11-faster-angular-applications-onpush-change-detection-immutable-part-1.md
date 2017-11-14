@@ -7,7 +7,7 @@ date: 2017-11-11T00:00:00Z
 tags:
 - Angular
 - Performance
-title: Faster Angular Applications - Part 1. On Push and Immutable.js
+title: Faster Angular Applications - Part 1. On Push Change Detection and Immutability
 url: /2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/
 ---
 
