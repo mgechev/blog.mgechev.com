@@ -66,7 +66,7 @@
                         <i class="fa fa-pencil-square-o"></i> Edit
                     </a>
                     · Aug 29, 2012
-                    · 485 words
+                    · 459 words
                     · 3 minutes read
                       <span class="tags">
                       
@@ -87,7 +87,7 @@
                 </header>
                 
                 <section id="post-body">
-                    <p>JavaScript is a bit of a strange language, sometimes doing strange things if you don’t follow best practices and if you’re not familiar with the ECMA standard. There are numerous strange things in the JavaScript syntax, one of those being the self-executing (self-invoking) functions. Here’s the syntax:</p>
+                    <p>There are a lot of interesting things in the syntax of JavaScript, one of which is the definition of self-executing (self-invoking) functions. Here&rsquo;s how we can defined such function:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="c1">//body of the function</span>
@@ -95,13 +95,14 @@
 </code></pre></div>
 
 
-<p>The main idea is that the anonymous function above is being invoked right after it has been defined. The benefit of self-invoking functions is that it enables you to execute code once without cluttering the global namespace (without declaring any globals).<br />
-For example, if you had a web page that you needed to attach event listeners to and do some layout work in, self-invoking functions would work great for that job.</p>
+<p>The anonymous function above will be invoked right after it has been defined. The benefit of self-invoking functions is that they enable us to execute code once without cluttering the global namespace (without declaring any globals).
+For example, if we have a web page in which we want to attach event listeners to DOM elements and other initialization work, self-invoking functions would be the best tool for the job!</p>
 
-<p>What actually happens?</p>
+<p>How they actually work?</p>
 
-<p>Since the function is defined anonymously, there are no global or even loval variables declared here (except for the variables declared inside the function body). We do not keep reference to the function, not even to it&rsquo;s return value. After the function has been initialized, it is immediately invoked.
-As you see it’s very useful for the initialization mentioned above. If we attach events at initialization we can do it only once because we loose the reference to the function.</p>
+<p>Since the function is defined anonymously, there are leaked global nor even local variables except, of course, the variables declared inside the function&rsquo;s body. We do not keep reference to the function, not even to its return value. After the function has been initialized, it is being immediately invoked.</p>
+
+<p>As we already mentioned, this is very convenient for executing initialization logic. Using self-invoking functions we will perform the initialization work only once because after the execution we&rsquo;ll loose the reference to the function.</p>
 
 <p>There few small (but important) syntax variations. Douglas Crockford’s JSLint offers the correct declaration for self-invoking functions as:</p>
 
@@ -111,7 +112,7 @@ As you see it’s very useful for the initialization mentioned above. If we atta
 </code></pre></div>
 
 
-<p>An alternative syntax, which Crockford calls “dog balls”, is declared as follows:</p>
+<p>An alternative syntax, which Crockford calls “dog balls”, is as follows:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="c1">//body</span>
@@ -119,9 +120,9 @@ As you see it’s very useful for the initialization mentioned above. If we atta
 </code></pre></div>
 
 
-<p>I presonally find the second variant to be more clear.</p>
+<p>I personally find the second variant to be more clear.</p>
 
-<p>You can also pass parameters to the self-invoking functions. It is a commonly used practice to have references to different global objects:</p>
+<p>You can also pass parameters to the self-invoking functions. It is a commonly used practice to pass references to global objects:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">d</span><span class="p">,</span> <span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
    <span class="c1">//body</span>
@@ -129,22 +130,24 @@ As you see it’s very useful for the initialization mentioned above. If we atta
 </code></pre></div>
 
 
-<p>It is not recommended too have many arguments (aka. more than 3-4) because when the function becomes larger, you will have to scroll every time you forget a parameter name, and with a lot of arguments that will happen often. Even if the arguments’ names are easy for you to remember, if your code is read by other developers, it will be difficult for them to figure out what is going on.</p>
+<p>It is not recommended to pass too many arguments (for instance, more than 3-4) because when the function becomes larger, we will have to scroll every time you forget a parameter name, and with a lot of arguments that will happen often. Even if the arguments’ names are easy to remember, if the code is read by other developers, it will be difficult for them to figure out what is going on.</p>
 
-<p>Usually the use of self-invoking functions is in the module pattern. It happens when we keep the reference to the function’s return value. Exactly the return value is the public API of the defined module:</p>
+<p>Usually the module pattern is implemented using self-invoking functions. In the module pattern, we keep the reference to the function’s returned object. In such case we consider the return value as the public API of the module:</p>
 
 <div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">module</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//private</span>
-    <span class="k">return</span> <span class="p">{</span>
-    <span class="c1">//public</span>
-    <span class="p">}</span>
+  <span class="c1">// private</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="c1">// public</span>
+  <span class="p">};</span>
 <span class="p">}());</span>
 </code></pre></div>
 
 
-<p>Since there are a lot of articles about the module pattern, I will not go into detail about it.</p>
+<p>Since there are a lot of articles about the module pattern, we skip the details.</p>
 
-<p>A self-invoking function is function which invokes itself – we already have a name for that and it is recursion. That is the reason Ben Alman gave them a new name: <a href="http://benalman.com/news/2010/11/immediately-invoked-function-expression/">Immediately Invoked Function Expression (IIFE).</a> It is recommended to use te IIFE term as it is far more semantically correct and clear.</p>
+<p><strong>Important note</strong></p>
+
+<p>In programming we usually call functions which invoke themselves recursive functions. That is the reason Ben Alman gave self-invoking functions a new name: <a href="http://benalman.com/news/2010/11/immediately-invoked-function-expression/">Immediately Invoked Function Expression (IIFE).</a> It is recommended to use the term IIFE since it&rsquo;s semantically correct and more clear.</p>
 
 <p>Edited by: <a href="https://github.com/braydenaimar">Brayden Aimar</a></p>
 
