@@ -18,7 +18,7 @@ There are a lot of interesting things in the syntax of JavaScript, one of which 
 
 {{< highlight JavaScript >}}
 (function () {
-    //body of the function
+  // body of the function
 }());
 {{< / highlight >}}
 
@@ -34,14 +34,14 @@ As we already mentioned, this is very convenient for executing initialization lo
 There few small (but important) syntax variations. Douglas Crockford’s JSLint offers the correct declaration for self-invoking functions as:
 
 {{< highlight JavaScript >}}(function () {
-    //body
+  // body
 }());
 {{< / highlight >}}
 
 An alternative syntax, which Crockford calls “dog balls”, is as follows:
 
 {{< highlight JavaScript >}}(function () {
-    //body
+  // body
 })();
 {{< / highlight >}}
 
@@ -50,7 +50,7 @@ I personally find the second variant to be more clear.
 You can also pass parameters to the self-invoking functions. It is a commonly used practice to pass references to global objects:
 
 {{< highlight JavaScript >}}(function (w, d, $) {
-   //body
+  // body
 }(window, document, jQuery));
 {{< / highlight >}}
 
