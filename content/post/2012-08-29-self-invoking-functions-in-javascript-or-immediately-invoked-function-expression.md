@@ -14,7 +14,7 @@ title: Self-invoking functions in JavaScript (or Immediately Invoked Function Ex
 url: /2012/08/29/self-invoking-functions-in-javascript-or-immediately-invoked-function-expression/
 ---
 
-JavaScript is a bit of a strange language, sometimes doing strange things if you don’t follow best practices and if you’re not familiar with the ECMA standard. There are numerous strange things in the JavaScript syntax, one of those being the self-executing (self-invoking) functions. Here’s the syntax:
+There are a lot of interesting things in the syntax of JavaScript, one of which is the definition of self-executing (self-invoking) functions. Here's how we can defined such function:
 
 {{< highlight JavaScript >}}
 (function () {
@@ -22,13 +22,14 @@ JavaScript is a bit of a strange language, sometimes doing strange things if you
 }());
 {{< / highlight >}}
 
-The main idea is that the anonymous function above is being invoked right after it has been defined. The benefit of self-invoking functions is that it enables you to execute code once without cluttering the global namespace (without declaring any globals).  
-For example, if you had a web page that you needed to attach event listeners to and do some layout work in, self-invoking functions would work great for that job.
+The anonymous function above will be invoked right after it has been defined. The benefit of self-invoking functions is that they enable us to execute code once without cluttering the global namespace (without declaring any globals).
+For example, if we have a web page in which we want to attach event listeners to DOM elements and other initialization work, self-invoking functions would be the best tool for the job!
 
-What actually happens?
+How they actually work?
 
-Since the function is defined anonymously, there are no global or even loval variables declared here (except for the variables declared inside the function body). We do not keep reference to the function, not even to it's return value. After the function has been initialized, it is immediately invoked.
-As you see it’s very useful for the initialization mentioned above. If we attach events at initialization we can do it only once because we loose the reference to the function.
+Since the function is defined anonymously, there are leaked global nor even local variables except, of course, the variables declared inside the function's body. We do not keep reference to the function, not even to its return value. After the function has been initialized, it is being immediately invoked.
+
+As we already mentioned, this is very convenient for executing initialization logic. Using self-invoking functions we will perform the initialization work only once because after the execution we'll loose the reference to the function.
 
 There few small (but important) syntax variations. Douglas Crockford’s JSLint offers the correct declaration for self-invoking functions as:
 
@@ -37,37 +38,39 @@ There few small (but important) syntax variations. Douglas Crockford’s JSLint 
 }());
 {{< / highlight >}}
 
-An alternative syntax, which Crockford calls “dog balls”, is declared as follows:
+An alternative syntax, which Crockford calls “dog balls”, is as follows:
 
 {{< highlight JavaScript >}}(function () {
     //body
 })();
 {{< / highlight >}}
 
-I presonally find the second variant to be more clear.
+I personally find the second variant to be more clear.
 
-You can also pass parameters to the self-invoking functions. It is a commonly used practice to have references to different global objects:
+You can also pass parameters to the self-invoking functions. It is a commonly used practice to pass references to global objects:
 
 {{< highlight JavaScript >}}(function (w, d, $) {
    //body
 }(window, document, jQuery));
 {{< / highlight >}}
 
-It is not recommended too have many arguments (aka. more than 3-4) because when the function becomes larger, you will have to scroll every time you forget a parameter name, and with a lot of arguments that will happen often. Even if the arguments’ names are easy for you to remember, if your code is read by other developers, it will be difficult for them to figure out what is going on.
+It is not recommended to pass too many arguments (for instance, more than 3-4) because when the function becomes larger, we will have to scroll every time you forget a parameter name, and with a lot of arguments that will happen often. Even if the arguments’ names are easy to remember, if the code is read by other developers, it will be difficult for them to figure out what is going on.
 
-Usually the use of self-invoking functions is in the module pattern. It happens when we keep the reference to the function’s return value. Exactly the return value is the public API of the defined module:
+Usually the module pattern is implemented using self-invoking functions. In the module pattern, we keep the reference to the function’s returned object. In such case we consider the return value as the public API of the module:
 
 {{< highlight JavaScript >}}var module = (function () {
-    //private
-    return {
-    //public
-    }
+  // private
+  return {
+    // public
+  };
 }());
 {{< / highlight >}}
 
-Since there are a lot of articles about the module pattern, I will not go into detail about it.
+Since there are a lot of articles about the module pattern, we skip the details.
 
-A self-invoking function is function which invokes itself – we already have a name for that and it is recursion. That is the reason Ben Alman gave them a new name: [Immediately Invoked Function Expression (IIFE).][1] It is recommended to use te IIFE term as it is far more semantically correct and clear.
+**Important note**
+
+In programming we usually call functions which invoke themselves recursive functions. That is the reason Ben Alman gave self-invoking functions a new name: [Immediately Invoked Function Expression (IIFE).][1] It is recommended to use the term IIFE since it's semantically correct and more clear.
 
 Edited by: [Brayden Aimar][2]
 
