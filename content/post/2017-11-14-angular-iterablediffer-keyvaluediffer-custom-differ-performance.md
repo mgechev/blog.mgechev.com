@@ -49,6 +49,8 @@ In short, **by default, after each task from the queue, Angular is going to perf
 
 On top of that when Angular performs change detection in the context of given component it will invoke its `ngDoCheck` life-cycle hook. This means that `ngDoCheck` is the perfect place to add custom piece of logic for detecting changes in the state of our components!
 
+<img src="/images/differs/lifecycle.jpg" alt="Life-Cycle"  style="display: block; margin: auto;">
+
 Lets take a look at the implementation of `NgForOf` to see how this actually works:
 
 ```ts
@@ -162,6 +164,8 @@ Notice that comparing two items from the collections will always happen in `O(1)
 # Encapsulation versus Performance
 
 Now we know what the purpose of the `IterableDiffer` is and how it compares the individual values from the collection. The only thing we're not familiar with is the comparison algorithm. In fact, it's not trivial at all since the Angular team tried to optimized as much as possible since `NgForOf` is frequently used directive and often it has to work with big data sets.
+
+<img src="/images/differs/encapsulation.jpg" alt="Life-Cycle"  style="display: block; margin: auto;">
 
 Lets take a brief look at the `DefaultIterableDiffer`. It is a concrete implementation of the `IterableDiffer` interface which Angular uses by default for comparing iterable collections:
 
@@ -412,6 +416,8 @@ Finally, we looked at benchmarks which show the performance boost we got from th
 
 # Resources
 
+- ["Faster Angular Applications - Part 1"](/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/)
+- ["Faster Angular Applications - Part 2"](/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/)
 - ["Purely Fast" application](https://github.com/mgechev/purely-fast)
 - ["Purely Fast" benchmarks](https://github.com/mgechev/purely-fast-benchmarks)
 - [Persistent data structures](https://en.wikipedia.org/wiki/Persistent_data_structure)
