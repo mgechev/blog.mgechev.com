@@ -305,20 +305,6 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
         </p>
       </section>
     </section>
-    <section class="timeline-event">
-      <h1>Accepted for MSc in Software Engineering at Oxford</h1>
-      <section>
-        <p>
-          In 2013, I set a goal that I want to study in a top ranked university. I was also aware that the fees are quite high...Anyhow, I made a plan how with my personal savings, my job as a contractor for a Silicon Valley startup and my parents' savings I can graduate MSc in Software Engineering at University of Oxford.
-        </p>
-        <p>
-          After the admission committee approved my application I was invited for an onsite interview which was successful.
-        </p>
-        <p>
-          The same time, I got an offer from the company I was working for to start an H-1B visa application process...I had to choose between two exciting opportunities. I picked the one to move to the Silicon Valley.
-        </p>
-      </section>
-    </section>
   </section>
   <section class="timeline-period">
     <header class="timeline-header">2012</header>
