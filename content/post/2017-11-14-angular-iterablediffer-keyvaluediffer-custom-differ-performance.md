@@ -8,7 +8,6 @@ tags:
 - Angular
 - IterableDiffer
 - Performance
-draft: true
 title: Understanding Differs in Angular and Developing a Custom IterableDiffer
 url: /2017/11/14/angular-iterablediffer-keyvaluediffer-custom-differ-track-by-fn-performance/
 ---
