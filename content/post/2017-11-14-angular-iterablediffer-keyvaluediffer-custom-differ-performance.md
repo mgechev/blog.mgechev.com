@@ -28,7 +28,7 @@ The code from this article can be found at:
 
 There are a lot of articles written on this topic so we will just quickly provide some background which will help us understand how differs work and how the framework uses them internally.
 
-Angular uses **dirty-checking mechanism** in order to detect changes in the registered inside of the templates' expressions. Lets suppose we have the following template:
+Angular uses **dirty-checking mechanism** in order to detect changes in the templates' expressions. Lets suppose we have the following template:
 
 ```html
 <ul>
