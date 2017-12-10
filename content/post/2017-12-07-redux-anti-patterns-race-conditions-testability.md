@@ -23,7 +23,7 @@ All of the anti-patterns below have the following structure:
 
 # State Duplication
 
-Sometimes we have instances of same business entity used in a different contexts. In such cases, instead of keeping them under the same store property we treat them differently.
+Sometimes we have instances of the same business entity used in different contexts. In such cases, instead of keeping the instances under the same store property we treat them differently.
 
 <img src="/images/redux-anti-patterns/duplicate.jpg" style="display: block; margin: auto" alt="Duplication">
 
@@ -60,14 +60,14 @@ const session = {
 };
 ```
 
-This way we'll have it in both the `sessions` array and as value of `currentSession`. Imagine the user navigates between the scheduler page and pages for different sessions. This will require two additional procedures in order to keep the state consistent:
+This way we'll have it in both: the `sessions` array and as value of `currentSession` property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:
 
 - If we modify the current session, we need to update the `sessions` array and `currentSession`.
-- If we switch between sessions we need to clean the `currentSession` and replace it with the new session, corresponding to the page we've navigated to.
+- If we switch between sessions we need to clean the `currentSession` and replace it with the session corresponding to the page we've navigated to.
 
 ## Solution
 
-The solution is to keep a pointer to the current session in the `sessions` array as value of the `currentSession` property. For instance, we can use the session's `id` for the purpose:
+The solution is to keep a value pointing to the current session in the `sessions` array as value of the `currentSession` property. For instance, we can use the `Session`'s `id` for the purpose:
 
 ```typescript
 interface Store {
@@ -76,7 +76,7 @@ interface Store {
 }
 ```
 
-This has an implication - we need to select the correct session from the "master" property. In this specific case, it'll take `O(n)` time to do that; often this is good enough because we work with small collections. If we had, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the `Store` interface to:
+This has an implication - we need to select the correct session from the "master" property. In this specific case, it'll take `O(n)` time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the `Store` interface to:
 
 ```typescript
 interface Store {
@@ -93,19 +93,19 @@ store.sessions[store.currentSession];
 
 # Incorrect Information Expert
 
-There's a collection of patterns called GRASP, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book "[Applying UML and Patterns](https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062)". One of them is the so called "Information Expert". The book describes this practice as:
+There's a collection of patterns called [GRASP](https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)), standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book "[Applying UML and Patterns](https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062)". One of them is called "Information Expert". The book describes this practice as:
 
 > Assign a responsibility to the information expert class that has the information necessary to fulfill the responsibility.
 
-The pattern suggests that based on the information that given module has we need to assign it the correct responsibilities. At first this doesn't seem applicable to the functional approach of redux (too object-orienty?).
+The pattern suggests that we should assign the responsibilities to given class based on the information it holds. At first this doesn't seem applicable to the functional approach of redux (sounds soo "object-orienty", doesn't it).
 
-We can take a look at this practice the another angle:
+If we suppose that the pattern is symmetric, we can take a look at it the another angle:
 
 > Keep the information in given component which helps it to fulfill its responsibilities.
 
 Keep in mind that the information expert for the entire redux application is the store itself. On the other hand, often we have local state which is shared only among the components belonging to given component sub-tree.
 
-The local state in redux is well discussed in multiple sources. In general, it's often UI state which can be preserved in given component instead of moved to the store. This reduces boilerplates and often increase development productivity.
+Whether and how we should use local state in redux is already well discussed in multiple sources. In general, the local state often UI state which can be preserved in given component instead of moved to the store. This reduces boilerplates and often increase development productivity.
 
 ## Problem
 
@@ -115,7 +115,7 @@ This has a serious implication - when the state need to be mutated, it often get
 
 ## Solution
 
-The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the children.
+The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components' children.
 
 Sometimes, it makes more sense to move the state directly to the store and use more systematic mechanism for mutating it (through actions and reducers).
 
@@ -123,17 +123,17 @@ As result we get:
 
 ### Coupling
 
-Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn't allow any static verification through a type system.
+Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn't allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it's often is not good enough.
 
 Take a look at the next figure:
 
 <img src="/images/redux-anti-patterns/cmp.png" style="display: block; margin: auto" alt="Component tree">
 
-If component `A` holds the state that `C` and `D` consume then `B` should also be aware of it. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven't experienced any serious issues with it.
+If component `A` holds the state that `C` and `D` consume then `B` should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven't experienced any serious issues with it for medium sized applications (above 40k SLOC).
 
 ### Mutation
 
-The mutation of the state now should happen through the parent component (on the diagram above `A`). This can be achieved by passing callbacks. In such cases, I often prefer to move the local state to the store.
+The mutation of the state now should happen through the parent component (on the diagram above `A`). This can be achieved by passing callbacks. When the callbacks need to be passed through several levels of children I often prefer to move the local state to the store.
 
 # Implicit State Duplication
 
@@ -161,9 +161,11 @@ Object.keys(sessions).length
 
 ## Solution
 
+We should get rid of the properties which can be computed from another properties. This introduces additional calculations but they can be easily optimized since they are based on pure functions.
+
 I find the usage of [`reselect`](https://github.com/reactjs/reselect) very appropriate for this particular case. Another alternative is definition of methods in a parent component which encapsulate the computations required for the given computed state property. Efficiency there can be achieved using memoization.
 
-# Overwriting Updates
+# Overwriting State Updates
 
 In this section we'll take a look at another issue which is related to inconsistent state mutation.
 
@@ -181,7 +183,7 @@ interface Session {
 }
 ```
 
-Lets suppose we have the following actions' definitions:
+...and the following actions' definitions:
 
 ```typescript
 const updateLocalSession = (session: Session) => ({ type: UpdateSession, session });
@@ -205,7 +207,7 @@ const setGuide = (session: Session) => (dispatch, getStore) =>
     .then(guide => dispatch(updateLocalSession(session.set('guide', new User(guide)))));
 ```
 
-And now, somewhere in the component tree we want to update the session title and get the associated guide:
+And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:
 
 ```typescript
 ...
@@ -219,13 +221,14 @@ createSession() {
 
 The code looks fine at first but lets trace what is actually going on:
 
-1. We assign reference to the `session` property to the constant `session`.
-1. We update the title of the session by invoking the set method of the `session` record.
+1. We assign reference to the `session` property to the constant called `session`.
+1. We update the title of the session by invoking the set method of the record.
 1. This creates a new session record which is passed to `updateSession`.
-1. Update session sends a network request and updates the session in the database.
+1. Update session sends a network request and updates the session in the back-end.
 1. Update session pessimistically updates the session in the store (i.e. in the store now we have the session with its new title).
 1. We invoke the `setGuide` action, passing the `session` constant as argument.
-1. In the action we get the guide, set it to the `guide` property and update the store.
+1. In the action we get the guide from the network.
+1. We update the `guide` property of the session and update the store with the returned by the `set` method value.
 
 Notice that at step `6.` we pass reference to the old `session` object where we still have the old `title`. This way the reducer will overwrite the session in the store and replace it with an object with the old `title` and the `guide` property set.
 
@@ -233,7 +236,7 @@ With this simple example the problem looks obvious. In case when we have multipl
 
 ## Solutions
 
-There are several simple solutions to this problem.
+There are several solutions to this problem; lets describe them one by one:
 
 ### Using `getState`
 
@@ -254,7 +257,7 @@ This way we can make sure that we always get the latest session inside of the `s
 
 ### Using Resolve Argument
 
-If we refactor `setGuide` in a different way:
+We can refactor `setGuide` in a different way:
 
 ```typescript
 const setGuide = (session: Session) => (dispatch, getStore) => {
@@ -281,7 +284,7 @@ createSession() {
 ...
 ```
 
-Although last two solutions work, they look a bit more imperative with the extra constant assignment. Third approach could be:
+Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:
 
 ### Updated Props
 
@@ -294,7 +297,7 @@ createSession() {
 ...
 ```
 
-The promise API is asynchronous and it will push a new micro-task into the queue. Even if in the implementation of `updateSession` looks like:
+The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of `updateSession` looks like:
 
 ```typescript
 const updateSession = (session: Session) => (dispatch, getStore) => {
@@ -304,15 +307,15 @@ const updateSession = (session: Session) => (dispatch, getStore) => {
 
 ```
 
-...we know that `this.props.session` would have the updated value of `session` inside of the resolve callback of the promise returned by the first invocation of `dispatch`.
+...we know that `this.props.session` will have the updated value of `session` inside of the resolve callback of the promise returned by the first invocation of `dispatch`.
 
 # Conclusion
 
-In this blog post we explored four state management anti-patterns for React with Redux. We discussed their consequences and proposed sample solutions for dealing with:
+In this blog post we explored four basic state management anti-patterns in Redux:
 
 - State duplication
 - Wrong information expert
 - Implicit state duplication
 - Overwriting state updates
 
-In the next post I'll share a few lessons I learned about testing.
+We discussed their consequences and proposed sample solutions. In the next post I'll share a few lessons I learned about testing.
