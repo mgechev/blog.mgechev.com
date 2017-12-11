@@ -160,7 +160,7 @@ The syntax analyzer (often know as parser) is the module of a compiler which out
 
 <img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;">
 
-Usually, the parser is implemented base on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[7]</sup>. Here's the grammar of our language:
+Usually, the parser is implemented based on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[7]</sup>. Here's the grammar of our language:
 
 ```
 digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
@@ -242,13 +242,13 @@ The operator `sum`, applied to `2`, `3`, `4` will look like this:
   val: 'sum',
   expr: [{
     type: Num,
-    va: 2
+    val: 2
   }, {
     type: Num,
-    va: 3
+    val: 3
   }, {
     type: Num,
-    va: 4
+    val: 4
   }]
 }
 ```
@@ -263,7 +263,7 @@ After we declare the node types, we define a function called `parse` which accep
 - `consume` - returns the element of `tokens` associated with the current value of the `c` local variable and increments `c`.
 - `parseNum` - gets the current token (i.e. invokes `peek()`), parses it to a natural number and returns a new number token.
 - `parseOp` - we'll explore in a little bit.
-- `parseExpr` - checks of the current token matches the regular expression `/\d/` (i.e. is a number) and invokes `parseNum` if the match was successful, otherwise returns `parseOp`.
+- `parseExpr` - checks if the current token matches the regular expression `/\d/` (i.e. is a number) and invokes `parseNum` if the match was successful, otherwise returns `parseOp`.
 
 ### Parsing Operations
 
@@ -279,7 +279,7 @@ const parseOp = () => {
 
 Since `parseOp` has been invoked by `parseExpr` when the value of `peek()` is not a number we know that it is an operator so we create a new operation node. Note that we don't perform any further validation, however, in a real-world programming language we'd want to do that and eventually throw a syntax error in case of unexpected token.
 
-Anyhow, in the node declaration we set the list of "sub-expressions" to be the empty list (i.e. `[]`), the operation name to the value of `peek()` and the type of the node to `Op`. Later, while we don't reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of "sub-expressions` of the given node. Finally, we return the node.
+Anyhow, in the node declaration we set the list of "sub-expressions" to be the empty list (i.e. `[]`), the operation name to the value of `consume()` and the type of the node to `Op`. Later, while we don't reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of "sub-expressions` of the given node. Finally, we return the node.
 
 Keep in mind that `while (peek()) node.expr.push(parseExpr());` performs an indirect recursion. In case we have the expression:
 
@@ -291,10 +291,10 @@ This will
 
 - First, invoke `parseExpr`, which will find that the current token (i.e. `tokens[0]`) is not a number (it's `sum`) so it'll invoke `parseOp`.
 - After that `parseOp` will create the operation node and because of the `consume()` call, increment the value of `c`.
-- Next `parseOp` will iterate over the nodes, and for `tokens[c]`, where `c` now equals `1` will invoke `parseExpr`.
-- `parseExpr` will find that the current node is not a number so it'll invoke `parseOp`.
-- `parseOp` will create another operation node and increment `c` and will start looping over all the tokens again.
-- `parseOp` will invoke `parseExpr` where `c` will not equal `2`.
+- Next `parseOp` will iterate over the tokens, and for `tokens[c]`, where `c` now equals `1` will invoke `parseExpr`.
+- `parseExpr` will find that the current token is not a number so it'll invoke `parseOp`.
+- `parseOp` will create another operation node and increment `c` and will start looping over the remaining tokens again.
+- `parseOp` will invoke `parseExpr` where `c` will now equal `2`.
 - Since `tokens[2] === "2"`, `parseExpr` will invoke `parseNum` which will create a number node, incrementing the `c` variable.
 - `parseNum` will return the number node and it will be pushed into the `expr` array of the last operation node produced by the latest `parseOp` invocation.
 - The last `parseOp` invocation will return the operation node since `peek()` will return `undefined` (`parseNum` has incremented `c` to `3` and `tokens[3] === undefined`).
@@ -305,13 +305,13 @@ The produced AST will look like:
 
 ```javascript
 {
-  type: "Op",
-  val: "sum",
+  type: Op,
+  val: "sum",
   expr: [{
-    type: "Op",
+    type: Op,
     val: "sum",
     expr: [{
-      type: "Num",
+      type: Num,
       val: 2
     }]
   }]
@@ -322,7 +322,7 @@ The produced AST will look like:
 
 ## Recursive Descent Parsing
 
-Now lets related the individual functions to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:
+Now lets see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:
 
 ```
 digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
@@ -331,11 +331,11 @@ op = sum | sub | mul | div
 expr = num | op expr+
 ```
 
-Now they may make a bit more sense? `expr` looks very much like `parseExpr`, where we parse either a `num`ber or an `op`eration. Similarly, `op expr+` looks very much like `parseOp` and `num` like `parseNum`. In fact, very often parsers are generated directly from the grammars since there's a direct connection between both with the [recursive descent parsing algorithm](https://en.wikipedia.org/wiki/Recursive_descent_parser)<sup>[8]</sup>.
+Do they now may make a bit more sense? `expr` looks very much like `parseExpr`, where we parse either a `num`ber or an `op`eration. Similarly, `op expr+` looks very much like `parseOp` and `num` like `parseNum`. In fact, very often parsers are generated directly from the grammars since there's a direct connection between both with the [recursive descent parsing algorithm](https://en.wikipedia.org/wiki/Recursive_descent_parser)<sup>[8]</sup>.
 
 And in fact, we just developed a simple recursive descent parser! Our parser was quite simple (well, we have only 4 **production rules** in the grammar) but you can imagine how complex the parser of a real-life programming language is.
 
-It's extremely convenient to develop the grammar of a language before write the actual parser in order to observe a simplified model of it. The parser contains a lot of details (for instance a lot of syntax constructs of the language you're developing it with), in contrast to the grammar which is extremely simplified and minimalistic.
+It's extremely convenient to develop the grammar of a language before writing the actual parser in order to observe a simplified model of it. The parser contains a lot of details (for instance a lot of syntax constructs of the language you're developing it with), in contrast to the grammar which is extremely simplified and minimalistic.
 
 # Developing the Transpiler
 
@@ -381,7 +381,7 @@ We invoke `lex(program)`, which produces the list of tokens, after that we pass 
 
 # Conclusion
 
-This article explained in details the development of a very simple compiler (or transpile) of a language with prefix expressions to JavaScript. Although this was explanation of only the very basics of the compiler development we were able to cover few very important concepts:
+This article explained in details the development of a very simple compiler (or transpiler) of a language with prefix expressions to JavaScript. Although this was explanation of only the very basics of the compiler development we were able to cover few very important concepts:
 
 - Lexical analysis
 - Syntax analysis
@@ -389,7 +389,7 @@ This article explained in details the development of a very simple compiler (or 
 - EBNF grammars
 - Recursive Descent Parsing
 
-If you're interested in further reading, I'd recommend you:
+If you're interested in further reading, I'd recommend:
 
 - [Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)
 - [Let’s Build A Simple Interpreter](https://ruslanspivak.com/lsbasi-part1/)
