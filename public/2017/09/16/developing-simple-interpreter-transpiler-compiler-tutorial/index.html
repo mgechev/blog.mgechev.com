@@ -69,7 +69,7 @@
                         <i class="fa fa-pencil-square-o"></i> Edit
                     </a>
                     · Sep 16, 2017
-                    · 2537 words
+                    · 2540 words
                     · 12 minutes read
                       <span class="tags">
                       
@@ -229,7 +229,7 @@
 
 <p><img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;"></p>
 
-<p>Usually, the parser is implemented base on a <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">grammar</a><sup>[7]</sup>. Here&rsquo;s the grammar of our language:</p>
+<p>Usually, the parser is implemented based on a <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">grammar</a><sup>[7]</sup>. Here&rsquo;s the grammar of our language:</p>
 <div class="highlight"><pre><span></span>digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
@@ -299,13 +299,13 @@ expr = num | op expr+
   <span class="nx">val</span><span class="o">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span>
   <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
     <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
-    <span class="nx">va</span><span class="o">:</span> <span class="mi">2</span>
+    <span class="nx">val</span><span class="o">:</span> <span class="mi">2</span>
   <span class="p">},</span> <span class="p">{</span>
     <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
-    <span class="nx">va</span><span class="o">:</span> <span class="mi">3</span>
+    <span class="nx">val</span><span class="o">:</span> <span class="mi">3</span>
   <span class="p">},</span> <span class="p">{</span>
     <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
-    <span class="nx">va</span><span class="o">:</span> <span class="mi">4</span>
+    <span class="nx">val</span><span class="o">:</span> <span class="mi">4</span>
   <span class="p">}]</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -321,7 +321,7 @@ expr = num | op expr+
 <li><code>consume</code> - returns the element of <code>tokens</code> associated with the current value of the <code>c</code> local variable and increments <code>c</code>.</li>
 <li><code>parseNum</code> - gets the current token (i.e. invokes <code>peek()</code>), parses it to a natural number and returns a new number token.</li>
 <li><code>parseOp</code> - we&rsquo;ll explore in a little bit.</li>
-<li><code>parseExpr</code> - checks of the current token matches the regular expression <code>/\d/</code> (i.e. is a number) and invokes <code>parseNum</code> if the match was successful, otherwise returns <code>parseOp</code>.</li>
+<li><code>parseExpr</code> - checks if the current token matches the regular expression <code>/\d/</code> (i.e. is a number) and invokes <code>parseNum</code> if the match was successful, otherwise returns <code>parseOp</code>.</li>
 </ul>
 
 <h3 id="parsing-operations">Parsing Operations</h3>
@@ -336,7 +336,7 @@ expr = num | op expr+
 
 <p>Since <code>parseOp</code> has been invoked by <code>parseExpr</code> when the value of <code>peek()</code> is not a number we know that it is an operator so we create a new operation node. Note that we don&rsquo;t perform any further validation, however, in a real-world programming language we&rsquo;d want to do that and eventually throw a syntax error in case of unexpected token.</p>
 
-<p>Anyhow, in the node declaration we set the list of &ldquo;sub-expressions&rdquo; to be the empty list (i.e. <code>[]</code>), the operation name to the value of <code>peek()</code> and the type of the node to <code>Op</code>. Later, while we don&rsquo;t reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of &ldquo;sub-expressions` of the given node. Finally, we return the node.</p>
+<p>Anyhow, in the node declaration we set the list of &ldquo;sub-expressions&rdquo; to be the empty list (i.e. <code>[]</code>), the operation name to the value of <code>consume()</code> and the type of the node to <code>Op</code>. Later, while we don&rsquo;t reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of &ldquo;sub-expressions` of the given node. Finally, we return the node.</p>
 
 <p>Keep in mind that <code>while (peek()) node.expr.push(parseExpr());</code> performs an indirect recursion. In case we have the expression:</p>
 <div class="highlight"><pre><span></span>sum sum 2
@@ -347,10 +347,10 @@ expr = num | op expr+
 <ul>
 <li>First, invoke <code>parseExpr</code>, which will find that the current token (i.e. <code>tokens[0]</code>) is not a number (it&rsquo;s <code>sum</code>) so it&rsquo;ll invoke <code>parseOp</code>.</li>
 <li>After that <code>parseOp</code> will create the operation node and because of the <code>consume()</code> call, increment the value of <code>c</code>.</li>
-<li>Next <code>parseOp</code> will iterate over the nodes, and for <code>tokens[c]</code>, where <code>c</code> now equals <code>1</code> will invoke <code>parseExpr</code>.</li>
-<li><code>parseExpr</code> will find that the current node is not a number so it&rsquo;ll invoke <code>parseOp</code>.</li>
-<li><code>parseOp</code> will create another operation node and increment <code>c</code> and will start looping over all the tokens again.</li>
-<li><code>parseOp</code> will invoke <code>parseExpr</code> where <code>c</code> will not equal <code>2</code>.</li>
+<li>Next <code>parseOp</code> will iterate over the tokens, and for <code>tokens[c]</code>, where <code>c</code> now equals <code>1</code> will invoke <code>parseExpr</code>.</li>
+<li><code>parseExpr</code> will find that the current token is not a number so it&rsquo;ll invoke <code>parseOp</code>.</li>
+<li><code>parseOp</code> will create another operation node and increment <code>c</code> and will start looping over the remaining tokens again.</li>
+<li><code>parseOp</code> will invoke <code>parseExpr</code> where <code>c</code> will now equal <code>2</code>.</li>
 <li>Since <code>tokens[2] === &quot;2&quot;</code>, <code>parseExpr</code> will invoke <code>parseNum</code> which will create a number node, incrementing the <code>c</code> variable.</li>
 <li><code>parseNum</code> will return the number node and it will be pushed into the <code>expr</code> array of the last operation node produced by the latest <code>parseOp</code> invocation.</li>
 <li>The last <code>parseOp</code> invocation will return the operation node since <code>peek()</code> will return <code>undefined</code> (<code>parseNum</code> has incremented <code>c</code> to <code>3</code> and <code>tokens[3] === undefined</code>).</li>
@@ -360,13 +360,13 @@ expr = num | op expr+
 
 <p>The produced AST will look like:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
-  <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;Op&quot;</span><span class="p">,</span>
-  <span class="nx">val</span><span class="o">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span>
+  <span class="nx">val</span><span class="o">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
   <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
-    <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;Op&quot;</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span>
     <span class="nx">val</span><span class="o">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
     <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
-      <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;Num&quot;</span><span class="p">,</span>
+      <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
       <span class="nx">val</span><span class="o">:</span> <span class="mi">2</span>
     <span class="p">}]</span>
   <span class="p">}]</span>
@@ -377,18 +377,18 @@ expr = num | op expr+
 
 <h2 id="recursive-descent-parsing">Recursive Descent Parsing</h2>
 
-<p>Now lets related the individual functions to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:</p>
+<p>Now lets see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:</p>
 <div class="highlight"><pre><span></span>digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
 expr = num | op expr+
 </pre></div>
 
-<p>Now they may make a bit more sense? <code>expr</code> looks very much like <code>parseExpr</code>, where we parse either a <code>num</code>ber or an <code>op</code>eration. Similarly, <code>op expr+</code> looks very much like <code>parseOp</code> and <code>num</code> like <code>parseNum</code>. In fact, very often parsers are generated directly from the grammars since there&rsquo;s a direct connection between both with the <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent parsing algorithm</a><sup>[8]</sup>.</p>
+<p>Do they now may make a bit more sense? <code>expr</code> looks very much like <code>parseExpr</code>, where we parse either a <code>num</code>ber or an <code>op</code>eration. Similarly, <code>op expr+</code> looks very much like <code>parseOp</code> and <code>num</code> like <code>parseNum</code>. In fact, very often parsers are generated directly from the grammars since there&rsquo;s a direct connection between both with the <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent parsing algorithm</a><sup>[8]</sup>.</p>
 
 <p>And in fact, we just developed a simple recursive descent parser! Our parser was quite simple (well, we have only 4 <strong>production rules</strong> in the grammar) but you can imagine how complex the parser of a real-life programming language is.</p>
 
-<p>It&rsquo;s extremely convenient to develop the grammar of a language before write the actual parser in order to observe a simplified model of it. The parser contains a lot of details (for instance a lot of syntax constructs of the language you&rsquo;re developing it with), in contrast to the grammar which is extremely simplified and minimalistic.</p>
+<p>It&rsquo;s extremely convenient to develop the grammar of a language before writing the actual parser in order to observe a simplified model of it. The parser contains a lot of details (for instance a lot of syntax constructs of the language you&rsquo;re developing it with), in contrast to the grammar which is extremely simplified and minimalistic.</p>
 
 <h1 id="developing-the-transpiler">Developing the Transpiler</h1>
 
@@ -432,7 +432,7 @@ expr = num | op expr+
 
 <h1 id="conclusion">Conclusion</h1>
 
-<p>This article explained in details the development of a very simple compiler (or transpile) of a language with prefix expressions to JavaScript. Although this was explanation of only the very basics of the compiler development we were able to cover few very important concepts:</p>
+<p>This article explained in details the development of a very simple compiler (or transpiler) of a language with prefix expressions to JavaScript. Although this was explanation of only the very basics of the compiler development we were able to cover few very important concepts:</p>
 
 <ul>
 <li>Lexical analysis</li>
@@ -442,7 +442,7 @@ expr = num | op expr+
 <li>Recursive Descent Parsing</li>
 </ul>
 
-<p>If you&rsquo;re interested in further reading, I&rsquo;d recommend you:</p>
+<p>If you&rsquo;re interested in further reading, I&rsquo;d recommend:</p>
 
 <ul>
 <li><a href="http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">Developing Statically Typed Programming Language</a></li>
