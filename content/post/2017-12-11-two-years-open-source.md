@@ -14,7 +14,9 @@ title: Two Years Open Source.
 url: /2017/12/11/two-years-open-source/
 ---
 
-This time I'll violate my principle to write only about purely technical topics in my blog. In the next a couple of paragraphs I'll talk about open source software from a very personal perspective. I'll start by explaining what open source software is and after that we'll discuss it's bright sides and dark corners...
+This time I'll violate my principle to write only about purely technical topics in my blog. In the next a couple of paragraphs I'll talk about open source software from a very personal perspective. I'll explain why I love doing open source and why I'd recommend more people to contribute to already existing projects or start their own.
+
+I'll start by explaining what open source software is and after that we'll discuss it's bright sides and dark corners...
 
 We'll then discuss what's the impact of the open source projects on a more global level. Finally, I'll give a concrete example by briefly describing my personal story - my last two years working on open source software.
 
@@ -31,6 +33,8 @@ In this specific article, I'll discus open source into the context of the one of
 In short, open source software means that when you create a program or a module, you release it publicly available. You provide it to the world for free. You release not only the software itself but also its source code. You can think of the source code as the list of instructions which you've typed in order to make the computer to do something. This will allow everyone else with some technical knowledge to copy this software, to modify it, to distribute it by their own, to build it, to use it, to sell it (yes, that's possible), to teach people how to use it...It allows everyone to do anything they want with your software! With your work.
 
 ## Giving your work for free...
+
+*In the beginning I mentioned that I'd want to encourage people to contribute to open source software. Well, unfortunately it's not all sunshines and rainbows. There are some things that you need to be aware of from the beginning. The next paragraphs are not to discourage anyone, I think that it'll be easier to set the right mindset and balance if you're familiar with some of the dark sides from the beginning.*
 
 I know this sounds very absurd to a lot of people. Giving your work for free. Work requires resources, like time, food, water, etc. and these resources are not free. Why would you give your work for free then? This is a mind gap that a lot of people cannot cross.
 
