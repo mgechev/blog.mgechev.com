@@ -4,14 +4,14 @@ categories:
 - Open source
 - People
 - Technology
-date: 2017-12-11T00:00:00Z
-draft: true
+date: 2017-12-18T00:00:00Z
+draft: false
 tags:
 - Open source
 - People
 - Technology
-title: Two Years Open Source.
-url: /2017/12/11/two-years-open-source/
+title: Follow Your Dream Career with Open Source. Personal Story.
+url: /2017/12/18/career-development-open-source-get-started/
 ---
 
 This time I'll violate my principle to write only about purely technical topics in my blog. In the next a couple of paragraphs I'll talk about open source software development from a personal perspective. Here are some of the ideas that you can find below:
@@ -38,6 +38,8 @@ In short (and not precisely accurate), open source software means a software mod
 
 Having the source code out there, allows everyone with some technical knowledge to copy the software, to build it, to modify it, to distribute it by their own, to use it, to sell it (yes, that's possible), to understand how it works, to teach people how to use it...It allows everyone to do anything they want with your software! With your work.
 
+<img src="/images/open-source/logo.png" style="display: block; margin: auto" alt="Open source">
+
 # Giving your work for free...
 
 *In the beginning I mentioned that I'd want to encourage people to contribute to open source software. Well, unfortunately open source, just like anything else in life, is not all sunshines and rainbows. In the next paragraphs I'll discuss some of the disappointments that I've faced over the years. I think that it'll be easier to set the right mindset, expectations and balance if you're familiar with some of the dark sides from the beginning.*
@@ -48,7 +50,7 @@ And the truth is that although there are some open source projects out there whi
 
 On the other hand, there are a lot of developers and corporations who are using a lot of open source software and they are making money out of that. In the end, the open source is coming for free, isn't it?
 
-### Guilt and Burnouts
+## Guilt and Burnouts
 
 I already mentioned that when you're doing open source in your spare time you're generally working for free. In fact, not only working for free but often making money for companies using your projects!
 
@@ -56,7 +58,7 @@ Well, that's not the worst. **You're not only giving your spare time without get
 
 I've had people, using my projects, shouting at me because I haven't solved their work problem during my weekend. This can definitely be stressful. **Getting often pressured by people makes you feel obligated to solve their problems. You feel guilty if you don't.** You feel guilty if you don't work on your open source projects over the weekend, because there are people who want more features or who have found a bug. There are interesting [talks](https://www.youtube.com/watch?v=UIDb6VBO9os) and [articles](http://thejameskyle.com/dear-javascript.html) on the topic.
 
-<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/UIDb6VBO9os?ecver=2" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+<div style="margin-top: 20px; margin-bottom: 20px; margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/UIDb6VBO9os?ecver=2" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
 There's no easy cure for this. My only suggestion would be [this](https://www.youtube.com/watch?v=9v99hclktVA).
 
@@ -64,7 +66,7 @@ There's another problem which directly relates to the negativity. At some point,
 
 This is how you **burnout**.
 
-### Dealing with Burnouts
+## Dealing with Burnouts
 
 People often state that burnouts happen when you take more work that you can handle. I'm not certain that this statement is correct. I burnout when I face similar problems over and over again and I don't feel sense of progress. I've experienced this with a few of my work and open source projects. In fact, on average I experience this 3 times a year. **The best solution for burnouts that I have found is to start something new. Something fun**, and of course [this](https://www.youtube.com/watch?v=9v99hclktVA).
 
@@ -90,7 +92,7 @@ The code is already out there so you can read it, but that's not the only thing 
 
 How does the contribution work? Well, imagine you find open source project and you're really interested in the problem that it solves. You find an issue in the project, or you open its issue tracker and find already reported one. Since you're interested in the problem domain, you can go through the project's source code and find out how it works, and fix the issue. This is not necessarily easy, it strongly depends on the project and the problem it solves. For some projects it can be a lot of work. Important thing to keep in mind here is - **do not get frustrated, just keep digging until you figure it out**. If you get frustrated from the artificial feeling that everything for you goes too slow...much slower that for everyone else, I'd strongly recommend you to watch the talk "[The Myth of the Genius Programmer](https://www.youtube.com/watch?v=0SARbwvhupQ)":
 
-<div style="position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/0SARbwvhupQ?ecver=2" width="480" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+<div style="margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:75.0%"><iframe src="https://www.youtube.com/embed/0SARbwvhupQ?ecver=2" width="480" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
 In case you want to get involved into a mature and technically complicated project, the reality is that you'll have to dig into its source code for days, maybe even weeks until you figure out how it works. The good news is that if you don't have that time you can contribute to the project's documentation pretty easily. Trust me, such contribution will be greatly appreciated. A lot of beginners (and not only) in the open source community started exactly with documentation when they get interested in given project. If, however, you want to get involved into something technically challenging **don't be afraid to ask questions and to get your hands dirty**. Do not think that everyone else contributing to the project's codebase is a genius. The difference between you and everyone else in the list of contributors is the domain knowledge, which helps to advance easier. Keep in mind that the other contributors are almost always willing to assist new comers who want to help!
 
@@ -106,6 +108,8 @@ I've had similar experiences. Because of my active contributions to the AngularJ
 
 I had the opportunity to get technical reviews from Miško Hevery, the creator of AngularJS and Angular, and other engineers from the Angular team. Later, I had the privilege to get technical review from Miško himself for my book - "[Switching to Angular](https://www.amazon.com/Switching-Angular-version-Googles-long-term/dp/1788620704)". You can't imagine how valuable such experience is!
 
+<img src="/images/open-source/best.png" style="display: block; margin: auto" alt="The Best">
+
 ## Popularity and Reputation
 
 We already made it clear that open source can be a great source of wisdom. Having the chance to work with the best software engineers in the world, [Turing Award](https://en.wikipedia.org/wiki/Turing_Award) winners, etc. That's not the only direction the open source software could be helpful, though. **It can also increase your recognition and reputation in your community.**
@@ -116,13 +120,17 @@ Over the past 2-3 of years I've been contributing to a lot of open source projec
 
 I've had a job interview where my interviewers told me - "Hey, do you know that we're using your Angular seed project in production? Also, we run codelyzer in our CI!". It was pretty cool experience to see two of my projects being used as foundation in their project!
 
+<img src="/images/open-source/talks.jpg" style="display: block; margin: auto" alt="Talks">
+
 ## Friendships
 
 I've heard [Igor Minar](https://twitter.com/igorminar) saying many times: "**It's not about the software, it's about the people.**".
 
 It really is. **I've found some of my best friends around open source projects that I've either developed or contributed to.** One of the best communities I've been in is the one around the Angular project. This community is always welcoming, positive, with a lot of bright people you can share ideas with.
 
-In the conferences I've spoken in the last years, I met hundreds of people and made friends from tens of countries, including but not limited to: Germany, Russia, Bulgaria, UK, USA, Canada, China, Japan, Taiwan, Spain, Colombia, Brazil, France, Serbia, Greece, Italy, Sweden, Netherlands, and many others.
+In the conferences I've spoken in the last years, I met hundreds of people and made friends from tens of countries, including but not limited to: Germany, Russia, Bulgaria, UK, USA, Canada, China, Japan, Taiwan, Spain, Colombia, Brazil, France, Serbia, Greece, Italy, Sweden, Netherlands, Turkey, and many others.
+
+<img src="/images/open-source/friendships.jpg" style="display: block; margin: auto" alt="Friendships">
 
 ## Finding your Dream Job!
 
@@ -150,7 +158,7 @@ Jim Carrey had an [amazing speech](https://www.mum.edu/whats-happening/graduatio
 
 > How will you serve the world? What do they need that your talent can provide? That’s all you have to figure out. As someone who has done what you are about to go do, I can tell you from experience, the effect you have on others is the most valuable currency there is.
 
-<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/V80-gPkpH6M?ecver=2" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+<div style="margin-top: 20px; margin-bottom: 20px; margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/V80-gPkpH6M?ecver=2" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 
 # Recognition
 
@@ -165,10 +173,14 @@ Here are few examples from my personal experience. In 2016 I had the chance to b
 
 As the only laureate with two awards in the history of the the "John Atanasoff" award, for me this was a dream coming true.
 
+<img src="/images/open-source/president-award.jpg" style="display: block; margin: auto" alt="President Award">
+
 # Conclusions
 
-The open source software development is the simple act of releasing your project together with its source code or contributing to other open source projects. It's so simple activity and in the same time so powerful for our career and personal development. It is a fast and generous way to provide valuable global impact.
+The open source software development is the simple act of releasing your project together with its source code or contributing to other open source projects. It's so simple activity and in the same time so powerful for our careers and personal development. It is a fast and generous way to provide valuable global impact.
 
 Of course, it has it's downsides but as an open source contributor and maintainer for the past years, I can confidently state that my open source contributions have had the biggest positive impact on my professional career.
 
 Doing software development we often get captured by purely technical aspects of the problem domain and we forget what's most important - the people. In the end, it's not about the software, it's about the people.
+
+*You can find more about my personal story [here](/story).*
