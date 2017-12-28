@@ -4,14 +4,14 @@ categories:
 - Open source
 - People
 - Technology
-date: 2017-12-18T00:00:00Z
+date: 2017-12-28T00:00:00Z
 draft: false
 tags:
 - Open source
 - People
 - Technology
 title: Follow Your Dream Career with Open Source. Personal Story.
-url: /2017/12/18/career-development-open-source-get-started/
+url: /2017/12/28/career-development-open-source-get-started/
 ---
 
 This time I'll violate my principle to write only about purely technical topics in my blog. In the next a couple of paragraphs I'll talk about open source software development from a personal perspective. Here are some of the ideas that you can find below:
