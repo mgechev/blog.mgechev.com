@@ -14,6 +14,8 @@ title: Follow Your Dream Career with Open Source. Personal Story.
 url: /2017/12/28/career-development-open-source-get-started/
 ---
 
+<meta property="og:image" content="/images/open-source/friendships.jpg"/>
+
 This time I'll violate my principle to write only about purely technical topics in my blog. In the next a couple of paragraphs I'll talk about open source software development from a personal perspective. Here are some of the ideas that you can find below:
 
 - Explanation what open source software is.
