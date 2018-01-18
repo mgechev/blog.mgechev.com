@@ -286,6 +286,28 @@ This brings several improvements:
 - `next` has now type `Dispatch<IStore>`, thanks to the `MiddlewareAPI<IStore>` annotation.
 - `action` now brings some extra semantics, for instance, we can access its `type` property and in case of a conditional statement, we can use the provided by TypeScript control flow type inference.
 
+**Note** that, depending on the version of the redux type definitions you use, you may need to take advantage of the open interfaces of TypeScript and improve the `Middleware` declaration:
+
+```typescript
+import { MiddlewareAPI } from 'redux';
+
+declare module 'redux' {
+  export interface Middleware<T = any> {
+    <T>(api: MiddlewareAPI<T>): (next: Dispatch<T>) => Dispatch<T>;
+  }
+}
+```
+
+Otherwise, you may get the error:
+
+```typescript
+[ts]
+Type '<S>({ getState }: MiddlewareAPI<IStore>) => (next: Dispatch<S>) => <A extends Action>(action: A) ...' is not assignable to type 'Middleware'.
+  Types of parameters '__0' and 'api' are incompatible.
+    Type 'MiddlewareAPI<S>' is not assignable to type 'MiddlewareAPI<IStore>'.
+      Type 'S' is not assignable to type 'IStore'.
+```
+
 # Conclusion
 
 Redux provides a lovely architectural pattern which allows us to isolate the side-effects and keep most of our codebase pure. This way, the state management of our application gets much more predictable.
