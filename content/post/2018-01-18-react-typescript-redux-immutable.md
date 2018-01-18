@@ -239,7 +239,7 @@ export const plainObjectMiddleware = store => next => (a: any) => {
 };
 ```
 
-# Broken Middleware Declaration
+# Improved Middleware Declaration
 
 By default the TypeScript's type definitions for redux come with the following middleware interface:
 
