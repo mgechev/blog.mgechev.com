@@ -661,7 +661,13 @@ In case the program that we want to type check is the following:
 
 The diagnostics that the compiler will produce will be as follows:
 
-<img src="/images/typed-lambda/compile-time-errors.png" alt="Compile-time errors"  style="display: block; margin: auto;">
+<pre style="font-family: Fira Code, monospace; font-size: 13px; padding: 10px; overflow: auto; background-color: #292929;">
+~/Projects/typed-calc <span style="color: #F22A2F">master</span> <span style="color: #FED669">❯</span> <span style="color: #C0C3C0">node index.js demo/incorrect1.lambda</span>
+<span style="color: #96A651">Evaluating "demo/incorrect1.lambda".</span>
+
+<span style="color: #BA4E50">Incorrect type of IsZero</span>
+<span style="color: #BA4E50">Incorrect type of application</span>
+</pre>
 
 ## Developing the Interpreter
 
