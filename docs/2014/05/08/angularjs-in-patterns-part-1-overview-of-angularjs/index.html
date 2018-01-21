@@ -1,0 +1,373 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="Articles about computer science, Angular, JavaScript, and compilers.">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>AngularJS in Patterns (Part 1). Overview of AngularJS &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+  <div class="book">
+    <div>
+      <a href="https://www.packtpub.com/web-development/switching-angular-third-edition" target="_blank">
+        <img src="/images/sta.png" width="60">
+      </a>
+      <div class="book-description">
+        <h2 style="margin-bottom: 5px; margin-top: 0; font: italic 19px/1.3em Georgia, serif">Check my new book!</h2>
+        <h1 style="margin-top: 0">Switching to Angular <span>version 5 and above</span></h1>
+        <div>Learn Angular from Google Developer Expert, core contributor,<br>
+          international speaker and co-author of the Angular style guide.<br>
+          <a href="/story" style="padding: 0">More about the author here.</a></div>
+        <span class="code" style="visibility: hidden">Use code <b>EBSTATD40</b> for 40% Discount</span>
+      </div>
+    </div>
+  </div>
+  <div class="link-wrapper">
+	
+	
+		<a href='http://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.com/post'>Posts</a>
+	<a href='http://blog.mgechev.com/about'>About</a>
+  </div>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        AngularJS in Patterns (Part 1). Overview of AngularJS
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2014-05-08-angularjs-in-patterns-part-1-overview-of-angularjs.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · May 8, 2014
+                    · 1243 words
+                    · 6 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.com/tags/angularjs">AngularJS</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/angularjs-overview">AngularJS overview</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/design-patterns">Design patterns</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/development">Development</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/object-oriented-programming">Object-Oriented Programming</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/patterns">patterns</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/programming">Programming</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/software-engineering">Software engineering</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/web-application">web application</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>In this series of blog posts I’m going to cover the paper I’m writing at <a href="https://github.com/mgechev/angularjs-in-patterns">GitHub</a>.</p>
+
+<p>It aims to provide a bit more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.</p>
+
+<p>Part one includes only a high level overview of AngularJS, enjoy it.</p>
+
+<h1 id="angularjs-overview">AngularJS overview</h1>
+
+<p>AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better – the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:</p>
+
+<ul>
+<li>two-way data binding</li>
+<li>dependency injection</li>
+<li>separation of concerns</li>
+<li>testability</li>
+<li>abstraction</li>
+</ul>
+
+<p>The separation of concerns is achieved by dividing each AngularJS application into separate components, such as:</p>
+
+<ul>
+<li>partials</li>
+<li>controllers</li>
+<li>directives</li>
+<li>services</li>
+<li>filters</li>
+</ul>
+
+<p>These components can be grouped inside different modules, which helps to achieve higher level of abstraction and handle complexity. Each of the components encapsulates specific piece of the application’s logic.</p>
+
+<h2 id="partials">Partials</h2>
+
+<p>The partials are HTML strings. They may contain AngularJS expressions inside the elements or their attributes. One of the distinctions between AngularJS and the others frameworks is the fact that AngularJS’ templates are not in an intermediate format, which needs to be turned into HTML (which is the case with mustache.js and handlebars, for example).</p>
+
+<p>Initially each SPA loads index.html file. In the case of AngularJS this file contains a set of standard and custom HTML attributes, elements and comments, which configure and bootstrap the application. Each sub-sequenced user action requires only load of another partial or change of the state of the application, for example through the data binding provided by the framework.</p>
+
+<p>Sample partial</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">html</span> <span class="na">ng-app</span><span class="p">&gt;</span>
+ <span class="c">&lt;!-- Body tag augmented with ngController directive  --&gt;</span>
+ <span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;MyController&quot;</span><span class="p">&gt;</span>
+   <span class="p">&lt;</span><span class="nt">input</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&quot;foo&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;bar&quot;</span><span class="p">&gt;</span>
+   <span class="c">&lt;!-- Button tag with ng-click directive, and</span>
+<span class="c">          string expression &#39;buttonText&#39;</span>
+<span class="c">          wrapped in &quot;{{&quot;{{ &quot;}}}}&quot; markup --&gt;</span>
+   <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;changeFoo()&quot;</span><span class="p">&gt;</span>{{&quot;{{buttonText&quot;}}}}<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+   <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;angular.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+ <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>With AngularJS expressions partials define what kind of actions should be performed for handling different user interactions. In the example above the value of the attribute ng-click states that the method changeFoo of the current scope will be invoked.</p>
+
+<h2 id="controllers">Controllers</h2>
+
+<p>The AngularJS controllers are JavaScript functions, which help handling the user interactions with the web application (for example mouse events, keyboard events, etc.), by attaching methods to the scope. All required external, for the controllers, components are provided through the Dependency Injection mechanism of AngularJS. The controllers are also responsible for providing the model to the partials by attaching data to the scope. We can think of this data as view model.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MyController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">buttonText</span> <span class="o">=</span> <span class="s1">&#39;Click me to change foo!&#39;</span><span class="p">;</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">changeFoo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Foo changed&#39;</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>For example, if we wire the sample controller above with the partial provided in the previous section the user will be able to interact with the application in few different ways.</p>
+
+<p>Change the value of foo by typing in the input box. This will immediately reflect the value of foo because of the two-way data binding.<br />
+Change the value of foo by clicking the button, which will be labeled Click me to change foo!.<br />
+All the custom elements, attributes, comments or classes could be recognized as AngularJS directives if they are previously defined as ones.</p>
+
+<h2 id="scope">Scope</h2>
+
+<p>In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contain different properties – primitives, objects or methods. All methods attached to the scope can be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.</p>
+
+<p>Another important characteristic of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke methods of its parents since they are properties of its direct or indirect prototype.</p>
+
+<p>Scope inheritance is illustrated in the following example:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;BaseCtrl&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;child&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;ChildCtrl&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;parent-method&quot;</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;foo()&quot;</span><span class="p">&gt;</span>Parent method<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;bar()&quot;</span><span class="p">&gt;</span>Child method<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">BaseCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Base foo&#39;</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">ChildCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Child bar&#39;</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>div#child is associated with ChildCtrl but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl), the method foo is accessible by button#parent-method.</p>
+
+<h2 id="directives">Directives</h2>
+
+<p>In AngularJS the directives are the place where all DOM manipulations should be placed. As a rule of thumb, when you have DOM manipulations in your controller you should create a new direcrive or consider refactoring of already existing one, which could handle the required DOM manipulations.<br />
+Each directive has a name and logic associated with it. In the simplest case the directive contains only name and definition of *postLink* function, which encapsulates all the logic required for the directive. In more complex cases the directive could contain a lot of properties such as:</p>
+
+<ul>
+<li>template</li>
+<li>compile function</li>
+<li>link function</li>
+<li>etc&hellip;</li>
+</ul>
+
+<p>By citing the name of the directives they can be used inside the declarative partials.</p>
+
+<p>Example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;alertButton&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;button ng-transclude&gt;&lt;/button&gt;&#39;</span><span class="p">,</span>
+    <span class="nx">scope</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">content</span><span class="o">:</span> <span class="s1">&#39;@&#39;</span>
+    <span class="p">},</span>
+    <span class="nx">replace</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span>
+    <span class="nx">transclude</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">el</span><span class="p">.</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">alert</span><span class="p">(</span><span class="nx">scope</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">alert-button</span> <span class="na">content</span><span class="o">=</span><span class="s">&quot;42&quot;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">alert-button</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>In the example above the tag <alert-button></alert-button> will be replaced by a button element. When the user clicks on the button, the string 42 will be alerted.</p>
+
+<p>Since the intent of this paper is not to explain the complete API of AngularJS, we will stop with the directives here.</p>
+
+<h2 id="filters">Filters</h2>
+
+<p>The filters in AngularJS are responsible for encapsulating logic required for formatting data. Usually filters are used inside the partials but they are also accessible in the controllers, directives, services and other filters through Dependency Injection.</p>
+
+<p>Here is definition of a sample filter, which turns given string to uppercase:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="s1">&#39;uppercase&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nx">str</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">();</span>
+  <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Inside a partial this filter could be used using the Unix’s piping syntax:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>{{ &quot;{{ name | uppercase &quot; }}}}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>Inside a controller the filter could be used as follows:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MyCtrl</span><span class="p">(</span><span class="nx">uppercaseFilter</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">uppercaseFilter</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span> <span class="c1">//FOO</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<h2 id="services">Services</h2>
+
+<p>Every piece of logic, which doesn’t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too “fat” the repetitive code should be placed inside a service.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;Developer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">motherLanguage</span> <span class="o">=</span> <span class="s1">&#39;JavaScript&#39;</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">live</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">code</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>The service could be injected inside any component, which supports dependency injection (controllers, other services, filters, directives).</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MyCtrl</span><span class="p">(</span><span class="nx">developer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">developer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Developer</span><span class="p">();</span>
+  <span class="nx">developer</span><span class="p">.</span><span class="nx">live</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
+
+
+
+    </body>
+</html>

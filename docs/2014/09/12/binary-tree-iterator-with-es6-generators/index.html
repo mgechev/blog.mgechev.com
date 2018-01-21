@@ -1,0 +1,284 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="Articles about computer science, Angular, JavaScript, and compilers.">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>Binary Tree iterator with ES6 generators &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+  <div class="book">
+    <div>
+      <a href="https://www.packtpub.com/web-development/switching-angular-third-edition" target="_blank">
+        <img src="/images/sta.png" width="60">
+      </a>
+      <div class="book-description">
+        <h2 style="margin-bottom: 5px; margin-top: 0; font: italic 19px/1.3em Georgia, serif">Check my new book!</h2>
+        <h1 style="margin-top: 0">Switching to Angular <span>version 5 and above</span></h1>
+        <div>Learn Angular from Google Developer Expert, core contributor,<br>
+          international speaker and co-author of the Angular style guide.<br>
+          <a href="/story" style="padding: 0">More about the author here.</a></div>
+        <span class="code" style="visibility: hidden">Use code <b>EBSTATD40</b> for 40% Discount</span>
+      </div>
+    </div>
+  </div>
+  <div class="link-wrapper">
+	
+	
+		<a href='http://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.com/post'>Posts</a>
+	<a href='http://blog.mgechev.com/about'>About</a>
+  </div>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Binary Tree iterator with ES6 generators
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2014-09-12-binary-tree-iterator-with-es6-generators.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Sep 12, 2014
+                    · 737 words
+                    · 4 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.com/tags/es6">es6</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/harmony">harmony</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/generators">generators</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/javascript">javascript</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/iterator">iterator</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>ES6 specification is being clarified every passed day! One of the key features of the new version of the language are the <a href="https://en.wikipedia.org/wiki/Generator_(computer_programming)">generators</a>.
+Generators (a.k.a. semicoroutines) will play quite important role after they are being officially released. They could be used to simplify the asynchronous control flow of any JavaScript program (look at <a href="https://github.com/visionmedia/co">co</a>). Another important role is using them for creating iterators.</p>
+
+<p>In this blog post we are going to take a look at how could be implemented iterator of binary search tree using the ES6 generators.</p>
+
+<p>Initially I&rsquo;m going to tell a few words about how generators could be used, after that we will look at the iterator design patterns and last, but not least we are going to take a look at the BST (binary search tree) iterator implementation.</p>
+
+<h2 id="getting-started">Getting started</h2>
+
+<h3 id="es6-generators">ES6 generators</h3>
+
+<p>In JavaScript we can define generator by using the following syntax:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span><span class="o">*</span> <span class="nx">generator</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// body</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Once we have defined given generator, we can instantiate it (more preciously we create an <a href="http://en.wikipedia.org/wiki/Generator_(computer_programming)#Uses">iterator</a>) by simply invoking it like a function:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">gen</span> <span class="o">=</span> <span class="nx">generator</span><span class="p">();</span>
+</code></pre></div>
+
+
+<p>Ok, so far we know how to define generators and instantiate them. The interesting part comes when we include the keyword <code>yield</code> into the game. With <code>yield</code> we can suspend the execution of the current generator and change the control flow:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span><span class="o">*</span> <span class="nx">generator</span><span class="p">(</span><span class="nx">param</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">yield</span> <span class="mi">42</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">returnRes</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">param</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">returnRes</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">gen</span> <span class="o">=</span> <span class="nx">generator</span><span class="p">(</span><span class="mf">3.1415926535</span><span class="p">);</span>
+<span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span> <span class="c1">// { value: 42, done: false }</span>
+<span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span> <span class="c1">// { value: 3.1415926535, done: false }</span>
+<span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="mf">1.618</span><span class="p">);</span> <span class="c1">// { value: 1.618, done: true }</span>
+</code></pre></div>
+
+
+<p>Initially we create a new instance of the generator and pass Pi as parameter. Later with <code>yield 42</code> we suspend the execution of the generator. By calling the <code>next</code> method we restore the execution from the last suspension point. By passing argument to <code>next</code> we can get value from the outside of the generator (like in <code>var returnRes = yield param</code>).</p>
+
+<p>So far so good, but some times we want to pass the execution to another generator. For this case we have a special syntax - <code>yield* generator(params)</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span><span class="o">*</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;In foo&#39;</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">yield</span><span class="o">*</span> <span class="nx">bar</span><span class="p">(</span><span class="mf">1.618</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span><span class="o">*</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">param</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;In bar&#39;</span><span class="p">);</span>
+  <span class="k">yield</span> <span class="nx">param</span><span class="p">;</span>
+  <span class="k">return</span> <span class="mi">42</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">();</span>
+<span class="nx">f</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+<span class="nx">f</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+<span class="cm">/**</span>
+<span class="cm">  // In foo</span>
+<span class="cm">  // In bar</span>
+<span class="cm">  // 42</span>
+<span class="cm">*/</span>
+</code></pre></div>
+
+
+<h3 id="iterator-design-pattern">Iterator Design Pattern</h3>
+
+<p>The iterator pattern belongs to the behavioral design patterns. It is used with collections of objects and its main aim is separation of the logic for traversing given collection, from the actual collection&rsquo;s implementation.</p>
+
+<p><img src="/images/patterns/behavioral/iterator.svg" alt="&quot;Iterator&quot;" title="Iterator" /></p>
+
+<p>Big advantage of this design pattern is that the abstract <code>Iterator</code> class provides common interface, which could be later implemented by multiple <code>ConcreteIterators</code>. This way we can traverse different collections (BSTs, linked lists, hash maps, etc.) using the same interface provided by the collection&rsquo;s iterator.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>In this section we&rsquo;ll take a look at the actual implementation of our BST iterator. Since the logic behind the data structure is not in the scope of this blog post, you can take a look at my repository - <a href="https://github.com/mgechev/javascript-algorithms/blob/master/src/data-structures/binary-search-tree.js">javascript-algorithms</a> for additional details.
+In this article we are going to extend the BST&rsquo;s API by adding a method called <code>getIterator</code>.
+Here is its implementation:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">BinaryTree</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getIterator</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">BinarySearchTreeIterator</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">next</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_root</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>In the snippet above, we create new instance of <code>BinarySearchTreeIterator</code> by passing the current BST instance and after that invoking it&rsquo;s <code>next</code> method. The <code>next</code> method of the iterator will return the next element of the collection. Initially, during the creation of the iterator, we need to call it because the <code>next</code> method is actually a generator, so by invoking it we return new instance of the generator.</p>
+
+<p>Here is the implementation of the iterator:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">BinarySearchTreeIterator</span><span class="p">(</span><span class="nx">tree</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_tree</span> <span class="o">=</span> <span class="nx">tree</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">BinarySearchTreeIterator</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">next</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">current</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">current</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span>
+    <span class="nx">current</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_tree</span><span class="p">.</span><span class="nx">_root</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">current</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="k">yield</span><span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">current</span><span class="p">.</span><span class="nx">_left</span><span class="p">);</span>
+  <span class="k">yield</span> <span class="nx">current</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="k">yield</span><span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">current</span><span class="p">.</span><span class="nx">_right</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>You can see that the only difference between the in-order traverse of the BST using iterator and the <a href="https://github.com/mgechev/javascript-algorithms/blob/master/src/data-structures/binary-search-tree.js#L65-L72">one implemented in the BST</a>, is that the iterator uses <code>yield</code>. Different <code>yield</code> syntax is used depending on whether we want to suspend the execution or to &ldquo;redirect&rdquo; it to different generator instead.</p>
+
+<p>Here is how our iterator could be used:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">tree</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BinaryTree</span><span class="p">();</span>
+
+<span class="nx">tree</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="nx">tree</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nx">tree</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+<span class="nx">tree</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">tree</span><span class="p">.</span><span class="nx">iterator</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">current</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">current</span> <span class="o">=</span> <span class="nx">i</span><span class="p">.</span><span class="nx">next</span><span class="p">()).</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">current</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="c1">// 0 1 5 6</span>
+</code></pre></div>
+
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
+
+
+
+    </body>
+</html>

@@ -1,0 +1,299 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<meta name="description" content="Articles about computer science, Angular, JavaScript, and compilers.">
+		<meta name="generator" content="Hugo 0.22-DEV" />
+		<title>Persistent State of ReactJS Component &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="http://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/style.css">
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/firacode/fira.css">
+		
+
+		
+		<link rel="stylesheet" href="http://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="http://blog.mgechev.com/index.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+  <div class="book">
+    <div>
+      <a href="https://www.packtpub.com/web-development/switching-angular-third-edition" target="_blank">
+        <img src="/images/sta.png" width="60">
+      </a>
+      <div class="book-description">
+        <h2 style="margin-bottom: 5px; margin-top: 0; font: italic 19px/1.3em Georgia, serif">Check my new book!</h2>
+        <h1 style="margin-top: 0">Switching to Angular <span>version 5 and above</span></h1>
+        <div>Learn Angular from Google Developer Expert, core contributor,<br>
+          international speaker and co-author of the Angular style guide.<br>
+          <a href="/story" style="padding: 0">More about the author here.</a></div>
+        <span class="code" style="visibility: hidden">Use code <b>EBSTATD40</b> for 40% Discount</span>
+      </div>
+    </div>
+  </div>
+  <div class="link-wrapper">
+	
+	
+		<a href='http://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='http://blog.mgechev.com/post'>Posts</a>
+	<a href='http://blog.mgechev.com/about'>About</a>
+  </div>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Persistent State of ReactJS Component
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2015-03-05-persistent-state-reactjs.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Mar 5, 2015
+                    · 1251 words
+                    · 6 minutes read
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="http://blog.mgechev.com/tags/localstorage">localStorage</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/reactjs">ReactJS</a>
+                          
+                              <a href="http://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>ReactJS is a framework, by facebook, which adds some well known concepts into the UI development. Each UI could be represented as a state machine but when the state of this state machine could be changed from a lot of places everything gets quite messy, complex and buggy. Given view may be rendered differently with the same model passed as parameter if it depends on some global data. A properly implemented ReactJS component, will be rendered the same way when the same &ldquo;input parameters&rdquo; are passed to it. This is based on the well known idea of the <a href="https://en.wikipedia.org/wiki/Pure_function">pure functions</a> (to be more precise the idea is similar but not the same, because each component may have its own state, which can change).</p>
+
+<p>The code from this article could be found <a href="https://github.com/mgechev/react-pstate">at GitHub</a>.</p>
+
+<h2 id="state">State</h2>
+
+<p>Each ReactJS component may have a state. It also accepts properties passed by its ancestors. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>The <code>Ticker</code> has a state, which represents the number of ticks passed. The ticks count is being incremented each second and rendered into a span element.
+If we want to use this component somewhere onto the page we can:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">React</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Ticker</span><span class="o">&gt;&lt;</span><span class="err">/Ticker&gt;, document.getElementById(&#39;container&#39;));</span>
+</code></pre></div>
+
+
+<p>The snippet above will render the component in a container with id <code>container</code>. Once the <code>Ticker</code> has been rendered the ticking will begin.</p>
+
+<p>Another example for component state could be the position (left and top) of a dialog on the screen, boolean flag, which indicates whether given dialog is open or closed, etc.</p>
+
+<h2 id="persistence">Persistence</h2>
+
+<p>The state of each component is a JavaScript object, which is stored into the main memory. This means that each component&rsquo;s state may mutate until page refresh/close of the browser. After that, on page load the component will be initialized with its initial state (in our <code>Ticker</code> example this state will be <code>{ ticks: 0 }</code>).</p>
+
+<p>But what if we want our <code>Ticker</code> to keep ticking from the same value, which it reached before the page refresh? Or if we want the dialog to remain on the same page position as it was before the page was closed?</p>
+
+<p>We have one &ldquo;correct&rdquo; way to do this - we can use the <a href="https://facebook.github.io/flux/docs/overview.html">Flux</a> architecture and save each component&rsquo;s state into a Store. We can then save the Store&rsquo;s value into a persistent storage. So now, on each <code>mousemove</code> event we are going to go through the whole flux process of saving data&hellip;We can do better by saving the data on specific events, for example in our drag &amp; drop case we can save the dialog&rsquo;s position on <code>mouseup</code>.</p>
+
+<p>But do we have to create a new database entry for each drop of the dialog? Isn&rsquo;t it much more suitable to keep this state object into cookies or <code>localStorage</code>? Yes, it is! So now we should have two types of stores:</p>
+
+<ul>
+<li>Persistent Stores</li>
+<li>Cookie/Local storage Stores</li>
+</ul>
+
+<p>Doesn&rsquo;t it gets a bit messy? There is easier way of doing this which doesn&rsquo;t violates the component&rsquo;s &ldquo;pureness&rdquo; that much.</p>
+
+<p>What we can do is:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;{}&#39;</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">));</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save&hellip;There are also some issues with the &ldquo;transactional&rdquo; behavior. What if the <code>localStorage</code> is full and it throws an error? We won&rsquo;t have the state saved persistently so we will have inconsistency between the state in the RAM memory and the one on the disk</p>
+
+<h2 id="mixins">Mixins</h2>
+
+<p>ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality and could be plugged into a component (class, package, component, whatever&hellip;). This is something in-between inheritance and delegation. We can&rsquo;t state that component using given mixin is a subclass of the mixin but it can be considered as subtype of it, since it implements it&rsquo;s interface (we can think of duck typing here - &ldquo;When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck.&rdquo;). Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes or <a href="https://kerflyn.wordpress.com/2012/07/09/java-8-now-you-have-mixins/">interfaces in Java 8</a>).</p>
+
+<p>So we can implement the <code>localStorage.setItem</code> and <code>localStorage.getItem</code> thing into a mixin. But we won&rsquo;t have a big value by this&hellip;What about if we want to have different types of persistent storages? We want to dynamically change the storage from cookies to <code>localStorage</code> or why not even a RESTful API? If we want to make RESTful calls we need to better have asynchronous API, although <code>localStorage</code> accesses the disk synchronously. So obviously we need an <a href="https://en.wikipedia.org/wiki/Adapter_pattern">adapter</a>.</p>
+
+<h2 id="react-pstate">react-pstate</h2>
+
+<p>A few days ago I wrote the <code>react-pstate</code> mixin, which does exactly this - it allows persistence of the state of ReactJS components, through pluggable storage. For example lets take a look at the following example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">ReactPersistentState</span><span class="p">],</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setPState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>This code looks a little bit simpler. We don&rsquo;t use any globals but only instance methods instead. The magic happens in these three lines of code:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span>
+</code></pre></div>
+
+
+<p>Initially we set the persistent storage we are going to use by <code>this.setPState(this.localStorage)</code>, later we set a unique identifier of the component <code>this.setPId('ticker')</code> and after that we restore the component&rsquo;s state if there is such by calling <code>this.restorePState</code>.</p>
+
+<p>In order to save the component&rsquo;s state persistently you can use <code>this.setPState</code>, which has exactly the same interface as <code>this.setState</code>, as first argument it accepts the new state and as second a callback, which will be invoked once the state is set.</p>
+
+<p>But how to change the storage from <code>localStorage</code> to XHR for example? We simply need to pass to <code>setPStorage</code> an object, which implements the following interface:</p>
+
+<ul>
+<li><code>get(id) : Promise</code></li>
+<li><code>set(id, state) : Promise</code></li>
+<li><code>remove(id) : Promise</code></li>
+</ul>
+
+<p>Since we want to have standardized interface for each storage and having asynchronous APIs of the stores, each of these methods should return an ECMAScript 6 promise object. Since not all browsers support it you can use the <a href="https://github.com/jakearchibald/es6-promise">polyfill by Jake Archibald</a>.</p>
+
+<p>You can find this module at my <a href="https://github.com/mgechev/react-pstate">GitHub account</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The mixin seems quite useful. However, it doesn&rsquo;t solve all the problems you might have for persistently storing the state of a component. For example saving the state of a dialog on <code>mousemove</code>, isn&rsquo;t the best thing you can do. This will lead to disk access/HTTP request each few milliseconds. In this case a better way of using <code>react-pstate</code> is by saving it on drag stop. However, it provides you primitives which prevent having code duplication.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="http://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-18060688-3', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
+
+
+
+    </body>
+</html>
