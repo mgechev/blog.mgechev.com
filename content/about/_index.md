@@ -21,8 +21,8 @@ My name is
 
 <ul>
   <li>Currently co-founder & CTO at <a href="https://rhyme.com">Rhyme.com</a>, former member of the Angular mobile team.</li>
+  <li>Awarded by <a href="/story">Google and the President of Bulgaria</a> for the impact of my open source projects.</li>
   <li>At the moment I’m based in San Francisco, California.</li>
-  <li>Awarded by <a href="/story">Google and the President of Bulgaria</a> for my contributions to open source software.</li>
   <li>See <a href="/talks">my recent talks</a>.</li>
   <li>Read <a href="/story">my story</a>.</li>
   <li>You can contact me at <strong>minko at gechev dot io</strong>.</li>
