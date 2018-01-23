@@ -1,6 +1,7 @@
 ---
 author: minko_gechev
-categories: jekyll update
+categories:
+- jekyll
 date: 2014-05-28T16:36:34Z
 title: Using GitHub Pages with Jekyll!
 url: /2014/05/28/welcome-to-jekyll/
