@@ -1,0 +1,53 @@
+<article class="single article-{{ .Source.Path | md5 }}">
+  <div class="header-wrapper">
+    <a href="{{ .Permalink }}" class="thumbnail" title="{{ .Title }}"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">{{ .Title }}</h1>
+        <ul class="p-facts">
+          <li><time datetime="{{ .Lastmod.Format "2006-01-02T15:04:05JST" }}">{{ .Lastmod.Format ( .Site.Params.dateformat | default "Jan 2, 2006") }}</time></li>
+          {{ with .Section }}<li><a href="{{ $.Site.BaseURL }}{{ . | urlize }}/">{{ . }}</a></li>{{ end }}
+          {{ if eq (getenv "HUGO_ENV") "DEV" }}
+          <li>{{ .WordCount }} Words</li>
+          {{ if .IsDraft }}<li style="color: #2196f3;">DRAFT</li>{{ end }}
+          {{ end }}
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  {{ partial "share.html" . }}
+
+  <div class="article-body">{{ .Content }}</div>
+
+  {{ partial "share.html" . }}
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></li>
+        {{ with .Section }}
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{{ $.Site.BaseURL }}{{ . | urlize }}/" itemprop="url"><span itemprop="title">{{ . }}</span></a></li>
+        {{ end }}
+        <li>{{ .Title }}</li>
+      </ol>
+
+      {{ $params := .Params }}
+      {{ range $key, $value := $.Site.Taxonomies }}
+      {{ if isset $params $key }}
+      <ul class="p-facts">
+        <li>
+          <header><a href="{{ $.Site.BaseURL }}{{ $key | urlize }}/">{{ $key }}</a></header>
+          <ul>
+            {{ range (index $params $key) }}
+            <li><a href="{{ $.Site.BaseURL }}{{ $key | urlize }}/{{ . | urlize }}/">{{ . }}</a></li>
+            {{ end }}
+          </ul>
+        </li>
+      </ul>
+      {{ end }}
+      {{ end }}
+    </section>
+  </footer>
+</article>
+
