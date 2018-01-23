@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2013/01/21/functional-programming-with-javascript/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Functional programming with JavaScript - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time.">
+
+<meta property="og:title" content="Functional programming with JavaScript - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2013/01/21/functional-programming-with-javascript/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2013/01/21/functional-programming-with-javascript/">
+<meta name="twitter:title" content="Functional programming with JavaScript - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Functional programming with JavaScript - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2013-01-21T00:00:00JST",
+    "dateModified": "2013-01-21T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-11f29c466a3e8ce0b2a8fb98bbda68a1">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2013/01/21/functional-programming-with-javascript/" class="thumbnail" title="Functional programming with JavaScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Functional programming with JavaScript</h1>
+        <ul class="p-facts">
+          <li><time datetime="2013-01-21T00:00:00JST">Jan 21, 2013</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&title=Functional%20programming%20with%20JavaScript" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&t=Functional%20programming%20with%20JavaScript" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&text=Functional%20programming%20with%20JavaScript&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Functional%20programming%20with%20JavaScript http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>This article is about the functional concepts of JavaScript. Some of them are built-in the languages, others extra implemented but all of them are very common for purely functional languages like Haskell. First I want to tell what I mean with the term purely functional language. These languages are “safe”, they will not make side effect i.e. evaluating an expression won’t change something in the internal state and lead to different result of the same expression when called next time. It seems very strange and useless to “imperative” guys like me, but actually there’s a list of benefits:</p>
+
+<ol>
+<li>Concurrency. We won’t have deadlocks or race conditions simply because we won’t need locks – the data is immutable. It starts to look very promising&hellip;</li>
+<li>Unit testing. We can write unit tests without worry about the state simply because there’s no such thing. We should care only about the arguments of the functions we test.</li>
+<li>Debugging. Simple stack trace is absolutely enough.</li>
+<li>Solid theoretical base. Functional languages are based on the lambda calculus which is a formal system. This theoretical foundation makes the prove of correctness of the programs very straightforward (for example using induction).</li>
+</ol>
+
+<p>I hope these arguments are enough for you to look at the next sections. Now I’ll describe the functional elements in JavaScript and also provide implementations of aspects which are not native but their implementation won’t cost us much.</p>
+
+<h2 id="anonymous-functions">Anonymous functions</h2>
+
+<p>It seems that the functional programming becomes more and more popular. Even in Java 8 we’re going to have anonymous functions, in C# we have them since a long time. The anonymous function is a function which is defined without being bound to an identifier. JavaScript is familiar with this concept. If you’ve used JavaScript for more than simple exercises I’m sure that you’re familiar with them. When you use jQuery that’s probably one of the first things you type:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="c1">//do some stuff</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>The function passed to $(document).ready is exactly an anonymous function. This concept give as great benefits some times especially when we want to keep things DRY.</p>
+
+<p>More about passing functions in the next section&hellip;</p>
+
+<h2 id="high-order-functions">High-order functions</h2>
+
+<p>High-order functions are functions which accepts functions as arguments or returns functions. We can return and pass functions as arguments in C#, Java 8, Python, Perl, Ruby&hellip; The most popular language – JavaScript has these functional elements built-in for a long time. Here is a basic example:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">property</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">endCallback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//Animation here...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">endCallback</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">endCallback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">animate</span><span class="p">(</span><span class="s1">&#39;background-color&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Animation finished&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>In the code above we have function called animate. It accepts as arguments property which should be animated, duration and a callback which should be invoked when the animation is completed. We have this pattern also in jQuery. There are plenty of jQuery methods which accept functions as arguments, for example $.get:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/test.json&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//processing of the data</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Callbacks are everywhere in JavaScript, they are just perfect for asynchronous programming like event handling, ajax requests, clients handling (Node.js) and so on. As I mentioned above you can avoid repeating yourself by using callbacks. They are extremely useful when you want a piece of your code to behave differently based on condition.</p>
+
+<p>We have one more type of high-order functions – ones that return functions. There are many cases in JavaScript when returning a function is great approach. For example when we want to use caching:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* From Asen Bozhilov&#39;s lz library */</span>
+<span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">cache</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">join</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s1">&#39;§&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;§&#39;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">cache</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>We have a variable cache defined in the local scope of the parent function. In each call first will be checked whether the function have been already called with these arguments, if so the result will be returned immediately, otherwise the result will be cached and returned. Even the suggestion that the function will return the same result if it’s called with the same arguments is extremely functional way of thinking&hellip;</p>
+
+<p>Imagine we have this case:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">baz</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">baz</span> <span class="o">+</span> <span class="nx">foo</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">cached</span> <span class="o">=</span> <span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
+<span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2</span>
+<span class="nx">foo</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2</span>
+</code></pre></div>
+
+
+<p>We have function called bar which accepts a single argument – baz and returns the sum of baz and the global foo. When we use memo we make bar cacheable and save a reference to the cacheable copy in the variable cached. When we call cached for first time its being evaluated for first time with argument 1 so it’s body is invoked and the result is 2. After that we increment foo and call the cached again. Now we get the same result (as we must in the pure functional languages) but it’s not the correct one. That’s because we have some kind of state. The state is something which will be considered lately in the Monads section (not the same type of state). Now lets keep our focus on the high-order functions and especially these which return functions.</p>
+
+<h2 id="closures">Closures</h2>
+
+<p>Let’s look at memo again. We have variable called cache which is defined in the lexical scope of the function which returns the cacheable function. This variable is also accessible from the returned function because a closure is created. This is one more element from the functional programming. It’s very wide spread. One of the ways we can implement privacy in JavaScript is using closures:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">articles</span> <span class="o">=</span> <span class="p">[];</span>
+
+    <span class="kd">function</span> <span class="nx">sortArticles</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">articles</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">name</span> <span class="o">-</span> <span class="nx">b</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">getArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">articles</span><span class="p">;</span>
+        <span class="p">},</span>
+        <span class="nx">setArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">articleList</span><span class="p">)</span> <span class="p">{</span>
+           <span class="nx">articles</span> <span class="o">=</span> <span class="nx">articleList</span><span class="p">;</span>
+           <span class="nx">sortArticles</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+<span class="p">}());</span>
+</code></pre></div>
+
+
+<p>In the example above we have object called timeline. It’s the result of the Immediately-Invoked Function Expression (IIFE) which returns an object with properties getArticles and setArticles which is the actual public interface of timeline. Inside of the lexical scope of the IIFE there’s definition of the articles array and sort function, which cannot be called directly using the timeline object.</p>
+
+<p>I’ll end the topic about the high-order functions with ECMAScript 5. Along the years JavaScript gets even more functional elements. One of the things which appear first in our minds when we hear something about functional programming is the map function. It accept as arguments an anonymous function and a list. It applies the function to all elements from the list. map is officially part of ECMAScript 5.</p>
+
+<p>Here is a basic usage of it:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">});</span>
+<span class="c1">//[2,4,6,8]</span>
+</code></pre></div>
+
+
+<p>In the code above map doubles the array. map is not the only function which is so typical for the functional programming languages and added to ECMAScript 5, there are also filter and reduce.</p>
+
+<h2 id="recursion">Recursion</h2>
+
+<p>Another element which is common for almost all modern programming languages is the recursion. It’s function which calls itself inside it’s body:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Above there’s a basic example which shows implementation of factorial using recursion. This concept is very popular so I’ll skip more detailed description.</p>
+
+<h2 id="managing-the-state-monads">Managing the state (Monads)</h2>
+
+<p>Of course, as we saw in the example with memoization, JavaScript is not purely functional language (probably that’s one of the reasons that the language is so popular&hellip;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here’s one by Douglas Crockford:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* Code by Douglas Crockford */</span>
+<span class="kd">function</span> <span class="nx">MONAD</span><span class="p">(</span><span class="nx">modifier</span><span class="p">)</span> <span class="p">{</span>
+    <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+    <span class="nx">prototype</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="kd">function</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">prototype</span><span class="p">);</span>
+        <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span>
+                <span class="kc">undefined</span><span class="p">,</span>
+                <span class="p">[</span><span class="nx">value</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">args</span> <span class="o">||</span> <span class="p">[]))</span>
+            <span class="p">);</span>
+        <span class="p">};</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">modifier</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">modifier</span><span class="p">(</span><span class="nx">monad</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">monad</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">unit</span><span class="p">.</span><span class="nx">method</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift_value</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+        <span class="p">};</span>
+        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nx">result</span> <span class="o">&amp;&amp;</span> <span class="nx">result</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">?</span> <span class="nx">result</span> <span class="o">:</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+        <span class="p">};</span>
+        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Here is a short demo which shows how we can create an I/O monad:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nx">MONAD</span><span class="p">();</span>
+<span class="nx">monad</span><span class="p">(</span><span class="nx">prompt</span><span class="p">(</span><span class="s2">&quot;Enter your name:&quot;</span><span class="p">)).</span><span class="nx">bind</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Hello &#39;</span> <span class="o">+</span> <span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;!&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Anyway, for me using monads in JavaScript looks more like academical exercise than really useful but if we want to work in purely functional manner we can use them.</p>
+
+<h2 id="schönfinkelization-or-simply-curring">Schönfinkelization (or simply Curring)</h2>
+
+<p>Schönfinkelization is a functional transformation which allows as to fill function’s arguments step by step. When the function accept it’s last argument it returns a result. It was originated by Moses Schönfinkel and later re-discovered by Haskell Curry. Here is a sample implementation in JavaScript, by Stoyan Stefanov:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* By Stoyan Stafanov */</span>
+<span class="kd">function</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">slice</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">,</span>
+        <span class="nx">stored_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">new_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">),</span>
+            <span class="nx">args</span> <span class="o">=</span> <span class="nx">stored_args</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">new_args</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>This is basic example using function for solving a quadratic equation:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">quadraticEquation</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">b</span> <span class="o">*</span> <span class="nx">b</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span>
+        <span class="nx">x1</span><span class="p">,</span> <span class="nx">x2</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="s2">&quot;No roots in R&quot;</span><span class="p">;</span>
+    <span class="nx">x1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
+    <span class="nx">x2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">x1</span><span class="o">:</span> <span class="nx">x1</span><span class="p">,</span>
+        <span class="nx">x2</span><span class="o">:</span> <span class="nx">x2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>If we want to fill the function’s arguments one by one we use:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">quadraticEquation</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">temp</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+<span class="nx">temp</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// { x1: 1, x2: 1 }</span>
+</code></pre></div>
+
+
+<p>If you want to use built in the language features instead of using the schonfinkelize function, you can use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind</a>. Since it’s defined in the prototype of the constructor function of all functions you can use it as method of each function. bind creates a new function with specific context and parameters. For example we may have the function:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>Now we apply bind to it:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">newF</span> <span class="o">=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1, 2]</span>
+<span class="nx">newF</span> <span class="o">=</span> <span class="nx">newF</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1,2,3]</span>
+<span class="nx">newF</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">//window, [1,2,3,4]</span>
+</code></pre></div>
+
+
+<p>You have to be careful with bind because it’s not that spread supported. Based on <a href="http://kangax.github.io/es5-compat-table/">kagax ES5 compatibility table</a> IE9+ supports bind.</p>
+
+<p>This has practical application in some cases. Imagine you have a session object. The session key can be generated using complex time-expensive algorithm, it’s generation is required once the user visit our web site. Our session object also should store some kind of information about the user, for example current skin of the web page chosen by the client. Using currying you can call the session generating function, with it’s parameters, once the page load, this will produce the key. After that we can call the function for the user skin. This will produce the session object after the user select a skin but we won’t have overhead because of the complex algorithm which have generated the session key generation (it won’t be sensible by the user).</p>
+
+<h2 id="pattern-matching">Pattern matching</h2>
+
+<p>One of the coolest things I’ve met in the functional programming is the pattern matching. Actually, if I have to be honest I’m not completely sure why I love it so much, probably because of it’s simplicity and the way it breaks the problem into smaller pieces. For example in Haskell you can define factorial like this:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">factorial</span> <span class="mi">0</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">factorial</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span> <span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>It looks pretty cool. You divide a large task to smaller ones and make your solution simpler. When I started to write this article I’ve got an idea to implement something like this in JavaScript but I found out that it’s already implemented. Here is an example from <a href="https://github.com/bramstein/funcy">Bram Stein’s funcy</a>:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">.</span><span class="nx">parameter</span><span class="p">,</span>
+    <span class="nx">fact</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}],</span>
+        <span class="p">[</span><span class="nx">$</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="p">}]</span>
+    <span class="p">);</span>
+</code></pre></div>
+
+
+<p>We have special variable for parameters which is inside fun – fun.parameter. When we call fact with “ – function () { return 1; } will be called, otherwise function (n) { return n * fact(n – 1); }. So cool, right?</p>
+
+<p>I hope that I showed you clear enough all the functional aspects of JavaScript and how beautiful and simple they could be.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&title=Functional%20programming%20with%20JavaScript" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&t=Functional%20programming%20with%20JavaScript" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f&text=Functional%20programming%20with%20JavaScript&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Functional%20programming%20with%20JavaScript http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f21%2ffunctional-programming-with-javascript%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Functional programming with JavaScript</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Computer-science/">Computer science</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Functional-programming/">Functional programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Java/">Java</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/jQuery/">jQuery</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Patterns/">Patterns</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Programming-languages/">Programming languages</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Anonymous-functions/">Anonymous functions</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Closure/">Closure</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Computer-science/">Computer science</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Currying/">Currying</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Functional-programming/">Functional programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/High-order-functions/">High-order functions</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Lambda/">Lambda</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Monads/">Monads</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Pattern-matching/">Pattern matching</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Recursion/">Recursion</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Sch%C3%B6nfinkelization/">Schönfinkelization</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

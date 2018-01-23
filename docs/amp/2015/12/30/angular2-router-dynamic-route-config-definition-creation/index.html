@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2015/12/30/angular2-router-dynamic-route-config-definition-creation/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Dynamically Configuring the Angular&#39;s Router - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+
+<meta property="og:title" content="Dynamically Configuring the Angular&#39;s Router - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2015/12/30/angular2-router-dynamic-route-config-definition-creation/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2015/12/30/angular2-router-dynamic-route-config-definition-creation/">
+<meta name="twitter:title" content="Dynamically Configuring the Angular&#39;s Router - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Dynamically Configuring the Angular&#39;s Router - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2015-12-30T00:00:00JST",
+    "dateModified": "2015-12-30T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &ldquo;Lazy Loading of Route Components in Angular 2&rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.
+This way we can incrementally load the entire application by only requesting the resources required for the individual views."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-761a05d0417af5ebcc4610c5f4e1965e">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2015/12/30/angular2-router-dynamic-route-config-definition-creation/" class="thumbnail" title="Dynamically Configuring the Angular&#39;s Router"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Dynamically Configuring the Angular&#39;s Router</h1>
+        <ul class="p-facts">
+          <li><time datetime="2015-12-30T00:00:00JST">Dec 30, 2015</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&title=Dynamically%20Configuring%20the%20Angular%27s%20Router" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&t=Dynamically%20Configuring%20the%20Angular%27s%20Router" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&text=Dynamically%20Configuring%20the%20Angular%27s%20Router&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Dynamically%20Configuring%20the%20Angular%27s%20Router http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<div class="error-box">
+  <strong>Warning</strong>: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
+</div>
+
+<p>A couple of months ago I wrote <a href="http://blog.mgechev.com/2015/09/30/lazy-loading-components-routes-services-router-angular-2/">&ldquo;Lazy Loading of Route Components in Angular 2&rdquo;</a>, where I explained how we can take advantage of the <code>AsyncRoute</code>s and the <a href="https://en.wikipedia.org/wiki/Proxy_pattern">virtual proxy pattern</a> in Angular 2.</p>
+
+<p>This way we can incrementally load the entire application by only requesting the resources required for the individual views. As result we will decrease the initial load time, which will dramatically improve the user&rsquo;s experience.</p>
+
+<p>The code for this article is available at <a href="https://github.com/mgechev/dynamic-route-creator/blob/master/app/components/app/app.ts">my GitHub account</a>.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>This strategy works great! The only things that we need to provide to the <code>AsyncRoute</code> definition are <code>name</code>, <code>path</code> and a <code>loader</code>.</p>
+
+<p>Inside of the <code>loader</code> function we can have whatever custom logic we want to. The only contract that we sign with the framework is that the <code>loader</code> needs to return a promise:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span> <span class="p">},</span>
+  <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
+    <span class="nx">loader</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/about/about&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span><span class="p">),</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
+  <span class="p">})</span>
+<span class="p">])</span>
+</code></pre></div>
+
+<p>But what if we receive the routes definitions from a remote service and we don&rsquo;t have them during initialization time?</p>
+
+<p>Well, in such case we need to solve the following three problems:</p>
+
+<h3 id="referencing-not-registered-routes-inside-of-a-template">Referencing not registered routes inside of a template</h3>
+
+<p>If we want to reference to a route which is not declared within <code>@RouteConfig</code> by using:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">a</span> <span class="err">[</span><span class="na">routeLink</span><span class="err">]=&quot;[&#39;/</span><span class="na">not-registered</span><span class="err">&#39;]&quot;</span><span class="p">&gt;</span>Not registered<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>We will get a runtime error. This means that we need to implement a behavior in which we can list the available at given point of time routes.</p>
+
+<h3 id="updating-the-routeconfig-s-metadata">Updating the <code>@RouteConfig</code>&rsquo;s metadata</h3>
+
+<p>This is required for consistency. Since the way we register routes in Angular 2 is by using <code>@RouteConfig</code>, we need to make sure that it&rsquo;s always up-to-date, with all the routes available.</p>
+
+<h3 id="dynamically-registering-routes">Dynamically registering routes</h3>
+
+<p>We need to make the framework aware of the new route definition that we received from the remote service. For this purpose we need to play with the router&rsquo;s internals, in order to provide the instructions for loading the new route.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>Lets start by exploring the solution of the first problem:</p>
+
+<h3 id="dynamically-rendering-the-application-s-navigation">Dynamically rendering the application&rsquo;s navigation</h3>
+
+<p>We can define a component called <code>AppNav</code> which receives a list of objects of the type <code>{ name: &quot;Route name&quot;, path: ['/Route', 'Path'] }</code> and renders the navigation:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app-nav&#39;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">ROUTER_DIRECTIVES</span><span class="p">],</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;nav&gt;</span>
+<span class="sb">      &lt;a *ngFor=&quot;#route of routes&quot;</span>
+<span class="sb">        [routerLink]=&quot;route.path&quot;&gt;</span>
+<span class="sb">        {{route.name}}</span>
+<span class="sb">      &lt;/a&gt;</span>
+<span class="sb">    &lt;/nav&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppNav</span> <span class="p">{</span>
+  <span class="kd">@Input</span><span class="p">()</span>
+  <span class="nx">routes</span>: <span class="kt">string</span><span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The component above has a single <code>@Input</code> called <code>routes</code> and uses the <code>ROUTER_DIRECTIVES</code> because of the <code>routerLink</code> directive. Once the <code>routes</code> property changes its template will be populated with the passed value.</p>
+
+<p>We can use this component in the following way:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">app-nav</span> <span class="err">[</span><span class="na">routes</span><span class="err">]=&quot;[</span>
+  <span class="err">{</span> <span class="na">name:</span> <span class="err">&#39;</span><span class="na">Route</span> <span class="na">1</span><span class="err">&#39;,</span> <span class="na">path:</span> <span class="err">[&#39;/</span><span class="na">Path1</span><span class="err">&#39;]</span> <span class="err">},</span>
+  <span class="err">{</span> <span class="na">name:</span> <span class="err">&#39;</span><span class="na">Route</span> <span class="na">2</span><span class="err">&#39;,</span> <span class="na">path:</span> <span class="err">[&#39;/</span><span class="na">Path2</span><span class="err">&#39;]</span> <span class="err">}</span>
+<span class="err">]&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">app-nav</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>So far so good! Now lets see how we can get the list of registered routes and pass them to the directive!</p>
+
+<h3 id="messing-around-with-the-routeconfig-s-metadata">Messing around with the <code>@RouteConfig</code>&rsquo;s metadata</h3>
+
+<p>Lets peek at the semantics of the <code>@RouteConfig</code> decorator. All it does is to add another item to the array of <code>annotations</code> stored as metadata associated with given component. This means that by using the <code>Reflect</code> API we can get all the registered routes!</p>
+
+<p>In order to have better separation of concerns we can isolate the logic for configuring the dynamic routes into a separate class.
+Lets define a class called <code>DynamicRouteConfigurator</code>, which has the following API:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Injectable</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">DynamicRouteConfigurator</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">registry</span>: <span class="kt">RouteRegistry</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="c1">// Gets the list of registered with @RouteConfig routes</span>
+  <span class="c1">// associated with given `component`</span>
+  <span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{...}</span>
+  <span class="c1">// Updates the metadata added by @RouteConfig associated</span>
+  <span class="c1">// with given `component`</span>
+  <span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{...}</span>
+  <span class="c1">// Adds additional `route` to given `component`</span>
+  <span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{...}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now lets define a root component which uses the <code>AppNav</code> component and <code>DynamicRouteConfigurator</code> service we defined:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span>
+  <span class="nx">viewProviders</span><span class="o">:</span> <span class="p">[</span><span class="nx">DynamicRouteConfigurator</span><span class="p">],</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./components/app/app.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;./components/app/app.css&#39;</span><span class="p">],</span>
+  <span class="nx">encapsulation</span>: <span class="kt">ViewEncapsulation.None</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppNav</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">HomeCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span> <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{</span>
+  <span class="nx">appRoutes</span>: <span class="kt">string</span><span class="p">[][];</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{...}</span>
+  <span class="kr">private</span> <span class="nx">getAppRoutes</span><span class="p">()</span><span class="o">:</span> <span class="kt">string</span><span class="p">[][]</span> <span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now lets explore the definition of <code>getRoutes</code>:</p>
+
+<h4 id="getting-the-registered-routes">Getting the registered routes</h4>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&#39;annotations&#39;</span><span class="p">,</span> <span class="nx">component</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&#39;RouteConfig&#39;</span><span class="p">;</span>
+    <span class="p">}).</span><span class="nx">pop</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Above we simply get all the <code>annotations</code> associated with the passed as argument component and extract the declared routes.</p>
+
+<h4 id="updating-the-registered-routes">Updating the registered routes</h4>
+
+<p>The implementation of <code>updateRouteConfig</code> is quite simple as well:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">annotations</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&#39;annotations&#39;</span><span class="p">,</span> <span class="nx">component</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">annotations</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">annotations</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&#39;RouteConfig&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">routeConfigIndex</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;No route metadata attached to the component&#39;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nx">annotations</span><span class="p">[</span><span class="nx">routeConfigIndex</span><span class="p">]</span> <span class="o">=</span> <span class="nx">routeConfig</span><span class="p">;</span>
+  <span class="nx">Reflect</span><span class="p">.</span><span class="nx">defineMetadata</span><span class="p">(</span><span class="s1">&#39;annotations&#39;</span><span class="p">,</span> <span class="nx">annotations</span><span class="p">,</span> <span class="nx">AppCmp</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We loop over all the <code>annotations</code> in order to find the index of the metadata added by the <code>@RouteConfig</code> decorator and when we find it, we update its value. Right after that we update the annotations using <code>Reflect.defineMetadata(...)</code>.</p>
+
+<h4 id="updating-the-navigation">Updating the navigation</h4>
+
+<p>We already have the definition of the <code>AppNav</code> component! Now we can get the registered with <code>@RouteConfig</code> routes  and render links to all of them.</p>
+
+<p>We can populate the list with the links to the routes using the <code>AppNav</code> component, by setting the <code>appRoutes</code>&rsquo; value:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="dynamically-registering-new-routes">Dynamically registering new routes</h3>
+
+<p>Now lets try to asynchronously add another route! We can notice that the <code>DynamicRouteConfigurator</code> has a method called <code>addRoute</code>, so lets use it:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+  <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">_</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">route</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">AboutCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span> <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">dynamicRouteConfigurator</span><span class="p">.</span><span class="nx">addRoute</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="kr">constructor</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+  <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>All we do above is to set a timeout for 1 second, define the <code>About</code> route and add it to the <code>AppCmp</code> using the injected instance of the <code>DynamicRouteConfigurator</code>. As last step we update the value of the <code>appRoutes</code> which will be reflected by the <code>AppNav</code> component.</p>
+
+<h4 id="using-the-routeregistry">Using the RouteRegistry</h4>
+
+<p>Now in order to get complete clarity of the entire implementation lets take a look at the <code>addRoute</code> method defined within the <code>DynamicRouteConfigurator</code>:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">routeConfig</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">);</span>
+  <span class="nx">routeConfig</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">route</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">updateRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>As first step we get all the registered routes associated with the target component by using <code>getRoutes</code>, later we append one additional route and we invoke the <code>updateRouteConfig</code> method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the <code>RouteRegister</code> passed as dependency via the DI mechanism of the framework.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Another point for future improvement of the <code>DynamicRouteConfigurator</code> is to allow further modification of the route configuration, such as deletion of existing routes. Although the <code>RouteRegistry</code> allows this functionality we&rsquo;ll need to touch private APIs (the <code>_routes</code> property of the <code>RouteRegistry</code> instances).</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&title=Dynamically%20Configuring%20the%20Angular%27s%20Router" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&t=Dynamically%20Configuring%20the%20Angular%27s%20Router" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f&text=Dynamically%20Configuring%20the%20Angular%27s%20Router&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Dynamically%20Configuring%20the%20Angular%27s%20Router http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f12%2f30%2fangular2-router-dynamic-route-config-definition-creation%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Dynamically Configuring the Angular&#39;s Router</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Router/">Router</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Router/">Router</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

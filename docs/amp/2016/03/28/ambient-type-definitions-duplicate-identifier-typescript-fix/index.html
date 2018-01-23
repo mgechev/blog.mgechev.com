@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2016/03/28/ambient-type-definitions-duplicate-identifier-typescript-fix/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="Maintaining the angular-seed, I found out that the most common problem for developers using the project is: Duplicate identifier &amp;#39;export=&amp;#39;. (2300)  compilation error.In this quick tutorial I&amp;rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&amp;rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and @types.Intro Before getting any further we need to tell a few words about the ambient type definitions of TypeScript.">
+
+<meta property="og:title" content="Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2016/03/28/ambient-type-definitions-duplicate-identifier-typescript-fix/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="Maintaining the angular-seed, I found out that the most common problem for developers using the project is: Duplicate identifier &amp;#39;export=&amp;#39;. (2300)  compilation error.In this quick tutorial I&amp;rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&amp;rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and @types.Intro Before getting any further we need to tell a few words about the ambient type definitions of TypeScript.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2016/03/28/ambient-type-definitions-duplicate-identifier-typescript-fix/">
+<meta name="twitter:title" content="Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="Maintaining the angular-seed, I found out that the most common problem for developers using the project is: Duplicate identifier &amp;#39;export=&amp;#39;. (2300)  compilation error.In this quick tutorial I&amp;rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&amp;rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and @types.Intro Before getting any further we need to tell a few words about the ambient type definitions of TypeScript.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2016-03-28T00:00:00JST",
+    "dateModified": "2016-03-28T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "Maintaining the angular-seed, I found out that the most common problem for developers using the project is:
+ Duplicate identifier &#39;export=&#39;. (2300)  compilation error.
+In this quick tutorial I&rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and @types.
+Intro Before getting any further we need to tell a few words about the ambient type definitions of TypeScript."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-6d447b5eab2b1955155a51b2684b51aa">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2016/03/28/ambient-type-definitions-duplicate-identifier-typescript-fix/" class="thumbnail" title="Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error</h1>
+        <ul class="p-facts">
+          <li><time datetime="2016-03-28T00:00:00JST">Mar 28, 2016</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&title=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&t=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&text=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>Maintaining the <a href="https://github.com/mgechev/angular-seed"><code>angular-seed</code></a>, I found out that the most common problem for developers using the project is:</p>
+<div class="highlight"><pre><span></span> Duplicate identifier &#39;export=&#39;. (2300)
+</pre></div>
+
+<p>compilation error.</p>
+
+<p>In this quick tutorial I&rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and <code>@types</code>.</p>
+
+<h2 id="intro">Intro</h2>
+
+<p>Before getting any further we need to tell a few words about the ambient type definitions of TypeScript.</p>
+
+<p>If you are familiar with the differences between TypeScript and JavaScript, you can skip this section.</p>
+
+<p>TypeScript is a statically typed language which is a superset of JavaScript. Being statically typed means that once we write our program it needs to go through a phase of compilation. During this phase the compiler performs type checking in order to verify correctness to some extent. For instance:</p>
+<div class="highlight"><pre><span></span><span class="c1">// person-hero.ts</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="p">{</span>
+  <span class="nx">talk() {</span>
+    <span class="c1">// ...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Superhero</span> <span class="kr">extends</span> <span class="nx">Person</span> <span class="p">{</span>
+  <span class="nx">fly() {</span>
+    <span class="c1">// ...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">bar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Person</span><span class="p">();</span>
+
+<span class="nx">bar</span><span class="p">.</span><span class="nx">fly</span><span class="p">();</span>
+</pre></div>
+
+<p>If we try to compile the above file, the TypeScript compiler will throw the following error:</p>
+<div class="highlight"><pre><span></span>$ tsc person-hero.ts
+Property <span class="s1">&#39;fly&#39;</span> does not exists on <span class="nb">type</span> <span class="s1">&#39;Person&#39;</span>.
+</pre></div>
+
+<p>In contrast, if we run the following file with JavaScript:</p>
+<div class="highlight"><pre><span></span>$ node person-human.js
+Uncaught TypeError: bar.fly is not a <span class="k">function</span>
+</pre></div>
+
+<p>Although both scripts throw an error, <code>tsc</code> throws the error <strong>compile-time</strong>, compared to <code>node</code>, which throws the error <strong>runtime</strong>.</p>
+
+<p>Compile-time errors are easy to handle by developers because they are based on a static code analysis performed over their code. This means that the compiler is able to notify the developers about eventual mistakes <strong>before the code reaches the users</strong>.</p>
+
+<p>On the other hand, in case we use <strong>dynamic typing</strong> with JavaScript, we may not find all the errors that we have made. The code of the dynamically typed languages is harder (even impossible in most cases) for advanced static code analysis so it is quite likely to not find the possible issue in our code base even after we deploy it to production.</p>
+
+<h3 id="ambient-type-definitions">Ambient Type Definitions</h3>
+
+<p>Although TypeScript is superset of JavaScript we want to be able to use programs written with TypeScript together with such written in JavaScript. For instance, lets suppose we want to use Angular 2, a framework written in TypeScript, together with jQuery.</p>
+
+<p>TypeScript compiles to JavaScript, which is great. This means that once the TypeScript code has been compiled it can communicate with code written in JavaScript but how to use jQuery within our TypeScript code? Lets take a look at the following example:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// jquery-demo.ts</span>
+<span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>We invoke the <code>$</code> function with a selector. The code above will produce the following compile-time error:</p>
+<div class="highlight"><pre><span></span>$ tsc jquery-demo.ts
+Cannot find name <span class="s1">&#39;$&#39;</span>.
+</pre></div>
+
+<p>This is due the fact that TypeScript is much stricter compared to JavaScript. It cannot relay on the fact that we may have included a reference to jQuery somewhere in our page. TypeScript needs to have <strong>declaration</strong> of <code>$</code>.</p>
+
+<p>That is why the <strong>ambient type definitions</strong> appeared. In order to declare that we have a global function called <code>$</code> what we can do is:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// jquery-definition.ts</span>
+<span class="kr">declare</span> <span class="kd">var</span> <span class="nx">$</span>: <span class="kt">Function</span><span class="p">;</span>
+
+<span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Now if we run:</p>
+<div class="highlight"><pre><span></span>$ tsc jquery-definition.ts
+
+<span class="c1"># Will output the file jquery-definition.js</span>
+</pre></div>
+
+<p>Notice that <code>declare var $: Function</code> is not a definition of the <code>$</code> function but only a <strong>declaration</strong>. In case we run <code>node jquery-definition.js</code> we will still get a run-time error because <code>$</code> is not defined.</p>
+
+<h4 id="why-ambient-type-definitions">Why Ambient Type Definitions?</h4>
+
+<p>The main purpose of the ambient type definitions is that they allow text editors and IDEs to perform advanced static analysis over libraries and frameworks written in JavaScript. This is a great benefit since we are able to get compile-time errors and IntelliSense during development! It is much less likely to hit runtime errors caused by misspelling a property name or just passing an object of an incorrect type to a function.</p>
+
+<h3 id="managing-ambient-type-definitions">Managing Ambient Type Definitions</h3>
+
+<p>TypeScript&rsquo;s compiler can discover type definitions distributed with libraries you use. For instance, if you install Angular 2:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>$ npm i @angular/core
+</code></pre></div>
+
+<p>The corresponding type definitions of the library will be already in <code>node_modules/@angular/core</code> directory. Typically most libraries written in TypeScript distribute their type definitions this way.</p>
+
+<p>However, there&rsquo;s huge percentage of libraries out there which do not distribute their type definitions as part of their packages. It is quite likely to use the ambient type definitions for some of the most popular libraries written in JavaScript such, as jQuery, AngularJS 1.x, React, etc.</p>
+
+<p>A few years back, from <a href="https://github.com/DefinitelyTyped/">DefinitelyTyped</a>, created a CLI (Command-Line Interface) manager called <code>tsd</code>.</p>
+
+<p>Later this tool was deprecated and replaced by the more advanced one - <a href="https://github.com/typings/typings"><code>typings</code></a>. Typings allows us to download the ambient type definitions of the libraries we use.</p>
+
+<p>As part of the released of TypeScript 2, Microsoft <a href="https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/">announced a way</a> to manage the TypeScript external type definitions with the <code>npm</code> registry (so we can use both <code>npm</code> and <code>yarn</code>).</p>
+
+<p>By default as part of <code>tsconfig.json</code>&rsquo;s <code>compilerOptions</code> you can include the <code>lib</code> property. It contains a list of typically used type definitions. This means that if your compilation target is ES5, and you&rsquo;re building for the browser you should include: <code>es5</code> and <code>dom</code>, if you&rsquo;re using ES6 features, than you should include <code>es6</code> and so on. This will automatically include definitions for ES6 features such as <code>Map</code>, <code>Set</code>, etc. and the corresponding type definitions. More about the <code>lib</code> property can be found <a href="https://www.typescriptlang.org/docs/handbook/compiler-options.html">here</a>.</p>
+
+<p>In order to install the ambient type definitions of jQuery using <code>npm</code> you can use:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>$ npm i @types/jquery --save-dev
+</code></pre></div>
+
+<p>Note that you usually want to use the <code>--save-dev</code> flag instead of <code>--save</code> since most likely you don&rsquo;t want the users of your <code>npm</code> package to install the type definitions of your third-party dependencies.</p>
+
+<h3 id="using-ambient-type-definitions">Using Ambient Type Definitions</h3>
+
+<p>So far so good, but now how to use the provided type definition?</p>
+
+<p>In the same directory where we installed jQuery&rsquo;s ambient type definitions, lets create the following file:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// jquery-demo.ts</span>
+
+<span class="c1">/// &lt;reference path=&quot;./node_modules/@types/jquery/index.d.ts&quot;/&gt;</span>
+<span class="kd">let</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">).</span><span class="nx">height</span><span class="p">();</span>
+</code></pre></div>
+
+<p>Although this works, it is not quite flexible. If we change the location of the definition file or the location of any file using the definitions we need to change the value of the <code>path</code> attribute. <code>tsconfig.json</code> allows us to have further flexibility:</p>
+
+<h3 id="tsconfig-json"><code>tsconfig.json</code></h3>
+
+<p>TypeScript defines a configuration file called <code>tsconfig.json</code>. In this file you can provide configuration for the TypeScript compiler. Here is a sample such file:</p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
+  <span class="nt">&quot;compilerOptions&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;es5&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;lib&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dom&quot;</span><span class="p">,</span> <span class="s2">&quot;es6&quot;</span><span class="p">],</span>
+    <span class="nt">&quot;typeRoots&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;./node_modules/@types&quot;</span>
+    <span class="p">]</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;exclude&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;node_modules&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dist&quot;</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;compileOnSave&quot;</span><span class="p">:</span> <span class="kc">false</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In order to hint <code>tsc</code> where to look for the installed external type definitions you can use the <code>typeRoots</code> array, part of <code>compilerOptions</code> of <code>tsconfig.json</code>.</p>
+
+<p>In this file we&rsquo;ve set that we want to use <code>es5</code> as target language and that we want to <strong>exclude</strong> the directories <code>node_modules</code> and <code>dist</code>.</p>
+
+<p>Let&rsquo;s also install <code>@types/core-js</code> in order to have type definitions for the ES6 APIs that we&rsquo;ll use:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>$ npm i @types/core-js
+</code></pre></div>
+
+<p>In the end our directory structure should look like:</p>
+<div class="highlight"><pre><span></span>.
+├── jquery-demo.js
+├── jquery-demo.ts
+├── tsconfig.json
+└── node_modules
+    └── @types
+        ├── jquery
+        │   ├── package.json
+        │   │── types-metadata.json
+        │   └── index.d.ts
+        └── core-js
+            ├── package.json
+            │── types-metadata.json
+            └── index.d.ts
+</pre></div>
+
+<p>Thanks to the <code>tsconfig.json</code> we can compile the <code>jquery-demo.ts</code> file using:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>$ tsc
+</code></pre></div>
+
+<p>And&hellip;we will get all these errors:</p>
+<div class="highlight"><pre><span></span><span class="o">./../</span><span class="p">.</span><span class="nc">npm-packages</span><span class="o">/</span><span class="nt">lib</span><span class="o">/</span><span class="nt">node_modules</span><span class="o">/</span><span class="nt">typescript</span><span class="o">/</span><span class="nt">lib</span><span class="o">/</span><span class="nt">lib</span><span class="p">.</span><span class="nc">es2015</span><span class="p">.</span><span class="nc">core</span><span class="p">.</span><span class="nc">d</span><span class="p">.</span><span class="nc">ts</span><span class="o">(</span><span class="nt">17</span><span class="o">,</span><span class="nt">14</span><span class="o">):</span> <span class="nt">error</span> <span class="nt">TS2300</span><span class="o">:</span> <span class="nt">Duplicate</span> <span class="nt">identifier</span> <span class="s1">&#39;PropertyKey&#39;</span><span class="o">.</span>
+<span class="nt">node_modules</span><span class="o">/</span><span class="p">@</span><span class="k">types</span><span class="o">/</span><span class="nt">core-js</span><span class="o">/</span><span class="nt">index</span><span class="p">.</span><span class="nc">d</span><span class="p">.</span><span class="nc">ts</span><span class="o">(</span><span class="nt">21</span><span class="o">,</span><span class="nt">14</span><span class="o">):</span> <span class="nt">error</span> <span class="nt">TS2300</span><span class="o">:</span> <span class="nt">Duplicate</span> <span class="nt">identifier</span> <span class="s1">&#39;PropertyKey&#39;</span><span class="o">.</span>
+<span class="nt">node_modules</span><span class="o">/</span><span class="p">@</span><span class="k">types</span><span class="o">/</span><span class="nt">core-js</span><span class="o">/</span><span class="nt">index</span><span class="p">.</span><span class="nc">d</span><span class="p">.</span><span class="nc">ts</span><span class="o">(</span><span class="nt">85</span><span class="o">,</span><span class="nt">5</span><span class="o">):</span> <span class="nt">error</span> <span class="nt">TS2687</span><span class="o">:</span> <span class="nt">All</span> <span class="nt">declarations</span> <span class="nt">of</span> <span class="s1">&#39;name&#39;</span> <span class="nt">must</span> <span class="nt">have</span> <span class="nt">identical</span> <span class="nt">modifiers</span><span class="o">.</span>
+<span class="nt">node_modules</span><span class="o">/</span><span class="p">@</span><span class="k">types</span><span class="o">/</span><span class="nt">core-js</span><span class="o">/</span><span class="nt">index</span><span class="p">.</span><span class="nc">d</span><span class="p">.</span><span class="nc">ts</span><span class="o">(</span><span class="nt">145</span><span class="o">,</span><span class="nt">5</span><span class="o">):</span> <span class="nt">error</span> <span class="nt">TS2403</span><span class="o">:</span> <span class="nt">Subsequent</span> <span class="nt">variable</span> <span class="nt">declarations</span> <span class="nt">must</span> <span class="nt">have</span> <span class="nt">the</span> <span class="nt">same</span> <span class="nt">type</span><span class="o">.</span>  <span class="nt">Variable</span> <span class="s1">&#39;</span><span class="cp">[</span><span class="nx">Symbol.unscopables</span><span class="cp">]</span><span class="s1">&#39;</span> <span class="nt">must</span> <span class="nt">be</span> <span class="nt">of</span> <span class="nt">type</span> <span class="s1">&#39;{ copyWithin: boolean; entries: boolean; fill: boolean; find: boolean; findIndex: boolean; keys: ...&#39;</span><span class="o">,</span> <span class="nt">but</span> <span class="nt">here</span> <span class="nt">has</span> <span class="nt">type</span> <span class="s1">&#39;any&#39;</span><span class="o">.</span>
+<span class="nt">node_modules</span><span class="o">/</span><span class="p">@</span><span class="k">types</span><span class="o">/</span><span class="nt">core-js</span><span class="o">/</span><span class="nt">index</span><span class="p">.</span><span class="nc">d</span><span class="p">.</span><span class="nc">ts</span><span class="o">(</span><span class="nt">262</span><span class="o">,</span><span class="nt">5</span><span class="o">):</span> <span class="nt">error</span> <span class="nt">TS2687</span><span class="o">:</span> <span class="nt">All</span> <span class="nt">declarations</span> <span class="nt">of</span> <span class="s1">&#39;flags&#39;</span> <span class="nt">must</span> <span class="nt">have</span> <span class="nt">identical</span> <span class="nt">modifiers</span><span class="o">.</span>
+<span class="o">...</span>
+</pre></div>
+
+<p>This is caused by multiple versions of the same type definitions. In <code>tsconfig.json</code> we have <code>es6</code> as part of the <code>lib</code> array but we also have <code>core-js</code> in <code>node_modules/@types</code>. <strong>The type definitions in <code>core-js</code> overlap with the ones already distributed with TypeScript.</strong> In order to fix this problem we have two options:</p>
+
+<ul>
+<li>Change <code>es6</code> to <code>es5</code> in <code>compilerOptions</code>&rsquo;s <code>lib</code> property. This way TypeScript won&rsquo;t include ES6 type definitions.</li>
+<li>Remove <code>core-js</code> from <code>node_modules</code>. This way TypeScript will use only its internal ES6 type definitions.</li>
+</ul>
+
+<p>Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, <strong>lets drop <code>node_modules/@types/core-js</code></strong>.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>$ rm -rf node_modules/@types/core-js
+</code></pre></div>
+
+<p>If we run <code>tsc</code> again, we&rsquo;ll get the compiled <code>jquery-demo.js</code> file.</p>
+
+<p>We can even remove the <code>&lt;reference/&gt;</code> tag from <code>jquery-demo.ts</code> and everything is still going to work! The behaviour of <code>tsc</code> in this case will be: &ldquo;Take <strong>all</strong> the files and <strong>all</strong> the type definitions from the current directory and all of its subdirectories, <strong>except the ones declared in the <code>exclude</code></strong> array&rdquo;. This means that <strong>we can also manage ambient type definitions with the <code>exclude</code> property in <code>tsconfig.json</code></strong>.</p>
+
+<p>Another option of <code>tsconfig.json</code> that we can use is the <code>files</code> property. If we set it, <code>tsc</code> will consider <strong>only the files listed there plus all the referenced files within them</strong>.</p>
+
+<h3 id="no-namespacing-of-type-definitions">No Namespacing of Type Definitions</h3>
+
+<p>You might be wondering why would we have the same type definitions in both <code>compilerOptions</code>&rsquo;s <code>lib</code> and <code>core-js</code>? The ambient type definitions in <strong>TypeScript cannot be namespaced</strong>. Why not? Well, if we use jQuery in our project and we cannot include two different sets of ambient type definitions since we have a single global <code>jQuery</code> object, so only a single interface.</p>
+
+<h2 id="recap">Recap</h2>
+
+<p>In recap:</p>
+
+<ul>
+<li>TypeScript is statically typed language, which is great since we can catch the errors we do before the users of our software!</li>
+<li>TypeScript adds type definitions through type annotations which help the compiler to perform advanced static code analysis.</li>
+<li>We can take advantage of static typing with non-TypeScript library by using <strong>ambient type definitions</strong> with and install them with <code>npm</code> or <code>yarn</code>.</li>
+<li>The ambient type definitions are not namespaced, they are always global!</li>
+<li>Fix <code>Duplicate *</code> error in TypeScript by using <code>tsconfig.json</code>&rsquo;s <strong>exclude</strong> property and add there the redundant type definitions, or remove them.</li>
+<li>Using <code>&lt;reference/&gt;</code> is considered a bad practice.</li>
+</ul>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&title=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&t=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f&text=Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Managing%20ambient%20type%20definitions%20and%20dealing%20with%20the%20%22Duplicate%20identifier%22%20TypeScript%20error http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f03%2f28%2fambient-type-definitions-duplicate-identifier-typescript-fix%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/TypeScript/">TypeScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Tutorial/">Tutorial</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Basic/">Basic</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/TypeScript/">TypeScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Tutorial/">Tutorial</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Basic/">Basic</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

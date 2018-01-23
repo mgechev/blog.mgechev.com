@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2015/02/06/parsing-binary-protocol-data-javascript-typedarrays-blobs/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Processing Binary Protocols with Client-Side JavaScript - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="Last couple of weeks I&amp;rsquo;m trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I&amp;rsquo;d be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.Because of limitations of the client-side API, JavaScript doesn&amp;rsquo;t has access to plain TCP sockets, there&amp;rsquo;s no full happiness. The second best option would be to use intermediate proxy, which:">
+
+<meta property="og:title" content="Processing Binary Protocols with Client-Side JavaScript - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2015/02/06/parsing-binary-protocol-data-javascript-typedarrays-blobs/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="Last couple of weeks I&amp;rsquo;m trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I&amp;rsquo;d be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.Because of limitations of the client-side API, JavaScript doesn&amp;rsquo;t has access to plain TCP sockets, there&amp;rsquo;s no full happiness. The second best option would be to use intermediate proxy, which:">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2015/02/06/parsing-binary-protocol-data-javascript-typedarrays-blobs/">
+<meta name="twitter:title" content="Processing Binary Protocols with Client-Side JavaScript - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="Last couple of weeks I&amp;rsquo;m trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I&amp;rsquo;d be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.Because of limitations of the client-side API, JavaScript doesn&amp;rsquo;t has access to plain TCP sockets, there&amp;rsquo;s no full happiness. The second best option would be to use intermediate proxy, which:">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Processing Binary Protocols with Client-Side JavaScript - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2015-02-06T00:00:00JST",
+    "dateModified": "2015-02-06T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "Last couple of weeks I&rsquo;m trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I&rsquo;d be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.
+Because of limitations of the client-side API, JavaScript doesn&rsquo;t has access to plain TCP sockets, there&rsquo;s no full happiness. The second best option would be to use intermediate proxy, which:"
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-c774f6c24743fa99a272068de93fa802">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2015/02/06/parsing-binary-protocol-data-javascript-typedarrays-blobs/" class="thumbnail" title="Processing Binary Protocols with Client-Side JavaScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Processing Binary Protocols with Client-Side JavaScript</h1>
+        <ul class="p-facts">
+          <li><time datetime="2015-02-06T00:00:00JST">Feb 6, 2015</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&title=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&t=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&text=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>Last couple of weeks I&rsquo;m trying to build high-performance consumption of binary protocol through the browser. The protocol is running over TCP. In the perfect world I&rsquo;d be talking with the remote TCP server, through TCP sockets, connecting directly from the client-side JavaScript and consuming the received binary data.</p>
+
+<p>Because of limitations of the client-side API, JavaScript doesn&rsquo;t has access to plain TCP sockets, there&rsquo;s no full happiness. The second best option would be to use intermediate proxy, which:</p>
+
+<ul>
+<li>Establishes connection with the client (our client-side JavaScript)</li>
+<li>Establishes TCP connection with the remote TCP server</li>
+<li>Forwards each message from the client to the TCP server and vice versa</li>
+</ul>
+
+<h2 id="history">History</h2>
+
+<h3 id="dark-ages">Dark Ages</h3>
+
+<p>Before the era of the duplex network communication in JavaScript (i.e. before WebSockets, I don&rsquo;t consider long polling as solution), the flow would be something like:</p>
+
+<ul>
+<li>Make XMLHttpRequest to a back-end service (our proxy)</li>
+<li>Translate the request in the back-end service from textual data to binary data, if required</li>
+<li>Forward the request to the target TCP server</li>
+<li>Receive a response by the target server</li>
+<li>Translates the response to textual data, if required</li>
+<li>Response to the XMLHttpRequest</li>
+</ul>
+
+<p>Which wasn&rsquo;t fun, at all. You initiate new POST/GET request for each client request and in case &ldquo;Keep-Alive&rdquo; is not set you might need to open TCP socket for each HTTP connection.</p>
+
+<h3 id="renaissance">Renaissance</h3>
+
+<p>After the era of the WebSockets, but without binary data support, we would:</p>
+
+<ul>
+<li>Send textual data to the remote WebSocket</li>
+<li>Translate the received data by the proxy</li>
+<li>Forward the data to the TCP server</li>
+<li>Receive a response by the remote TCP server</li>
+<li>Translate the response to textual data, if required</li>
+<li>Response to the client&rsquo;s message</li>
+</ul>
+
+<p>I haven&rsquo;t included the initial WebSocket handshake, since there isn&rsquo;t any significant overhead by it, because it is initiated only a single time.</p>
+
+<p>The performance of the second case is much better by a few reasons:</p>
+
+<ul>
+<li>No need to send additional HTTP headers, which in some cases are huge</li>
+<li>Reuse a single TCP connection for each message by the client</li>
+<li>Have duplex connection, which allows you to receive push notifications</li>
+</ul>
+
+<p>Anyway, there&rsquo;s still place of improvement. In the perfect case we want to talk directly to the remote TCP server, without translation of the protocol.</p>
+
+<p>Nowadays, most browsers (even IE10), support transfer of binary data over WebSockets. This allows us to skip two more steps (translate the message sent by the client and response received by the TCP server) and reduce the bandwidth usage (since encoding to base64 will increase the size of the message with around 30%).</p>
+
+<p>Using binary WebSockets, we got something like:</p>
+
+<ul>
+<li>Send binary data to the proxy&rsquo;s WebSocket</li>
+<li>Forward the data to the TCP server</li>
+<li>Receive response by the TCP server</li>
+<li>Forward the data to our client</li>
+</ul>
+
+<p>In the last case our proxy will look something like:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">WebSocketServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;ws&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">wss</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocketServer</span><span class="p">({</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">8081</span> <span class="p">});</span>
+<span class="kd">var</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;net&#39;</span><span class="p">);</span>
+
+<span class="nx">wss</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ws</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">client</span><span class="p">;</span>
+  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Message received&#39;</span><span class="p">);</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">client</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;handshake&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">client</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createConnection</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Connected&#39;</span><span class="p">);</span>
+        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+          <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;handshake&#39;</span><span class="p">,</span>
+          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;success&#39;</span>
+        <span class="p">}));</span>
+      <span class="p">});</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">);</span>
+        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span> <span class="nx">binary</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
+      <span class="p">});</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">);</span>
+        <span class="nx">ws</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">client</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on&#39;</span><span class="p">,</span> <span class="mi">8081</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p>And our high-level architecture will look like:</p>
+
+<p><img src="/images/binary-protocol-processing/client-proxy-server.png" alt="" /></p>
+
+<p>There&rsquo;s a place for improvements in the code above but you get the basic idea - receive binary data and forward it to the remote TCP server, after the handshake was initiated.</p>
+
+<h2 id="processing-binary-data-in-javascript">Processing binary data in JavaScript</h2>
+
+<p>There are a few primitives we&rsquo;re going to use: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray">TypedArray</a> and <a href="https://developer.mozilla.org/en/docs/Web/API/Blob">Blob</a>.</p>
+
+<blockquote>
+<p>The ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer. You can not directly manipulate the contents of an ArrayBuffer; instead, you create one of the typed array objects or a DataView object which represents the buffer in a specific format, and use that to read and write the contents of the buffer.</p>
+</blockquote>
+
+<p>The <code>TypedArray</code>s allow us to process words (with length 8, 16, 32 bits) in order to handle the binary messages received by the proxy. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s1">&#39;ws://127.0.0.1:8081&#39;</span><span class="p">);</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">binaryType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+
+<p>The two possible values for <code>binaryType</code>, of the WebSocket, are <code>arraybuffer</code> and <code>blob</code>. In most cases <code>arraybuffer</code> will be the one, which allows faster processing since it can be used with the synchronous API of the <code>DataView</code>. In case of large pieces of binary data preferable is the <code>blob</code> binary type.</p>
+
+<p>So how would we process the following example, using <code>DataView</code> and <code>arraybuffer</code>:</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>2      U16      framebuffer-width
+2      U16      framebuffer-height
+16 PIXEL_FORMAT server-pixel-format
+4      U32      name-length
+</code></pre></div>
+
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">connection</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">dv</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">getPixelFormat</span><span class="p">(</span><span class="nx">dv</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint32</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;We have width: &#39;</span> <span class="o">+</span> <span class="nx">width</span> <span class="o">+</span>
+      <span class="s1">&#39;px, height: &#39;</span> <span class="o">+</span>
+      <span class="nx">height</span> <span class="o">+</span> <span class="s1">&#39;px, name length: &#39;</span> <span class="o">+</span> <span class="nx">len</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p><code>DataView</code> provides interface, which allows us to read specific data type by providing given offset. For example <code>dv.getUint32(2)</code> will return unsigned 32 bit integer with offset 2 bytes from the beginning of the buffer.</p>
+
+<h3 id="handling-endianness">Handling endianness</h3>
+
+<p>Endianness refer to the convention used to interpret the bytes making up a data word when those bytes are stored in computer memory. For the one-byte data types we don&rsquo;t have any issues handling the byte order, for 16, 32 and 64 we need to do some additional work.</p>
+
+<p>The <code>TypedArray</code>&rsquo;s standard doesn&rsquo;t refer to specific endianness used in them, everything depends on the underlaying machine. The usual byte ordering is little endian, but in order to prevent hard-coded values we can use the function <code>getEndianness</code>:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">getEndianness</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayBuffer</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+  <span class="nx">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xa1</span><span class="p">;</span>
+  <span class="nx">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xb2</span><span class="p">;</span>
+  <span class="nx">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xc3</span><span class="p">;</span>
+  <span class="nx">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xd4</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xd4c3b2a1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">LITTLE_ENDIAN</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xa1b2c3d4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">BIG_ENDIAN</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Unrecognized endianness&#39;</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>Let&rsquo;s take a look at the function&rsquo;s implementation:</p>
+
+<ul>
+<li>Initially we construct an <code>ArrayBuffer</code> with size 4 bytes</li>
+<li>We create array with unsigned 8bit integers, based on the <code>ArrayBuffer</code> we just created</li>
+<li>We create array with unsigned 32bit integers, based on the same <code>ArrayBuffer</code></li>
+<li>We assign 8bit values to all indexes in the 8bit array (<code>0xa1</code>, <code>0xb2</code>, <code>0xc3</code>, <code>0xd4</code>). This is going to change the <code>ArrayBuffer</code> used by both <code>Uint8Array</code> and <code>Uint32Array</code></li>
+</ul>
+
+<p>If the bytes, in the only 32bit word in the second array, keep their initial ordering (i.e. the most significant value is the one we assigned to index 0), the machine has big endian encoding, otherwise it uses little endian.</p>
+
+<p>This snippet is used in my <a href="https://github.com/mgechev/blobreader/blob/master/src/index.js#L6-L22"><code>BlobReader</code> implementation, which you can find at GitHub</a>. <code>DataView</code> handles the endianness by specifying the second argument in it&rsquo;s <code>get</code>-methods. Value <code>true</code> as second argument, indicates that the data which should be read is in little endian encoding, <code>false</code> corresponds to big endian.</p>
+
+<p>So far we can parse short binary strings with the primitives our browser provides (<code>ArrayBuffer</code>, <code>TypedArray</code>s and <code>DataView</code>).</p>
+
+<h3 id="reading-blobs">Reading Blobs</h3>
+
+<p>As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use <code>Blob</code> data instead of <code>ArayBuffer</code>. <code>Blob</code>s could be read using the <code>FileReader</code> API, which is asynchronous by default (always in the main execution thread). <code>Blob</code>s can be read synchronously when used inside <code>Workers</code> with <a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface"><code>FileReaderSync</code></a>.</p>
+
+<p><code>Blob</code> has method in it&rsquo;s prototype called <code>slice</code>. It accepts interval, as two integers, and returns &ldquo;sub-blob&rdquo; composed by the bytes in the interval:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])]);</span>
+<span class="kd">var</span> <span class="nx">subBlob</span> <span class="o">=</span> <span class="nx">blob</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">fr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
+<span class="nx">fr</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">)[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">};</span>
+<span class="nx">fr</span><span class="p">.</span><span class="nx">readAsArrayBuffer</span><span class="p">(</span><span class="nx">subBlob</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p>Each time you want to read specific part of the blob you need to create <code>FileReader</code> instance and eventually slice it. This requires a lot of additional, repetitive work. Also, when you read the code above it is not very semantically clear that you want to read the third element of the array, since there&rsquo;s a lot of additional code around the construction of the <code>FileReader</code> and handling the <code>onload</code> event.</p>
+
+<p>In order to simplify the process of reading <code>Blob</code>s I created <a href="https://github.com/mgechev/blobreader"><code>BlobReader</code></a>, which provides simple interface for reading binary large objects.</p>
+
+<p><code>BlobReader</code> allows you to read blobs in the following fashion:</p>
+
+<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="c1">// Blob definition</span>
+<span class="kd">var</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">uint16</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint16Array</span><span class="p">([</span><span class="mi">3</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">uint82</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">uint32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">([</span><span class="mi">8</span><span class="p">]);</span>
+<span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="nx">uint8</span><span class="p">,</span> <span class="nx">uint16</span><span class="p">,</span> <span class="nx">uint82</span><span class="p">,</span> <span class="nx">uint32</span><span class="p">]);</span>
+
+<span class="c1">// Reading the blob</span>
+<span class="nx">BlobReader</span><span class="p">(</span><span class="nx">blob</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">readUint16</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint82&#39;</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">skip</span><span class="p">()</span>
+<span class="p">.</span><span class="nx">readUint32</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint16</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint32</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>There are shortcut methods for reading the main data types, each of the methods accept name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the <code>commit</code> callback. <code>skip</code> allows you to skip bytes (like padding).</p>
+
+<p>You can lookup the whole API of the library <a href="https://github.com/mgechev/blobreader/tree/master/docs">here</a>.</p>
+
+<h3 id="reducing-the-latency">Reducing the latency</h3>
+
+<p>So far, we improved the protocol processing by using WebSockets instead of HTTP, we transfer binary instead of textual data but we can do one more thing. Now the protocol packets are transmitted between the client-side browser application, the proxy and the TCP server, just like the diagram below:</p>
+
+<p><img src="/images/binary-protocol-processing/client-proxy-server.png" alt="" /></p>
+
+<p>We can reduce the latency by moving the WebSocket proxy to the server machine. This way we will create a thin wrapper around the TCP server, so the data will be transferred locally (we can use something like <a href="https://github.com/kanaka/websockify">websockify</a>).</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The solutions in this blog post are already used in production in different applications/frameworks. As example you can take a look at <a href="https://github.com/FreeRDP/FreeRDP-WebConnect">FreeRDP WebConnect</a>, which is used by <a href="http://www.cloudbase.it/freerdp-html5-proxy-windows/">CloudBase</a>.</p>
+
+<p>Although it looks like doing awesome magic and providing magically legacy services in your browser, you should be aware of some issues:</p>
+
+<h3 id="security">Security</h3>
+
+<p>Make sure you use encrypted connection when required (<code>wss</code>)</p>
+
+<h3 id="performance">Performance</h3>
+
+<p>Although v8 is extremely fast, you may hit some critical performance issues. In these cases you can move parts of the protocol processing in <a href="http://www.html5rocks.com/en/tutorials/workers/basics/"><code>WebWorkers</code></a>.</p>
+
+<h3 id="browser-support">Browser Support</h3>
+
+<p>Not all the features we talked about are widely supported, even in the modern browsers.</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+<li><a href="https://github.com/mgechev/blobreader"><code>BlobReader</code></a></li>
+<li><a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface">FileReader API</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer">ArrayBuffer</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a></li>
+</ol>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&title=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&t=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f&text=Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Processing%20Binary%20Protocols%20with%20Client-Side%20JavaScript http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f02%2f06%2fparsing-binary-protocol-data-javascript-typedarrays-blobs%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Processing Binary Protocols with Client-Side JavaScript</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Binary-Data/">Binary Data</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Blob/">Blob</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/TCP/">TCP</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/WebSockets/">WebSockets</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Blob/">Blob</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Binary-Data/">Binary Data</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

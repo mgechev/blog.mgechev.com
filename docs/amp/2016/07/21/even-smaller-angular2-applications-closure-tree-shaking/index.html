@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="In the post &amp;ldquo;Building an Angular 2 Application for Production&amp;rdquo; we explored how we can decrease the bundle size of a &amp;ldquo;Hello world!&amp;rdquo; application to from about 1.6M (non-minified &amp;amp; uncompressed) to 49K! We did this by using the following techniques: Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!">
+
+<meta property="og:title" content="2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="In the post &amp;ldquo;Building an Angular 2 Application for Production&amp;rdquo; we explored how we can decrease the bundle size of a &amp;ldquo;Hello world!&amp;rdquo; application to from about 1.6M (non-minified &amp;amp; uncompressed) to 49K! We did this by using the following techniques: Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/">
+<meta name="twitter:title" content="2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="In the post &amp;ldquo;Building an Angular 2 Application for Production&amp;rdquo; we explored how we can decrease the bundle size of a &amp;ldquo;Hello world!&amp;rdquo; application to from about 1.6M (non-minified &amp;amp; uncompressed) to 49K! We did this by using the following techniques: Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2016-07-21T00:00:00JST",
+    "dateModified": "2016-07-21T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "In the post &ldquo;Building an Angular 2 Application for Production&rdquo; we explored how we can decrease the bundle size of a &ldquo;Hello world!&rdquo; application to from about 1.6M (non-minified &amp; uncompressed) to 49K! We did this by using the following techniques:
+ Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!"
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-36f1bf407c8b171017a50c10431b7950">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/" class="thumbnail" title="2.5X Smaller Angular 2 Applications with Google Closure Compiler"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">2.5X Smaller Angular 2 Applications with Google Closure Compiler</h1>
+        <ul class="p-facts">
+          <li><time datetime="2016-07-21T00:00:00JST">Jul 21, 2016</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&title=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&t=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&text=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>In the post &ldquo;<a href="http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">Building an Angular 2 Application for Production</a>&rdquo; we explored how we can decrease the bundle size of a &ldquo;Hello world!&rdquo; application to from about 1.6M (non-minified &amp; uncompressed) to 49K! We did this by using the following techniques:</p>
+
+<ul>
+<li>Angular offline template compiler for generating tree-shakable code.</li>
+<li>Tree-shaking of ES2015 modules with rollup.</li>
+<li>Bundling of the application.</li>
+<li>Minification with uglifyjs.</li>
+<li>Compression with gzip.</li>
+</ul>
+
+<p>Although we achieved impressive results we can do even better! In this post I&rsquo;ll show some of the work done by <a href="https://twitter.com/Jakeherringbone">Alex Eagle</a> and <a href="https://twitter.com/jeffbcross">Jeff Cross</a> from the Angular core team.</p>
+
+<div class="warning-box">
+  <strong>Disclaimer</strong>: This article explains a research which uses experimental tools tools which <strong>WILL</strong> change in near future. <strong>Do not</strong> use anything described here in production.
+</div>
+
+<h2 id="closure-compiler">Closure Compiler</h2>
+
+<p>For our purpose we&rsquo;ll use the Google Closure Compiler:</p>
+
+<blockquote>
+<p>The Closure Compiler is a tool for making JavaScript download and run faster. Instead of compiling from a source language to machine code, it compiles from JavaScript to better JavaScript. It parses your JavaScript, analyzes it, removes dead code and rewrites and minimizes what&rsquo;s left. It also checks syntax, variable references, and types, and warns about common JavaScript pitfalls.</p>
+</blockquote>
+
+<p>The steps that we are going to go through this time will be simplified since Closure Compiler can do most of the work for us, such as tree-shaking, minification and bundling! This will help us to reduce the tools from our tool-chain to only ngc and Closure Compiler!</p>
+
+<p>Everything looks like a piece of cake at first, however, there are some complications:</p>
+
+<h2 id="obstacles-incomplete-es2015-module-support">Obstacles - Incomplete ES2015 Module Support</h2>
+
+<p>Fortunately, Google Closure compiler <a href="https://www.reddit.com/r/javascript/comments/3pb750/ecmascript_6_is_now_officially_supported_by/">officially supports ES2015</a>, but unfortunately it supports only a subset of the module syntax. For instance:</p>
+
+<p><strong>bar.js</strong></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</code></pre></div>
+
+<p><strong>index.js</strong></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="o">*</span> <span class="nx">from</span> <span class="s1">&#39;./bar&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+<p><strong>foo.js</strong></p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">bar</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./index&#39;</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
+</code></pre></div>
+
+<p>&hellip;is not supported by Closure Compiler because of <code>export * from ./bar</code>.</p>
+
+<h2 id="solution-goog-module">Solution - <code>goog.module</code></h2>
+
+<p>An alternative module syntax that works well with the compiler is <code>goog.module</code>. Unfortunately the TypeScript compiler doesn&rsquo;t support transpilation to <code>goog.module</code>s. For this purpose we have to use <code>tsc</code> combined with the tool <a href="https://github.com/angular/tsickle"><code>tsickle</code></a> which allows us to hook in the <code>ngc</code> compilation process and emit Closure-friendly ES2015 instead.</p>
+
+<p>In short, we need a custom build of Angular and all of its dependencies to <code>goog.module</code> modules. At this point this is achievable by going through a list of hacky solutions, however, soon the CLI and the <a href="https://github.com/mgechev/angular2-seed">Angular starters</a> will automate this process completely and will eliminate all the boilerplates.</p>
+
+<h2 id="results">Results</h2>
+
+<p><a href="https://github.com/alexeagle">Alex Eagle</a>, posted his experiment <a href="https://github.com/alexeagle/closure-compiler-angular-bundling">on GitHub</a> and shared all the details about the build process in <a href="https://docs.google.com/document/d/17m1GwzXraKgbCkCmH1JnY9IZzPy4cqlpCFVhvlZnOys/edit">this document</a>.</p>
+
+<p>Lets run the build script and see what the bundle size of our Angular application will be!</p>
+
+<p>Note that the build script below requires <code>brotli</code>. Brotli is a tool which implements the brotli general-purpose lossless compression algorithm. For further details visit <a href="https://github.com/google/brotli">Brotli&rsquo;s GitHub</a> repository.</p>
+<div class="highlight"><pre><span></span>$ git clone https://github.com/mgechev/closure-compiler-angular-bundling
+$ <span class="nb">cd</span> closure-compiler-angular-bundling
+$ npm install
+$ npm run build
+</pre></div>
+
+<p>Now if we go to <code>dist</code> we&rsquo;ll find:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> dist
+$ ls -lah
+total <span class="m">344</span>
+drwxr-xr-x   <span class="m">7</span> mgechev  staff   238B Jul <span class="m">21</span> <span class="m">12</span>:18 .
+drwxr-xr-x  <span class="m">15</span> mgechev  staff   510B Jul <span class="m">21</span> <span class="m">12</span>:18 ..
+-rw-r--r--   <span class="m">1</span> mgechev  staff    80K Jul <span class="m">21</span> <span class="m">12</span>:18 bundle.js
+-rw-r--r--   <span class="m">1</span> mgechev  staff    20K Jul <span class="m">21</span> <span class="m">12</span>:18 bundle.js.brotli
+-rw-r--r--   <span class="m">1</span> mgechev  staff    23K Jul <span class="m">21</span> <span class="m">12</span>:18 bundle.js.gz
+-rw-r--r--   <span class="m">1</span> mgechev  staff   <span class="m">3</span>.7K Jul <span class="m">21</span> <span class="m">12</span>:18 property_renaming_report
+-rw-r--r--   <span class="m">1</span> mgechev  staff    32K Jul <span class="m">21</span> <span class="m">12</span>:18 variable_renaming_report
+</pre></div>
+
+<p>20K bundle! We have almost 150% improvement compared to our previous experiments!</p>
+
+<p>In order to make sure that the application works run:</p>
+<div class="highlight"><pre><span></span>$ npm run serve
+</pre></div>
+
+<p>The code from above is hosted in my <a href="https://github.com/mgechev/closure-compiler-angular-bundling">GitHub account</a>.</p>
+
+<h3 id="comparison">Comparison</h3>
+
+<p>On the diagram below you can find how the Google Closure Compiler + ngc bundle stays next to the other ones produced by the different bundling strategies explored in the <a href="http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">previous post</a>:</p>
+
+<p><a href="/images/ng2-build/ngc-closure-compiler-all.png">
+  <img src="/images/ng2-build/ngc-closure-compiler-all.png" alt="ngc + Google Closure Compiler bundle comparison" width="500">
+</a></p>
+
+<p>Since the size amplitude above is huge, the diagram below illustrates how the bundle produced in this post compares to the other compressed bundles from the previous post:</p>
+
+<p><a href="/images/ng2-build/ngc-closure-compiler-smaller.png">
+  <img src="/images/ng2-build/ngc-closure-compiler-smaller.png" alt="ngc + Google Closure Compiler bundle comparison" width="500">
+</a></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>With the advanced compression of Google Closure Compiler we are able to drop the bundle size of a &ldquo;Hello world!&rdquo; application to 20K! However, this came with the price of a few hacks - custom build of Angular and its dependencies to <code>goog.module</code>s. However, in near future the entire process will be completely abstracted and automated. This will allow us to apply advanced build techniques such as offline compilation, tree-shaking, transpilation, compression and minification with only a single command!</p>
+
+<h2 id="references">References</h2>
+
+<p>For further reference take a look at the following resources:</p>
+
+<ul>
+<li><a href="https://github.com/angular/angular/issues/8550">Use Closure Compiler with offline template compiler</a></li>
+<li><a href="https://docs.google.com/document/d/17m1GwzXraKgbCkCmH1JnY9IZzPy4cqlpCFVhvlZnOys/edit">Closure compiler for ng2 optimisation</a></li>
+<li><a href="https://github.com/lucidsoftware/closure-typescript-example">Docker for production build of Angular apps with Google Closure Compiler</a></li>
+</ul>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&title=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&t=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f&text=2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?2.5X%20Smaller%20Angular%202%20Applications%20with%20Google%20Closure%20Compiler http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f21%2feven-smaller-angular2-applications-closure-tree-shaking%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>2.5X Smaller Angular 2 Applications with Google Closure Compiler</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/DevOps/">DevOps</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/rollup/">rollup</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/tree-shaking/">tree-shaking</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/commonjs/">commonjs</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

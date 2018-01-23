@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2015/10/26/angular2-hot-loader-hot-loading-tooling/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Angular 2 Hot Loader - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="A couple of months ago I watched a few talks from ReactEurope. I was truly impressed by a few of them and especially by the one by Dan Abramov on redux and his hot loader. The tool he shown helps you do something similar to live-reload with one big difference. When you change the code of any of the components in your react application, the new version of the component is send to the application itself where all its instances are patched so the changes you did to be visible.">
+
+<meta property="og:title" content="Angular 2 Hot Loader - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2015/10/26/angular2-hot-loader-hot-loading-tooling/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="A couple of months ago I watched a few talks from ReactEurope. I was truly impressed by a few of them and especially by the one by Dan Abramov on redux and his hot loader. The tool he shown helps you do something similar to live-reload with one big difference. When you change the code of any of the components in your react application, the new version of the component is send to the application itself where all its instances are patched so the changes you did to be visible.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2015/10/26/angular2-hot-loader-hot-loading-tooling/">
+<meta name="twitter:title" content="Angular 2 Hot Loader - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="A couple of months ago I watched a few talks from ReactEurope. I was truly impressed by a few of them and especially by the one by Dan Abramov on redux and his hot loader. The tool he shown helps you do something similar to live-reload with one big difference. When you change the code of any of the components in your react application, the new version of the component is send to the application itself where all its instances are patched so the changes you did to be visible.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Angular 2 Hot Loader - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2015-10-26T00:00:00JST",
+    "dateModified": "2015-10-26T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "A couple of months ago I watched a few talks from ReactEurope. I was truly impressed by a few of them and especially by the one by Dan Abramov on redux and his hot loader. The tool he shown helps you do something similar to live-reload with one big difference. When you change the code of any of the components in your react application, the new version of the component is send to the application itself where all its instances are patched so the changes you did to be visible."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-e8cea213f2c6b3475f3d07be5343c4a6">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2015/10/26/angular2-hot-loader-hot-loading-tooling/" class="thumbnail" title="Angular 2 Hot Loader"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Angular 2 Hot Loader</h1>
+        <ul class="p-facts">
+          <li><time datetime="2015-10-26T00:00:00JST">Oct 26, 2015</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&title=Angular%202%20Hot%20Loader" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&t=Angular%202%20Hot%20Loader" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&text=Angular%202%20Hot%20Loader&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Angular%202%20Hot%20Loader http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>A couple of months ago I watched a few talks from <a href="https://www.react-europe.org/">ReactEurope</a>. I was truly impressed by a few of them and especially by the one by Dan Abramov on redux and his <a href="https://github.com/gaearon/react-hot-loader">hot loader</a>. The tool he shown helps you do something similar to <a href="http://livereload.com/">live-reload</a> with one big difference. When you change the code of any of the components in your react application, the new version of the component is send to the application itself where all its instances are patched so the changes you did to be visible. This way the new, changed implementation of the component is rendered on the screen with all the attached functionality to it. In contrast to live-reload, your application does not need to be refreshed when you make a change in your code. This way the current state of the application (selected page/view, fields of your models/store) can be preserved across updates. Although this looks amazingly awesome, the idea and the implementation behind the hot loading is quite clear, especially after Dan&rsquo;s talk. We will take a look at the basic idea in the implementation below.</p>
+
+<p>Last week I <a href="https://www.youtube.com/watch?v=C6e6-31HD5A">gave a talk</a> on <a href="http://angularconnect.com/">AngularConnect</a> (the alternative of ReactEurope for the Angular&rsquo;s community) on <a href="https://github.com/mgechev/aspect.js">aspect-oriented programming with ES2016 decorators</a>. The environment and the organization of the conference were amazing! I met a lot of smart people who motivated me a lot! So in order to show how awesome Angular 2 is, last Sunday I did a quick (and super dirty!) prototype of a hot loader in Angular 2.</p>
+
+<h2 id="demo">Demo</h2>
+
+<p>Here is a sample demo of the prototype I built:</p>
+
+<iframe width="420" height="315" src="https://www.youtube.com/embed/S9pKbi3WrCM" frameborder="0" allowfullscreen></iframe>
+
+<p><strong>The code for the demo could be found at my <a href="https://github.com/mgechev/angular2-hot-loader-demo">GitHub profile</a>.</strong> In the next a couple of sections I&rsquo;ll describe how it works and what are its pros and cons.</p>
+
+<h2 id="basic-architecture">Basic Architecture</h2>
+
+<p><img src="/images/angular2-hot-loader.png" alt="" /></p>
+
+<p>In order to detect all the changes in the components in our application, we need to watch the source code files associated to them. I did this with the <a href="https://www.npmjs.com/package/watch">watch</a> package in npm. Once we detect a change in any of the components we need to send its updated version to application. For this purpose I&rsquo;ve implemented a super basic JSON based protocol via WebSockets, which is responsible for sending updates to the front-end which are basically the ES5 + CommonJS version of the changed components.</p>
+
+<p>In the front-end of the application, we need to include the hot-loader scripts, which basically accepts the code of the changed components and updates all their instances in the rendered application.</p>
+
+<h2 id="handling-the-state">Handling the State</h2>
+
+<p>The tricky part here is to preserve the state of the application itself although we need to patch or rerender the changed component(s). This is an easy task with dumb components (pure components) because they don&rsquo;t hold any state so you can freely rerender them and just populate them with data stored somewhere else in your app. In react this can be achieved by using a flux-like architecture where the state of your application is decoupled from the UI in a module called store. We can approach the exact same way in Angular 2 by taking advantage of flux/redux/whatever. However, in Angular we also have out-of-the-box dependency injection, which can makes our life even easier.</p>
+
+<p>Here is an example of how we can preserve the state of the application by using a singleton services:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">provide</span><span class="p">(</span><span class="nx">NameList</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useValue</span>: <span class="kt">new</span> <span class="nx">NameList</span><span class="p">()</span> <span class="p">})],</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="c1">// ...</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Basically we define a root component called <code>AppCmp</code>, which has a single provider - binding of the <code>NameList</code> services to an instance of the class itself. Since this is a singleton if we are required to rerender the application, even if we need to re-instantiate all the components inside of it they will get the exact same instance of the <code>NameList</code> service.  We can apply this for all the component&rsquo;s dependencies and this way their state can be easily externalized. This allows us to render the new version of the components based on the same state.</p>
+
+<p>You may ask, but what if I hold the state in my component instead? For example, what if I have the following component and I change its <code>_foo</code> field by an input:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Foobar</span> <span class="p">{</span>
+  <span class="nx">_foo</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">set</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_foo</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Well, when new version of any component is delivered to the application state hold by instance variables be lost. React-hot-loader solves this issue by patching the components without re-instantiating them, however, I wasn&rsquo;t able to find a clean way to do this in Angular so far. Does this mean that react is better in sense of hot loading? I wouldn&rsquo;t say so. I might have not considered all the different options for patching the components (I&rsquo;m not completely familiar with Angular 2&rsquo;s code base) and still..since react&rsquo;s components are only being patched, no change in the constructor of the component will be applied to the patched component in the front-end. This means that the state of given an instance of given component can be initialized only ONCE when the instance is rendered for first time. As we can see both approaches (re-instantiating the component on change and only patching its prototype) has their pros and cons.
+However, we can handle all the related to these approaches issues in both Angular 2 and react by using pure components and externalizing their state, which generally is considered as good practice.</p>
+
+<h2 id="current-limitations">Current limitations</h2>
+
+<p>Since the hot loader is based on a couple of hours effort, I wasn&rsquo;t able to make it as well functional as I&rsquo;d want to. The work is still in progress so I&rsquo;d love to hear your opinions on if we can approach better in the component patching. However, here are a few things which work pretty well:</p>
+
+<ul>
+<li>Patching all instances of existing components, including:
+
+<ul>
+<li>Patching changed templates</li>
+<li>Patching of the component&rsquo;s prototype (all methods)</li>
+</ul></li>
+<li>Defining new components in existing files</li>
+<li>Using new components which are defined in existing files</li>
+</ul>
+
+<h3 id="limitations">Limitations</h3>
+
+<ul>
+<li>Works only with TypeScript components and your application build to ES5 &amp; CommonJS (i.e. you can try <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a></li>
+<li>Does not work with components which are annotated with <code>@RouteConfig</code> (easy to fix)</li>
+<li>Does not update the constructor of the existing component if it is changed (easy to fix)</li>
+<li>Does not work with <code>AsyncRoute</code> components (easy to fix)</li>
+<li>Does not work with services &amp; pipes (and probably will never work for services since they need to preserve the state)</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Although hot loading seems super amazing it looks like a hacky solution to a real problem to me. For sure there&rsquo;s much more work to be done in both react-hot-loader and angular2-hot-loader but for sure we&rsquo;re going in the right direction!</p>
+
+<p>The Angular 2 hot loader is pretty much work in progress so be tunned for more functional version which I&rsquo;ll publish on npm! Meanwhile, take a look at the book I&rsquo;m working on <a href="https://www.packtpub.com/web-development/switching-angular-2">&ldquo;Switching to Angular 2&rdquo;</a>.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&title=Angular%202%20Hot%20Loader" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&t=Angular%202%20Hot%20Loader" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f&text=Angular%202%20Hot%20Loader&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Angular%202%20Hot%20Loader http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f10%2f26%2fangular2-hot-loader-hot-loading-tooling%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Angular 2 Hot Loader</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Tooling/">Tooling</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Tooling/">Tooling</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Performance/">Performance</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2014/07/05/angularjs-in-patterns-part-3/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>AngularJS in Patterns (Part 3) - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+
+<meta property="og:title" content="AngularJS in Patterns (Part 3) - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2014/07/05/angularjs-in-patterns-part-3/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2014/07/05/angularjs-in-patterns-part-3/">
+<meta name="twitter:title" content="AngularJS in Patterns (Part 3) - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "AngularJS in Patterns (Part 3) - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2014-07-05T00:00:00JST",
+    "dateModified": "2014-07-05T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.
+This is the last blog post of the series &ldquo;AngularJS in Patterns&rdquo;. You can find the original GitHub repository, which contains all the information at github."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-979813b44aadefb8198fdca027b0e978">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2014/07/05/angularjs-in-patterns-part-3/" class="thumbnail" title="AngularJS in Patterns (Part 3)"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">AngularJS in Patterns (Part 3)</h1>
+        <ul class="p-facts">
+          <li><time datetime="2014-07-05T00:00:00JST">Jul 5, 2014</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&title=AngularJS%20in%20Patterns%20%28Part%203%29" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&t=AngularJS%20in%20Patterns%20%28Part%203%29" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&text=AngularJS%20in%20Patterns%20%28Part%203%29&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?AngularJS%20in%20Patterns%20%28Part%203%29 http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<blockquote>
+This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
+</blockquote>
+
+<p><a href="http://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/">Link</a> to the first part of the series.
+<a href="http://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/">Link</a> to the second part of the series.</p>
+
+<p>This is the last blog post of the series &ldquo;AngularJS in Patterns&rdquo;. You can find the original GitHub repository, which contains all the information at <a href="https://github.com/mgechev/angularjs-in-patterns">github.com/mgechev/angularjs-in-patterns</a>. If you want to be aware of my up-coming work, you can follow me at <a href="https://github.com/mgechev">github.com/mgechev</a>.</p>
+
+<h3 id="directives">Directives</h3>
+
+<h4 id="composite">Composite</h4>
+
+<blockquote>
+<p>The composite pattern is a partitioning design pattern. The composite pattern describes that a group of objects are to be treated in the same way as a single instance of an object. The intent of a composite is to &ldquo;compose&rdquo; objects into tree structures to represent part-whole hierarchies.</p>
+</blockquote>
+
+<p><img src="/images/patterns/structural/composite.svg" alt="Composite" title="Fig. 3" /></p>
+
+<p>According to the Gang of Four, MVC is nothing more than combination of:</p>
+
+<ul>
+<li>Strategy</li>
+<li>Composite</li>
+<li>Observer</li>
+</ul>
+
+<p>They state that the view is composition of components. In AngularJS the situation is similar. Our views are formed by a composition of directives and DOM elements, on which these directives could be applied.</p>
+
+<p>Lets look at the following example:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">zippy</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;zippy&quot;</span><span class="p">&gt;</span>
+      zippy!
+    <span class="p">&lt;/</span><span class="nt">zippy</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;zippy&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span>
+    <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;div&gt;&lt;div class=&quot;header&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot; ng-transclude&gt;&lt;/div&gt;&lt;/div&gt;&#39;</span><span class="p">,</span>
+    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.header&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;.content&#39;</span><span class="p">).</span><span class="nx">toggle</span><span class="p">();</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>This example defines a simple directive, which is a UI component. The defined component (called &ldquo;zippy&rdquo;) has header and content. Click on its header toggles the visibility of the content.</p>
+
+<p>From the first example we can note that the whole DOM tree is a composition of elements. The root component is the <code>html</code> element, directly followed by the nested elements <code>head</code> and <code>body</code> and so on&hellip;</p>
+
+<p>In the second, JavaScript, example we see that the <code>template</code> property of the directive, contains markup with <code>ng-transclude</code> directive inside it. So this means that inside the directive <code>zippy</code> we have another directive called <code>ng-transclude</code>, i.e. composition of directives. Theoretically we can nest the components infinitely until we reach a leaf node.</p>
+
+<h3 id="interpreter">Interpreter</h3>
+
+<blockquote>
+<p>In computer programming, the interpreter pattern is a design pattern that specifies how to evaluate sentences in a language. The basic idea is to have a class for each symbol (terminal or nonterminal) in a specialized computer language. The syntax tree of a sentence in the language is an instance of the composite pattern and is used to evaluate (interpret) the sentence.</p>
+</blockquote>
+
+<p><img src="/images/patterns/behavioral/interpreter.svg" alt="Interpreter" title="Fig. 6" /></p>
+
+<p>Behind its <code>$parse</code> service, AngularJS provides its own implementation of interpreter of a DSL (Domain Specific Language). The used DSL is simplified and modified version of JavaScript.
+The main differences between the JavaScript expressions and AngularJS expressions are that AngularJS expressions:</p>
+
+<ul>
+<li>may contain filters with UNIX like pipe syntax</li>
+<li>don&rsquo;t throw any errors</li>
+<li>don&rsquo;t have any control flow statements (exceptions, loops, if statements although you can use the ternary operator)</li>
+<li>are evaluated in given context (the context of the current <code>$scope</code>)</li>
+</ul>
+
+<p>Inside the <code>$parse</code> service are defined two main components:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//Responsible for converting given string into tokens</span>
+<span class="kd">var</span> <span class="nx">Lexer</span><span class="p">;</span>
+<span class="c1">//Responsible for parsing the tokens and evaluating the expression</span>
+<span class="kd">var</span> <span class="nx">Parser</span><span class="p">;</span>
+</code></pre></div>
+
+
+<p>Once given expression has been tokenized it is cached internally, because of performance concerns.</p>
+
+<p>The terminal expressions in the AngularJS DSL are defined as follows:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">OPERATORS</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="cm">/* jshint bitwise : false */</span>
+  <span class="s1">&#39;null&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">null</span><span class="p">;},</span>
+  <span class="s1">&#39;true&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">true</span><span class="p">;},</span>
+  <span class="s1">&#39;false&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">false</span><span class="p">;},</span>
+  <span class="kc">undefined</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
+  <span class="s1">&#39;+&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+        <span class="c1">//...</span>
+      <span class="p">},</span>
+  <span class="s1">&#39;*&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">*</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;/&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">/</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;%&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">%</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;^&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">^</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;=&#39;</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
+  <span class="s1">&#39;===&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">===</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;!==&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;==&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;!=&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&lt;&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&gt;&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&lt;=&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&gt;=&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&amp;&amp;&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;||&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">||</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;&amp;&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+  <span class="s1">&#39;|&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">));},</span>
+  <span class="s1">&#39;!&#39;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">){</span><span class="k">return</span> <span class="o">!</span><span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);}</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+<p>We can think of the function associated with each terminal as implementation of the <code>AbstractExpression</code>&rsquo;s interface.</p>
+
+<p>Each <code>Client</code> interprets given AngularJS expression in a specific context - specific scope.</p>
+
+<p>Few sample AngularJS expressions are:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// toUpperCase filter is applied to the result of the expression</span>
+<span class="c1">// (foo) ? bar : baz</span>
+<span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="o">?</span> <span class="nx">bar</span> <span class="o">:</span> <span class="nx">baz</span> <span class="o">|</span> <span class="nx">toUpperCase</span>
+</code></pre></div>
+
+
+<h4 id="template-view">Template View</h4>
+
+<blockquote>
+<p>Renders information into HTML by embedding markers in an HTML page.</p>
+</blockquote>
+
+<p><img src="/images/patterns/peaa/template-view.svg" alt="Template View" title="Fig. 8" /></p>
+
+<p>The dynamic page rendering is not that trivial thing. It is connected with a lot of string concatenations, manipulations and frustration. Far easier way to build your dynamic page is to write your markup and embed little expressions inside it, which are later evaluated in given context and so the whole template is being compiled to its end format. In our case this format is going to be HTML (or even DOM). This is exactly what the template engines do - they take given DSL, evaluate it in the appropriate context and then turn it into its end format.</p>
+
+<p>Templates are very commonly used especially in the back-end.
+For example, you can embed PHP code inside HTML and create a dynamic page, you can use Smarty or you can use eRuby with Ruby in order to embed Ruby code inside your static pages.</p>
+
+<p>For JavaScript there are plenty of template engines, such as mustache.js, handlebars, etc. Most of these engines manipulate the template as a string. The template could be located in different places - as static file, which is fetched with AJAX, as <code>script</code> embedded inside your view or even inlined into your JavaScript.</p>
+
+<p>For example:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;template/mustache&quot;</span><span class="p">&gt;</span>
+  <span class="o">&lt;</span><span class="nx">h2</span><span class="o">&gt;</span><span class="nx">Names</span><span class="o">&lt;</span><span class="err">/h2&gt;</span>
+  <span class="p">{{</span><span class="err">#</span><span class="nx">names</span><span class="p">}}</span>
+    <span class="o">&lt;</span><span class="nx">strong</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">name</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/strong&gt;</span>
+  <span class="p">{{</span><span class="err">/names}}</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>The template engine turns this string into DOM elements by compiling it within a given context. This way all the expressions embedded in the markup are evaluated and replaced by their value.</p>
+
+<p>For example if we evaluate the template above in the context of the following object: <code>{ names: ['foo', 'bar', 'baz'] }</code>, so we will get:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Names<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>foo<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>bar<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>baz<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>AngularJS templates are actually HTML, they are not in an intermediate format like the traditional templates are.
+What AngularJS compiler does is to traverse the DOM tree and look for already known directives (elements, attributes, classes or even comments). When AngularJS finds any of these directives it invokes the logic associated with them, which may involve evaluation of different expressions in the context of the current scope.</p>
+
+<p>For example:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;name in names&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>in the context of the scope:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">];</span>
+</code></pre></div>
+
+
+<p>will produce the same result as the one above. The main difference here is that the template is not wrapped inside a <code>script</code> tag, it is HTML instead.</p>
+
+<h3 id="scope">Scope</h3>
+
+<h4 id="observer">Observer</h4>
+
+<blockquote>
+<p>The observer pattern is a software design pattern in which an object, called the subject, maintains a list of its dependents, called observers, and notifies them automatically of any state changes, usually by calling one of their methods. It is mainly used to implement distributed event handling systems.</p>
+</blockquote>
+
+<p><img src="/images/patterns/behavioral/observer.svg" alt="Observer" title="Fig. 7" /></p>
+
+<p>There are two basic ways of communication between the scopes in an AngularJS application. The first one is calling methods of parent scope by a child scope. This is possible since the child scope inherits prototypically by its parent, as mentioned above (see <a href="#scope">Scope</a>). This allows communication in a single direction - child to parent. Some times it is necessary to call method of given child scope or notify it about a triggered event in the context of the parent scope. AngularJS provides built-in observer pattern, which allows this. Another possible use case, of the observer pattern, is when multiple scopes are interested in given event but the scope, in which context the event is triggered, is not aware of them. This allows decoupling between the different scopes, non of the scopes should be aware of the rest of the scopes.</p>
+
+<p>Each AngularJS scope has public methods called <code>$on</code>, <code>$emit</code> and <code>$broadcast</code>. The method <code>$on</code> accepts topic as first argument and callback as second. We can think of the callback as an observer - an object, which implements the <code>Observer</code> interface (in JavaScript the functions are first-class, so we can provide only implementation of the <code>notify</code> method):</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;event-name&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">handler</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">//body</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>In this way the current scope &ldquo;subscribes&rdquo; to events of type <code>event-name</code>. When <code>event-name</code> is triggered in any parent or child scope of the given one, <code>handler</code> would be called.</p>
+
+<p>The methods <code>$emit</code> and <code>$broadcast</code> are used for triggering events respectively upwards and downwards through the scope chain.
+For example:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&#39;event-name&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>The scope in the example above, triggers the event <code>event-name</code> to all scopes upwards. This means that each of the parent scopes of the given one, which are subscribed to the event <code>event-name</code>, would be notified and their handler callback will be invoked.</p>
+
+<p>Analogical is the case when the method <code>$broadcast</code> is called. The only difference is that the event would be transmitted downwards - to all children scopes.
+Each scope can subscribe to any event with multiple callbacks (i.e. it can associate multiple observers to given event).</p>
+
+<p>In the JavaScript community this pattern is better known as publish/subscribe.</p>
+
+<h4 id="chain-of-responsibilities">Chain of Responsibilities</h4>
+
+<blockquote>
+<p>The chain-of-responsibility pattern is a design pattern consisting of a source of command objects and a series of processing objects. Each processing object contains logic that defines the types of command objects that it can handle; the rest are passed to the next processing object in the chain. A mechanism also exists for adding new processing objects to the end of this chain.</p>
+</blockquote>
+
+<p><img src="/images/patterns/behavioral/chain-of-responsibilities.svg" alt="Chain of Responsibilities" title="Fig. 5" /></p>
+
+<p>As stated above the scopes in an AngularJS application form a hierarchy known as the scope chain. Some of the scopes are &ldquo;isolated&rdquo;, which means that they don&rsquo;t inherit prototypically by their parent scope, but are connected to it via their <code>$parent</code> property.</p>
+
+<p>When <code>$emit</code> or <code>$broadcast</code> are called we can think of the scope chain as event bus, or even more accurately - chain of responsibilities. Once the event is triggered it is emitted downwards or upwards (depending on the method, which was called). Each subsequent scope may:</p>
+
+<ul>
+<li>Handle the event and pass it to the next scope in the chain</li>
+<li>Handle the event and stop its propagation</li>
+<li>Pass the event to the next scope in the chain without handling it</li>
+<li>Stop the event propagation without handling it</li>
+</ul>
+
+<p>In the example below you can see an example in which <code>ChildCtrl</code> triggers an event, which is propagated upwards through the scope chain. In the case above each of the parent scopes (the one used in <code>ParentCtrl</code> and the one used in <code>MainCtrl</code>) are going to handle the event by logging into the console: <code>&quot;foo received&quot;</code>. If any of the scopes should be considered as final destination it can call the method <code>stopPropagation</code> of the event object, passed to the callback.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;foo received&#39;</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ParentCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;foo received&#39;</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>The different handlers from the UML diagram above are the different scopes, injected to the controllers.</p>
+
+<h4 id="command">Command</h4>
+
+<blockquote>
+<p>In object-oriented programming, the command pattern is a behavioral design pattern in which an object is used to represent and encapsulate all the information needed to call a method at a later time. This information includes the method name, the object that owns the method and values for the method parameters.</p>
+</blockquote>
+
+<p><img src="/images/patterns/behavioral/command.svg" alt="Command" title="Fig. 11" /></p>
+
+<p>Before continuing with the application of the command pattern lets describe how AngularJS implements data binding.</p>
+
+<p>When we want to bind our model to the view we use the directives <code>ng-bind</code> (for single-way data binding) and <code>ng-model</code> (for two-way data binding). For example, if we want each change in the model <code>foo</code> to reflect the view we can:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>Now each time we change the value of <code>foo</code> the inner text of the span will be changed. We can achieve the same effect with more complex AngularJS expressions, like:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo + &quot;</span> <span class="err">&quot;</span> <span class="err">+</span> <span class="na">bar</span> <span class="err">|</span> <span class="na">uppercase</span><span class="err">&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<p>In the example above the value of the span will be the concatenated uppercased value of <code>foo</code> and <code>bar</code>. What happens behind the scenes?</p>
+
+<p>Each <code>$scope</code> has method called <code>$watch</code>. When the AngularJS compiler finds the directive <code>ng-bind</code> it creates a new watcher of the expression <code>foo + ' ' + bar | uppercase</code>, i.e. <code>$scope.$watch(&quot;foo + ' ' + bar | uppercase&quot;, function () { /* body */ });</code>. The callback will be triggered each time the value of the expression is changed. In the current case the callback will update the value of the span.</p>
+
+<p>Here are the first couple of lines of the implementation of <code>$watch</code>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$watch</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span><span class="p">,</span> <span class="nx">objectEquality</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+      <span class="nx">get</span> <span class="o">=</span> <span class="nx">compileToFn</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="s1">&#39;watch&#39;</span><span class="p">),</span>
+      <span class="nx">array</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span>
+      <span class="nx">watcher</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">fn</span><span class="o">:</span> <span class="nx">listener</span><span class="p">,</span>
+        <span class="nx">last</span><span class="o">:</span> <span class="nx">initWatchVal</span><span class="p">,</span>
+        <span class="nx">get</span><span class="o">:</span> <span class="nx">get</span><span class="p">,</span>
+        <span class="nx">exp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+        <span class="nx">eq</span><span class="o">:</span> <span class="o">!!</span><span class="nx">objectEquality</span>
+      <span class="p">};</span>
+<span class="c1">//...</span>
+</code></pre></div>
+
+
+<p>We can think of the <code>watcher</code> object as a command. The expression of the command is being evaluated on each <a href="https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest"><code>&quot;$digest&quot;</code></a> loop. Once AngularJS detects change in the expression, it invokes the <code>listener</code> function. The <code>watcher</code> command encapsulates all the information required for watching given expression and delegates the execution of the command to the <code>listener</code> (the actual receiver). We can think of the <code>$scope</code> as the command&rsquo;s <code>Client</code> and the <code>$digest</code> loop as the command&rsquo;s <code>Invoker</code>.</p>
+
+<h3 id="controllers">Controllers</h3>
+
+<h4 id="page-controller">Page Controller</h4>
+
+<blockquote>
+<p>An object that handles a request for a specific page or action on a Web site. Martin Fowler</p>
+</blockquote>
+
+<p><img src="/images/patterns/peaa/page-controller.svg" alt="Page Controller" title="Fig. 8" /></p>
+
+<p>According to <a href="#references">4</a> the page controller:</p>
+
+<blockquote>
+<p>Page Controller pattern accept input from the page request, invoke the requested actions on the model, and determine the correct view to use for the resulting page. Separate the dispatching logic from any view-related code</p>
+</blockquote>
+
+<p>Since there is a lot of duplicate behavior between the different pages (like rendering footers, headers, taking care of the user&rsquo;s session, etc.) page controllers can form a hierarchy. In AngularJS we have controllers, which are with more limited scope of responsibilities. They don&rsquo;t accept user requests, since this is responsibility of the <code>$route</code> or <code>$state</code> services and the page rendering is responsibility of the directives <code>ng-view</code>/<code>ui-view</code>.</p>
+
+<p>Similarly to the page controllers, AngularJS controllers handle user interactions, provide and update the models. The model is exposed to the view when it is being attached to the scope, all methods invoked by the view, in result of user actions, are ones, which are already attached to the scope. Another similarity between the page controllers and the AngularJS controllers is the hierarchy, which they form. It corresponds to the scope hierarchy. That way common actions can be isolated to the base controllers.</p>
+
+<p>The controllers in AngularJS are quite similar to the code-behind in ASP.NET WebForms, since their responsibilities almost overlap.
+Here is an example hierarchy between few controllers:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!doctype html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;MainCtrl&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;ChildCtrl&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>{{user.name}}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;click()&quot;</span><span class="p">&gt;</span>Click<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">User</span><span class="p">.</span><span class="nx">isAuthenticated</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">(</span><span class="s1">&#39;/unauthenticated&#39;</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">ChildCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">click</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;You clicked me!&#39;</span><span class="p">);</span>
+  <span class="p">};</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>This example aims to illustrate the most trivial way to reuse logic by using a base controller, anyway in production applications I don&rsquo;t recommend you to put your authorization logic in the controllers. The access to the different routes could be determined on a higher level of abstraction.</p>
+
+<p>The <code>ChildCtrl</code> is responsible for handling actions such as clicking the button with label <code>&quot;Click&quot;</code> and exposing the model to the view, by attaching it to the scope.</p>
+
+<h3 id="others">Others</h3>
+
+<h4 id="module-pattern">Module Pattern</h4>
+
+<p>This is actually not a design pattern from Gang of Four, neither one from P of EAA. This is a traditional JavaScript pattern, the main goal of which is to provide encapsulation and privacy.</p>
+
+<p>Using the module pattern you can achieve privacy based on the JavaScript&rsquo;s functional lexical scope. Each module may have zero or more private members, which are hidden in the local scope of a function. This function returns an object, which exports the public API of the given module:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">Page</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="kd">var</span> <span class="nx">title</span><span class="p">;</span>
+
+  <span class="kd">function</span> <span class="nx">setTitle</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
+    <span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">getTitle</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">title</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">setTitle</span><span class="o">:</span> <span class="nx">setTitle</span><span class="p">,</span>
+    <span class="nx">getTitle</span><span class="o">:</span> <span class="nx">getTitle</span>
+  <span class="p">};</span>
+<span class="p">}());</span>
+</code></pre></div>
+
+
+<p>In the example above we have IIFE (Immediately-Invoked Function Expression), which after being called returns an object, with two methods (<code>setTitle</code> and <code>getTitle</code>). The returned object is being assigned to the <code>Page</code> variable.</p>
+
+<p>In this case the user of the <code>Page</code> object doesn&rsquo;t have direct access to the <code>title</code> variable, which is defined inside the local scope of the IIFE.</p>
+
+<p>The module pattern is very useful when defining services in AngularJS. Using this pattern we can simulate (and actually achieve) privacy:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="kd">function</span> <span class="nx">privateMember</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">//body...</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">publicMember</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">//body...</span>
+    <span class="nx">privateMember</span><span class="p">();</span>
+    <span class="c1">//body</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">publicMember</span><span class="o">:</span> <span class="nx">publicMember</span>
+  <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>Once we want to inject <code>foo</code> inside any other component we won&rsquo;t be able to use the private methods, but only the public ones. This solution is extremely powerful especially when one is building a reusable library.</p>
+
+<h3 id="data-mapper">Data Mapper</h3>
+
+<blockquote>
+<p>A Data Mapper is a Data Access Layer that performs bidirectional transfer of data between a persistent data store (often a relational database) and an in memory data representation (the domain layer). The goal of the pattern is to keep the in memory representation and the persistent data store independent of each other and the data mapper itself.</p>
+</blockquote>
+
+<p><img src="/images/patterns/peaa/data-mapper.svg" alt="Data Mapper" title="Fig. 10" /></p>
+
+<p>As the description above states, the data mapper is used for bidirectional transfer of data between a persistent data store and an in memory data representation. Usually our AngularJS application communicates with API server, which is written in any server-side language (Ruby, PHP, Java, JavaScript, etc.).</p>
+
+<p>Usually, if we have RESTful API <code>$resource</code> will help us communicate with the server in Active Record like fashion. Although, in some applications the data entities returned by the server are not in the most appropriate format, which we want to use in the front-end.</p>
+
+<p>For instance, lets assume we have application in which each user has:</p>
+
+<ul>
+<li>name</li>
+<li>address</li>
+<li>list of friends</li>
+</ul>
+
+<p>And our API has the methods:</p>
+
+<ul>
+<li><code>GET /user/:id</code> - returns the user&rsquo;s name and the address of given user</li>
+<li><code>GET /friends/:id</code> - returns the list of friends of given user</li>
+</ul>
+
+<p>Possible solution is to have two different services, one for the first method and one for the second one. Probably more useful solution would be if we have a single service called <code>User</code>, which loads the user&rsquo;s friends when we request the user:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="kd">function</span> <span class="nx">User</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">address</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">friends</span> <span class="o">=</span> <span class="nx">friends</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/user/&#39;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">),</span>
+        <span class="nx">friends</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/friends/&#39;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="nx">$q</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">])</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
+  <span class="k">return</span> <span class="nx">User</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>This way we create pseudo-data mapper, which adapts our API according to the SPA requirements.</p>
+
+<p>We can use the <code>User</code> service by:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>And the following partial:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    Name: {{user.name}}
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    Address: {{user.address}}
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+    Friends with ids:
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;friend in user.friends&quot;</span><span class="p">&gt;</span>{{friend}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&title=AngularJS%20in%20Patterns%20%28Part%203%29" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&t=AngularJS%20in%20Patterns%20%28Part%203%29" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f&text=AngularJS%20in%20Patterns%20%28Part%203%29&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?AngularJS%20in%20Patterns%20%28Part%203%29 http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f07%2f05%2fangularjs-in-patterns-part-3%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>AngularJS in Patterns (Part 3)</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/AngularJS/">AngularJS</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Object-Oriented-Programming/">Object-Oriented Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/OpenSource/">OpenSource</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Patterns/">Patterns</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Web-development/">Web development</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/AngularJS/">AngularJS</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/AngularJS-overview/">AngularJS overview</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Design-patterns/">Design patterns</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Development/">Development</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Object-Oriented-Programming/">Object-Oriented Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/patterns/">patterns</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Software-engineering/">Software engineering</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/web-application/">web application</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

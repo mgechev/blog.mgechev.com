@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2016/07/05/using-stripe-payment-with-angular-2/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Using Stripe with Angular - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&amp;rsquo;re offering using Stripe as a mediator.On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.">
+
+<meta property="og:title" content="Using Stripe with Angular - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2016/07/05/using-stripe-payment-with-angular-2/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&amp;rsquo;re offering using Stripe as a mediator.On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2016/07/05/using-stripe-payment-with-angular-2/">
+<meta name="twitter:title" content="Using Stripe with Angular - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&amp;rsquo;re offering using Stripe as a mediator.On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Using Stripe with Angular - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2016-07-05T00:00:00JST",
+    "dateModified": "2016-07-05T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&rsquo;re offering using Stripe as a mediator.
+On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.
+In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-ecd5a6c9e52d823cbb74a4d176a7c323">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2016/07/05/using-stripe-payment-with-angular-2/" class="thumbnail" title="Using Stripe with Angular"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Using Stripe with Angular</h1>
+        <ul class="p-facts">
+          <li><time datetime="2016-07-05T00:00:00JST">Jul 5, 2016</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&title=Using%20Stripe%20with%20Angular" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&t=Using%20Stripe%20with%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&text=Using%20Stripe%20with%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Using%20Stripe%20with%20Angular http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&rsquo;re offering using Stripe as a mediator.</p>
+
+<p><img src="/images/stripe/angular-and-stripe.png" alt="Angular & Stripe" style="display: block; margin: auto"></p>
+
+<p>On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.</p>
+
+<p>In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.</p>
+
+<p>So lets begin!</p>
+
+<h2 id="sample-application">Sample Application</h2>
+
+<p><img src="/images/stripe/stripe-demo.gif" alt="App Demo" /></p>
+
+<p>This app is based on the <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a> project. The complete demo is <a href="https://github.com/mgechev/angular2-stripe-demo">located here</a>.</p>
+
+<p>Above you can see two views:</p>
+
+<ul>
+<li>Default Stripe Form.</li>
+<li>Custom Stripe Form.</li>
+</ul>
+
+<p>The first one demonstrates the default Stripe checkout mechanism and the second one gets the token for the entered credit card by using a custom form.</p>
+
+<h2 id="stripe-checkout">Stripe Checkout</h2>
+
+<p>Our end goal here is to add a button which triggers the default stripe checkout mechanism and visualizes a form for entering credit card information.</p>
+
+<p>First, we need to add the checkout script which will expose the global variable <code>StripeCheckout</code>. Open <code>index.html</code> (notice <strong>do not add this script to any of your components&rsquo; templates because Angular will <a href="https://angular.io/docs/ts/latest/guide/security.html#!#sts=Sanitization%20and%20security%20contexts">remove it</a></strong>), and add the following line:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://checkout.stripe.com/checkout.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>As next step we need to add a button to our component&rsquo;s template:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Default Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">button</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">openCheckout</span><span class="err">()&quot;</span><span class="p">&gt;</span>Purchase<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that we also added a click handler to the button. Once the user clicks on the button, the <code>openCheckout</code> method defined in the component&rsquo;s controller will be invoked.</p>
+
+<p>Now lets take a look at the component&rsquo;s controller implementation:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;sd-stripe-form&#39;</span><span class="p">,</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;stripe-form.component.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;stripe-form.component.css&#39;</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">StripeFormComponent</span> <span class="p">{</span>
+
+  <span class="nx">openCheckout</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">handler</span> <span class="o">=</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="nb">window</span><span class="p">).</span><span class="nx">StripeCheckout</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
+      <span class="nx">key</span><span class="o">:</span> <span class="s1">&#39;pk_test_oi0sKPJYLGjdvOXOM8tE8cMa&#39;</span><span class="p">,</span>
+      <span class="nx">locale</span><span class="o">:</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+      <span class="nx">token</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">token</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// You can access the token ID with `token.id`.</span>
+        <span class="c1">// Get the token ID to your server-side code for use.</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="nx">handler</span><span class="p">.</span><span class="nx">open</span><span class="p">({</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Demo Site&#39;</span><span class="p">,</span>
+      <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;2 widgets&#39;</span><span class="p">,</span>
+      <span class="nx">amount</span><span class="o">:</span> <span class="mi">2000</span>
+    <span class="p">});</span>
+
+  <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once the user clicks on the button and the <code>openCheckout</code> method is invoked, we create a new Stripe handle. To the handle we pass <a href="https://stripe.com/docs/checkout#integration-custom">configuration object</a>, and right after that we invoke the <code>open</code> method of the handle! This will open our stripe checkout pop-up.</p>
+
+<p>So far so good! The <code>token</code> callback that we pass with the handle&rsquo;s configuration object will return the id of the token associated with the user&rsquo;s card. This token can be used, for instance, server-side. You may experience some issues using it because of the way stripe sends requests to their APIs.</p>
+
+<p>So now lets go to the next section and see what the issues with the <code>token</code> callback are and how we can deal with them.</p>
+
+<h2 id="custom-stripe-form">Custom Stripe Form</h2>
+
+<p>The first step of the custom form integration is to add the following script in your <code>index.html</code> file:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://js.stripe.com/v2/&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Right after that we need to set your Stripe public key:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
+  <span class="nx">Stripe</span><span class="p">.</span><span class="nx">setPublishableKey</span><span class="p">(</span><span class="s1">&#39;pk_test_oi0sKPJYLGjdvOXOM8tE8cMa&#39;</span><span class="p">);</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>As next step lets take a look at the custom Stripe form. It is encapsulated in the <code>CustomFormComponent</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/forms&#39;</span><span class="p">;</span>
+
+<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;sd-custom-form&#39;</span><span class="p">,</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;custom-form.component.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;custom-form.component.css&#39;</span><span class="p">],</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">REACTIVE_FORM_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{...}</span>
+</code></pre></div>
+
+<p>&hellip;with the following template:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Custom Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;payment-form&quot;</span> <span class="err">(</span><span class="na">submit</span><span class="err">)=&quot;</span><span class="na">getToken</span><span class="err">()&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;payment-message&quot;</span><span class="p">&gt;</span>{{message}}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-row&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>Card Number<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">cardNumber</span><span class="err">&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;card-number&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">size</span><span class="o">=</span><span class="s">&quot;20&quot;</span> <span class="na">data-stripe</span><span class="o">=</span><span class="s">&quot;number&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-row&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>Expiration (MM/YY)<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">expiryMonth</span><span class="err">&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;expiry-month&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">size</span><span class="o">=</span><span class="s">&quot;2&quot;</span> <span class="na">data-stripe</span><span class="o">=</span><span class="s">&quot;exp_month&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span> / <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">expiryYear</span><span class="err">&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;expiry-year&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">size</span><span class="o">=</span><span class="s">&quot;2&quot;</span> <span class="na">data-stripe</span><span class="o">=</span><span class="s">&quot;exp_year&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-row&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>CVC<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">input</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">cvc</span><span class="err">&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;cvc&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">size</span><span class="o">=</span><span class="s">&quot;4&quot;</span> <span class="na">data-stripe</span><span class="o">=</span><span class="s">&quot;cvc&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Submit Payment&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Notice that in our form we bind to the properties <code>cardNumber</code>, <code>expiryMonth</code>, <code>expiryYear</code>, <code>cvc</code>. Once the user fills the form, she can click on the <code>Submit Payment</code> button and the method <code>getToken()</code> will be invoked. Notice that in order to use <code>[(ngModel)]</code> each input should have a name.</p>
+
+<p>As next step, lets take a look at the <code>CustomFormComponent</code> class. The most straightforward implementation looks like:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/forms&#39;</span><span class="p">;</span>
+
+<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;sd-custom-form&#39;</span><span class="p">,</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;custom-form.component.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;custom-form.component.css&#39;</span><span class="p">],</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">REACTIVE_FORM_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
+  <span class="nx">cardNumber</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">expiryMonth</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">expiryYear</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">cvc</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="nx">message</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="nx">getToken</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="s1">&#39;Loading...&#39;</span><span class="p">;</span>
+
+    <span class="p">(</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="nb">window</span><span class="p">).</span><span class="nx">Stripe</span><span class="p">.</span><span class="nx">card</span><span class="p">.</span><span class="nx">createToken</span><span class="p">({</span>
+      <span class="nx">number</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">cardNumber</span><span class="p">,</span>
+      <span class="nx">exp_month</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">expiryMonth</span><span class="p">,</span>
+      <span class="nx">exp_year</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">expiryYear</span><span class="p">,</span>
+      <span class="nx">cvc</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">cvc</span>
+    <span class="p">},</span> <span class="p">(</span><span class="nx">status</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">response</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="sb">`Success! Card token </span><span class="si">${</span><span class="nx">response</span><span class="p">.</span><span class="nx">card</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">.`</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><img src="/images/stripe/stripe-bug.gif" alt="Change detection not performing" /></p>
+
+<p>As can be seen from the video above, the form behaves weirdly. Once we submit the credit card only the <code>Loading...</code> label shows and after that we need to change value in the form in order to see the response gotten from Stripe, once the request completes.</p>
+
+<p>What actually happens is that:</p>
+
+<ul>
+<li>We send request to Stripe and respectively update the <code>message</code> to value <code>Loading...</code>.</li>
+<li>The request gets processed and we receive a response.</li>
+<li>Once we change an input value, we trigger the change detection mechanism which renders the response on the screen.</li>
+</ul>
+
+<p>But why the change detection doesn&rsquo;t get triggered after we get the response?</p>
+
+<h4 id="in-the-zones">In the Zones&hellip;</h4>
+
+<p>The Angular Zones are monkey patching (almost) all asynchronous APIs! Zones intercept async events and triggering the change detection on special events. Zones take care of <code>XMLHttpRequests</code>, <code>fetch</code>, <code>setTimeout</code>, etc. However, Stripe uses hidden <code>iframe</code> for establishing requests to its API, instead of the APIs that zone.js takes care of:</p>
+
+<p><img src="/images/stripe/stripe-hidden-iframe.png" alt="Hidden iframe" /></p>
+
+<p>In order to workaround this issue, we need to run the callback in the context of the Angular Zone (or <code>NgZone</code>). In order to do this we need to inject <code>NgZone</code> in the <code>CustomFormComponent</code> and slightly change <code>getToken</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
+
+  <span class="c1">// Same properties declaration</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_zone</span><span class="o">:</span> <span class="nx">NgZone</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">getToken</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="s1">&#39;Loading...&#39;</span><span class="p">;</span>
+
+    <span class="p">(</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="nb">window</span><span class="p">).</span><span class="nx">Stripe</span><span class="p">.</span><span class="nx">card</span><span class="p">.</span><span class="nx">createToken</span><span class="p">({</span>
+      <span class="nx">number</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">cardNumber</span><span class="p">,</span>
+      <span class="nx">exp_month</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">expiryMonth</span><span class="p">,</span>
+      <span class="nx">exp_year</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">expiryYear</span><span class="p">,</span>
+      <span class="nx">cvc</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">cvc</span>
+    <span class="p">},</span> <span class="p">(</span><span class="nx">status</span><span class="o">:</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">response</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+
+      <span class="c1">// Wrapping inside the Angular zone</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_zone</span><span class="p">.</span><span class="nx">run</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="sb">`Success! Card token </span><span class="si">${</span><span class="nx">response</span><span class="p">.</span><span class="nx">card</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">.`</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">});</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this short blog post we described how we can easily use Stripe with Angular. We went through the default Stripe checkout and after that we built a custom form!</p>
+
+<p>The only tricky thing that we found in the first part of our experiment was the sanitization of the components&rsquo; templates by Angular. It prevents us from using:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/charge&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span>
+    <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://checkout.stripe.com/checkout.js&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;stripe-button&quot;</span>
+    <span class="na">data-key</span><span class="o">=</span><span class="s">&quot;pk_test_oi0sKPJYLGjdvOXOM8tE8cMa&quot;</span>
+    <span class="na">data-amount</span><span class="o">=</span><span class="s">&quot;2000&quot;</span>
+    <span class="na">data-name</span><span class="o">=</span><span class="s">&quot;Demo Site&quot;</span>
+    <span class="na">data-description</span><span class="o">=</span><span class="s">&quot;2 widgets&quot;</span>
+    <span class="na">data-image</span><span class="o">=</span><span class="s">&quot;/img/documentation/checkout/marketplace.png&quot;</span>
+    <span class="na">data-locale</span><span class="o">=</span><span class="s">&quot;auto&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>and instead makes to be a bit more creative :-).</p>
+
+<p>With the custom form we faced another issue related to not triggering the Angular change detection once we get the card token. We discovered that this is due the uncommon way Stripe performs the Ajax request for registering the user&rsquo;s card.</p>
+
+<p>We solved the issue simply by wrapping the callback inside of a <code>zone.run(() =&gt; {...})</code> call!</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&title=Using%20Stripe%20with%20Angular" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&t=Using%20Stripe%20with%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f&text=Using%20Stripe%20with%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Using%20Stripe%20with%20Angular http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f07%2f05%2fusing-stripe-payment-with-angular-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Using Stripe with Angular</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular/">Angular</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/stripe/">stripe</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular/">Angular</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="In this post we&amp;rsquo;ll focus on techniques from functional programming we can apply in order to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&amp;rsquo;t read the first part of the &amp;ldquo;Faster Angular Applications&amp;rdquo; series, I&amp;rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&amp;rsquo;re optimizing.The code for this blog post is available at my GitHub account:">
+
+<meta property="og:title" content="Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="In this post we&amp;rsquo;ll focus on techniques from functional programming we can apply in order to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&amp;rsquo;t read the first part of the &amp;ldquo;Faster Angular Applications&amp;rdquo; series, I&amp;rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&amp;rsquo;re optimizing.The code for this blog post is available at my GitHub account:">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">
+<meta name="twitter:title" content="Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="In this post we&amp;rsquo;ll focus on techniques from functional programming we can apply in order to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&amp;rsquo;t read the first part of the &amp;ldquo;Faster Angular Applications&amp;rdquo; series, I&amp;rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&amp;rsquo;re optimizing.The code for this blog post is available at my GitHub account:">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2017-11-12T00:00:00JST",
+    "dateModified": "2017-11-12T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "In this post we&rsquo;ll focus on techniques from functional programming we can apply in order to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&rsquo;t read the first part of the &ldquo;Faster Angular Applications&rdquo; series, I&rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&rsquo;re optimizing.
+The code for this blog post is available at my GitHub account:"
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-b83e9e37a3f43d6688552e24765ff21e">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/" class="thumbnail" title="Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization</h1>
+        <ul class="p-facts">
+          <li><time datetime="2017-11-12T00:00:00JST">Nov 12, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&title=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&t=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&text=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>In this post we&rsquo;ll focus on techniques from functional programming we can apply in order to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&rsquo;t read the first part of the &ldquo;Faster Angular Applications&rdquo; series, I&rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&rsquo;re optimizing.</p>
+
+<p>The code for this blog post is available at my <a href="https://github.com/mgechev">GitHub account</a>:</p>
+
+<ul>
+<li><a href="https://github.com/mgechev/purely-fast">&ldquo;Purely Fast&rdquo;</a></li>
+<li><a href="https://github.com/mgechev/purely-fast-benchmarks">&ldquo;Purely Fast - Benchmarks&rdquo;</a></li>
+<li><a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">&ldquo;Faster Angular Applications - Part 1&rdquo;</a></li>
+</ul>
+
+<h1 id="goals-for-optimization">Goals for Optimization</h1>
+
+<p>In this section we&rsquo;ll see how we can reduce the number of computations going on in the application even further! The three specific features that we&rsquo;re going to focus on are:</p>
+
+<ol>
+<li>Adding an employee to a department.</li>
+<li>Removing an employee from a department.</li>
+<li>Initial rendering performance.</li>
+</ol>
+
+<h2 id="optimizing-the-mutation-operations">Optimizing the Mutation Operations</h2>
+
+<p>There&rsquo;s something in common between the first two points above - they mutate the list of employees for a specific department. Since in the previous blog post we switched to <code>OnPush</code> change detection strategy with Immutable.js, now if we add or remove an employee from any of the lists we&rsquo;ll get a new immutable list. This will trigger the change detection for the <code>EmployeeListComponent</code> and its child components - <code>ListComponent</code> and <code>NameListComponent</code> which will require re-evaluation of all the expressions in the templates of these components.</p>
+
+<p>Lets see how this looks in practice. For the purpose, we can add a log statement in the <code>ListComponent</code>&rsquo;s calculate method in order to see when it gets invoked. Here&rsquo;s the final result:</p>
+
+<p><img src="/images/faster-ng-apps-2/slow-add.gif" style="border: 1px solid #ccc;"></p>
+
+<p>From the GIF above we can see that while typing the change detection doesn&rsquo;t get invoked - cool! We did this optimization in the <a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">previous post from the series</a>.</p>
+
+<p>We can also notice that when the user adds a new employee the <code>calculate</code> method gets invoked 71 times. Given that we initially have 70 employees in the sales list, this means that on top of calculating the numeric value for the new employee we also recalculate it for all the already existing employees. This way we perform 70 useless calculations which in case of a computationally intensive business calculation can have some serious performance implications!</p>
+
+<p>What we&rsquo;d want to happen is:</p>
+
+<ul>
+<li>During the initial application rendering we calculate the numeric values for all the employees and visualize them.</li>
+<li>When we add a new entry we calculate the numeric value only for the newly added employee, without performing any redundant calculations for the already existing employees, since we have their numeric values from the rendering phase.</li>
+</ul>
+
+<p>In order to implement this behavior, lets take a look at our mocked business calculation - the function of Fibonacci:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>It has two very important properties which are common for all mathematical functions:</p>
+
+<ul>
+<li><strong>It does not perform any side effects</strong> - when calculating the employees numeric value, we don&rsquo;t send any network requests, touch local storage, log anything in the console, etc.</li>
+<li><strong>It returns the exact same result for the same set of arguments</strong> - <code>fibonacci(1)</code> is always 1, same for <code>fibonacci(n)</code> which always is going to return the same <code>k</code> where <code>n ∈ ℕ, k ∈ ℕ</code>.</li>
+</ul>
+
+<p>Such functions in the world of functional programming are called <strong>pure functions</strong>. All mathematical functions are pure and for performing a meaningful business calculation for the employees&rsquo; numeric value we&rsquo;d most likely use a mathematical function.</p>
+
+<h2 id="angular-pipes-and-pure-functions">Angular Pipes and Pure Functions</h2>
+
+<p>In Angular, on the other hand, we have pipes. Pipes are used for performing some kind of data processing, for instance data formatting. There are two types of pipes:</p>
+
+<ul>
+<li><strong>Pure pipes</strong> - produce the same output when invoked with the same set of arguments. Such pipes hold the <strong><a href="https://wiki.haskell.org/Referential_transparency">referential transparency</a></strong> property.</li>
+<li><strong>Impure pipes</strong> - can hold state and respectively produce different output for the same set of arguments.</li>
+</ul>
+
+<p>Examples for pure pipes are the <code>DecimalPipe</code> and <code>DatePipe</code> pipes. Every time when we invoke the <code>DecimalPipe</code> with given number and formatting configuration we&rsquo;ll always get the exact same string as result.</p>
+
+<p>An example for impure pipe is the <code>async</code> pipe for instance, which holds internal state. More about pure and impure pipes you can find in my book <a href="https://www.packtpub.com/web-development/switching-angular-third-edition">&ldquo;Switching to Angular&rdquo;</a>.</p>
+
+<p>Alright, so we have pure and impure pipes but how does this matter for Angular? Well:</p>
+
+<blockquote>
+<p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
+</blockquote>
+
+<p>Angular is going to determine if the arguments of the pipe are different by performing an equality check. This means that, if we have:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span>{{ 2.718281828459045 | number:&#39;3.1-5&#39; }}
+</code></pre></div>
+
+<p><strong>Angular is going to evaluate the expression once</strong> and produce the string <code>2.718</code>. <strong>The next time when the change detection runs, Angular will get the last result from the evaluation since the arguments of the pure pipe haven&rsquo;t changed</strong>!</p>
+
+<h2 id="optimizing-expression-re-evaluation-with-pure-pipes">Optimizing Expression Re-Evaluation with Pure Pipes</h2>
+
+<p>Wait, isn&rsquo;t that exactly what we want to do in our application - do not re-evaluate the employee&rsquo;s numeric value unless it gets changed? This means that we can encapsulate our business calculation inside of a pure pipe and as bonus get the caching that Angular provides.</p>
+
+<p>Here&rsquo;s how we can proceed:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Pipe</span><span class="p">({</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;calculate&#39;</span><span class="p">,</span>
+  <span class="nx">pure</span>: <span class="kt">true</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CalculatePipe</span> <span class="p">{</span>
+  <span class="nx">transform</span><span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In fact, all pipes in Angular are pure by default, so we can drop the <code>pure: true</code> property.</p>
+
+<p>Now we need to modify the template of the <code>ListComponent</code> a little bit in order to invoke the pipe instead of the <code>calculate</code> method defined inside of its controller:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    ...</span>
+<span class="sb">     {{ item.num | calculate }}</span>
+<span class="sb">    ...</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ListComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div>
+
+<p>In order to verify if the last optimization improved the application&rsquo;s performance I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress I got the following results:</p>
+
+<p><img src="/images/faster-ng-apps-2/adding-removing.png" style="border: 1px solid #ccc;"></p>
+
+<p>With the latest optimization the time required for running the tests dropped from 394.53ms to 9.70ms! That is a huge improvement! We achieved it only by performing a small refactoring, without writing any custom code, just taking advantage of what Angular already provides for free!</p>
+
+<h2 id="initial-application-rendering">Initial Application Rendering</h2>
+
+<p>For this performance benchmark we&rsquo;ll increase the number of items from 140 to 1,000. Lets see how this is going to affect our application&rsquo;s rendering performance:</p>
+
+<p><img src="/images/faster-ng-apps-2/slow-initial-rendering.png" style="border: 1px solid #ccc;"></p>
+
+<p>9.53s is quite a lot for initial rendering time. In fact&hellip;</p>
+
+<p><center>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Waiting for slow web pages to load is as stressful as watching a horror movie: <a href="https://t.co/spwEC1P9ct">https://t.co/spwEC1P9ct</a> <a href="https://twitter.com/hashtag/perfmatters?src=hash&amp;ref_src=twsrc%5Etfw">#perfmatters</a> <a href="https://t.co/3JmcGPZij2">pic.twitter.com/3JmcGPZij2</a></p>&mdash; Addy Osmani (@addyosmani) <a href="https://twitter.com/addyosmani/status/711330814827569152?ref_src=twsrc%5Etfw">March 19, 2016</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</center></p>
+
+<p>In our case we&rsquo;re even not waiting for the application to get loaded, we&rsquo;re waiting for it to get rendered. Lets suppose we have put a lot of effort into optimizing the network performance of the application and our bundle size is only 50KB, we download all the resources from the network for less than 100ms. This sounds great, right? Well, after that the user needs to wait another 9430ms in order see the application rendered.</p>
+
+<p>There are various techniques to fix this - we don&rsquo;t have to render all the 1,000 employees at once, we can, for instance, apply pagination or render the items lazily when the user scrolls. But there&rsquo;s also something else we can apply in this specific case. For this purpose, lets take a look at the numeric data for the employees:</p>
+
+<p><img src="/images/faster-ng-apps-2/duplicate-values.png" style="border: 1px solid #ccc;"></p>
+
+<p>We have a lot of employees with the same numeric values which produce the same output after going through the business calculation. We can conclude that in this case we have samples from a small range. Lets for a second remember what optimization Angular performs with pure pipes:</p>
+
+<blockquote>
+<p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
+</blockquote>
+
+<p>This doesn&rsquo;t say anywhere that Angular is not going to evaluate two pipe expressions in different places in the component tree which have the same arguments. So, if we have:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+  {{ &#39;Emily&#39; }}
+  {{ 27 | calculate }}
+<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+  {{ &#39;Dan&#39; }}
+  {{ 27 | calculate }}
+<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Angular is going to evaluate <code>{{ 27 | calculate }}</code> twice! The optimization that the framework will perform is that it won&rsquo;t re-evaluate the expressions on the next tick of the change detection mechanism. This means that <strong>it&rsquo;ll cache the result for the last value for a specific place in the rendered (dynamic) component tree</strong>.</p>
+
+<p>On the other hand, in functional programming for pure functions we can apply an optimization called <strong>memoization</strong> which Wikipedia defines as:</p>
+
+<blockquote>
+<p>In computing, memoization or memoization is an optimization technique used primarily to speed up computer programs by storing the results of expensive function calls and returning the cached result when the same inputs occur again.</p>
+</blockquote>
+
+<p>In contrast to the caching that Angular performs, memoization uses a global cache used for <strong>all the invocations of given function</strong>. This means that in the context of the example above, if we apply memoization to the <code>fibonacci</code> function, although <code>{{ 27 | calculate }}</code> will be evaluated twice, <code>fibonacci(27)</code> will be invoked only once, the next time we&rsquo;ll directly get the memoized result!</p>
+
+<p>We can apply memoization to <code>fibonacci</code> using <code>lodash.memoize</code>:</p>
+<div class="highlight"><pre><code class="language-ts" data-lang="ts"><span></span><span class="kr">const</span> <span class="nx">memoize</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;lodash.memoize&#39;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">((</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>Now lets see how this affects our initial rendering:</p>
+
+<p><img src="/images/faster-ng-apps-2/memoization.png" style="border: 1px solid #ccc;"></p>
+
+<p>Not bad! By performing this optimization we reduced the initial rendering with 30%!</p>
+
+<h1 id="memoization-pure-pipes-on-push-and-referential-transparency">Memoization, Pure Pipes, On Push and Referential Transparency</h1>
+
+<p>As we saw from the example above, we can think of pure pipes as pure functions. On the other hand, the optimization that Angular performs for pure pipes differs quite a lot compared to memoization. Angular treats expressions formed by pure pipes as referentially transparent expressions. Here&rsquo;s definition of the property of referential transparency:</p>
+
+<blockquote>
+<p>If all functions involved in the expression are pure functions, then the expression is referentially transparent. Also, some impure functions can be included in the expression if their values are discarded and their side effects are insignificant.</p>
+</blockquote>
+
+<p>To what degree we consider the side effect performed by a pure pipe &ldquo;insignificant&rdquo; depends on our own judgment. In case we decide that the side effect that our pure pipe performs is significant, we can declare the pipe as impure by setting the <code>pure</code> property of the object literal we pass to the <code>@Pipe</code> decorator to <code>false</code>.</p>
+
+<p>An interesting question to ask is, can we apply memoization to all pure pipes in order to get the performance benefit from the latest optimization we did? Here we can think of two cases:</p>
+
+<ul>
+<li>When the arguments of the pipe are primitive values.</li>
+<li>When the arguments of the pipe are non-primitive values.</li>
+</ul>
+
+<p>For primitive values, it makes sense to apply memoization since we can create a cache which maps the pipe&rsquo;s arguments to their results. Of course, this is only applicable in case the pure pipe performs no side effects or they are insignificant enough.</p>
+
+<p>On the other hand, if the pipe has non-primitive arguments the situation can get trickier. In such case, it&rsquo;ll be quite inconvenient to cache the result for the function based on its arguments&rsquo; references. Very often two instances of a data structure which have different references can hold the same data. Should we return the cached result in such case or not? Probably we should. But how can we efficiently determine if the items in the two collections are the same? Maybe hashing? This is a topic of another discussion and there is <a href="http://repository.cmu.edu/cgi/viewcontent.cgi?article=3285&amp;context=compsci">a lot of research in this direction</a>.</p>
+
+<p>For components we can think in a similar fashion. We can abstract them as functions and consider their inputs as arguments, and the UI that they render as the function&rsquo;s result. We think of the Angular templates as expressions and the components with <code>OnPush</code> change detection used in these templates as referentially transparent sub-expressions.</p>
+
+<p>That&rsquo;s how we found some patterns which are already well described by computer science in the face of pure functions, referential transparency and memoization.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>This blog post was the second from the series &ldquo;Faster Angular Applications&rdquo;.</p>
+
+<p>In this part we improved the operations for adding and removing employees from the lists by encapsulating the business computation inside of a pure pipe. After that we explained what optimizations Angular performs on pure pipes, treating the expressions that they form as referentially transparent.</p>
+
+<p>As next step, in order to optimize the initial rendering of our application we used memoization.</p>
+
+<p>Finally, we explained the theoretical foundation behind these APIs. It&rsquo;s definitely worth it to invest time in computer science in order to understand the underlying concepts behind everything we use on a daily basis. This way we can find agnostic patterns across technologies and reuse them in our projects.</p>
+
+<p>In conclusion we can say that there&rsquo;s no silver bullet for optimizing the runtime performance of our Angular applications. There are several techniques we can apply in response to our deep understanding of:</p>
+
+<ul>
+<li>The component structure of our applications.</li>
+<li>The business data that our application processes and visualizes.</li>
+</ul>
+
+<p>On top of that, in order to conclude if the optimizations we do are meaningful we should <strong>make application-specific benchmarks</strong>.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&title=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&t=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f&text=Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Faster%20Angular%20Applications%20-%20Part%202.%20Pure%20Pipes%2c%20Pure%20Functions%20and%20Memoization http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f11%2f12%2ffaster-angular-applications-pure-pipes-memoization-pure-functions-part-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular/">Angular</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Performance/">Performance</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular/">Angular</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Performance/">Performance</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

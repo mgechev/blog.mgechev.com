@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2013/01/11/virtualization-into-the-browser/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>plainvm - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="plainvm can take the virtualization into different level of usage. To prove this I’ll first ask few rhetorical questions and put their answers&amp;hellip;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&amp;hellip;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) – the browser.">
+
+<meta property="og:title" content="plainvm - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2013/01/11/virtualization-into-the-browser/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="plainvm can take the virtualization into different level of usage. To prove this I’ll first ask few rhetorical questions and put their answers&amp;hellip;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&amp;hellip;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) – the browser.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2013/01/11/virtualization-into-the-browser/">
+<meta name="twitter:title" content="plainvm - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="plainvm can take the virtualization into different level of usage. To prove this I’ll first ask few rhetorical questions and put their answers&amp;hellip;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&amp;hellip;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) – the browser.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "plainvm - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2013-01-11T00:00:00JST",
+    "dateModified": "2013-01-11T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "plainvm can take the virtualization into different level of usage. To prove this I’ll first ask few rhetorical questions and put their answers&hellip;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&hellip;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) – the browser."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-d9566298e31a60289067e74f6e45919a">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2013/01/11/virtualization-into-the-browser/" class="thumbnail" title="plainvm"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">plainvm</h1>
+        <ul class="p-facts">
+          <li><time datetime="2013-01-11T00:00:00JST">Jan 11, 2013</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&title=plainvm" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&t=plainvm" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&text=plainvm&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?plainvm http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body"><p><a href="http://plainvm.mgechev.com/" target="_blank">plainvm</a> can take the virtualization into different level of usage. To prove this I’ll first ask few rhetorical questions and put their answers&hellip;Which is the programming language which everyone has interpreter for? Java? Actually no! Does iOS supports Java applets for example?! No! Everyone has a browser in his smartphone. Every browser (well may be I should exclude lynx, links&hellip;) has JavaScript interpreter. And what is the common thing between all modern devices (and actually the devices most wide spread) – the browser. Another problem is that you don’t have such a great resources onto your mobile devices to run Windows/Linux/Mac even with double boot (yeah we can argue here about Debian&hellip;probably). We can use remote desktop via VNC/RDP but we have to install extra software and we will have access to a single machine not a whole cluster (well actually we can&hellip;I agree we can switch through different sessions, we can also become crazy).</p>
+
+<p>For a while I’m working on an opensource project (for good or bad written in perl) called <a href="http://plainvm.mgechev.com/" title="plainvm" target="_blank">plainvm</a>. It’s main goal is to provide web interface for virtualization platforms. You can control your Virtual Machines (VMs) using your browser (stop, start, change parameters) and also log into these machines and use them! The project and all it’s components are absolutely free for non-commercial use! For the functionality I’ve mentioned I’ve used different opensource projects and brought them together with a lot of Perl and JavaScript glue. Of course event with the localStorage feature (since HTML5) we still don’t have enough memory to create a pure virtualization into the browser (only with HTML5 and JavaScript), that’s why I’ve used already proven virtualization platform for that goal. The project uses VirtualBox as core virtualization platform (of course it’ll cost you to implement just a single class for using VMware player or VMware Workstation for example). I won’t publish more details about the implementation, if you’re still curious you can visit the project’s repository at <a title="plainvm @ github" href="https://github.com/mgechev/plainvm" target="_blank">GitHub</a>, if you’re not enough curious just watch the video below and your curiosity should make you check the GitHub link.</p>
+
+<p>In the next few lines I’ll make a summery of few of the most useful sides of plainvm:</p>
+
+<ul>
+<li>It’s easy to use</li>
+<li>It’s pure HTML5 (no plugins at all)</li>
+<li>It’s lightweight</li>
+<li>It uses websockets for duplex communication channel between the client and the server</li>
+<li>With plainvm you can manage multiple hosts hosting different virtual machines</li>
+</ul>
+
+<p>The project is very young, I’m planning and developing it’s features in my spare time so I cant accomplish everything I want. If you need any feature or you just like the idea and want to help, feel free to contribute. Extra implementation details can be found in the project’s wiki page (<a href="https://github.com/mgechev/plainvm/wiki" title="Wiki" target="_blank">at GitHub</a>). I tried to make the code readable enough to be as much easy to understand as possible.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&title=plainvm" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&t=plainvm" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f&text=plainvm&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?plainvm http%3a%2f%2fblog.mgechev.com%2famp%2f2013%2f01%2f11%2fvirtualization-into-the-browser%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>plainvm</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Browsers/">Browsers</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Development/">Development</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/HTML5/">HTML5</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Http/">Http</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Image-processing/">Image processing</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Internet/">Internet</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Java/">Java</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Linux/">Linux</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/OpenSource/">OpenSource</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/RDP/">RDP</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Ubuntu/">Ubuntu</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Virtualization/">Virtualization</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/VNC/">VNC</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Development/">Development</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/HTML5/">HTML5</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/OpenSource/">OpenSource</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Programming/">Programming</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Projects/">Projects</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Virtual-Machine/">Virtual Machine</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Virtualization/">Virtualization</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/VM/">VM</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

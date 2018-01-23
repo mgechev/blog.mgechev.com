@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>ViewChildren and ContentChildren in Angular - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="In this article I&amp;rsquo;m going to explain the difference between the concepts of view children and content children in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties providers and viewProviders of the @Component decorator is.You can find the source code of the current article at my GitHub account.">
+
+<meta property="og:title" content="ViewChildren and ContentChildren in Angular - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="In this article I&amp;rsquo;m going to explain the difference between the concepts of view children and content children in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties providers and viewProviders of the @Component decorator is.You can find the source code of the current article at my GitHub account.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/">
+<meta name="twitter:title" content="ViewChildren and ContentChildren in Angular - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="In this article I&amp;rsquo;m going to explain the difference between the concepts of view children and content children in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties providers and viewProviders of the @Component decorator is.You can find the source code of the current article at my GitHub account.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "ViewChildren and ContentChildren in Angular - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2016-01-23T00:00:00JST",
+    "dateModified": "2016-01-23T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "In this article I&rsquo;m going to explain the difference between the concepts of view children and content children in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties providers and viewProviders of the @Component decorator is.
+You can find the source code of the current article at my GitHub account."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-945d7cb7a76d459183a2a8e3bbbee0c4">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/" class="thumbnail" title="ViewChildren and ContentChildren in Angular"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">ViewChildren and ContentChildren in Angular</h1>
+        <ul class="p-facts">
+          <li><time datetime="2016-01-23T00:00:00JST">Jan 23, 2016</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&title=ViewChildren%20and%20ContentChildren%20in%20Angular" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&t=ViewChildren%20and%20ContentChildren%20in%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&text=ViewChildren%20and%20ContentChildren%20in%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?ViewChildren%20and%20ContentChildren%20in%20Angular http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>In this article I&rsquo;m going to explain the difference between the concepts of <strong>view children</strong> and <strong>content children</strong> in Angular. We will take a look at how we can pass access these two different kinds of children from their parent component. Along the content we are also going to mention what the difference between the properties <code>providers</code> and <code>viewProviders</code> of the <code>@Component</code> decorator is.</p>
+
+<p>You can find the source code of the current article at my <a href="https://github.com/mgechev/viewchildren-contentchildren-demo/blob/master/src/client/app/app.ts">GitHub account</a>. So lets our journey begin!</p>
+
+<h2 id="composing-primitives">Composing primitives</h2>
+
+<p>First of all, lets clarify the relation between the <strong>component</strong> and <strong>directive</strong> concepts in Angular. A typical design pattern for developing user interface is the <a href="https://en.wikipedia.org/wiki/Composite_pattern">composite pattern</a>. It allows us to compose different primitives and treat them the same way as a single instance. In the world of functional programming we can compose functions. For instance:</p>
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span></span><span class="nf">map</span> <span class="p">((</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="c1">-- [4,6,8]</span>
+</code></pre></div>
+
+<p>The Haskell code above we compose the functions <code>(*2)</code> and <code>(+1)</code> so that to each item <em>n</em> in the list will be applied the following sequence of operations <code>n</code> -&gt; <code>+ 1</code> -&gt; <code>* 2</code>.</p>
+
+<h3 id="composition-in-the-ui">Composition in the UI</h3>
+
+<p>In user interface we can apply composition in a similar way. We can think of the individual component as functions. These functions can be composed together in order and as result we get more complex functions.</p>
+
+<p>We can illustrate this graphically by the following structural diagram:</p>
+
+<p><img alt="" src="/images/component-directive-angular2.png" style="display: block; margin: auto"></p>
+
+<p>In the figure above we have two elements:</p>
+
+<ul>
+<li><code>Directive</code> - A self-contained element which holds some logic, but does not contain any structure.</li>
+<li><code>Component</code> - An element, which specifies the <code>Directive</code> element and holds a list of other <code>Directive</code> instances (which could also be components since <code>Component</code> extends <code>Directive</code>).</li>
+</ul>
+
+<p>This means that using the preceding abstractions we can build structures of the following form:</p>
+
+<p><img alt="" src="/images/component-tree-angular2.png" style="display: block; margin: auto"></p>
+
+<p>On the figure above we can see a hierarchical structure of components and directives. The leaf elements on the diagram are either directives or components that don&rsquo;t hold references to other directives.</p>
+
+<h2 id="composition-of-components-in-angular">Composition of Components in Angular</h2>
+
+<p>Now, in order to be more specific, lets switch to the context of Angular.</p>
+
+<p>In order to better illustrate the concepts we are going to explore, lets build a simple application:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// ...</span>
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;todo-app&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;section&gt;</span>
+<span class="sb">      Add todo:</span>
+<span class="sb">      &lt;todo-input (todo)=&quot;addTodo($event)&quot;&gt;&lt;/todo-input&gt;</span>
+<span class="sb">    &lt;/section&gt;</span>
+<span class="sb">    &lt;section&gt;</span>
+<span class="sb">      &lt;h4 *ngIf=&quot;todos.getAll().length&quot;&gt;Todo list&lt;/h4&gt;</span>
+<span class="sb">      &lt;todo-item *ngFor=&quot;let todo of todos.getAll()&quot; [todo]=&quot;todo&quot;&gt;</span>
+<span class="sb">      &lt;/todo&gt;</span>
+<span class="sb">    &lt;/section&gt;</span>
+<span class="sb">    &lt;ng-content select=&quot;app-footer&quot;&gt;&lt;/ng-content&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">TodoAppComponent</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">todos</span>: <span class="kt">TodoList</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">addTodo</span><span class="p">(</span><span class="nx">todo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">todos</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">todo</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>Yes, this is going to be &ldquo;Yet another MV* todo application&rdquo;. Above we define a component with selector <code>todo-app</code> which has an inline template, and defines a set of directives that it or any of its child components is going to use.</p>
+
+<p>We can use the component in the following way:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">todo-app</span><span class="p">&gt;&lt;/</span><span class="nt">todo-app</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>Well, this is basically an XML, so between the opening and closing tags of the <code>todo-app</code> element we can put some content:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">todo-app</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">app-footer</span><span class="p">&gt;</span>
+    Yet another todo app!
+  <span class="p">&lt;/</span><span class="nt">app-footer</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">todo-app</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<h3 id="basic-content-projection-with-ng-content">Basic Content Projection with <code>ng-content</code></h3>
+
+<p>Now lets switch back to the <code>todo-app</code> component&rsquo;s definition for a second. Notice the last element in its template: <code>&lt;ng-content select=&quot;app-footer&quot;&gt;&lt;/ng-content&gt;</code>.
+With <code>ng-content</code> we can grab the content between the opening and closing tag of the <code>todo-app</code> element and project it somewhere inside of the template! The value of the <code>select</code> attribute is a CSS selector, which allows us to select the content that we want to project. For instance, in the example above, the <code>app-footer</code> will be projected at the bottom of the rendered todo component.</p>
+
+<p>We can also skip the <code>select</code> attribute of the <code>ng-content</code> element. In this case we will project the entire content passed between the opening and closing tags on the place of the <code>ng-content</code> element.</p>
+
+<p>There are two more components which are not interesting for our discussion so we are going to omit their implementation. Once completeld our application will look as follows:</p>
+
+<p><img src="/images/todo-app-sample.gif" style="width: 500px; display: block; margin: auto;"></p>
+
+<h3 id="viewchildren-and-contentchildren">ViewChildren and ContentChildren</h3>
+
+<p>And yes, it was that easy! Now we are ready to define what the concepts of <strong>view children</strong> and <strong>content children</strong> are. **The children element which are located inside of its template of a component are called <em>view children</em> **. On the other hand, **elements which are used between the opening and closing tags of the host element of a given component are called <em>content children</em> **.</p>
+
+<p>This means that <code>todo-input</code> and <code>todo-item</code> could be considered view children of <code>todo-app</code>, and <code>app-footer</code> (if it is defined as Angular component or directive) could be considered as a content child.</p>
+
+<h4 id="accessing-view-and-content-children">Accessing View and Content Children</h4>
+
+<p>Now comes the interesting part! Lets see how we can access and manipulate these two types of children!</p>
+
+<h5 id="playing-around-with-view-children">Playing around with View Children</h5>
+
+<p>Angular provides the following property decorators in the <code>@angular/core</code> package: <code>@ViewChildren</code>, <code>@ViewChild</code>, <code>@ContentChildren</code> and <code>@ContentChild</code>. We can use them the following way:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">ViewChild</span><span class="p">,</span> <span class="nx">ViewChildren</span><span class="p">,</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">AfterViewInit</span><span class="p">...}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="c1">// ...</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;todo-app&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`...`</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">TodoAppComponent</span> <span class="kr">implements</span> <span class="nx">AfterViewInit</span> <span class="p">{</span>
+  <span class="kd">@ViewChild</span><span class="p">(</span><span class="nx">TodoInputComponent</span><span class="p">)</span> <span class="nx">inputComponent</span>: <span class="kt">TodoInputComponent</span>
+  <span class="kd">@ViewChildren</span><span class="p">(</span><span class="nx">TodoComponent</span><span class="p">)</span> <span class="nx">todoComponents</span>: <span class="kt">QueryList</span><span class="o">&lt;</span><span class="nx">TodoComponent</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">todos</span>: <span class="kt">TodoList</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="nx">ngAfterViewInit() {</span>
+    <span class="c1">// available here</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>The example above shows how we can take advantage of <code>@ViewChildren</code> and <code>@ViewChild</code>. Basically we can decorate a property and this way query the view of a component. In the example above, we query the <code>TodoInputComponent</code> child component with <code>@ViewChild</code> and <code>TodoComponent</code> with <code>@ViewChildren</code>. We use different decorators because we have different number of instances of the components that we want to select. For instance, we can select <code>TodoInputComponent</code> with <code>@ViewChild</code> because we have only a single instance of it, but we have multiple todo items, so for them we need to apply the <code>@ViewChildren</code> decorator.</p>
+
+<p>Another thing to notice are the types of the <code>inputComponent</code> and <code>todoComponents</code> properties. The first property is of type <code>TodoInputComponent</code>. It&rsquo;s value can be either <code>null</code>, if Angular haven&rsquo;t found such child, or a reference to the instance of the component&rsquo;s controller (in this case, reference to an instance of the <code>TodoInputComponent</code> class). On the other hand, since we have multiple <code>TodoComponent</code> instances which can be dynamically added and removed from the view, the type of the <code>todoComponents</code> property is <code>QueryList&lt;TodoComponent&gt;</code>. We can think of the <code>QueryList</code> as an observable collection, which can emit events once items are added or removed from it. We can access the <code>Observable</code> wrapped by the <code>QueryList</code> with its <code>changes</code> property. For further information <a href="https://angular.io/docs/ts/latest/api/core/index/QueryList-class.html">click here</a>.</p>
+
+<p><strong>Since Angular&rsquo;s DOM compiler will process the <code>todo-app</code> component before its children, during the instantiation the <code>inputComponent</code> and <code>todosComponen</code> properties will have value <code>undefined</code>. Their values are going to be set in the <code>ngAfterViewInit</code> life-cycle hook</strong>.</p>
+
+<h5 id="accessing-content-children">Accessing Content Children</h5>
+
+<p>Almost the same rules are valid for the element&rsquo;s content children, however, there are some slight differences. In order to illustrate them better, lets take a look at the root component, which uses the <code>TodoAppComponent</code>:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app-footer&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;ng-content&gt;&lt;/ng-content&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">FooterComponent</span> <span class="p">{}</span>
+
+<span class="kd">@Component</span><span class="p">(...)</span>
+<span class="kr">class</span> <span class="nx">TodoAppComponent</span> <span class="p">{...}</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;demo-app&#39;</span><span class="p">,</span>
+  <span class="nx">styles</span><span class="o">:</span> <span class="p">[</span>
+    <span class="s1">&#39;todo-app { margin-top: 20px; margin-left: 20px; }&#39;</span>
+  <span class="p">],</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
+<span class="sb">    &lt;content&gt;</span>
+<span class="sb">      &lt;todo-app&gt;</span>
+<span class="sb">        &lt;app-footer&gt;</span>
+<span class="sb">          &lt;small&gt;Yet another todo app!&lt;/small&gt;</span>
+<span class="sb">        &lt;/app-footer&gt;</span>
+<span class="sb">      &lt;/todo-app&gt;</span>
+<span class="sb">    &lt;/content&gt;</span>
+<span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>In the snippet above we define two more components <code>FooterComponent</code> and <code>AppComponent</code>. <code>FooterComponent</code> visualizes all of the content passed between the opening and closing tags of its host element (<code>&lt;app-footer&gt;content to be projected&lt;/app-footer&gt;</code>). On the other hand, <code>AppComponent</code> uses <code>TodoAppComponent</code> and passes <code>FooterComponent</code> between its opening and closing tags. So given our terminology from above, <code>FooterComponent</code> is a content child of <code>TodoAppComponent</code>. We can access it in the following way:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// ...</span>
+<span class="kd">@Component</span><span class="p">(...)</span>
+<span class="kr">class</span> <span class="nx">TodoAppComponent</span> <span class="kr">implements</span> <span class="nx">AfterContentInit</span> <span class="p">{</span>
+  <span class="kd">@ContentChild</span><span class="p">(</span><span class="nx">FooterComponent</span><span class="p">)</span> <span class="nx">footer</span>: <span class="kt">FooterComponent</span><span class="p">;</span>
+  <span class="nx">ngAfterContentInit() {</span>
+    <span class="c1">// this.footer now points to the instance of `FooterComponent`</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>As we can see from above, the only two differences between accessing view children and content children are the decorators and the life-cycle hooks in which they are initialized. For grabbing all the content children we should use <code>@ContentChildren</code> (or <code>@ContentChild</code> if there&rsquo;s only one child), and the children will be set on <code>ngAfterContentInit</code>.</p>
+
+<h4 id="viewproviders-vs-providers"><code>viewProviders</code> vs <code>providers</code></h4>
+
+<p>Alright! We&rsquo;re almost done with our journey! As final step lets see what the difference between <code>providers</code> and <code>viewProviders</code> is (if you&rsquo;re not familiar with the dependency injection mechanism of Angular, you can take a look at <a href="https://www.packtpub.com/web-development/switching-angular-2">my book</a>).</p>
+
+<p>Lets peek at the declaration of the <code>TodoAppComponent</code>:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">TodoList</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">todos</span>: <span class="kt">Todo</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span>
+
+  <span class="nx">add</span><span class="p">(</span><span class="nx">todo</span>: <span class="kt">Todo</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">remove</span><span class="p">(</span><span class="nx">todo</span>: <span class="kt">Todo</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">set</span><span class="p">(</span><span class="nx">todo</span>: <span class="kt">Todo</span><span class="p">,</span> <span class="nx">index</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">get</span><span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">getAll() {</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="c1">// ...</span>
+  <span class="nx">viewProviders</span><span class="o">:</span> <span class="p">[</span><span class="nx">TodoList</span><span class="p">]</span>
+  <span class="c1">// ...</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">TodoAppComponent</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">todos</span>: <span class="kt">TodoList</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Inside of the <code>@Component</code> decorator we set the <code>viewProviders</code> property to an array with a single element - the <code>TodoList</code> class. The <code>TodoList</code> class holds all the todo items, which are entered in the current session.</p>
+
+<p>We inject the <code>TodoList</code> service in the <code>TodoAppComponent</code>&rsquo;s constructor, but we can also inject it in any other directive&rsquo;s (or component) constructor, which is used in the <code>TodoAppComponent</code>&rsquo;s view. This means that <code>TodoList</code> is accessible from:</p>
+
+<ul>
+<li><code>TodoList</code></li>
+<li><code>TodoComponent</code></li>
+<li><code>TodoInputComponent</code></li>
+</ul>
+
+<p>However, if we try to inject this service in <code>FooterComponent</code>&rsquo;s constructor we are going to get the following runtime error:</p>
+<div class="highlight"><pre><span></span>ORIGINAL EXCEPTION: No provider for TodoList!
+</pre></div>
+
+<p><strong>This means that providers declared in given component with <code>viewProviders</code> are accessible by the component itself and all of its view children.</strong></p>
+
+<p>In case we want to make the service available to <code>FooterComponent</code> as well we need to change the declaration of the component&rsquo;s providers from <code>viewProviders</code> to <code>providers</code>.</p>
+
+<h5 id="when-to-use-viewproviders">When to use <code>viewProviders</code>?</h5>
+
+<p>Why would I use <code>viewProviders</code>, if such providers are not accessible by the content children of the component?
+Suppose you&rsquo;re developing a third-part library, which internally uses some services. These services are part of the <strong>private</strong> API of the library and you don&rsquo;t want to expose them to the users. If such private dependencies are registered with <code>providers</code> and the user passes content children to any of the components exported by the public API of your library, she will get access to them.
+However, if you use <code>viewProviders</code>, the providers will not be accessible from the outside.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this article we took a brief look at how we can compose components and directives. We also explained what the difference between content children and view children is, as well as, how we can access these two different kinds of children.</p>
+
+<p>As final step we explained the semantics between the <code>viewProviders</code> and <code>providers</code> properties of the <code>@Component</code> decorator. If you have further interest in the topic I recommend you the book I&rsquo;m working on &ldquo;<a href="https://www.packtpub.com/web-development/getting-started-angular-second-edition">Getting Started with Angular</a>&rdquo;.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&title=ViewChildren%20and%20ContentChildren%20in%20Angular" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&t=ViewChildren%20and%20ContentChildren%20in%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f&text=ViewChildren%20and%20ContentChildren%20in%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?ViewChildren%20and%20ContentChildren%20in%20Angular http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f01%2f23%2fangular2-viewchildren-contentchildren-difference-viewproviders%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>ViewChildren and ContentChildren in Angular</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular/">Angular</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular/">Angular</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/ViewChildren/">ViewChildren</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/ContentChildren/">ContentChildren</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
+
+<meta property="og:title" content="Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
+<meta name="twitter:title" content="Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2017-12-07T00:00:00JST",
+    "dateModified": "2017-12-07T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.
+All of the anti-patterns below have the following structure:
+ Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Redux Anti-Patterns - Part 1. State Management.</h1>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&title=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&t=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&text=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management. http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.</p>
+
+<p>All of the anti-patterns below have the following structure:</p>
+
+<ul>
+<li>Introduction</li>
+<li>Problem definition</li>
+<li>Sample solutions with discussion of their pros and cons</li>
+</ul>
+
+<h1 id="state-duplication">State Duplication</h1>
+
+<p>Sometimes we have instances of the same business entity used in different contexts. In such cases, instead of keeping the instances under the same store property we treat them differently.</p>
+
+<p><img src="/images/redux-anti-patterns/duplicate.jpg" style="display: block; margin: auto" alt="Duplication"></p>
+
+<h2 id="problem">Problem</h2>
+
+<p>For example, lets suppose we are developing an application which provides tutoring functionality. A tutor can schedule sessions and also, once the time for given session comes, the tutor can join it. Lets model the session with the following interface:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+  <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
+  <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&rsquo;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
+  <span class="nx">currentSession</span>: <span class="kt">Session</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Although such shape of the store is logically correct, it introduces state duplication. For example, lets suppose the user schedules the following session and later joins it:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Introduction to Go&#39;</span><span class="p">,</span>
+  <span class="nx">start</span>: <span class="kt">startTime</span><span class="p">,</span>
+  <span class="nx">end</span>: <span class="kt">endTime</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>This way we&rsquo;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
+
+<ul>
+<li>If we modify the current session, we need to update the <code>sessions</code> array and <code>currentSession</code>.</li>
+<li>If we switch between sessions we need to clean the <code>currentSession</code> and replace it with the session corresponding to the page we&rsquo;ve navigated to.</li>
+</ul>
+
+<h2 id="solution">Solution</h2>
+
+<p>The solution is to keep a value pointing to the current session in the <code>sessions</code> array as value of the <code>currentSession</code> property. For instance, we can use the <code>Session</code>&rsquo;s <code>id</code> for the purpose:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
+  <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This has an implication - we need to select the correct session from the &ldquo;master&rdquo; property. In this specific case, it&rsquo;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+  <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
+  <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This way we will be able to access the current session with constant complexity:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span>
+</code></pre></div>
+
+<h1 id="incorrect-information-expert">Incorrect Information Expert</h1>
+
+<p>There&rsquo;s a collection of patterns called <a href="https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)">GRASP</a>, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book &ldquo;<a href="https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062">Applying UML and Patterns</a>&rdquo;. One of them is called &ldquo;Information Expert&rdquo;. The book describes this practice as:</p>
+
+<blockquote>
+<p>Assign a responsibility to the information expert class that has the information necessary to fulfill the responsibility.</p>
+</blockquote>
+
+<p>The pattern suggests that we should assign the responsibilities to given class based on the information it holds. At first this doesn&rsquo;t seem applicable to the functional approach of redux (sounds soo &ldquo;object-orienty&rdquo;, doesn&rsquo;t it).</p>
+
+<p>If we suppose that the pattern is symmetric, we can take a look at it the another angle:</p>
+
+<blockquote>
+<p>Keep the information in given component which helps it to fulfill its responsibilities.</p>
+</blockquote>
+
+<p>Keep in mind that the information expert for the entire redux application is the store itself. On the other hand, often we have local state which is shared only among the components belonging to given component sub-tree.</p>
+
+<p>Whether and how we should use local state in redux is already well discussed in multiple sources. In general, the local state often UI state which can be preserved in given component instead of moved to the store. This reduces boilerplates and often increase development productivity.</p>
+
+<h2 id="problem-1">Problem</h2>
+
+<p>An anti-pattern that I have noticed is that often the state is hold by an incorrect component in the hierarchy. Commonly multiple child components hold copy of shared, local state.</p>
+
+<p>This has a serious implication - when the state need to be mutated, it often gets changed only in one of the components which breaks consistency.</p>
+
+<h2 id="solution-1">Solution</h2>
+
+<p>The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components&rsquo; children.</p>
+
+<p>Sometimes, it makes more sense to move the state directly to the store and use more systematic mechanism for mutating it (through actions and reducers).</p>
+
+<p>As result we get:</p>
+
+<h3 id="coupling">Coupling</h3>
+
+<p>Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn&rsquo;t allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it&rsquo;s often is not good enough.</p>
+
+<p>Take a look at the next figure:</p>
+
+<p><img src="/images/redux-anti-patterns/cmp.png" style="display: block; margin: auto" alt="Component tree"></p>
+
+<p>If component <code>A</code> holds the state that <code>C</code> and <code>D</code> consume then <code>B</code> should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven&rsquo;t experienced any serious issues with it for medium sized applications (above 40k SLOC).</p>
+
+<h3 id="mutation">Mutation</h3>
+
+<p>The mutation of the state now should happen through the parent component (on the diagram above <code>A</code>). This can be achieved by passing callbacks. When the callbacks need to be passed through several levels of children I often prefer to move the local state to the store.</p>
+
+<h1 id="implicit-state-duplication">Implicit State Duplication</h1>
+
+<p>Often we have a piece of the state which can be computed from another. In such cases we have implicit state duplication.</p>
+
+<h2 id="problem-2">Problem</h2>
+
+<p>Lets suppose we have the following global store:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
+  <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
+  <span class="nx">totalSessions</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice that there&rsquo;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span>
+</code></pre></div>
+
+<p><img src="/images/redux-anti-patterns/encapsulation.jpg" style="display: block; margin: auto" alt="Hidden dependencies"></p>
+
+<h2 id="solution-2">Solution</h2>
+
+<p>We should get rid of the properties which can be computed from another properties. This introduces additional calculations but they can be easily optimized since they are based on pure functions.</p>
+
+<p>I find the usage of <a href="https://github.com/reactjs/reselect"><code>reselect</code></a> very appropriate for this particular case. Another alternative is definition of methods in a parent component which encapsulate the computations required for the given computed state property. Efficiency there can be achieved using memoization.</p>
+
+<h1 id="overwriting-state-updates">Overwriting State Updates</h1>
+
+<p>In this section we&rsquo;ll take a look at another issue which is related to inconsistent state mutation.</p>
+
+<h2 id="problem-3">Problem</h2>
+
+<p>Lets suppose that our redux project uses immutable.js and we have a record for the <code>Session</code> model which has the following interface.</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+  <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
+  <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
+  <span class="nx">guide</span>: <span class="kt">User</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>&hellip;and the following actions&rsquo; definitions:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
+
+<span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span><span class="p">,</span>
+      <span class="nx">body</span>: <span class="kt">JSON.stringify</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()),</span>
+      <span class="nx">headers</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s1">&#39;content-type&#39;</span><span class="o">:</span> <span class="s1">&#39;application/json&#39;</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">s</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">s</span><span class="p">)));</span>
+
+<span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span>
+</code></pre></div>
+
+<p>And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<span class="nx">createSession() {</span>
+  <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">session</span><span class="p">)));</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div>
+
+<p>The code looks fine at first but lets trace what is actually going on:</p>
+
+<ol>
+<li>We assign reference to the <code>session</code> property to the constant called <code>session</code>.</li>
+<li>We update the title of the session by invoking the set method of the record.</li>
+<li>This creates a new session record which is passed to <code>updateSession</code>.</li>
+<li>Update session sends a network request and updates the session in the back-end.</li>
+<li>Update session pessimistically updates the session in the store (i.e. in the store now we have the session with its new title).</li>
+<li>We invoke the <code>setGuide</code> action, passing the <code>session</code> constant as argument.</li>
+<li>In the action we get the guide from the network.</li>
+<li>We update the <code>guide</code> property of the session and update the store with the returned by the <code>set</code> method value.</li>
+</ol>
+
+<p>Notice that at step <code>6.</code> we pass reference to the old <code>session</code> object where we still have the old <code>title</code>. This way the reducer will overwrite the session in the store and replace it with an object with the old <code>title</code> and the <code>guide</code> property set.</p>
+
+<p>With this simple example the problem looks obvious. In case when we have multiple asynchronous calls and the control flow gets less intuitive, the issue may get tricker.</p>
+
+<h2 id="solutions">Solutions</h2>
+
+<p>There are several solutions to this problem; lets describe them one by one:</p>
+
+<h3 id="using-getstate">Using <code>getState</code></h3>
+
+<p>We can update <code>setGuide</code> to:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">getStore</span><span class="p">().</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+  <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>This way we can make sure that we always get the latest session inside of the <code>setGuide</code> async action.</p>
+
+<h3 id="using-resolve-argument">Using Resolve Argument</h3>
+
+<p>We can refactor <code>setGuide</code> in a different way:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">));</span>
+      <span class="nx">updateSession</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">s</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>Respectively, we can update the component to:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<span class="nx">createSession() {</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">s</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">s</span><span class="p">)));</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div>
+
+<p>Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:</p>
+
+<h3 id="updated-props">Updated Props</h3>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<span class="nx">createSession() {</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">)));</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div>
+
+<p>The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of <code>updateSession</code> looks like:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">));</span>
+  <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">session</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>&hellip;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>In this blog post we explored four basic state management anti-patterns in Redux:</p>
+
+<ul>
+<li>State duplication</li>
+<li>Wrong information expert</li>
+<li>Implicit state duplication</li>
+<li>Overwriting state updates</li>
+</ul>
+
+<p>We discussed their consequences and proposed sample solutions. In the next post I&rsquo;ll share a few lessons I learned about testing.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&title=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&t=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&text=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management. http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Redux Anti-Patterns - Part 1. State Management.</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/React/">React</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Redux/">Redux</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Architecture/">Architecture</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/React/">React</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Redux/">Redux</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Architecture/">Architecture</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-d5453b70e14b3e477d88477b37bc5167">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/11/14/angular-iterablediffer-keyvaluediffer-custom-differ-track-by-fn-performance/" class="thumbnail" title="Faster Angular Applications - Understanding Differs. Developing a Custom IterableDiffer"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/11/14/angular-iterablediffer-keyvaluediffer-custom-differ-track-by-fn-performance/">Faster Angular Applications - Understanding Differs. Developing a Custom IterableDiffer</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-11-17T00:00:00JST">Nov 17, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

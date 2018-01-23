@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2017/06/25/virtual-reality-for-a-gamified-ide-ngworld-angular/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>WebVR for a Gamified IDE - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on ngconf 2017, and the project&amp;rsquo;s extension I presented on AngularUP 2017 during my talks &amp;ldquo;Mad Science with the Angular Compiler&amp;rdquo;.">
+
+<meta property="og:title" content="WebVR for a Gamified IDE - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2017/06/25/virtual-reality-for-a-gamified-ide-ngworld-angular/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on ngconf 2017, and the project&amp;rsquo;s extension I presented on AngularUP 2017 during my talks &amp;ldquo;Mad Science with the Angular Compiler&amp;rdquo;.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2017/06/25/virtual-reality-for-a-gamified-ide-ngworld-angular/">
+<meta name="twitter:title" content="WebVR for a Gamified IDE - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on ngconf 2017, and the project&amp;rsquo;s extension I presented on AngularUP 2017 during my talks &amp;ldquo;Mad Science with the Angular Compiler&amp;rdquo;.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "WebVR for a Gamified IDE - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2017-06-25T00:00:00JST",
+    "dateModified": "2017-06-25T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on ngconf 2017, and the project&rsquo;s extension I presented on AngularUP 2017 during my talks &ldquo;Mad Science with the Angular Compiler&rdquo;."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-7fca5d52ef0b8393291d96951819bacf">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/06/25/virtual-reality-for-a-gamified-ide-ngworld-angular/" class="thumbnail" title="WebVR for a Gamified IDE"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">WebVR for a Gamified IDE</h1>
+        <ul class="p-facts">
+          <li><time datetime="2017-06-25T00:00:00JST">Jun 25, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&title=WebVR%20for%20a%20Gamified%20IDE" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&t=WebVR%20for%20a%20Gamified%20IDE" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&text=WebVR%20for%20a%20Gamified%20IDE&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?WebVR%20for%20a%20Gamified%20IDE http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>In the first part of this blog post I discuss the idea of using virtual reality for gamification of manual tasks in the software development process. I introduce a demo project which allows source code visualization and manipulation in a generated Minecraft-like virtual reality. My initial presentation of the demo project was on <a href="https://www.youtube.com/watch?v=tBV4IQwPssU">ngconf 2017</a>, and the project&rsquo;s extension I presented on <a href="http://angular-up.com/">AngularUP 2017</a> during my talks &ldquo;<a href="https://www.youtube.com/watch?v=tBV4IQwPssU">Mad Science with the Angular Compiler</a>&rdquo;.</p>
+
+<p>Since I heard a lot of people being interested in the actual implementation of the demo, in the second part of the post we&rsquo;ll go through its source code, which is <a href="https://github.com/mgechev/ngworld">hosted here, on GitHub</a>. You can find demo of the project in the <a href="#demo">last part of the blog post</a>.</p>
+
+<h1 id="vr-as-a-gamified-ide">VR as a gamified IDE</h1>
+
+<p>This section leaves more questions than answers. In the next a couple of subsections I discuss the idea of abstracting manual software engineering tasks as games, and releasing them on the global market. If you&rsquo;re interested in the actual implementation of <a href="https://github.com/mgechev/ngworld">ngworld tool</a>, skip to the <a href="#Sample-Implementation">&ldquo;Sample Implementation&rdquo; section</a>.</p>
+
+<h2 id="background">Background</h2>
+
+<p>The purpose of my &ldquo;<a href="https://www.youtube.com/watch?v=tBV4IQwPssU">Mad Science with the Angular Compiler</a>&rdquo; talk is to demonstrate what doors the Angular compiler opens by providing us an access to the ASTs produced by the frontend of the TypeScript compiler, Angular template, expression and CSS parsers. In the talk I explain how the compiler can be used for:</p>
+
+<ul>
+<li>Proving that our code aligns to style-related recommendations listed in the <a href="https://angular.io/styleguide">Angular style guide</a> (see <a href="http://codelyzer.com">codelyzer</a>)</li>
+<li>Simplification of the migration process, by providing pluggable AST transformation rules, depending on the deprecations and the breaking changes introduced by the framework.</li>
+<li><a href="https://github.com/mgechev/ngrev">Tool for reverse engineering</a> of Angular applications through source code visualization.</li>
+</ul>
+
+<p><a href="https://github.com/mgechev/ngrev">ngrev</a> is already quite useful, however, I wanted to go one step further and provide a more fun demo. That&rsquo;s why for <a href="https://youtu.be/tBV4IQwPssU?t=15m19s">ngconf</a>, I developed an &ldquo;unconventional compiler&rdquo; which from an Angular application produces a Minecraft-like WebVR. The VR is produced by the following rules:</p>
+
+<ul>
+<li>The virtual world corresponds to the entire application, composed by the Angular modules.</li>
+<li>Each module is represented by a &ldquo;garden&rdquo;.</li>
+<li>The trees in the gardens are the components of the application.</li>
+<li>Each tree has a crown which consists of blocks. Each block is a template element.</li>
+<li>The blocks have different colors depending on whether they represent an Angular component or a plain HTML element.</li>
+</ul>
+
+<h2 id="open-questions">Open questions</h2>
+
+<p>While I was building this demo, I was thinking about the following three questions:</p>
+
+<ul>
+<li>Can we make the visualization more interactive and propagate mutations happening in the virtual world to the application&rsquo;s source code?</li>
+<li>Can we use VR for meaningful source code visualization? Obviously, although fun, the demo application doesn&rsquo;t provide a lot of value.</li>
+<li>Can we solve real-life problems this way?</li>
+</ul>
+
+<p>I experimented with the first point. Since tree-shaking is a <a href="https://webpack.js.org/guides/tree-shaking/">big thing in the JavaScript world</a>, and I already had the trees, for <a href="http://angular-up.com/">AngularUP</a> I introduced the shaking part. In order to make it more memorable, I created a lightweight server which accepts commands from the virtual reality and modifies the source code. For the purpose of the demo, we can tree-shake a tree and drop its leaves, one by one.</p>
+
+<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/uwBo201Dd8A?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+
+<p>After one of the Angular SF meetups, I had a chat with <a href="https://twitter.com/pxwise">Shawn Stedman</a> who told me that after watching my talk on ngconf, he thought about extending the demo and building a Minecraft-based IDE where one can plant trees (i.e. create components), create gardens (add modules), etc. Abstractly thinking, this can be considered as a gamified IDE in the virtual reality.</p>
+
+<p>It turns out that gamifying the software development process is a <a href="https://dl.acm.org/citation.cfm?id=2494589">broadly</a> <a href="http://www.sciencedirect.com/science/article/pii/S0950584914001980">researched</a> <a href="https://scholar.google.com/scholar?q=gamification+software+development&amp;hl=bg&amp;as_sdt=0&amp;as_vis=1&amp;oi=scholart&amp;sa=X&amp;ved=0ahUKEwjs4IvR6tjUAhUCNhoKHfLHCbwQgQMIIjAA">topic</a>.</p>
+
+<p>Gamifying the software development process looks like an interesting opportunity, however, it still requires the full engagement of very expensive asset - software engineers. In our daily work environment, as engineers we don&rsquo;t always have to solve exciting, challenging problems which use our full potential. Such tasks can be outsourced to people with lower expertise, even without engineering background.</p>
+
+<p>This is where it gets interesting. Imagine if we&rsquo;re able to isolate the manual, boring tasks that we need to perform every single day and present them into the form of a game released on the global market. This way hundreds of thousands of people, can solve the manual problems while consuming these games.</p>
+
+<p>Looking at this from slightly different perspective, it turns out that scientists already use similar technic for using gamers as computational units for solving NP-complete protein folding problems <a href="#foldit"><sup>[1]</sup></a> <a href="#outsourcing"><sup>[2]</sup></a> <a href="#hope-college"><sup>[3]</sup></a>.</p>
+
+<p>Meanwhile, I found that there is a research for visualization of object-oriented source code in the three dimensional space <a href="#memphis"><sup>[4]</sup></a> and in AltspaceVR experimented introducing a more traditional IDE to VR <a href="#ide-vr"><sup>[5]</sup></a>.</p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>Virtual Reality opens an entire new world of visualization which we will most likely take advantage of as part of our development process in the next a couple of years. The questions that this blog post opens are:</p>
+
+<ul>
+<li>Can we move our integrated development environment to VR and&hellip;</li>
+<li>Can we isolate some of the manual tasks we need to perform as engineers, abstract them into the form of a game and outsource them as a game.</li>
+</ul>
+
+<p>Although the demo project demonstrated in this blog post doesn&rsquo;t have the potential to be turned into a full-fledged IDE, based on the third-party research in this direction seems that there&rsquo;s an opportunity in this space.</p>
+
+<h1 id="sample-implementation">Sample Implementation</h1>
+
+<p>Since looking in the code is always fun, in this section I&rsquo;ll briefly describe the implementation of the demo project. Its <a href="https://github.com/mgechev/ngworld">source code is hosted on GitHub</a>. Working demo can be found in the <a href="#demo">end of the post</a> or <a href="https://mgechev.github.io/ngworld">here</a></p>
+
+<h2 id="parsing">Parsing</h2>
+
+<p>The initial part of the implementation of every compiler is its frontend. We get the phases of lexical analysis and syntax analysis for free from <a href="https://github.com/mgechev/ngast">ngast</a>, which delegates some of the work to <a href="https://github.com/angular/angular">ngc</a> and the <a href="https://github.com/Microsoft/TypeScript">tsc</a>.</p>
+
+<p>Parsing the entire project with <a href="https://github.com/mgechev/ngast">ngast</a> is as simple as this:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">projectPath</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">project</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ProjectSymbols</span><span class="p">(</span><span class="nx">createProgramFromTsConfig</span><span class="p">(</span><span class="nx">projectPath</span><span class="p">),</span> <span class="p">{</span>
+    <span class="nx">getSync</span><span class="o">:</span> <span class="p">(</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">path</span><span class="p">).</span><span class="nx">toString</span><span class="p">(),</span>
+    <span class="nx">get</span><span class="o">:</span> <span class="p">(</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="k">new</span> <span class="nx">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">readFile</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">content</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">error</span> <span class="o">?</span> <span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">:</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">content</span><span class="p">.</span><span class="nx">toString</span><span class="p">())))</span>
+  <span class="p">},</span> <span class="p">(</span><span class="nx">error</span>: <span class="kt">string</span><span class="p">,</span> <span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">path</span><span class="p">));</span>
+  <span class="k">return</span> <span class="nx">formatContext</span><span class="p">(</span><span class="nx">project</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>All we need to do is to create a new instance of the <code>ProjectSymbols</code> class by providing a TypeScript program, a host (<code>ResourceResolver</code>) and a logger to its constructor.</p>
+
+<p>In the end of the <code>parse</code> method we transform the project with the function <code>formatContext</code>.</p>
+
+<h2 id="transforms">Transforms</h2>
+
+<p>After we have the symbols of the project, we need to extract the ASTs of the templates of the components and transform it to a form convenient for code generation.</p>
+
+<p>Here are the signatures of the methods used for the phase of AST transformation, and the interfaces of their output:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Module</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">components</span>: <span class="kt">Component</span><span class="p">[];</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">template</span>: <span class="kt">Node</span><span class="p">[];</span>
+  <span class="nx">templateUrl</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">enum</span> <span class="nx">NodeType</span> <span class="p">{</span>
+  <span class="nx">Plain</span><span class="p">,</span>
+  <span class="nx">Custom</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Node</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">type</span>: <span class="kt">NodeType</span><span class="p">,</span>
+  <span class="nx">children</span>: <span class="kt">Node</span><span class="p">[];</span>
+  <span class="nx">startOffset</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">endOffset</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">formatContext</span> <span class="o">=</span> <span class="p">(</span><span class="nx">context</span>: <span class="kt">ProjectSymbols</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">const</span> <span class="nx">formatModules</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">ModuleSymbol</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">const</span> <span class="nx">transformTemplateAst</span> <span class="o">=</span> <span class="p">(</span><span class="nx">template</span>: <span class="kt">TemplateAst</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">const</span> <span class="nx">formatComponents</span> <span class="o">=</span> <span class="p">(</span><span class="nx">directives</span>: <span class="kt">DirectiveSymbol</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+</code></pre></div>
+
+<ul>
+<li><code>formatModules</code> is responsible for transforming the internal <a href="https://github.com/mgechev/ngast">ngast</a> module representation to a structure which can be used for generation of a &ldquo;garden&rdquo;.</li>
+<li><code>formatComponents</code> will transform the internal <code>DirectiveSymbol</code>s to object suitable for generation of &ldquo;trees&rdquo;.</li>
+<li><code>transformTemplateAst</code> is used for transformation of the directive&rsquo;s <code>TemplateAst</code>s.</li>
+</ul>
+
+<p>The implementations of these methods are straightforward, so we don&rsquo;t have to go into any details, however, if you&rsquo;re interested them, you can see the transformers <a href="https://github.com/mgechev/ngworld/blob/master/parser/formatters.ts#L29-L76">here</a>.</p>
+
+<h2 id="layout">Layout</h2>
+
+<p>For our compiler, we need to implement one more AST transformation phase, which put into the context of ngworld is just computation of the layout of the virtual world. For simplicity in our VR everything will be known ahead of time and nothing will be generated lazily.</p>
+
+<p>Here are the methods declarations and the interfaces of their outputs:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Size</span> <span class="p">{</span>
+  <span class="nx">width</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">height</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">depth</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Position</span> <span class="p">{</span>
+  <span class="nx">x</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">y</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">z</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">enum</span> <span class="nx">LeafType</span> <span class="p">{</span>
+  <span class="nx">Plain</span><span class="p">,</span>
+  <span class="nx">Special</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Leaf</span> <span class="p">{</span>
+  <span class="nx">label</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">type</span>: <span class="kt">LeafType</span><span class="p">;</span>
+  <span class="nx">startOffset</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">endOffset</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="nx">type</span> <span class="nx">LeaveSet</span> <span class="o">=</span> <span class="nx">Leaf</span><span class="p">[];</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">TreeLayout</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">position</span>: <span class="kt">Position</span><span class="p">;</span>
+  <span class="nx">leaves</span>: <span class="kt">LeaveSet</span><span class="p">[];</span>
+  <span class="nx">templateUrl</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">GardenLayout</span> <span class="p">{</span>
+  <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">size</span>: <span class="kt">Size</span><span class="p">;</span>
+  <span class="nx">position</span>: <span class="kt">Position</span><span class="p">;</span>
+  <span class="nx">trees</span>: <span class="kt">TreeLayout</span><span class="p">[];</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">WorldLayout</span> <span class="p">{</span>
+  <span class="nx">size</span>: <span class="kt">Size</span><span class="p">;</span>
+  <span class="nx">position</span>: <span class="kt">Position</span><span class="p">;</span>
+  <span class="nx">gardens</span>: <span class="kt">GardenLayout</span><span class="p">[];</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">getLeaves</span> <span class="o">=</span> <span class="p">(</span><span class="nx">template</span>: <span class="kt">Node</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="c1">// We have less trees compared to previous layer</span>
+<span class="kr">const</span> <span class="nx">getTreesLayout</span> <span class="o">=</span> <span class="p">(</span><span class="nx">components</span>: <span class="kt">Component</span><span class="p">[],</span> <span class="nx">prevSize</span>: <span class="kt">Size</span><span class="p">,</span> <span class="nx">prevPosition</span>: <span class="kt">Position</span><span class="p">)</span><span class="o">:</span> <span class="nx">TreeLayout</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">const</span> <span class="nx">getGardenLayout</span> <span class="o">=</span> <span class="p">(</span><span class="nx">module</span>: <span class="kt">Module</span><span class="p">,</span> <span class="nx">prevGarden</span>: <span class="kt">GardenLayout</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">const</span> <span class="nx">getGardensLayout</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">Module</span><span class="p">[])</span><span class="o">:</span> <span class="nx">GardenLayout</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">createWorldLayout</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">Module</span><span class="p">[])</span><span class="o">:</span> <span class="nx">WorldLayout</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+</code></pre></div>
+
+<p>In the snippet above we calculate the layout for the first tree of the first module, after that the second one, etc, until we calculate the layout for all the trees for the garden (module). Since at this point we already know the location of all the trees in given garden, we can just surround them with a fence which is the garden&rsquo;s layout.</p>
+
+<p>When we&rsquo;ve calculated the layout of each individual garden, we can calculate the layout of the entire world.</p>
+
+<h2 id="code-generation">Code Generation</h2>
+
+<p>The last step is the code generation. Given that we&rsquo;ll use <a href="https://aframe.io/">aframe</a>, this is going to be a straightforward process. We can represent the leaves, trees and gardens as a mustache templates. Later, based on our calculations in the layout phase, we can render the templates and fill the placeholders corresponding to colors, positioning, labeling, etc.</p>
+
+<p>Let&rsquo;s take a look at the tree template, to get a better idea:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">TreeTemplate</span> <span class="o">=</span> <span class="sb">`</span>
+<span class="sb">&lt;a-entity id=&quot;{{id}}&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;{{x}} {{y}} {{z}}&quot; rotation=&quot;0 30 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot; data-template-url=&quot;{{{templateUrl}}}&quot;&gt;</span>
+<span class="sb">  &lt;a-entity static-body=&quot;&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;-0.1 0 0&quot; rotation=&quot;2 60 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot;&gt;&lt;/a-entity&gt;</span>
+<span class="sb">  &lt;a-entity static-body=&quot;&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;0 0 0.1&quot; rotation=&quot;2 -90 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot;&gt;&lt;/a-entity&gt;</span>
+<span class="sb">  &lt;a-entity position=&quot;0 0 0.4&quot; rotation=&quot;-35 -30 0&quot; text=&quot;side: double; width: 5; color: white; align: center; value: {{label}};&quot;&gt;</span>
+<span class="sb">  &lt;/a-entity&gt;</span>
+<span class="sb">  {{{leaves}}}</span>
+<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
+<span class="sb">               dur=&quot;150&quot;¬</span>
+<span class="sb">               to=&quot;5 30 0&quot;¬</span>
+<span class="sb">               begin=&quot;shake-front-{{id}}&quot;</span>
+<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
+<span class="sb">  &lt;/a-animation&gt;¬</span>
+<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
+<span class="sb">               dur=&quot;150&quot;¬</span>
+<span class="sb">               to=&quot;-3 30 0&quot;¬</span>
+<span class="sb">               begin=&quot;shake-back-{{id}}&quot;</span>
+<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
+<span class="sb">  &lt;/a-animation&gt;¬</span>
+<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
+<span class="sb">               dur=&quot;150&quot;¬</span>
+<span class="sb">               to=&quot;0 30 0&quot;¬</span>
+<span class="sb">               begin=&quot;shake-ready-{{id}}&quot;</span>
+<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
+<span class="sb">  &lt;/a-animation&gt;¬</span>
+<span class="sb">&lt;/a-entity&gt;</span>
+<span class="sb">`</span><span class="p">;</span>
+</code></pre></div>
+
+<p>This is a standard <a href="https://aframe.io">aframe</a> template where we have an entity with identifier. Inside of it we have declaration of three animations and also placeholder for the leaves. The animations are related to the tree-shaking simulation. The properties of the object that this template accepts, can be represented by the following interface:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">TreeProperties</span> <span class="p">{</span>
+  <span class="nx">x</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">y</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">z</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">height</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">label</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">leaves</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">templateUrl</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice that inside of the <code>TreeProperties</code> interface we have declaration of <code>templateUrl</code>. Now lets take a look at the leaf template and properties interface:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">LeafProperties</span> <span class="p">{</span>
+  <span class="nx">color</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">x</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">y</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">z</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">label</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">width</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">height</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">depth</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">halfLeaf</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">treeId</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">endOffset</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">startOffset</span>: <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">LeafTemplate</span> <span class="o">=</span> <span class="sb">`</span>
+<span class="sb">&lt;a-entity</span>
+<span class="sb">  id=&quot;{{id}}&quot;</span>
+<span class="sb">  data-start-offset=&quot;{{startOffset}}&quot;</span>
+<span class="sb">  data-end-offset=&quot;{{endOffset}}&quot;</span>
+<span class="sb">  data-tree-id=&quot;{{treeId}}&quot;</span>
+<span class="sb">  geometry=&quot;primitive: box; depth: {{depth}}; height: {{height}}; width: {{width}}&quot;</span>
+<span class="sb">  position=&quot;{{x}} {{y}} {{z}}&quot;</span>
+<span class="sb">  material=&quot;shader: standard; metalness: 0.6; color: {{color}}; repeat: 1 1&quot;&gt;</span>
+<span class="sb">  ...</span>
+<span class="sb">  &lt;a-animation attribute=&quot;position&quot;¬</span>
+<span class="sb">               dur=&quot;1000&quot;¬</span>
+<span class="sb">               begin=&quot;shake-{{id}}&quot;</span>
+<span class="sb">               fill=&quot;forwards&quot;¬</span>
+<span class="sb">               to=&quot;{{x}} 0 {{z}}&quot;¬</span>
+<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
+<span class="sb">  &lt;/a-animation&gt;¬</span>
+<span class="sb">&lt;/a-entity&gt;</span>
+<span class="sb">`</span><span class="p">;</span>
+</code></pre></div>
+
+<p>There are three interesting properties that we need to consider:</p>
+
+<ul>
+<li><code>treeId</code> - identifier of the tree this leaf is attached to.</li>
+<li><code>startOffset</code> - the start offset of the template element represented by this leaf. This is the start position of the opening tag of the element in the string representing the component&rsquo;s template.</li>
+<li><code>endOffset</code> - the end offset of the template element represented by this leaf. This is the end position of the closing tag of the element in the string representing the component&rsquo;s template.</li>
+</ul>
+
+<p>This is all the metadata required for removal of template elements by &ldquo;shaking the tree&rdquo;.</p>
+
+<h2 id="tree-shaking">Tree-Shaking</h2>
+
+<p>When we shake the tree, we activate the following invocation:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;http://localhost:8081&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+  <span class="nx">headers</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="nx">body</span>: <span class="kt">JSON.stringify</span><span class="p">({</span>
+    <span class="nx">file</span>: <span class="kt">tree.getAttribute</span><span class="p">(</span><span class="s1">&#39;data-template-url&#39;</span><span class="p">),</span>
+    <span class="nx">start</span>: <span class="kt">leaf.getAttribute</span><span class="p">(</span><span class="s1">&#39;data-start-offset&#39;</span><span class="p">),</span>
+    <span class="nx">end</span>: <span class="kt">leaf.getAttribute</span><span class="p">(</span><span class="s1">&#39;data-end-offset&#39;</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>All it does is to send a post request to an HTTP application server listening on port <code>8081</code>. All the server needs to do, is to remove the element corresponding to the given offset.</p>
+
+<p>However, notice that if we remove an element, the offsets of all the elements following it in the template, will require an update. This will involve more complex communication protocol between the VR UI and the application server. Because of that, the demo simply replaces all the different characters from the element with whitespace.</p>
+
+<h3 id="server">Server</h3>
+
+<p>Here&rsquo;s the server implementation, with the mentioned hack:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
+    <span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">content</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">p</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="o">+</span>
+      <span class="nx">content</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="nx">p</span><span class="p">.</span><span class="nx">end</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\S/g</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span>
+      <span class="nx">content</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">end</span><span class="p">,</span> <span class="nx">content</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="nx">writeFileSync</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<h2 id="further-improvements">Further improvements</h2>
+
+<p>Of course, we can start planting trees and creating gardens in order to turn this demo into a more complete &ldquo;IDE&rdquo;. Another place for improvement is to drop all child leaves once a parent leaf has been shaken.</p>
+
+<p>There&rsquo;s place for a lot of improvement, however, I&rsquo;m not sure if such a demo project will provide enough value to worth this investment.</p>
+
+<h1 id="external-resources">External resources</h1>
+
+<ol>
+<li><a href="http://www.skepticblog.org/2011/09/19/gamers-succeed-where-scientists-fail/" id="foldit">Gamers succeed where scientists fail</a></li>
+<li><a href="https://www.polygon.com/2017/3/31/15125824/games-companies-outsourcing" id="outsourcing">Games companies turn to outsourcers for low-cost workers</a></li>
+<li><a href="http://meaningfulplay.msu.edu/proceedings2010/mp2010_paper_16.pdf" id="hope-college">Online Games as Social-Computational Systems for Solving NP-complete Problems</a></li>
+<li><a href="https://pdfs.semanticscholar.org/d574/88e55b326d95ba605dd1e7197555cbe039e1.pdf" id="memphis">Visualizing Software in an Immersive Virtual Reality Environment</a></li>
+<li><a href="http://cognitivevr.co/blog/programming-in-virtual-reality/" id="ide-fr"><a href="http://cognitivevr.co/blog/programming-in-virtual-reality/">http://cognitivevr.co/blog/programming-in-virtual-reality/</a></a></li>
+</ol>
+
+<h2 id="demo">Demo</h2>
+
+<iframe src="https://mgechev.github.io/ngworld/" style="border: none; width: 100%; height: 600px;"></iframe>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&title=WebVR%20for%20a%20Gamified%20IDE" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&t=WebVR%20for%20a%20Gamified%20IDE" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f&text=WebVR%20for%20a%20Gamified%20IDE&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?WebVR%20for%20a%20Gamified%20IDE http%3a%2f%2fblog.mgechev.com%2famp%2f2017%2f06%2f25%2fvirtual-reality-for-a-gamified-ide-ngworld-angular%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>WebVR for a Gamified IDE</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/VR/">VR</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/WebVR/">WebVR</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/IDE/">IDE</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular/">Angular</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Source-code-visualization/">Source code visualization</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/VR/">VR</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/WebVR/">WebVR</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/IDE/">IDE</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

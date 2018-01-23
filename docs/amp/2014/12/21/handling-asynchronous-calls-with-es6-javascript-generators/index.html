@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2014/12/21/handling-asynchronous-calls-with-es6-javascript-generators/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Asynchronous calls with ES6 generators - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version. This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.A cool module, which TJ developed, called co, is available for quite a while (his initial commit in the co repository was on 6th of June 2013).">
+
+<meta property="og:title" content="Asynchronous calls with ES6 generators - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2014/12/21/handling-asynchronous-calls-with-es6-javascript-generators/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version. This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.A cool module, which TJ developed, called co, is available for quite a while (his initial commit in the co repository was on 6th of June 2013).">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2014/12/21/handling-asynchronous-calls-with-es6-javascript-generators/">
+<meta name="twitter:title" content="Asynchronous calls with ES6 generators - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version. This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.A cool module, which TJ developed, called co, is available for quite a while (his initial commit in the co repository was on 6th of June 2013).">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Asynchronous calls with ES6 generators - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2014-12-21T00:00:00JST",
+    "dateModified": "2014-12-21T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version. This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.
+A cool module, which TJ developed, called co, is available for quite a while (his initial commit in the co repository was on 6th of June 2013)."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-c08e8477616f6609776c6bb3aad994f3">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2014/12/21/handling-asynchronous-calls-with-es6-javascript-generators/" class="thumbnail" title="Asynchronous calls with ES6 generators"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Asynchronous calls with ES6 generators</h1>
+        <ul class="p-facts">
+          <li><time datetime="2014-12-21T00:00:00JST">Dec 21, 2014</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&title=Asynchronous%20calls%20with%20ES6%20generators" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&t=Asynchronous%20calls%20with%20ES6%20generators" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&text=Asynchronous%20calls%20with%20ES6%20generators&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Asynchronous%20calls%20with%20ES6%20generators http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>ES6 generators have landed in Chrome 39 Beta on 9th of October and are already available in the stable version.
+This means that brand new development practices are already applicable, although for supporting older browsers you might need to fallback to the traceroute compiler.</p>
+
+<p>A cool module, which <a href="https://github.com/tj">TJ</a> developed, called <a href="https://github.com/tj/co"><code>co</code></a>, is available for quite a while (his initial commit in the <code>co</code> repository was on 6th of June 2013).</p>
+
+<p>A few months ago Jake Archibald wrote an <a href="http://jakearchibald.com/2014/es7-async-functions/">article</a> about the awesomeness of the <code>async</code> functions in ES7 and how we can &ldquo;emulate&rdquo; them using ES6&rsquo;s generators, using his <code>spawn</code> function, which has subset of the features of <code>co</code>.</p>
+
+<p>In this blog post we&rsquo;ll take a look at standard ways of handling asynchronous calls and how we can improve the readability of our code using generators. We&rsquo;ll also take a further look at the implementation of <code>spawn</code>, since there are few tricky moments there.</p>
+
+<p>The code from the demo is at my <a href="https://github.com/mgechev/generators-async-demo">GitHub</a>.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>You must be familiar with how JavaScript promises work. You can read this amazing <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">HTML5 rocks article</a> about them and take a look at my <a href="https://github.com/mgechev/light-q">Light Q implementation</a> for the underlaying details.</p>
+
+<p>You should be also familiar with how generators work. For some initial, quick background I can recommend you <a href="http://blog.mgechev.com/2014/09/11/binary-tree-iterator-with-es6-generators/">&ldquo;Binary Tree iterator with ES6 generators&rdquo;</a>.</p>
+
+<h2 id="getting-started">Getting started</h2>
+
+<p>In this section we&rsquo;re going to take a look at simple example, which handles asynchronous function calls with callbacks, promises and generators (we can think them as <a href="https://en.wikipedia.org/wiki/Coroutine">semi-coroutines</a>).</p>
+
+<p>We&rsquo;ll use the most common example for this - AJAX calls.</p>
+
+<h3 id="sample-data-set">Sample data set</h3>
+
+<p>Let&rsquo;s suppose we have the following data, which should be resolved using XHR (XMLHttpRequests):</p>
+
+<p><strong>users.json</strong></p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
+  <span class="nt">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;admins&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;users_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;user1.json&quot;</span><span class="p">,</span> <span class="s2">&quot;user2.json&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Where in each JSON file, corresponding to given user we have:</p>
+
+<p><strong>userx.json</strong></p>
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
+  <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;foobar&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;avatar&quot;</span><span class="p">:</span> <span class="s2">&quot;photox.png&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>All we want to do is get the list of users with GET XHR, log the group name and after that get the users one by one (or at once if possible).</p>
+
+<h3 id="callback-solution">Callback solution</h3>
+
+<p>Let&rsquo;s implement the <code>getJSON</code> method:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">success</span><span class="p">,</span> <span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+  <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">success</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">));</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">error</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+  <span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+  <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Our <code>loadUsers</code> function would look like this:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">loadUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;users.json&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">.</span><span class="nx">group</span><span class="p">);</span>
+    <span class="nx">users</span><span class="p">.</span><span class="nx">users_list</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">u</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">getJSON</span><span class="p">(</span><span class="nx">u</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+      <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">});</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This looks&hellip;alright, I guess.
+What we do is to fetch the <code>users.json</code> and later, in the success callback, fetch each user in the <code>users_list</code> array. Excluding the ugliness of the code (plenty of nested callbacks), the functionality is not that bad because we can fetch up-to 6 users simultaneously (that&rsquo;s the limit in Chrome).</p>
+
+<h3 id="promises-solution">Promises solution</h3>
+
+<p>We can modify slightly <code>getJSON</code> in order to make it return a promise:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">resolve</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="nx">reject</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+    <span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now <code>loadUsers</code> will look like this:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">loadUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;users.json&#39;</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">group</span><span class="p">);</span>
+    <span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">users_list</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">getJSON</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I believe, the code looks a little bit more compact. We still fetch up-to 6 users simultaneously, because of the call <code>data.users_list.map(getJSON)</code>.</p>
+
+<h3 id="solution-with-generators">Solution with generators</h3>
+
+<p>Since <code>async</code> functions are still not implemented in the modern browsers, as Jake suggests, we can use generators as something akin to them. Let&rsquo;s leave our <code>getJSON</code> implementation untouched and implement <code>loadUsers</code> using a generator:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">loadUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">spawn</span><span class="p">(</span><span class="kd">function</span> <span class="o">*</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;users.json&#39;</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">user</span> <span class="k">of</span> <span class="nx">users</span><span class="p">.</span><span class="nx">users_list</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">getJSON</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">yield</span> <span class="nx">user</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Looks much more elegant, doesn&rsquo;t it? Now lets trace what is actually going on under the hood. Let&rsquo;s try to implement <code>spawn</code>.</p>
+
+<p>First of all, we should be aware of the fact that it accepts a generator function, so we should use it like:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">spawn</span><span class="p">(</span><span class="nx">genFunc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">generator</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>After the first invocation of our generator we will receive a promise:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">spawn</span><span class="p">(</span><span class="nx">genFunc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">generator</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+  <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//...</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>This snippet will invoke <code>getJSON</code> and will receive the returned promise (as <code>generator.next().value</code>). On resolve of the promise, the callback will be invoked with JavaScript object, equals to the parsed JSON we just fetched from <code>users.json</code>.</p>
+
+<p>As next step we need to invoke the generator with the received object, this way the local variable <code>users</code> (inside <code>loadUsers</code>) will hold the correct value and we will have access to the <code>users_list</code> property, over which we need to iterate with <code>map</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">spawn</span><span class="p">(</span><span class="nx">genFunc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">generator</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+  <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">users</span><span class="p">).</span><span class="nx">value</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//...</span>
+    <span class="p">})</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once we invoke the generator with the <code>users</code> object we continue the execution of the generator and enter the loop (<code>for...of</code>) where we invoke <code>yield</code> with the first promise. Once the promise is resolved we enter the <code>then</code> callback and we can request the second user:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">spawn</span><span class="p">(</span><span class="nx">genFunc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">generator</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+  <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">users</span><span class="p">).</span><span class="nx">value</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">generator</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">users</span><span class="p">).</span><span class="nx">value</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Done!</span>
+      <span class="p">});</span>
+    <span class="p">})</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>As you see we have a series of nested promise calls. We can generalize them into the following implementation of <code>spawn</code>:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">spawn</span><span class="p">(</span><span class="nx">genFunc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">generator</span> <span class="o">=</span> <span class="nx">genFunc</span><span class="p">();</span>
+  <span class="kd">function</span> <span class="nx">co</span><span class="p">(</span><span class="nx">type</span><span class="p">,</span> <span class="nx">arg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">res</span><span class="p">;</span>
+    <span class="k">try</span> <span class="p">{</span>
+      <span class="nx">res</span> <span class="o">=</span> <span class="nx">generator</span><span class="p">[</span><span class="nx">type</span><span class="p">](</span><span class="nx">arg</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;throw&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">arg</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">co</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="nx">val</span><span class="p">);</span>
+      <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">co</span><span class="p">(</span><span class="s1">&#39;throw&#39;</span><span class="p">,</span> <span class="nx">err</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nx">co</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>Promise.resolve</code> has the same functionality as <code>Q.when</code>, everything else is quite straightforward.</p>
+
+<p>Note that the following code fetches all users one by one in contrast to the callback and the pure promise solution, where we fetch the users simultaneously.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&title=Asynchronous%20calls%20with%20ES6%20generators" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&t=Asynchronous%20calls%20with%20ES6%20generators" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f&text=Asynchronous%20calls%20with%20ES6%20generators&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Asynchronous%20calls%20with%20ES6%20generators http%3a%2f%2fblog.mgechev.com%2famp%2f2014%2f12%2f21%2fhandling-asynchronous-calls-with-es6-javascript-generators%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Asynchronous calls with ES6 generators</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/ES6/">ES6</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/ES7/">ES7</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Programming/">Programming</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/ES6/">ES6</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/ES7/">ES7</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

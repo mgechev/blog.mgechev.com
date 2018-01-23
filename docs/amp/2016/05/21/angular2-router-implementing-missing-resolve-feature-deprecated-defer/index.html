@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="For the last a couple of months I&amp;rsquo;m working on an Angular 2 based PWA. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&amp;rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.One of the features that I miss most in both the new and the newest Angular 2 routes is the resolve functionality which the AngularJS 1.">
+
+<meta property="og:title" content="Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="For the last a couple of months I&amp;rsquo;m working on an Angular 2 based PWA. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&amp;rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.One of the features that I miss most in both the new and the newest Angular 2 routes is the resolve functionality which the AngularJS 1.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/">
+<meta name="twitter:title" content="Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="For the last a couple of months I&amp;rsquo;m working on an Angular 2 based PWA. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&amp;rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.One of the features that I miss most in both the new and the newest Angular 2 routes is the resolve functionality which the AngularJS 1.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2016-05-21T00:00:00JST",
+    "dateModified": "2016-05-21T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "For the last a couple of months I&rsquo;m working on an Angular 2 based PWA. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.
+One of the features that I miss most in both the new and the newest Angular 2 routes is the resolve functionality which the AngularJS 1."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-f794bdbab305ea022112d41d325f8bac">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/" class="thumbnail" title="Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router</h1>
+        <ul class="p-facts">
+          <li><time datetime="2016-05-21T00:00:00JST">May 21, 2016</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&title=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&t=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&text=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>For the last a couple of months I&rsquo;m working on an Angular 2 based <a href="https://developers.google.com/web/progressive-web-apps/">PWA</a>. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.</p>
+
+<p>One of the features that I miss most in both the new and the newest Angular 2 routes is the <code>resolve</code> functionality which the AngularJS 1.x router and the ui-router offer. In short, this functionality allows your application to load data on navigation events and render the routing component once the data has been successfully downloaded.</p>
+
+<p>With the <code>router-deprecated</code> module we can get similar behavior by using <code>@CanActivate</code> decorator, unfortunately we cannot take advantage of the dependency injection mechanism without <a href="https://stackoverflow.com/questions/33462532/using-resolve-in-angular2-routes">any dirty hacks</a>.</p>
+
+<p>In this article I&rsquo;ll explain what solution we use until the <code>resolve</code> functionality is supported. Demo of the final result can be found <a href="#demo">here</a>. The code associated to this article is at <a href="https://github.com/mgechev/ng2-router">my GitHub account</a>.</p>
+
+<div class="warning-box">
+  <strong>Disclaimer</strong>: This article is mostly for learning purposes. It uses already deprecated Angular 2 module and offers a custom solution which most likely will not be supported in future.
+</div>
+
+<p>The article is structured in the following way:</p>
+
+<ol>
+<li>Background for the problem that we need to solve (and this section is already over :-)).</li>
+<li>Discussion of the API design of the solution.</li>
+<li>Explanation of example that uses the defined API.</li>
+<li>Background on how the deprecated Angular 2 router works.</li>
+<li>Implementation of the missing feature.</li>
+<li>A few words on how to use the router with the missing feature included.</li>
+<li>Conclusion.</li>
+</ol>
+
+<p>If you&rsquo;re not interested in implementation details I&rsquo;d recommend you to skip section 5.</p>
+
+<h3 id="demo">Demo</h3>
+
+<p>Here&rsquo;s demo of final result of our implementation:</p>
+
+<p><img src="/images/router-demo.gif" alt="" /></p>
+
+<h2 id="api-design">API Design</h2>
+
+<p>Using the deprecated router we can define our routing configuration by:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">HomeComponent</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about/:name&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Our goal is to be able to perform an asynchronous action on which given routing component depends before the component gets rendered. For instance, we may want to load the profile of the user associated with the <code>:name</code> parameter in the <code>About</code> route, before the <code>AboutComponent</code> gets rendered.</p>
+
+<p>This means that we need to alter additional configuration data to the route definition objects:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">HomeComponent</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about/:name&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">User</span><span class="p">.</span><span class="nx">loadUsers</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Once the user navigates to <code>/about/:joe</code>, for instance, we will load all the users by using the <code>loadUsers</code> static method of the <code>User</code> service. This solution isn&rsquo;t much better compared to <code>@CanActivate</code> because we&rsquo;re not taking advantage of the Angular 2&rsquo;s DI mechanism.</p>
+
+<p>A better API will be:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">HomeComponent</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about/:name&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">resolve</span><span class="o">:</span> <span class="p">(</span><span class="nx">model</span><span class="o">:</span> <span class="nx">User</span><span class="p">,</span> <span class="nx">params</span><span class="o">:</span> <span class="nx">RouteParams</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">model</span><span class="p">.</span><span class="nx">loadUser</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+      <span class="p">},</span>
+      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nx">User</span><span class="p">,</span> <span class="nx">RouteParams</span><span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Although the route definition above looks a bit more complex at first, it provides great flexibility! First - we have access to all the registered in our <code>Injector</code> dependencies, second - we have access to all the local dependencies associated with the given route (<code>RouteParams</code> in this case).</p>
+
+<p>Once the user navigates to <code>/about/:joe</code>, the <code>resolve</code> method of the <code>defer</code> object will be invoked, but before that, all the dependencies passed to the <code>deps</code> array will be instantiated in order to be passed to <code>resolve</code>. Based on the passed dependencies, the <code>resolve</code> method will call the <code>model</code>&rsquo;s <code>loadUser</code> method with <code>joe</code> as argument. Once the promise returned by the <code>loadUser</code> method gets resolved, the component <code>AboutComponent</code> will be rendered.</p>
+
+<p>Why to make the <code>resolve</code> method return a promise, why not observable instead? Observables will give us much greater flexibility (in case the <code>loadUser</code> method fails we can retry or we can just stop the request, etc, good discussion on this topic can be found <a href="https://github.com/angular/angular/issues/5876">here</a>) but provide more complex API.</p>
+
+<p>Now, in order to follow the API introduced by AngularJS 1.x more strictly and provide the entire functionality it has we can modify the interface of the <code>defer</code> property to:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">HomeComponent</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about/:name&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">user</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">resolve</span><span class="o">:</span> <span class="p">(</span><span class="nx">model</span><span class="o">:</span> <span class="nx">User</span><span class="p">,</span> <span class="nx">params</span><span class="o">:</span> <span class="nx">RouteParams</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">model</span><span class="p">.</span><span class="nx">loadUser</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+        <span class="p">},</span>
+        <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nx">User</span><span class="p">,</span> <span class="nx">RouteParams</span><span class="p">]</span>
+      <span class="p">},</span>
+      <span class="nx">auth</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">resolve</span><span class="o">:</span> <span class="p">(</span><span class="nx">auth</span><span class="o">:</span> <span class="nx">Auth</span><span class="p">,</span> <span class="nx">params</span><span class="o">:</span> <span class="nx">RouteParams</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="nx">auth</span><span class="p">.</span><span class="nx">isAuthorized</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+        <span class="p">},</span>
+        <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nx">Auth</span><span class="p">,</span> <span class="nx">RouteParams</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Later we will be able to inject the &ldquo;deferred&rdquo; parameters to our component&rsquo;s constructor like:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="kr">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span> <span class="nx">user</span><span class="o">:</span> <span class="nx">User</span><span class="p">,</span> <span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;auth&#39;</span><span class="p">)</span> <span class="nx">isAuthorized</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Notice that the tokens of the dependencies are the keys associated to the specific deferred properties in the <code>defer</code> configuration object.</p>
+
+<p>Sweet!</p>
+
+<h2 id="simple-example">Simple example</h2>
+
+<p>In order to get a better idea of what we want to achieve, lets take a look at a specific example based on the <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a>. You can find the code for the demo <a href="https://github.com/mgechev/ng2-router/tree/demo">here</a>.</p>
+
+<p>Lets define our base component:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">HomeComponent</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about/:name&#39;</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;About&#39;</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">resolve</span><span class="o">:</span> <span class="p">(</span><span class="nx">params</span><span class="o">:</span> <span class="nx">RouteParams</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+          <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+            <span class="nx">setTimeout</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">params</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)),</span> <span class="mi">2000</span><span class="p">);</span>
+          <span class="p">});</span>
+        <span class="p">},</span>
+        <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nx">RouteParams</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+
+<p>Inside of it we define an <code>About</code> route which has a <code>defer</code> property. In the <code>resolve</code> function we return a promise which we resolve after two seconds with the value of the <code>name</code> routing parameter, gotten from the <code>RouteParams</code>&rsquo;s instance.</p>
+
+<p>In order to get the value that we resolved the promise with we can do the following:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">Inject</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Once the user navigates to <code>/about/:name</code> in 2 seconds we&rsquo;ll see the value of the <code>:name</code> parameter logged in the console. Notice that the value of the token we inject is the same as the key inside of the <code>defer</code> property in the route definition object.</p>
+
+<p>For demo take a look <a href="#demo">here</a>.</p>
+
+<p>Now lets start our&hellip;implementation! But before that&hellip;</p>
+
+<h2 id="background">Background</h2>
+
+<p>In order to get a better understanding be the content below, lets make a quick introduction to how the Angular router works.</p>
+
+<p><img src="/images/ng2-routing.png" alt="" /></p>
+
+<ul>
+<li>First the user declares her routing configuration in the <code>@RouteConfig</code> decorator.</li>
+<li>After that the input goes through normalization.</li>
+<li>As next step the routing objects get translated to routing rules.</li>
+<li>On navigation the router creates different navigation instructions.</li>
+<li>In the end the <code>router-outlet</code> renders the target component by using a specific sequence of instructions.</li>
+</ul>
+
+<p>This means that we need to go through the following steps:</p>
+
+<ul>
+<li>Allow the route definition objects to carry information about how we should perform the async actions.</li>
+<li>Keep this information in the route rules and instructions.</li>
+<li>Just before we render the component in the <code>router-outlet</code> we&rsquo;ll need to perform the async actions and get the result.</li>
+</ul>
+
+<h2 id="implementation">Implementation</h2>
+
+<h3 id="step-1">Step 1</h3>
+
+<p>As first step we will fork the <code>router-deprecated</code> module <a href="https://github.com/angular/angular/tree/master/modules/%40angular/router-deprecated">located here</a> and removed all <code>*.dart</code> files (sorry Dart&hellip;you complicate the things too much with all the facades required for you&hellip;).</p>
+
+<p>Since we want to provide slightly different APIs for routes definition we need to modify the <code>route_definition.ts</code> file:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
+  <span class="c1">// All the properties we&#39;re familiar with...</span>
+  <span class="nx">defer</span><span class="o">?:</span> <span class="nx">Defer</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Defer</span> <span class="p">{</span>
+  <span class="p">[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">DeferredFactory</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * An object which needs to be resolved until we are able to render the route component.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @example</span>
+<span class="cm"> * const baz: DeferredFactory = { resolve: () =&gt; Promise.resolve(), deps: [] };</span>
+<span class="cm"> */</span>
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">DeferredFactory</span> <span class="p">{</span>
+  <span class="nx">resolve</span><span class="o">:</span> <span class="p">(...</span><span class="nx">deps</span><span class="o">:</span> <span class="nx">any</span><span class="p">[])</span> <span class="p">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">deps</span><span class="o">?:</span> <span class="nx">any</span><span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The only new property we introduced here is an optional one called <code>defer</code>. It must be an object having the &ldquo;shape&rdquo; defined by the <code>Defer</code> interface. On the other hand, the <code>Defer</code> interface defines a set of key-value pairs with strings as keys and objects of type <code>DeferredFactory</code> as values. We will be able to inject the values gotten from the resolved promises, returned by the <code>resolve</code> functions, by using the tokens associated with the <code>DeferredFactory</code> instance. Notice that we also have a <code>deps</code> property inside of the <code>DeferredFactory</code>. This array contains a list of tokens that we want to be injected inside of the <code>resolve</code> function.</p>
+
+<p>Doesn&rsquo;t the <code>DeferredFactory</code> interface look similar to a factory provider definition?</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">new</span> <span class="nx">Provider</span><span class="p">(</span><span class="nb">String</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useFactory</span><span class="o">:</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">&quot;Value: &quot;</span> <span class="o">+</span> <span class="nx">value</span><span class="p">;</span> <span class="p">},</span>
+                    <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nb">Number</span><span class="p">]</span> <span class="p">})</span>
+</code></pre></div>
+
+<p>Hell yeah! We are going to use a list of providers like this one once when we reach the point when we need to resolve all the deferred values. The benefits we get here:</p>
+
+<ul>
+<li>We are able to inject dependencies associated to any token.</li>
+<li>After minification everything is going to work since we&rsquo;re passing tokens which are either direct references to the dependencies instances of which we want to invoke, or references to any other tokens which will not be influenced by minification.</li>
+</ul>
+
+<h3 id="step-2">Step 2</h3>
+
+<p>Notice that in the <code>RouteDefinition</code> the <code>deps</code> property is optional. This means that our router can break in case the user doesn&rsquo;t provide value for it, in any of the deferred factories. That is why we need to normalize the route definition in the <code>route_config_normalizer.ts</code> file. This module provides a method called <code>normalizeRouteConfig</code> which accepts a <code>RouteDefinition</code> object and normalizes it depending on the properties it has. What we&rsquo;d do here is:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kd">function</span> <span class="nx">normalizeRouteConfig</span><span class="p">(</span><span class="nx">config</span><span class="o">:</span> <span class="nx">RouteDefinition</span><span class="p">,</span>
+                                     <span class="nx">registry</span><span class="o">:</span> <span class="nx">RouteRegistry</span><span class="p">)</span><span class="o">:</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">key</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="kd">let</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+      <span class="nx">d</span><span class="p">.</span><span class="nx">deps</span> <span class="o">=</span> <span class="nx">d</span><span class="p">.</span><span class="nx">deps</span> <span class="o">||</span> <span class="p">[];</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Above we define a dummy <code>defer</code> object in case the user hasn&rsquo;t provided one. On the other hand, if we have definitions of deferred factories we loop over all of them and set the <code>deps</code> property to an empty array in case it is not defined or has a falsy value.</p>
+
+<p>The <code>normalizeRouteConfig</code> method is also responsible for creating different route definition objects such as <code>AsyncRoute</code>s and <code>Route</code>s. In order to not loose the <code>defer</code> property from our <code>RouteDefinition</code> we need to pass it to the constructors of any <code>RouteDefinition</code>-like class:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">...</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;constructor&#39;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Route</span><span class="p">({</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span>
+    <span class="nx">component</span><span class="o">:&lt;</span><span class="nx">Type</span><span class="o">&gt;</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">constructor</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+    <span class="nx">data</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span>
+    <span class="nx">useAsDefault</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">useAsDefault</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span>
+  <span class="p">});</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;loader&#39;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span>
+    <span class="nx">loader</span><span class="o">:</span> <span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">loader</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+    <span class="nx">data</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span>
+    <span class="nx">useAsDefault</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">useAsDefault</span><span class="p">,</span>
+    <span class="nx">defer</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span>
+  <span class="p">});</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nx">BaseException</span><span class="p">(</span>
+      <span class="sb">`Invalid component type &quot;</span><span class="si">${</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="sb">&quot;. Valid types are &quot;constructor&quot; and &quot;loader&quot;.`</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</code></pre></div>
+
+<p>Everything so far works fine, except that the <code>Route</code> and <code>AsyncRoute</code>&rsquo;s constructors need to preserve/handle this <code>defer</code> property somehow.</p>
+
+<h3 id="step-3">Step 3</h3>
+
+<p>There&rsquo;s an abstract class called <code>AbstractRoute</code> which defines the base functionality for all the different route types. In order to make this class keep a reference to the <code>defer</code> value we need to:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">AbstractRoute</span> <span class="kr">implements</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">useAsDefault</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">;</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">regex</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">serializer</span><span class="o">:</span> <span class="nx">RegexSerializer</span><span class="p">;</span>
+  <span class="nx">data</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">any</span><span class="p">};</span>
+  <span class="nx">defer</span><span class="o">:</span> <span class="nx">Defer</span><span class="p">;</span>
+
+  <span class="nx">constructor</span><span class="p">({</span><span class="nx">name</span><span class="p">,</span> <span class="nx">useAsDefault</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">regex</span><span class="p">,</span> <span class="nx">serializer</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">defer</span><span class="p">}</span><span class="o">:</span> <span class="nx">RouteDefinition</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">useAsDefault</span> <span class="o">=</span> <span class="nx">useAsDefault</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">path</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">regex</span> <span class="o">=</span> <span class="nx">regex</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">serializer</span> <span class="o">=</span> <span class="nx">serializer</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+    <span class="c1">// It went through the normalizer</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="nx">defer</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The only three differences from the original implementation here are:</p>
+
+<ul>
+<li>We declare one more property of the class called <code>defer</code>.</li>
+<li>In the destructuring in the <code>constructor</code> we get one more property from the passed object, called <code>defer</code>.</li>
+<li>We assign the value passed by the <code>defer</code> variable to the <code>defer</code> property of the route.</li>
+</ul>
+
+<p>The rest of the changes we need to make are in the <code>Route</code> and <code>AsyncRoute</code> classes, were we should to pass the <code>defer</code> property to the base constructor call.</p>
+
+<h3 id="step-4">Step 4</h3>
+
+<p>Now, first add a <code>_defer</code> property to the <code>RouteRule</code> class like this:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">RouteRule</span> <span class="kr">implements</span> <span class="nx">AbstractRule</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_routePath</span><span class="o">:</span> <span class="nx">RoutePath</span><span class="p">,</span> <span class="kr">public</span> <span class="nx">handler</span><span class="o">:</span> <span class="nx">RouteHandler</span><span class="p">,</span>
+              <span class="kr">private</span> <span class="nx">_routeName</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="kr">private</span> <span class="nx">_defer</span><span class="o">:</span> <span class="nx">Defer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">specificity</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_routePath</span><span class="p">.</span><span class="nx">specificity</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_routePath</span><span class="p">.</span><span class="nx">hash</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">terminal</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_routePath</span><span class="p">.</span><span class="nx">terminal</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We need to do the same for the <code>AsyncRoute</code>.</p>
+
+<p>From the diagram above we can notice that the route definition objects get translated to route rules. In order to preserve the <code>defer</code> definition object in the rules we need to do the following:</p>
+
+<p>In <code>rule_set.ts</code> include the route&rsquo;s <code>defer</code> property in the <code>RouteRule</code> instantiation process:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
+<span class="kd">let</span> <span class="nx">newRule</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RouteRule</span><span class="p">(</span><span class="nx">routePath</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">);</span>
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>The <code>RouteRule</code> class has a private <code>_getInstruction</code> method, which based on the state of the <code>RouteRule</code> instance and passed arguments returns an instruction. We need to update its implementation to:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">private</span> <span class="nx">_getInstruction</span><span class="p">(</span><span class="nx">urlPath</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">urlParams</span><span class="o">:</span> <span class="nx">string</span><span class="p">[],</span>
+                        <span class="nx">params</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">any</span><span class="p">})</span><span class="o">:</span> <span class="nx">ComponentInstruction</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isBlank</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">componentType</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">BaseException</span><span class="p">(</span><span class="sb">`Tried to get instruction before the type was loaded.`</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">hashKey</span> <span class="o">=</span> <span class="nx">urlPath</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="nx">urlParams</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">hashKey</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">hashKey</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kd">var</span> <span class="nx">instruction</span> <span class="o">=</span>
+      <span class="k">new</span> <span class="nx">ComponentInstruction</span><span class="p">(</span><span class="nx">urlPath</span><span class="p">,</span> <span class="nx">urlParams</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">componentType</span><span class="p">,</span>
+                               <span class="k">this</span><span class="p">.</span><span class="nx">terminal</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">specificity</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_routeName</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_defer</span><span class="p">);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">hashKey</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">instruction</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We&rsquo;re done with most of the work!</p>
+
+<h3 id="step-5">Step 5</h3>
+
+<p>The final, and the most exciting step is this one! In order to render the routing component once the associated with it data is resolved, we need to update the <code>router-outlet</code> directive. Open the file <code>router_outlet.ts</code> and take a look at the <code>activate</code> method:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
+<span class="nx">activate</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="o">:</span> <span class="nx">ComponentInstruction</span><span class="p">)</span><span class="o">:</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">previousInstruction</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_currentInstruction</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_currentInstruction</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">componentType</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">componentType</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">childRouter</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_parentRouter</span><span class="p">.</span><span class="nx">childRouter</span><span class="p">(</span><span class="nx">componentType</span><span class="p">);</span>
+
+  <span class="kd">var</span> <span class="nx">providers</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolve</span><span class="p">([</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteData</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">routeData</span><span class="p">}),</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteParams</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="k">new</span> <span class="nx">RouteParams</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">params</span><span class="p">)}),</span>
+    <span class="nx">provide</span><span class="p">(</span><span class="nx">routerMod</span><span class="p">.</span><span class="nx">Router</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="nx">childRouter</span><span class="p">})</span>
+  <span class="p">]);</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span> <span class="o">=</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_loader</span><span class="p">.</span><span class="nx">loadNextToLocation</span><span class="p">(</span><span class="nx">componentType</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_viewContainerRef</span><span class="p">,</span> <span class="nx">providers</span><span class="p">);</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">componentRef</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">activateEvents</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">componentRef</span><span class="p">.</span><span class="nx">instance</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">hasLifecycleHook</span><span class="p">(</span><span class="nx">hookMod</span><span class="p">.</span><span class="nx">routerOnActivate</span><span class="p">,</span> <span class="nx">componentType</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+          <span class="p">(</span><span class="nx">ref</span><span class="o">:</span> <span class="nx">ComponentRef</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span>
+              <span class="p">(</span><span class="o">&lt;</span><span class="nx">OnActivate</span><span class="o">&gt;</span><span class="nx">ref</span><span class="p">.</span><span class="nx">instance</span><span class="p">).</span><span class="nx">routerOnActivate</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="p">,</span> <span class="nx">previousInstruction</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">componentRef</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>The <code>activate</code> method accepts an instruction and renders the component associated with it once it gets available (i.e. its template is loaded, etc.).</p>
+
+<p>Notice that inside of the method is created a custom set of <code>providers</code> which include the <code>RouteData</code> associated with the given route, as well as <code>RouteParams</code> and the <code>Router</code>. After that the <code>activate</code> method loads the target component next to the <code>router-outlet</code> directive. It does this with the <code>DynamicComponentLoader</code> by taking all the defined above providers plus all the providers which reside in the <code>_viewContainerRef</code> (for a reference take a look <a href="https://github.com/angular/angular/blob/bb8976608db93b9ff90a71187608a4390cbd7a07/modules/%40angular/core/src/linker/dynamic_component_loader.ts#L137-L139">here</a>).</p>
+
+<p>Now we can use the <code>defer</code> property of the <code>nextInstruction</code> which is accessible via:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">defer</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">defer</span><span class="p">;</span>
+</code></pre></div>
+
+<p>In order to invoke the <code>resolve</code> method of the <code>defer</code> object in the context of the current injector (which includes providers for <code>RouteData</code> and <code>RouteParams</code>) we can:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
+<span class="kd">var</span> <span class="nx">commonProviders</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteData</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">routeData</span><span class="p">}),</span>
+  <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteParams</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="k">new</span> <span class="nx">RouteParams</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">params</span><span class="p">)}),</span>
+  <span class="nx">provide</span><span class="p">(</span><span class="nx">routerMod</span><span class="p">.</span><span class="nx">Router</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="nx">childRouter</span><span class="p">})</span>
+<span class="p">];</span>
+<span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">defer</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">localProviders</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">current</span> <span class="o">=</span> <span class="nx">defer</span><span class="p">[</span><span class="nx">token</span><span class="p">];</span>
+  <span class="k">return</span> <span class="nx">provide</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">useFactory</span><span class="o">:</span> <span class="nx">current</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span>
+    <span class="nx">deps</span><span class="o">:</span> <span class="nx">current</span><span class="p">.</span><span class="nx">deps</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">providers</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">commonProviders</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">localProviders</span><span class="p">));</span>
+<span class="kd">var</span> <span class="nx">parentInjector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_viewContainerRef</span><span class="p">.</span><span class="nx">parentInjector</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">fromResolvedProviders</span><span class="p">(</span><span class="nx">providers</span><span class="p">,</span> <span class="nx">parentInjector</span><span class="p">);</span>
+<span class="c1">// ...</span>
+</code></pre></div>
+
+<p>This way we create an injector which has all providers from the <code>_viewContainerRef</code> (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated with the keys in the <code>defer</code> object we can:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">deferPromises</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span>
+</code></pre></div>
+
+<p>&hellip;which will return an array of promises. We can wait for all promises to be resolved by using <code>Promise.all</code>. Once the promise returned by <code>Promise.all</code> is resolved we are supposed to activate the component so in the end we&rsquo;ll have:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
+<span class="k">return</span> <span class="nx">deferPromises</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">data</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="nx">localProviders</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">idx</span><span class="o">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">provide</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+  <span class="kd">var</span> <span class="nx">deferResolvedProviders</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">commonProviders</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">localProviders</span><span class="p">));</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span> <span class="o">=</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_loader</span><span class="p">.</span><span class="nx">loadNextToLocation</span><span class="p">(</span><span class="nx">componentType</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_viewContainerRef</span><span class="p">,</span> <span class="nx">deferResolvedProviders</span><span class="p">);</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">componentRef</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">activateEvents</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="nx">componentRef</span><span class="p">.</span><span class="nx">instance</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">hasLifecycleHook</span><span class="p">(</span><span class="nx">hookMod</span><span class="p">.</span><span class="nx">routerOnActivate</span><span class="p">,</span> <span class="nx">componentType</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_componentRef</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span>
+          <span class="p">(</span><span class="nx">ref</span><span class="o">:</span> <span class="nx">ComponentRef</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span>
+              <span class="p">(</span><span class="o">&lt;</span><span class="nx">OnActivate</span><span class="o">&gt;</span><span class="nx">ref</span><span class="p">.</span><span class="nx">instance</span><span class="p">).</span><span class="nx">routerOnActivate</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="p">,</span> <span class="nx">previousInstruction</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">componentRef</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">},</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the <code>loadNextToLocation</code> method with different set of providers. To the keys used in the <code>defer</code> object we associate values instead of factories. These are the values gotten from the resolved promises returned by the factories. We don&rsquo;t want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.</p>
+
+<h2 id="how-to-use">How to use?</h2>
+
+<p>You can install the modified router using:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>npm i git://github.com/mgechev/ng2-router.git#dist
+</code></pre></div>
+
+<p>For a project which uses the modified router take a look at the <a href="https://github.com/mgechev/ng2-router/tree/demo">following repository</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>This article was mostly for learning purposes.</p>
+
+<p>The provided solution is something that we use in our Angular 2 application but only until we get this feature implemented by the newest Angular 2 router itself. I would not recommend you to introduce this modified version of the deprecated Angular 2 router as dependency of your project.</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&title=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&t=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f&text=Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Implementing%20the%20Missing%20%22resolve%22%20Feature%20of%20the%20Angular%202%20Router http%3a%2f%2fblog.mgechev.com%2famp%2f2016%2f05%2f21%2fangular2-router-implementing-missing-resolve-feature-deprecated-defer%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Router/">Router</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Router/">Router</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+

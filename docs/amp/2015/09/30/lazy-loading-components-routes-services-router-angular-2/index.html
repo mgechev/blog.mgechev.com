@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html ⚡>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV" />
+
+<link rel="apple-touch-icon" href="http://blog.mgechev.com/amp/images/logo.png">
+
+
+<link rel="canonical" href="http://blog.mgechev.com/amp/2015/09/30/lazy-loading-components-routes-services-router-angular-2/">
+
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Lato:400,700" rel="stylesheet">
+    
+    <title>Lazy Loading of Route Components in Angular 2 - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  For the examples in the content below I&amp;rsquo;ve used the angular2-seed project. The code for the article could be found at my GitHub account.This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we&amp;rsquo;re about to solve.">
+
+<meta property="og:title" content="Lazy Loading of Route Components in Angular 2 - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://blog.mgechev.com/amp/2015/09/30/lazy-loading-components-routes-services-router-angular-2/">
+<meta property="og:image" content="http://blog.mgechev.com/amp/images/default.png">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  For the examples in the content below I&amp;rsquo;ve used the angular2-seed project. The code for the article could be found at my GitHub account.This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we&amp;rsquo;re about to solve.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="http://blog.mgechev.com/amp/2015/09/30/lazy-loading-components-routes-services-router-angular-2/">
+<meta name="twitter:title" content="Lazy Loading of Route Components in Angular 2 - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  For the examples in the content below I&amp;rsquo;ve used the angular2-seed project. The code for the article could be found at my GitHub account.This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we&amp;rsquo;re about to solve.">
+<meta name="twitter:image" content="http://blog.mgechev.com/amp/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"http://blog.mgechev.com/amp/"
+    },
+    "headline": "Lazy Loading of Route Components in Angular 2 - Minko Gechev&#39;s blog",
+    "image": {
+      "@type": "ImageObject",
+      "url": "http://blog.mgechev.com/amp/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2015-09-30T00:00:00JST",
+    "dateModified": "2015-09-30T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "http://blog.mgechev.com/amp/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  For the examples in the content below I&rsquo;ve used the angular2-seed project. The code for the article could be found at my GitHub account.
+This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we&rsquo;re about to solve."
+  }
+</script>
+
+
+    <style amp-custom>
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: block; background-position: center; background-size: cover; background-image: url(http://blog.mgechev.com/amp/images/default.jpg); width: 6rem; height: 6rem; border-radius: 50%; box-shadow: 0 0 3px 0 #333 inset; float: left; margin-right: 1rem;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="http://blog.mgechev.com/amp/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-7c05f036218df503238cdf06668c15c2">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2015/09/30/lazy-loading-components-routes-services-router-angular-2/" class="thumbnail" title="Lazy Loading of Route Components in Angular 2"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Lazy Loading of Route Components in Angular 2</h1>
+        <ul class="p-facts">
+          <li><time datetime="2015-09-30T00:00:00JST">Sep 30, 2015</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&title=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&t=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&text=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202 http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<div class="error-box">
+  <strong>Warning</strong>: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.
+</div>
+
+<p>For the examples in the content below I&rsquo;ve used the <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a> project. The code for the article could be found at my <a href="https://github.com/mgechev/lazy-loading-routes-angular2">GitHub account</a>.</p>
+
+<p>This blog post is mostly about performance and more accurately - lazy loading. Before we get started lets make a quick recap of what problem we&rsquo;re about to solve.</p>
+
+<h2 id="background">Background</h2>
+
+<p><em>Disclaimer: Angular 2 is still in alpha. All the APIs we&rsquo;re using here are quite likely to change. If you notice that the article is not up to date, please <a href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/2015-09-30-lazy-loading-components-routes-services-router-angular-2.md">open a PR</a>, leave a comment or contact me via <a href="https://twitter.com/mgechev">twitter</a>.</em></p>
+
+<p>In order to get familiar with the upcoming content you need to have basic understanding of Angular 2 and the component based router introduced by the framework. Good introduction to routing in Angular 2 could be found <a href="http://blog.thoughtram.io/angular/2015/06/16/routing-in-angular-2.html">here</a>.</p>
+
+<h3 id="sample-application">Sample Application</h3>
+
+<p>Lets take a look at this sample application:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">RouteConfig</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">,</span> <span class="nx">ROUTER_PROVIDERS</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/router&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Home</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/home/home&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">About</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/about/about&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span>
+<span class="p">})</span>
+<span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">About</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span> <span class="p">}</span>
+<span class="p">])</span>
+<span class="kd">@View</span><span class="p">({</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./app.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;./app.css&#39;</span><span class="p">],</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">ROUTER_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">App</span> <span class="p">{}</span>
+
+<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>This is the root component of <a href="https://github.com/mgechev/angular2-seed/blob/c5c7f8ffc3be1d75040ee11d9220c22dadf59c57/app/app.ts">angular2-seed</a>.</p>
+
+<p>In the snippet above we create a new component with controller the <code>App</code> class. We also register two routes:</p>
+
+<ul>
+<li><code>/</code> - once opened the <code>Home</code> component will be rendered.</li>
+<li><code>/about</code> - once opened the <code>About</code> component will be rendered.</li>
+</ul>
+
+<p>Here&rsquo;s the implementation of the <code>About</code> component:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">CORE_DIRECTIVES</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+
+<span class="kr">import</span> <span class="p">{</span><span class="nx">NameList</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;../../services/NameList&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">NameList</span><span class="p">],</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./components/about/about.html&#39;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">CORE_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">About</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">public</span> <span class="nx">list</span>: <span class="kt">NameList</span><span class="p">)</span> <span class="p">{}</span>
+  <span class="nx">addName</span><span class="p">(</span><span class="nx">newname</span><span class="p">)</span><span class="o">:</span><span class="kr">boolean</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">newname</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="nx">newname</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>About</code> component uses the service <code>NameList</code>, which is located under <code>../../services/NameList</code>. So far so good, now lets take a look at how our application looks like:</p>
+
+<p><img src="/images/lazy-loading-angular-2/sample-app.gif" alt="Sample app" /></p>
+
+<p>As we can see from Chrome DevTools&rsquo; Network tab, during the initial page load all the components and services used in the entire application are being downloaded. However, in order to render the <code>Home</code> view we don&rsquo;t need the <code>About</code> component, neither the <code>NameList</code> service (usually the template of the <code>About</code> component will be requested as well. However, in this example it is being inlined inside the component by a gulp task).</p>
+
+<h4 id="place-for-improvements">Place for Improvements!</h4>
+
+<p>In the sample application above, loading a couple of files more is not such a big problem since the entire app consists only two views and a single service. However, in a real-life application downloading the entire dependency graph during the initial page load may create quite poor user experience. Imagine we had <code>n</code> views, each of these <code>n</code> components had <code>m</code> dependencies, which had another <code>k</code> dependencies, etc.</p>
+
+<h3 id="lazy-loading">Lazy Loading</h3>
+
+<p>The practice of lazy loading is quite common in web development. We lazy load <a href="https://css-tricks.com/snippets/javascript/lazy-loading-images/">assets</a>, <a href="http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">partials</a>, basically whatever we need in order to speedup our load time and we load it on demand!</p>
+
+<h4 id="the-problem">The Problem</h4>
+
+<p>Although the <code>About</code> component is not essential for rendering the <code>Home</code> component it is referenced directly inside the file, which contains the definition of the root component of our application (<code>App</code>). <code>App</code> cannot be rendered until all of the dependencies, which are declared inside of the file are not loaded. Although the ES2015 modules have implicit asynchronous behavior the rendering of the <code>App</code> component happens synchronously, since we need to resolve all of its dependencies before it appears onto the screen.</p>
+
+<p>In order to workaround this issue we can use the ES2015 module loader imperative API.</p>
+
+<h3 id="asyncroute">AsyncRoute</h3>
+
+<p>The <em>obvious</em> Angular solution to the problem us using <code>AsyncRoute</code>. This is class, which implements <code>RouteDefinition</code> and allows asynchronous loading of the component associated with given route. This allows on demand loading of the component&rsquo;s dependencies as well. Here&rsquo;s now our definition will look like with <code>AsyncRoute</code>:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span> <span class="p">},</span>
+  <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
+    <span class="nx">loader</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/about/about&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span><span class="p">),</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
+  <span class="p">})</span>
+<span class="p">])</span>
+</code></pre></div>
+
+<p>Basically we register two routes:
+- A regular route
+- Async route. The async route accepts as argument a <code>loader</code>. The <code>loader</code> is a function that must return a promise, which needs to be resolved with the component that needs to be rendered.</p>
+
+<p>So far so good! Everything looks great and we achieved our goal. However, there are some more advanced cases we may want to cover. For example, we may need to throw events when the route change has started and completed. In the case of <code>AsyncRoute</code> we can implement a generic loader, which takes care of this. However, we may want to implement something like a splash screen or have even further control on the component&rsquo;s rendering. In such case we may use a:</p>
+
+<h3 id="virtual-proxy">Virtual Proxy</h3>
+
+<p>The Angular router accepts a component for value of the <code>component</code> property of all of its routes definitions. However, instead of providing the concrete component, which needs to be rendered we can provide a component proxy. This is the <a href="https://en.wikipedia.org/wiki/Proxy_pattern#Possible_Usage_Scenarios">Virtual Proxy pattern</a>. Inside the component proxy we can load the target component and later, when it is loaded, using the <code>DynamicComponentLoader</code> we can render it onto the screen.</p>
+
+<p>Lets define a <code>componentProxyFactory</code>, which will be responsible for creating component proxies:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">ComponentProvider</span> <span class="p">{</span>
+  <span class="nx">path</span>:<span class="kt">string</span><span class="p">;</span>
+  <span class="nx">provide</span><span class="o">:</span><span class="p">{(</span><span class="nx">module</span>:<span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="nx">any</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">PROXY_CLASSNAME</span> <span class="o">=</span> <span class="s1">&#39;component-wrapper&#39;</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">PROXY_SELECTOR</span> <span class="o">=</span> <span class="sb">`.</span><span class="si">${</span><span class="nx">PROXY_CLASSNAME</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+
+<span class="kr">export</span> <span class="kd">function</span> <span class="nx">componentProxyFactory</span><span class="p">(</span><span class="nx">provider</span>: <span class="kt">ComponentProvider</span><span class="p">)</span><span class="o">:</span> <span class="nx">Type</span> <span class="p">{</span>
+  <span class="kd">@Component</span><span class="p">({</span>
+    <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;component-proxy&#39;</span><span class="p">,</span>
+    <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">provide</span><span class="p">(</span><span class="nx">ComponentProvider</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useValue</span>: <span class="kt">provider</span> <span class="p">})]</span>
+  <span class="p">})</span>
+  <span class="kd">@View</span><span class="p">({</span>
+    <span class="nx">template</span><span class="o">:</span> <span class="sb">`&lt;span #content/&gt;`</span>
+  <span class="p">})</span>
+  <span class="kr">class</span> <span class="nx">VirtualComponent</span> <span class="p">{</span>
+    <span class="kr">constructor</span><span class="p">(</span>
+      <span class="nx">el</span>: <span class="kt">ElementRef</span><span class="p">,</span>
+      <span class="nx">loader</span>:<span class="kt">DynamicComponentLoader</span><span class="p">,</span>
+      <span class="nx">inj</span>:<span class="kt">Injector</span><span class="p">,</span>
+      <span class="nx">provider</span>:<span class="kt">ComponentProvider</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">path</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="nx">loader</span><span class="p">.</span><span class="nx">loadIntoLocation</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">provide</span><span class="p">(</span><span class="nx">m</span><span class="p">),</span> <span class="nx">el</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">);</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">VirtualComponent</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Now lets take a look at the code step by step:</p>
+
+<ol>
+<li>We define a class called <code>ComponentProvider</code>. It contains two properties:
+
+<ul>
+<li><code>path</code> - a path to the component, which will be used by the module loader.</li>
+<li><code>provide</code> - a provider, which will return the target component based on the passed module as argument</li>
+</ul></li>
+<li>We define a function called <code>componentProxyFactory</code>:
+
+<ul>
+<li>This function accepts as argument a <code>ComponentProvider</code> object and returns a new component called <code>VirtualComponent</code>.</li>
+<li>The <code>VirtualComponent</code> defines a single provider, in order to allow the provider to be passed as argument to the constructor through DI.</li>
+<li>Inside <code>VirtualComponent</code>&rsquo;s constructor we load the module based on the provider&rsquo;s <code>path</code> and right after that loaded in the template using: <code>loader.loadIntoLocation(provider.provide(m), el, 'content');</code></li>
+</ul></li>
+</ol>
+
+<p>And thats all!</p>
+
+<p>Now lets take a look how we can refactor our root component in order to take advantage of the lazy loading:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">RouteConfig</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">,</span> <span class="nx">ROUTER_PROVIDERS</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/router&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Home</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/home/home&#39;</span><span class="p">;</span>
+
+<span class="kr">import</span> <span class="p">{</span><span class="nx">componentProxyFactory</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./component_proxy&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span> <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
+    <span class="nx">component</span>: <span class="kt">componentProxyFactory</span><span class="p">({</span>
+      <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;./components/about/about&#39;</span><span class="p">,</span>
+      <span class="nx">provide</span>: <span class="kt">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span>
+    <span class="p">}),</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
+  <span class="p">}</span>
+<span class="p">])</span>
+<span class="kd">@View</span><span class="p">({</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./app.html&#39;</span><span class="p">,</span>
+  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;./app.css&#39;</span><span class="p">],</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">ROUTER_DIRECTIVES</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">App</span> <span class="p">{}</span>
+
+<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span>
+</code></pre></div>
+
+<p>Now the file doesn&rsquo;t contain any reference to the <code>About</code> component. Instead it registers in the route definition for the <code>About</code> component using:</p>
+<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
+  <span class="nx">component</span>: <span class="kt">componentProxyFactory</span><span class="p">({</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;./components/about/about&#39;</span><span class="p">,</span>
+    <span class="nx">provide</span>: <span class="kt">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span>
+  <span class="p">}),</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h2 id="results">Results</h2>
+
+<p>Lets take a look at how the page load will look this time:</p>
+
+<p><img src="/images/lazy-loading-angular-2/sample-lazy-app.gif" alt="Sample lazy app" /></p>
+
+<p>As we can see there are two additional resources, which are being downloaded on demand:</p>
+
+<ul>
+<li><code>about.js</code></li>
+<li><code>NameList.js</code></li>
+</ul>
+
+<p><img src="/images/lazy-loading-angular-2/victory-is-mine.png" alt="Victory" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are still a lot of things to be considered. For example, in a real-life application you&rsquo;ll most likely have different bundles in order to reduce the number of downloaded files even further. In our case we can combine the <code>About</code> component and <code>NameList</code> in a single file during the build process.</p>
+
+<p>Also do not forget that Angular 2 is still in early alpha so the framework and the entire API are under development. However, no one stops you from having fun with it!</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://b.hatena.ne.jp/add?mode=confirm&url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&title=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202" title="はてなブックマーク" class="ht" target="_blank" rel="nofollow"></a>
+  <a href="http://www.facebook.com/sharer.php?u=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&t=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f&text=Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+  <a href="http://line.me/R/msg/text/?Lazy%20Loading%20of%20Route%20Components%20in%20Angular%202 http%3a%2f%2fblog.mgechev.com%2famp%2f2015%2f09%2f30%2flazy-loading-components-routes-services-router-angular-2%2f" title="LINEでシェア" class="ln" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="http://blog.mgechev.com/amp/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="http://blog.mgechev.com/amp/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Lazy Loading of Route Components in Angular 2</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/categories/Performance/">Performance</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="http://blog.mgechev.com/amp/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular-2/">Angular 2</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Angular-Router/">Angular Router</a></li>
+            
+            <li><a href="http://blog.mgechev.com/amp/tags/Performance/">Performance</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6a8d6cd1d272696bfc05f90632f00f22">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/" class="thumbnail" title="Follow Your Dream Career with Open Source. Personal Story."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/28/career-development-open-source-get-started/">Follow Your Dream Career with Open Source. Personal Story.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-28T00:00:00JST">Dec 28, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-6462257f7dffe7a4f4bc80054188e5d5">
+  <div class="header-wrapper">
+    <a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="http://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">Redux Anti-Patterns - Part 1. State Management.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
+          <li><a href="http://blog.mgechev.com/amp/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_aglaus" class="h-logo">Aglaus</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+
