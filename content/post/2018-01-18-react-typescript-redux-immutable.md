@@ -293,7 +293,7 @@ import { MiddlewareAPI } from 'redux';
 
 declare module 'redux' {
   export interface Middleware<T = any> {
-    <T>(api: MiddlewareAPI<T>): (next: Dispatch<T>) => Dispatch<T>;
+    <U>(api: MiddlewareAPI<T>): (next: Dispatch<T>) => Dispatch<T>;
   }
 }
 ```
