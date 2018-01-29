@@ -50,6 +50,8 @@ From the example above we can see that the `getName` method got automatically bo
 
 This decorator has a few quite useful applications.
 
+<img src="/images/decorators/bind.jpg" style="display: block; margin: auto" alt="Bind">
+
 ### React Event Handlers
 
 Firstly, it's quite handy to use `@autobind` with React in order to not create new functions for the event handlers each time when the `render` method gets invoked. For instance:
@@ -328,6 +330,8 @@ class DataMapperAspect {
 ```
 
 This way the `log` method will be called only before the invocation of methods with `save` prefix.
+
+<img src="/images/decorators/ocd.jpg" style="display: block; margin: auto" alt="Separation of Concerns">
 
 ### What else `aspect.js` provides?
 
