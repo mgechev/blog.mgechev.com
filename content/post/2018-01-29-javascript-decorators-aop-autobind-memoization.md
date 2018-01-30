@@ -18,10 +18,10 @@ Decorators in JavaScript are now in [stage 2](https://github.com/tc39/proposals)
 
 In this blog post I'll share a few decorators which I'm using on a daily basis. We'll take a look at:
 
-- How to write more efficient code with `@autobind`
+- How to write more efficient React components with `@autobind`
 - How to cache results of computations using `@memo`
 - Improving separation of concerns and cohesion with `aspect.js`'s `@beforeMethod` and `@afterMethod`
-- Developing more decoupled code using dependency injection from `injection-js`
+- Developing more decoupled code using Angular's dependency injection with `injection-js`
 
 ## Autobind
 
