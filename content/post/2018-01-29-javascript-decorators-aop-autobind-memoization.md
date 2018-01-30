@@ -16,7 +16,12 @@ url: /2018/01/29/javascript-decorators-aop-autobind-memoization
 
 Decorators in JavaScript are now in [stage 2](https://github.com/tc39/proposals). They allow us to alter the definition of a class, method, or a property. There are already a few neat libraries which provide decorators and make our life easier by allowing us to write more declarative code with better performance characteristics.
 
-In this blog post I'll share a few decorators which I'm using on a daily basis.
+In this blog post I'll share a few decorators which I'm using on a daily basis. We'll take a look at:
+
+- How to write more efficient code with `@autobind`
+- How to cache results of computations using `@memo`
+- Improving separation of concerns and cohesion with `aspect.js`'s `@beforeMethod` and `@afterMethod`
+- Developing more decoupled code using dependency injection from `injection-js`
 
 ## Autobind
 
