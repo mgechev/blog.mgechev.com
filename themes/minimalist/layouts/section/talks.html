@@ -6,34 +6,68 @@
 
     {{ .Content }}
 
-    <div class="talks-grid" id="talks-root">
-    {{ range $key, $value := .Site.Params.Talks }}
-        {{ if eq (mod $key 3) 0 }}
-            <div class="talks-row">
+    <h1>Selected Talks</h1>
+
+    <div class="talks-grid">
+        {{ range $key, $value := .Site.Params.SelectedTalks }}
+            {{ if eq (mod $key 3) 0 }}
+                <div class="talks-row">
+            {{ end }}
+                <div class="talk">
+                    <div class="talk-background"></div>
+                    <div class="talk-location">{{ $value.flag }}</div>
+                    <h1>{{ $value.title }}</h1>
+                    <section>
+                        {{ $value.event | safeHTML }}, {{ $value.date }}
+                        <div class="links">
+                            {{ if $value.video }}
+                                <a href="{{ $value.video }}">📹 video</a>
+                            {{ end }}
+                            {{ if $value.slides }}
+                                <a href="{{ $value.slides }}">📈 slides</a>
+                            {{ end }}
+                            {{ if $value.eventLink }}
+                                <a href="{{ $value.eventLink }}">ℹ️ website</a>
+                            {{ end }}
+                        </div>
+                    </section>
+                </div>
+            {{ if eq (mod $key 3) 2 }}
+                </div>
+            {{ end }}
         {{ end }}
-            <div class="talk">
-                <div class="talk-background"></div>
-                <div class="talk-location">{{ $value.flag }}</div>
-                <h1>{{ $value.title }}</h1>
-                <section>
-                    {{ $value.event | safeHTML }}, {{ $value.date }}
-                    <div class="links">
-                        {{ if $value.video }}
-                            <a href="{{ $value.video }}">📹 video</a>
-                        {{ end }}
-                        {{ if $value.slides }}
-                            <a href="{{ $value.slides }}">📈 slides</a>
-                        {{ end }}
-                        {{ if $value.eventLink }}
-                            <a href="{{ $value.eventLink }}">ℹ️ website</a>
-                        {{ end }}
-                    </div>
-                </section>
-            </div>
-        {{ if eq (mod $key 3) 2 }}
-            </div>
+    </div>
+
+    <h1>All Talks</h1>
+
+    <div class="talks-grid">
+        {{ range $key, $value := .Site.Params.Talks }}
+            {{ if eq (mod $key 3) 0 }}
+                <div class="talks-row">
+            {{ end }}
+                <div class="talk">
+                    <div class="talk-background"></div>
+                    <div class="talk-location">{{ $value.flag }}</div>
+                    <h1>{{ $value.title }}</h1>
+                    <section>
+                        {{ $value.event | safeHTML }}, {{ $value.date }}
+                        <div class="links">
+                            {{ if $value.video }}
+                                <a href="{{ $value.video }}">📹 video</a>
+                            {{ end }}
+                            {{ if $value.slides }}
+                                <a href="{{ $value.slides }}">📈 slides</a>
+                            {{ end }}
+                            {{ if $value.eventLink }}
+                                <a href="{{ $value.eventLink }}">ℹ️ website</a>
+                            {{ end }}
+                        </div>
+                    </section>
+                </div>
+            {{ if eq (mod $key 3) 2 }}
+                </div>
+            {{ end }}
         {{ end }}
-    {{ end }}
     </div>
 
     {{ if .Site.Params.enableDisqus }}
