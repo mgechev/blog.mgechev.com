@@ -70,8 +70,8 @@
                         <i class="fa fa-pencil-square-o"></i> Edit
                     </a>
                     · Nov 17, 2017
-                    · 2936 words
-                    · 14 minutes read
+                    · 3007 words
+                    · 15 minutes read
                       <span class="tags">
                       
                       
@@ -273,6 +273,16 @@
 <p>Now take a look at the <code>check</code> method. We can clearly see that the <code>DefaultIterableDiffer</code> iterates over the collection in order to check what has changed inside of its state compared to the last check. Treating the collection as a black box automatically introduces <code>O(n)</code> time complexity.</p>
 
 <p>This has pros and cons. The pros is that the differ is just a consumer of the collection so it relies that the collection is an array or has iterator implementation. This makes the <code>DefaultIterableDiffer</code> reusable since it&rsquo;ll work with most built-in collections and external libraries. The cons is that we need to iterate over the entire collection in order to find whether and what has changed inside of it.</p>
+
+<h2 id="putting-everything-together">Putting Everything Together</h2>
+
+<p>On the following diagram you can see how everything fits together:</p>
+
+<p><img src="/images/differs/differs.png" style="border: 1px solid #ccc;"></p>
+
+<p>Notice how <code>NgForOf</code> uses the <code>IterableDiffers</code> in order to get an <code>IterableDiffer</code> which supports the collection we&rsquo;re iterating over. Internally, the <code>IterableDiffers</code> will check whether there&rsquo;s any <code>IterableDifferFactory</code> which knows how to instantiate a differ which can handle the given collection.</p>
+
+<p>Finally, <code>NgForOf</code> sets the <code>TrackByFn</code> by calling the <code>create</code> method of the selected by <code>IterableDiffers</code> factory.</p>
 
 <h1 id="improving-the-performance-of-iterablediffer">Improving the Performance of <code>IterableDiffer</code></h1>
 

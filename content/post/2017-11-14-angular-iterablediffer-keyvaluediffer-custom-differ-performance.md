@@ -203,6 +203,16 @@ Now take a look at the `check` method. We can clearly see that the `DefaultItera
 
 This has pros and cons. The pros is that the differ is just a consumer of the collection so it relies that the collection is an array or has iterator implementation. This makes the `DefaultIterableDiffer` reusable since it'll work with most built-in collections and external libraries. The cons is that we need to iterate over the entire collection in order to find whether and what has changed inside of it.
 
+## Putting Everything Together
+
+On the following diagram you can see how everything fits together:
+
+<img src="/images/differs/differs.png" style="border: 1px solid #ccc;">
+
+Notice how `NgForOf` uses the `IterableDiffers` in order to get an `IterableDiffer` which supports the collection we're iterating over. Internally, the `IterableDiffers` will check whether there's any `IterableDifferFactory` which knows how to instantiate a differ which can handle the given collection.
+
+Finally, `NgForOf` sets the `TrackByFn` by calling the `create` method of the selected by `IterableDiffers` factory.
+
 # Improving the Performance of `IterableDiffer`
 
 Although the `IterableDiffer` can find whether given collection has changed, the collection knows this best. A possible way to optimize the change detection is to move the logic for keeping track of the changes that have happened in given collection to the collection itself. This way detecting a change will give us `O(1)` complexity same as getting all the changes that have happened in some specific interval of time. This however, is only possible if we can afford to use a custom data structure in our application.
