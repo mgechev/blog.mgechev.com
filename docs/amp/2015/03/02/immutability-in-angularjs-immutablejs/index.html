@@ -335,7 +335,7 @@ Later, when my code was used in production, I started appreciating things like h
 
 <h2 id="benchmarks">Benchmarks</h2>
 
-<p><a href="/images/unicorn.jpg"><amp-img src="/images/unicorn.jpg" alt=""></amp-img></a></p>
+<p><a href="/images/unicorn.jpg"><amp-img src="/images/unicorn.jpg" alt="" layout="responsive"></amp-img></a></p>
 
 <p>Using immutable data structures seems exciting and amazing! Anyway, it has some drawbacks. The <code>$watch</code> expressions became extremely fast but there&rsquo;s a big overhead of creating a new data structure once we add or remove items. This gets even slower when we have a complex nested composition.</p>
 
@@ -573,17 +573,17 @@ Later, when my code was used in production, I started appreciating things like h
 
 <p>Here is a chart for better understanding of the benchmark:</p>
 
-<p><a href="/images/immutable-angular/immutable-angular-1.png"><amp-img src="/images/immutable-angular/immutable-angular-1.png" alt=""></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-angular-1.png"><amp-img src="/images/immutable-angular/immutable-angular-1.png" alt="" layout="responsive"></amp-img></a></p>
 
 <p>Initially the plain JavaScript array does better but once we increase the number of bindings the performance decreases dramatically.</p>
 
 <p>But lets go a little bit further&hellip;Lets do CPU profiling for the test cases, which runs with immutable collection and 30 watchers.</p>
 
-<p><a href="/images/immutable-angular/cpu-profile.png"><amp-img src="/images/immutable-angular/cpu-profile.png" alt=""></amp-img></a></p>
+<p><a href="/images/immutable-angular/cpu-profile.png"><amp-img src="/images/immutable-angular/cpu-profile.png" alt="" layout="responsive"></amp-img></a></p>
 
 <p>The biggest slowdown comes from the watcher added by <code>ng-repeat</code>. Lets dig into AngularJS&rsquo;s source code and change that watcher to a simple <code>$watch</code> instead of <code>$watchCollection</code> (<strong>do not do this in AngularJS copy you are going to use in production otherwise <code>ng-repeat</code>&rsquo;s binding will not work with mutable data structures</strong>) and see what will happen&hellip;</p>
 
-<p><a href="/images/immutable-angular/immutable-watch.png"><amp-img src="/images/immutable-angular/immutable-watch.png" alt=""></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-watch.png"><amp-img src="/images/immutable-angular/immutable-watch.png" alt="" layout="responsive"></amp-img></a></p>
 
 <p>After running the 30 bindings benchmark with the immutable list with changed <code>ng-repeat</code>&rsquo;s implementation, we got almost 1 second improvement!</p>
 
@@ -593,11 +593,11 @@ Later, when my code was used in production, I started appreciating things like h
 
 <p>When running the Chrome DevTools Heap Profiler, in the test case with 30 watchers and plain JavaScript object, we get pretty low memory usage:</p>
 
-<p><a href="/images/immutable-angular/plain-memory.png"><amp-img src="/images/immutable-angular/plain-memory.png" alt=""></amp-img></a></p>
+<p><a href="/images/immutable-angular/plain-memory.png"><amp-img src="/images/immutable-angular/plain-memory.png" alt="" layout="responsive"></amp-img></a></p>
 
 <p>As expected, when using Immutable.js the memory usage is a bit higher because of the overhead of creating new data structure on change.</p>
 
-<p><a href="/images/immutable-angular/immutable-memory.png"><amp-img src="/images/immutable-angular/immutable-memory.png" alt=""></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-memory.png"><amp-img src="/images/immutable-angular/immutable-memory.png" alt="" layout="responsive"></amp-img></a></p>
 
 <h2 id="conclusion">Conclusion</h2>
 

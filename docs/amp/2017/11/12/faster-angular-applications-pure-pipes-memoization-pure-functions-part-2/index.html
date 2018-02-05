@@ -159,7 +159,7 @@ The code for this blog post is available at my GitHub account:"
 
 <p>Lets see how this looks in practice. For the purpose, we can add a log statement in the <code>ListComponent</code>&rsquo;s calculate method in order to see when it gets invoked. Here&rsquo;s the final result:</p>
 
-<p><amp-img src="/images/faster-ng-apps-2/slow-add.gif"></amp-img></p>
+<p><amp-img src="/images/faster-ng-apps-2/slow-add.gif" layout="responsive"></amp-img></p>
 
 <p>From the GIF above we can see that while typing the change detection doesn&rsquo;t get invoked - cool! We did this optimization in the <a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">previous post from the series</a>.</p>
 
@@ -247,7 +247,7 @@ The code for this blog post is available at my GitHub account:"
 
 <p>In order to verify if the last optimization improved the application&rsquo;s performance I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress I got the following results:</p>
 
-<p><amp-img src="/images/faster-ng-apps-2/adding-removing.png"></amp-img></p>
+<p><amp-img src="/images/faster-ng-apps-2/adding-removing.png" layout="responsive"></amp-img></p>
 
 <p>With the latest optimization the time required for running the tests dropped from 394.53ms to 9.70ms! That is a huge improvement! We achieved it only by performing a small refactoring, without writing any custom code, just taking advantage of what Angular already provides for free!</p>
 
@@ -255,7 +255,7 @@ The code for this blog post is available at my GitHub account:"
 
 <p>For this performance benchmark we&rsquo;ll increase the number of items from 140 to 1,000. Lets see how this is going to affect our application&rsquo;s rendering performance:</p>
 
-<p><amp-img src="/images/faster-ng-apps-2/slow-initial-rendering.png"></amp-img></p>
+<p><amp-img src="/images/faster-ng-apps-2/slow-initial-rendering.png" layout="responsive"></amp-img></p>
 
 <p>9.53s is quite a lot for initial rendering time. In fact&hellip;</p>
 
@@ -268,7 +268,7 @@ The code for this blog post is available at my GitHub account:"
 
 <p>There are various techniques to fix this - we don&rsquo;t have to render all the 1,000 employees at once, we can, for instance, apply pagination or render the items lazily when the user scrolls. But there&rsquo;s also something else we can apply in this specific case. For this purpose, lets take a look at the numeric data for the employees:</p>
 
-<p><amp-img src="/images/faster-ng-apps-2/duplicate-values.png"></amp-img></p>
+<p><amp-img src="/images/faster-ng-apps-2/duplicate-values.png" layout="responsive"></amp-img></p>
 
 <p>We have a lot of employees with the same numeric values which produce the same output after going through the business calculation. We can conclude that in this case we have samples from a small range. Lets for a second remember what optimization Angular performs with pure pipes:</p>
 
@@ -308,7 +308,7 @@ The code for this blog post is available at my GitHub account:"
 
 <p>Now lets see how this affects our initial rendering:</p>
 
-<p><amp-img src="/images/faster-ng-apps-2/memoization.png"></amp-img></p>
+<p><amp-img src="/images/faster-ng-apps-2/memoization.png" layout="responsive"></amp-img></p>
 
 <p>Not bad! By performing this optimization we reduced the initial rendering with 30%!</p>
 
