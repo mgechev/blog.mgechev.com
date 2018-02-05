@@ -139,7 +139,7 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <h2 id="introduction">Introduction</h2>
 
-<p><amp-img src="/images/superman-batman-lego.jpg" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/superman-batman-lego.jpg" alt="" layout="responsive" width="640" height="480"></amp-img></p>
 
 <p>Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the <code>$digest</code> loop. How immutability could help? Immutable data cannot change after being created. The execution of each operation, which changes the immutable collection (add, delete, set) will create of a new data structure but will leave the initial data unchanged. This way we know that a watched expression, which evaluation results a collection, have changed if and only if its current reference differs from the previous one. This speeds up the change detection of the expression from <code>O(n)</code> to <code>O(1)</code>, i.e. instead of watching collection with <code>$watchCollection(expr, fn)</code>, we can afford <code>$watch(expr, fn, false)</code>, instead.</p>
 
@@ -165,7 +165,7 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <h3 id="watch">$watch</h3>
 
-<p><amp-img src="/images/papi-lego.jpg" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/papi-lego.jpg" alt="" layout="responsive" width="640" height="425"></amp-img></p>
 
 <p>The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">let</span> <span class="nx">primitive</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
@@ -306,7 +306,7 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <h2 id="benchmark-results">Benchmark Results</h2>
 
-<p><amp-img src="/images/batman-superman-robbin-lego.jpg" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/batman-superman-robbin-lego.jpg" alt="" layout="responsive" width="640" height="480"></amp-img></p>
 
 <p>I compared the performance of <a href="https://github.com/mgechev/versionable-collections/blob/master/lib/versionable-list.js"><code>VersionableList</code></a> versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:</p>
 
@@ -321,31 +321,31 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <h3 id="5-entries">5 entries</h3>
 
-<p><amp-img src="/images/faster-collections/data-size-5.png" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/faster-collections/data-size-5.png" alt="" layout="responsive" width="800" height="500"></amp-img></p>
 
 <p>The two big competitors in this benchmark are the <code>VersionableList</code> and the native JavaScript array. As we see the built-in JavaScript list performs just a little bit better than <code>VersionableList</code>. Immutable.js list is slower because of the overhead caused by copying the entire data structure on change.</p>
 
 <h3 id="10-entries">10 entries</h3>
 
-<p><amp-img src="/images/faster-collections/data-size-10.png" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/faster-collections/data-size-10.png" alt="" layout="responsive" width="800" height="500"></amp-img></p>
 
 <p>When having a data structure with 10 items the built-in JavaScript array and <code>VersionableList</code> have almost the same performance.</p>
 
 <h3 id="100-entries">100 entries</h3>
 
-<p><amp-img src="/images/faster-collections/data-size-100.png" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/faster-collections/data-size-100.png" alt="" layout="responsive" width="800" height="500"></amp-img></p>
 
 <p>The kicking-ass winner in this benchmark is the <code>VersionableList</code>. With higher amount of bindings, the immutable list performs better than the built-in JavaScript array.</p>
 
 <h3 id="1-000-entries">1,000 entries</h3>
 
-<p><amp-img src="/images/faster-collections/data-size-1000.png" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/faster-collections/data-size-1000.png" alt="" layout="responsive" width="800" height="500"></amp-img></p>
 
 <p>With 1k collection size the immutable list performs better than the built-in JavaScript array and is with almost constant running time (the bindings almost don&rsquo;t impact the running time, since they have constant complexity). The <code>VersionableList</code> performs even better since it doesn&rsquo;t require copying of the collection on change.</p>
 
 <h3 id="10-000-entries">10,000 entries</h3>
 
-<p><amp-img src="/images/faster-collections/data-size-10000.png" alt="" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/faster-collections/data-size-10000.png" alt="" layout="responsive" width="800" height="500"></amp-img></p>
 
 <p>The supreme champion is the <code>VersionableList</code>. The interesting fact here is that the immutable list performs just slightly worst than the <code>VersionableList</code> list, although on each change <strike>a new collection with 10,000 items is created</strike> a lot of operations for maintaining the <a href="https://en.wikipedia.org/wiki/Persistent_data_structure">persistent data structure</a> are performed.</p>
 

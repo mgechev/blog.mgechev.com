@@ -9,8 +9,9 @@ const updateFiles = node => {
     children.forEach(c => updateFiles(join(node, c)));
   } else {
     if (node.endsWith('.html')) {
-      console.log('Updating', node);
-      writeFileSync(node, ampify(readFileSync(node)));
+      ampify(readFileSync(node), {
+        imgBase: 'docs'
+      }).then(c => writeFileSync(node, c)).then(() => console.log('Updated', node));
     }
   }
 };
