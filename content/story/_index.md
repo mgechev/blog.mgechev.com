@@ -27,7 +27,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           It incorporated the latest changes introduced by Angular version 5 and introduced additional improvements such as introduction to structural typing, alignment to the new `StaticInjector` API and many others.
         </p>
         <p>
-          I am very thankful to the Angular team for their assistence during the alignment to the latest changes introduced to the framework. They are constant inspiration!
+          I am very thankful to the Angular team for their assistance during the alignment to the latest changes introduced to the framework. They are a constant inspiration!
         </p>
       </section>
     </section>
@@ -37,10 +37,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/john-atanasoff.jpg">
         <p>
-          On 10th of October, 2017, I became the first laureate, in the history of the award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
+          On 10th of October 2017, I became the first laureate, in the history of the award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
         </p>
         <p>
-          President Rumen Radev, awarded me with diploma for the award "John Atanasoff", which is given to young scientists with globally impactful contributions to the development of computer science and software engineering.
+          President Rumen Radev awarded me with a diploma for the award "John Atanasoff", which is given to young scientists with globally impactful contributions to the development of computer science and software engineering.
         </p>
         <p>
           The second award, that the President awarded me with, is for the development of a project with wide social impact.
@@ -55,7 +55,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/codelyzer.png">
         <p>
-          Early 2016, I started a project for static analysis of Angular applications. Some of my core motivations were automatic check of the assignments of my students in the class "Advanced JavaScript" at Sofia University, and automatic, static verification for the rules in the Angular style guide I developed.
+          Early 2016, I started a project for static analysis of Angular applications. Some of my core motivations were an automatic check of the assignments of my students in the class "Advanced JavaScript" at Sofia University, and automatic, static verification for the rules in the Angular style guide I developed.
         </p>
         <p>
           Later, this tool got <a href="">introduced in the Angular CLI</a>. I implemented a few more crucial modules related to templates and styles analysis.
@@ -73,7 +73,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
         </p>
         <img src="/images/story/rhyme.png">
         <p>
-          At that time, I got a few amazing offers from the best technological companies in the Valley. This put me into a cross road:
+          At that time, I got a few amazing offers from the best technology companies in the Valley. This put me at a crossroad:
           <ul>
             <li>Work with the smartest people in the Valley having a safe job</li>
             <li>...or go into the unknown and work on a startup</li>
@@ -137,7 +137,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           In the product that I was working on - Brownie Points, we decided to go...very bleeding edge. We developed the front end in 25k lines of TypeScript and Angular, while Angular was still in beta.
         </p>
         <p>
-          In the beginning of the product's development, I came up with a scalable architecture which allowed us to perform efficient and coherent state management.
+          At the beginning of the product's development, I came up with a scalable architecture which allowed us to perform efficient and coherent state management.
         </p>
         <p>
           The talk about my "Scalable Application Architecture" I presented on <a>ng-be</a> and <a>FDConf</a>.
@@ -184,10 +184,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/gde.png">
         <p>
-          Because of my constant contributions to Angular and related projects, my frequent talks on international conferences, popular blog, published book and other achievements, Jeff Cross from the Angular team invited me to join as a Google Developer Expert.
+          Because of my constant contributions to Angular and related projects, my frequent talks on international conferences, a popular blog, published book and other achievements, Jeff Cross from the Angular team invited me to join as a Google Developer Expert.
         </p>
         <p>
-          I really appreciated the invitation and went through the process as quickly as possible. Although, that was an amazing recognition from Google, I got even more thrilled by the opportunity to join the Angular organization on GitHub as a member with write access to the <a>mobile-toolkit</a> repository. This gave me the opportunity to create value with bigger reach!
+          I really appreciated the invitation and went through the process as quickly as possible. Although that was an amazing recognition from Google, I got even more thrilled by the opportunity to join the Angular organization on GitHub as a member with write access to the <a>mobile-toolkit</a> repository. This gave me the opportunity to create value with bigger reach!
         </p>
       </section>
     </section>
@@ -195,7 +195,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Got the Google Peer Bonus</h1>
       <section>
         <p>
-          Because of my contributions to Angular core, Angular mobile toolkit, Angular style guide and Angular CLI I got nominated for Google Peer Bonus.
+          Because of my contributions to the Angular core, Angular mobile toolkit, Angular style guide and Angular CLI I got nominated for Google Peer Bonus.
         </p>
         <p>
           This is a recognition from Google to people who have significant contributions on open source project with high social impact. I got the honor to be one of the two developers nominated for Angular.
@@ -222,7 +222,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/sta.png">
         <p>
-          Because of my activities in the AngularJS community and my popular blog posts, Packt Publishing invited me to write a book about Angular. <strong>I was thrilled when they told me that Miško Hevery has agreed to be my technical reviewer</strong>. That was an amazing honor for me, since I'm following his work even before he created AngularJS.
+          Because of my activities in the AngularJS community and my popular blog posts, Packt Publishing invited me to write a book about Angular. <strong>I was thrilled when they told me that Miško Hevery has agreed to be my technical reviewer</strong>. That was an amazing honor for me since I'm following his work even before he created AngularJS.
         </p>
         <p>
           March, 2016, we published "Switching to Angular 2". Later this year, "Switching to Angular 2" turned into one of the bestsellers of the Packt!
@@ -236,7 +236,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Graduated MSc software engineering</h1>
       <section>
         <p>
-          In 2015, I graduated my MSc in Software Engineering from Sofia University. I appreciated every subject we went through and found them practical applications in my day to day development process. For my last class I developed a programming language with distributed front end and call stack.
+          In 2015, I graduated my MSc in Software Engineering from Sofia University. I appreciated every subject we went through and found them practical applications in my day to day development process. For my last class, I developed a programming language with a distributed front end and call stack.
         </p>
         <p>
           My thesis was on topic "Remote Access to Physical and Virtual Machines" and was related to modules of what we later called Rhyme.com.
@@ -247,7 +247,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Started "Angular Seed"</h1>
       <section>
         <p>
-          Because of my contributions in the AngularJS community, I was looking forward for trying Angular. I even included it as part of the program of "Advanced JavaScript" at Sofia University. I was looking for a reliable starter project which will help me handle the entire tooling overhead.
+          Because of my contributions to the AngularJS community, I was looking forward to trying Angular. I even included it as part of the program of "Advanced JavaScript" at Sofia University. I was looking for a reliable starter project which will help me handle the entire tooling overhead.
         </p>
         <p>
           Unfortunately, such starter project didn't exist back then so I created it and called it Angular Seed. To the project joined an amazing contributor Ludvoic Henin, who did stunning job on the core architecture. Months after that, I used Angular Seed for "Advanced JavaScript" and my book "Switching to Angular 2".
@@ -265,7 +265,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           I did a research in the area of implementation of immutable data structures and their practical applications in the development of user interface. Later based on my results I published a few posts. Inspired by the posts, I applied for a talk at <a>ng-vegas</a> and I got accepted!
         </p>
         <p>
-          It was such a honor for me to travel all the way from Sofia to Las Vegas in order to present my findings! I felt quite awkward after the talk, presenting it in front of hundreds of people with a different native language.
+          It was such an honor for me to travel all the way from Sofia to Las Vegas in order to present my findings! I felt quite awkward after the talk, presenting it in front of hundreds of people with a different native language.
         </p>
       </section>
     </section>
@@ -273,7 +273,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Wrote "Angular in Patterns"</h1>
       <section>
         <p>
-          AngularJS was the most well designed JavaScript framework back in 2014 (well, now that's Angular). In my class for object-oriented design and design patterns, I worked on an article which explains the individual design patterns and their practical applications in AngularJS.
+          AngularJS was the most well-designed JavaScript framework back in 2014 (well, now that's Angular). In my class for object-oriented design and design patterns, I worked on an article which explains the individual design patterns and their practical applications in AngularJS.
         </p>
         <p>
           Later, my document got translated to French, Japanese, Russian and Chinese.
@@ -287,10 +287,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Wrote "AngularJS Style Guide"</h1>
       <section>
         <p>
-          In late 2013, I made the observation how mature the best practices for development in the different technologies were. Unfortunately, in JavaScript we had nothing but coding style.
+          In late 2013, I made the observation how mature the best practices for development in the different technologies were. Unfortunately, in JavaScript, we had nothing but coding style.
         </p>
         <p>
-          A few hours after that, I wrote the first draft of the AngularJS style guide. Later, it got translated in 13 different languages and got 75 external contributors! Now the project has 5k stars on GitHub.
+          A few hours after that, I wrote the first draft of the AngularJS style guide. Later, it got translated into 13 different languages and got 75 external contributors! Now the project has 5k stars on GitHub.
         </p>
         <p>
           A few months after that a few more style guides were released.
@@ -312,7 +312,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>TA and part-time Lecturer</h1>
       <section>
         <p>
-          My professors invited me to join as a teaching assistant in the classes "Analysis and Design of Software Projects", "Programming with ASP.NET" and later as part-time lecturer and expert in the class "Advanced JavaScript".
+          My professors invited me to join as a teaching assistant in the classes "Analysis and Design of Software Projects", "Programming with ASP.NET" and later as a part-time lecturer and expert in the class "Advanced JavaScript".
         </p>
         <p>
           It was a great experience to explain in deep details the tools I was working with on a daily basis. I found it fascinating to connect concepts from the theoretical computer science with the wild JavaScript ecosystem.
@@ -330,7 +330,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           In Sofia that time, there were user groups for Java and .NET but when I was looking for a JavaScript community I wasn't able to find one. I wanted to meet like-minded people who I can chat with.
         </p>
         <p>
-          That's why in October, 2012, I organized the first SofiaJS meetup at initLab, the local hacker space in Sofia. There were maybe...40 people? That was a huge success for me. I was so happy I can chat about what I do and exchange ideas with others.
+          That's why in October 2012, I organized the first SofiaJS meetup at initLab, the local hackerspace in Sofia. There were maybe...40 people? That was a huge success for me. I was so happy I can chat about what I do and exchange ideas with others.
         </p>
         <p>
           Until then, I organized tens of events either by myself or with the help of the other co-organizers, especially Mihail Mateev who has been an amazing help!
@@ -345,7 +345,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/webloz.png">
         <p>
-          In high school I was taking a part in different National competitions in software development. According to the rules, students have to develop a complete software project on whatever topic we want to and present it in front of a jury from Sofia University.
+          In high school, I was taking apart in National competitions in software development. According to the rules, students have to develop a complete software project on whatever topic we want to and present it in front of a jury from Sofia University.
         </p>
         <p>
           For one of these competitions, I developed a CMS system from scratch (yes, not even jQuery) with intensive Ajax usage (yes, Ajax was a big thing back then...we used to do hidden frame for browsers which didn't have XMLHttpRequest support). My CMS system was awarded and was used as official website for my high school.
@@ -357,7 +357,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/graduate.jpg">
         <p>
-          Later this year, I was awarded with a plaque and announced as leader of the course because of my achievements in information technologies, astronomy and physics, martial arts, tennis, and mathematics.
+          Later this year, I was awarded a plaque and announced as leader of the course because of my achievements in information technologies, astronomy, and physics, martial arts, tennis, and mathematics.
         </p>
         <p>
           During my speech...that was the first time I had to talk in front of a few hundreds of people.
@@ -372,7 +372,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/karate.jpg">
         <p>
-          In 2008, just before I got my black belt in karate, I became the National champion of Bulgaria in kumite (sparing).
+          In 2008, just before I got my black belt in karate, I became the National champion of Bulgaria in Kumite (sparing).
         </p>
         <p>
           There is no better feeling than hearing "We Are The Champions" while getting my gold medal. This championship gave me the opportunity to train with the National Karate team as preparation for European championships.
@@ -383,7 +383,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>University admission from a programming competition</h1>
       <section>
         <p>
-          As laureate of a National Programming competition I got grade 5.5 out of 6 as admission score for BSc degree at Sofia University.
+          As the laureate of a National Programming competition, I got grade 5.5 out of 6 as admission score for BSc degree at Sofia University.
         </p>
         <p>
           From other competitions I got excellent grade for admission in 4 more universities.
@@ -397,7 +397,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>My first web application</h1>
       <section>
         <p>
-          In 2007 I first got introduced to Web development from my high school teacher Svilen Dimitrov. He provided a tramendence support helping me understand the basics of JavaScript, MySQL, PHP and Flash.
+          In 2007 I first got introduced to Web development from my high school teacher Svilen Dimitrov. He provided an incredible support helping me understand the basics of JavaScript, MySQL, PHP, and Flash.
         </p>
         <p>
           A few weeks after that, I developed my first website for the TV show "Perfect Strangers". Later, I developed a few more web applications for collecting the data from observations of meteor showers and others.
@@ -428,7 +428,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Physics and astronomy</h1>
       <section>
         <p>
-          I was amazed by the space. I had my old Russian telescope reflector with brand name "Alkor". I used to spend almost every clear night observing the sky, writing down my observations in a notebook.
+          I was amazed by the space. I had my old Russian telescope reflector with the brand name "Alkor". I used to spend almost every clear night observing the sky, writing down my observations in a notebook.
         </p>
         <p>
           That's how I got introduced to our local Astronomy school, in Troyan, where I met one of the most dedicated teachers I thought can exist - Nadka Dankova. She was helping me with the preparation for the National astronomy competitions I was participating in.
