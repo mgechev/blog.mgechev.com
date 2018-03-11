@@ -9,7 +9,7 @@ categories:
 - Webpack
 - Machine Learning
 date: 2018-03-11T00:00:00Z
-draft: true
+draft: false
 tags:
 - TypeScript
 - JavaScript
@@ -64,7 +64,7 @@ In the first a couple of pages we'll cover the individual tools from [`mlx`](htt
 
 In this section we'll cover the tools:
 
-- `@mlx/ga` - a module which is used to fetch structured information from Google Analytics.
+- `@mlx/ga` - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application paremetrized routes. This means that even if we have `/a/:id`, Google Analytics will consider `/a/1` and `/a/2` as separate routes. In order to aggragate the data you can either provide an array of the routes in your application manually, or let the following module extract them for you:
 - `@mlx/parser` - a module which extracts the routes of our application, finds the associated bundle entry points, and builds the routing bundle tree.
 - `@mlx/clusterize` - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree.
 - `@mlx/webpack` - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application.
@@ -164,6 +164,10 @@ You can expand this section to get familiar with the mathematica foundations bet
 
 - Graphs, trees, weighted graphs, and connected components
 - Basics of theory of probability and Markov chains
+
+<div style="cursor: pointer; color: #5694f1;" id="expand">Expand &#9658;</div>
+<div style="cursor: pointer; display: none; color: #5694f1;" id="collapse">Collapse &#9660;</div>
+<section class="zippy hidden" id="zippy">
 
 ## Basics of Graph Theory
 
@@ -363,3 +367,104 @@ What we can conclude from the matrix is that:
 A matrix like that, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**.
 
 That's it! That's all the math we need.
+
+</section>
+
+<script>
+(function (){
+var expand = document.getElementById('expand');
+var collapse = document.getElementById('collapse');
+var zippy = document.getElementById('zippy');
+expand.onclick = function () {
+  zippy.style.display = 'block';
+  collapse.style.display = 'block';
+  expand.style.display = 'none';
+};
+collapse.onclick = function () {
+  zippy.style.display = 'none';
+  expand.style.display = 'block';
+  collapse.style.display = 'none';
+};
+}());
+</script>
+
+# Definitions
+
+To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded, this is just for simplicity, it's not restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
+
+![]()
+
+```txt
+/a -> /b
+/a -> /c
+/a -> /a/b
+/b -> /a
+/b -> /a/a
+```
+
+## Navigation Graph
+
+The graph above we'll call **navigation graph**. Why it's a graph? Because it has cycles. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are representsd by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
+
+For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`.
+
+## Page Graph
+
+Although the navigation graph look pretty handy, it's not usable for our bundling purposes becase usually our applications have parametrized routes. For example, let's suppose we have the routes:
+
+```text
+/a
+/a/:id
+/b
+/c
+```
+
+In this case, most likely, we want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**.
+
+## Routing Tree
+
+The routes of our application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call **routing tree**.
+
+## Bundle Routing Tree
+
+If we suppose that all the routes in our application are entry points of bundles in our application than our bundle tree matches the routing tree, in shape. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the bundles.
+
+In case, however, we have the following situation:
+
+```ts
+// React
+// App.tsx
+<Route path="/intro" component={AsyncComponent(() => import('./Main'))} />
+<Route path="/main" component={AsyncComponent(() => import('./Main'))} />
+<Route path="/about" component={AsyncComponent(() => import('./About'))} />
+```
+
+or in Angular:
+
+```ts
+// Angular
+// app.routing-module.ts
+export const appRoutes: Routes = [
+  {
+    loadChildren: './main/main.module#IntroModule',
+    path: 'intro'
+  },
+  {
+    loadChildren: './main/main.module#MainModule',
+    path: 'main'
+  },
+  {
+    loadChildren: './about/about.module#AboutModule',
+    path: 'about'
+  }
+];
+```
+
+In this case tree routing tree will differ from the bundle routing tree:
+
+- The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
+- The bundle routing tree will have root node named after the file while the routes definition is (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`).
+
+
+
+
