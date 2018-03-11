@@ -31,7 +31,6 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
         </p>
       </section>
     </section>
-
     <section class="timeline-event">
       <h1>Two awards from the President of the Republic of Bulgaria</h1>
       <section>
