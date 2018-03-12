@@ -130,7 +130,7 @@ In our program, we can represent this graph in different ways. For our purposes,
 ```ts
 const graph = {
   'foo.js': ['bar.js', 'baz.js'],
-  'baz.js': ['foo.js],
+  'baz.js': ['foo.js'],
   'bar.js': ['baz.js']
 };
 ```
@@ -443,7 +443,7 @@ In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported 
 
 Internally, **`@mlx/ga` will build the weighted page graph of the application**. The tool will query Google Analytics' API and will get the previous page for each visited page, together with the number of visits. This way, in the end we'll have graph similar to this one:
 
-```json
+```js
 {
   "": {
     "/intro/parent": 144,
