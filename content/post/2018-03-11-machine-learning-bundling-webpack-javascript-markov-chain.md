@@ -72,7 +72,9 @@ In the first a couple of sections, we'll cover the individual tools from the [`m
 
 **Disclaimer**: the packages that we're going to cover are in a very early stage of their development. It's very likely that they are incompatible with your projects. Keep in mind that their APIs are not finalized. Over time their implementation will mature and get more robust.
 
-An Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and a React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
+The examples with the article use two identical, simple Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
+
+The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
 
 ```ts
 ...
@@ -244,15 +246,15 @@ const graph = {
 };
 ```
 
-Now our bundler needs to figure out which is the entry point in our application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
+Now our bundler needs to figure out which is the entry point in the application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
 
-- We'll first find the file which has no dependencies, which in our case will be `foo.js` and add it to the result list.
+- We'll first find the file which has no dependencies, which in our case will be `foo.js`, and add it to the result list.
 - After that, we'll remove `foo.js` from the graph, together with all edges pointing to it.
 - As next step, we'll find the next node without dependencies. This is going to be `bar.js` since it no longer points to `foo.js` (this file is not in the graph anymore).
 - We'll remove `bar.js` from the graph, add it to the result list and keep going.
-- Finally, we'll find `baz.js` - the only node in the graph left. We'll add it to the result list and remove it from the graph.
+- Finally, we'll find `baz.js` - the only node left in the graph. We'll add it to the result list and remove it from the graph.
 
-This way the topological order of the graph will be `['foo.js', 'bar.js', 'baz.js']`. The bundler now can use 'baz.js` as the entry point of the chunk. It turns out that topological sorting is very convenient for detecting cycles in the graph. If at a given point we cannot find a node without a dependency, this means that we have a cycle.
+This way the topological order of the graph will be `['foo.js', 'bar.js', 'baz.js']`. The bundler now can use `baz.js` as the entry point of the chunk. It turns out that topological sorting is very convenient for detecting cycles in the graph. If at a given point we cannot find a node without a dependency, this means that we have a cycle.
 
 ### Trees
 
@@ -260,9 +262,9 @@ Trees are graphs. A special kind of graphs:
 
 >...tree is an undirected graph in which any two vertices are connected by exactly one path...
 
-In other words, trees are  **acyclic connected graph**.
+In other words, trees are **acyclic connected graph**.
 
-For example, we may have the following routing tree in our application:
+For example, we may have the following *routing tree* in our application:
 
 <img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
@@ -270,7 +272,7 @@ As we can see, the root of the tree is `/`, its children are `/a` and `/b`, wher
 
 ## Basics Probability Theory
 
-Let's go back to our aggregated Google Analytics data from the example above:
+Let's take a look at this aggregated data from Google Analytics:
 
 ```ts
 const graph = {
@@ -284,7 +286,7 @@ const graph = {
 };
 ```
 
-We can see that when the user is at page `/a`, `10` out of `13` visits they are going to go to `/b` (we're ignoring the cases when the user leaves the page). This means that `10/13` is the **probability** the user to go from `/a` to `/b` and `3/13` is the probability the user to go from `/a` to `/c`.
+We can notice that when the user is at page `/a`, `10` out of `13` visits they are going to go to `/b` (we're ignoring the cases when the user leaves the page). This means that `10/13` is the **probability** the user to go from `/a` to `/b` and `3/13` is the probability the user to go from `/a` to `/c`. Probability of an event is a number between 0 and 1 (i.e. in the interval `[0, 1]`).
 
 Now, based on the probabilities for all the pages, we can form a matrix:
 
@@ -302,7 +304,7 @@ From the matrix, we can conclude that:
 - There's `4/4` probability (or `1`) the user to go from `/b` to `/a`.
 - There's `0` probability for all other cases: `/b` to `/b`, `/b` to `/c`, `/c` to `/a`, `/c` to `/b`, and `/c` to `/c`.
 
-A matrix like that, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**.
+A matrix like that, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**. In fact, this is a machine learning model
 
 That's it! That's all the math we need.
 
@@ -334,7 +336,7 @@ To make sure we're all on the same page with the concepts that we're going to di
 
 ## Navigation Graph
 
-The graph above we'll call **navigation graph**. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
+The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
 
 For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`.
 
