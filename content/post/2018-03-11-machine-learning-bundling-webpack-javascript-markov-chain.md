@@ -9,7 +9,7 @@ categories:
 - Webpack
 - Machine Learning
 date: 2018-03-11T00:00:00Z
-draft: false
+draft: true
 tags:
 - TypeScript
 - JavaScript
@@ -18,11 +18,11 @@ tags:
 - Tooling
 - Webpack
 - Machine Learning
-title: JavaScript Decorators for Declarative and Readable Code
+title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/11/machine-learning-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven bundling and data-driven pre-fetching in our single-page applications. For the purpose, I'll explain how we can use data from Google Analytics, in order to automate the process of bundling and pre-fetching of the application's assets based on the users' behavior.
+In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven chunk clusterization and data-driven pre-fetching in our single-page applications. For the purpose, I'll explain how we can use data from Google Analytics, in order to automate the process of bundling and pre-fetching of the application's assets based on the users' behavior.
 
 # Introduction
 
@@ -54,7 +54,7 @@ A better approach is to choose our chunk layout based on data. There are differe
 
 A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can make such decisions more accurately.
 
-Now let's focus only on the page level chunking. **What if we load every page lazily and let our bundler decide, based on data, what should be grouped together and what should be pre-fetched?** In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven bundling and data-driven pre-fetching. All code examples can be found at my [GitHub profile](https://github.com/mgechev/mlx).
+Now let's focus only on the page level chunking. **What if we load every page lazily and let our bundler decide, based on data, what should be grouped together and what should be pre-fetched?** In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clusterization and data-driven pre-fetching. All code examples can be found at my [GitHub profile](https://github.com/mgechev/mlx).
 
 In the first a couple of sections, we'll cover the individual tools from [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, we'll discuss how everything from `@mlx` works together in details.
 
@@ -138,7 +138,7 @@ const graph = {
 Often we have a numeric value associated with the edge between two nodes. For example, in our Google Analytics case, we may have a number of visits from page `A` to page `B`. In such case, we can model the data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
 
 ```ts
-const grpah = {
+const graph = {
   '/a': {
     '/b': 10,
     '/c': 3
@@ -374,13 +374,13 @@ export const appRoutes: Routes = [
 In this case, tree routing tree will differ from the bundle routing tree:
 
 - The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
-- The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). This is because two routes in this case point to the same bundle entry point.
+- The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
 
 ## Bundle Page Graph
 
 We already defined the page graph as the navigation graph which we got from given source, with aggregated routes. If instead of the routes, we get the entry points of their corresponding chunks, we'll get the bundle page graph.
 
-Keep in mind that we may not have 1:1 correspondance between chunk entry point and a route. This is possible in case not all the routes are lazy. In such case, we may need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well.
+Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we may need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well.
 
 # Technical Details
 
@@ -388,8 +388,8 @@ Alright, now we understand all the mathematics behind the tool and we defined al
 
 If you take a look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
-- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application paremetrized routes, i.e. **we get a navigation graph which we need to translate to page graph**. `@mlx/ga` can do this automaticallt for us, if we provide a list of all the paths in our application.
-- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes, and builds the routing bundle tree.
+- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
+- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree.
 - [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
 - [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
 
@@ -431,10 +431,10 @@ In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported 
 - Key for access to the Google Analytics API <sup>[9]</sup>
 - Google Analytics View ID <sup>[9]</sup>
 - Start & end intervals for the Google Analytics report
-- Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manupulation over them. In the example above, it drops the `/app` prefix.
+- Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manipulation over them. In the example above, it drops the `/app` prefix.
 - Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use `@mlx/parser` in order to extract them automatically. This array is essential in order to allow `@mlx/ga` to map the navigation graph to a page graph.
 
-Internally, **`@mlx/ga` will build the weighted page graph of the application**. The tool will query Google Analytics' API and will get the previous page for each visited page, together with the number of visits. This way, in the end we'll have graph similar to this one:
+Internally, **`@mlx/ga` will build the weighted page graph of the application**. The tool will query Google Analytics' API and will get the previous page for each visited page, together with the number of visits. This way, in the end, we'll have a graph similar to this one:
 
 ```js
 {
@@ -466,7 +466,9 @@ Internally, **`@mlx/ga` will build the weighted page graph of the application**.
 
 This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and [React](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Here's an interactive visualization of the entire aggregated data:
 
-![]()
+<div style="height: 600px; width: 100%" id="canvas"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
+<script src="/assets/js/mlx/graph.js"></script>
 
 You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the view ID with the one of your web app.
 
@@ -517,7 +519,7 @@ export interface MLPluginConfig {
   ```ts
   new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
   ```
-- `runtime` configures the plugin for data-driven bundle pre-fetching. With this property we can either specify an optional `basePath` or disable the pre-fetching completely.
+- `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` or disable the pre-fetching completely.
 - `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clusterization algorithm performed by `@mlx/clusterize`. This may sound a bit abstract at first. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
 
 Keep in mind that **the plugin will not do any code splitting**. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
@@ -534,7 +536,7 @@ As you might have already guessed, **`ClusterizeChunksPlugin` is used for combin
 
 ### Runtime Pre-fetching
 
-The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the martix. For example:
+The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the matrix. For example:
 
 ```ts
 {
@@ -589,32 +591,35 @@ The second point is crucial for the work of `@mlx/webpack` and `@mlx/clusterize`
 This is stripped version of the array produced after parsing the [sample Angular project](https://github.com/mgechev/ng-dd-bundled). There are several important things to notice:
 
 - The array contains the routes from our definitions. This means that the parameterized routes look the way we define them in the source code.
-- Each array element has a `modulePath` property which points to the entry point of the JavaScript chunk which will to be loaded when the user navigates to the given `path`.
-- Each element also has a `parentModulePath`. This is the entry point of the chunk which contains the actual route definition. For non-lazy routes the `modulePath` will have the same value as the `parentModulePath`.
+- Each array element has a `modulePath` property which points to the entry point of the JavaScript chunk which will be loaded when the user navigates to the given `path`.
+- Each element also has a `parentModulePath`. This is the entry point of the chunk which contains the actual route definition. For non-lazy routes, the `modulePath` will have the same value as the `parentModulePath`.
 
 You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser) <sup>[10]</sup>.
 
-Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser, relies on a lot of conventions. It's built on top of TypeScript.
+Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser relies on a lot of conventions. It's built on top of TypeScript.
 
 ## `@mlx/clusterize`
 
 The final package that we're going to cover is the clusterization algorithm. As input, it accepts:
 
-- `bundleGraph: Graph` - a weighted bundle page graph which is result of the transformation of the weighed page graph.
+- `bundleGraph: Graph` - a weighted bundle page graph which is the result of the transformation of the weighed page graph.
 - `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. That's the `modules` argument.
-- `n: number` - `n` is the minimum number of chunks that we want to get in the end of the clusterization algorithm.
+- `n: number` - `n` is the minimum number of chunks that we want to get at the end of the clusterization algorithm.
 
 Once this information is available, the clusterization algorithm will:
 
 1. Try to find the connected components in the `bundleGraph`.
-2. In case the connected components are more than the minumum, the algorithm will return them.
-3. In case the connected components are less than the minimum, the algorithm will find the edge with smallest weight, and subtract it from all other edges.
+2. In case the connected components are more than the minimum, the algorithm will return them.
+3. In case the connected components are less than the minimum, the algorithm will find the edge with the smallest weight, and subtract it from all other edges.
 4. After that the algorithm will go back to step 1. and repeat the procedure until it finds a clusterization of the graph satisfying `n`.
 
 For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)<sup>[12]</sup>.
 
 # Conclusion
 
+In this blog post, we introduced the idea of data-driven chunk clusterization and pre-fetching. We explained how we can apply it by consuming aggregated data from one of the most popular services for web application analysis - Google Analytics.
+
+After we looked at a brief introduction to graph theory and the probability theory, we introduced a few concepts, including navigation graph, page graph, and bundle page graph. Stepping on this solid foundation we explained the implementation of data-driven clusterization at `@mlx`.
 
 1. https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/
 2. https://blog.hubspot.com/marketing/page-load-time-conversion-rates
