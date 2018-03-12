@@ -106,7 +106,7 @@ You can expand this section to get familiar with the mathematical foundations of
 
 ## Basics of Graph Theory
 
-A graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices. In this article, we're often going to mention the term "dependency graph". This is just a graph which represents the dependencies between something. For example:
+A graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices (nodes). In this article, we're often going to mention the term "dependency graph". This is just a graph which represents the dependencies between something. The individual entities of the problem domain are represented with the nodes of the graph and the dependencies between them are represented with the edges. For example:
 
 ```ts
 // foo.ts
@@ -130,11 +130,11 @@ Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because
 G = ([('bar.ts', 'foo.ts')], ['bar.ts', 'foo.ts'])
 ```
 
-Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from `bar.ts` to `foo.ts`. Graphs with edges which point from one vertex to another are called **directed** graphs, otherwise, if there's path in both directions, we call the graph **undirected**.
+Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from `bar.ts` to `foo.ts`. Graphs with edges which point from one vertex to another are called **directed** graphs, otherwise, if there's path in both directions, we call the graph **undirected**. In directed graphs, the edges are ordered tuples, in undirected graphs the edges are unordered tuples.
 
 Let's now suppose we have the following graph:
 
-<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
 In our program, we can represent this graph in different ways. For our purposes, we'll often use a **list of neighbors** representation:
 
@@ -146,7 +146,9 @@ const graph = {
 };
 ```
 
-Often we have a numeric value associated with the edge between two nodes. For example, in our Google Analytics case, we may have a number of visits from page `A` to page `B`. In such case, we can model the data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
+The object above has three keys - one for each node of the graph. Each of the keys has an associated array which lists the neighbors of the current node.
+
+Often we have a numeric value associated with the edge between two nodes. For example, in our Google Analytics case, this numeric value may represent the number of visits from page `A` to page `B`. In such case, we can model the data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
 
 ```ts
 const graph = {
@@ -160,11 +162,11 @@ const graph = {
 };
 ```
 
-From the graph, above we can see that there are `10` visits from `/a` to page `/b`, `3` visits from `/a` to `/c`, and `4` visits from `/b` to `/a`.
+From the graph, above we can see that there are `10` visits from page `/a` to page `/b`, `3` visits from `/a` to `/c`, and `4` visits from `/b` to `/a`.
 
 ### Connected Components
 
-Often, however, users visit different parts of our application. For example, let's suppose that the following graph represents the Google Analytics data:
+Often, however, users visit different modules of our application independently. For example, let's suppose that the following graph represents Google Analytics data:
 
 ```ts
 const graph = {
@@ -186,9 +188,9 @@ const graph = {
 
 Let's look at the graphical representation of this graph:
 
-<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
-We can see that the entire graph consists of two smaller graphs: one which contains the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
+We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
 
 ### Cyclic Graphs and Topological Sorting
 
@@ -219,13 +221,14 @@ export const foo = 42;
 
 ```ts
 // bar.js
-import {foo} from './foo';
+import { foo } from './foo';
 
 export const bar = foo + 1.617;
 ```
 
 ```ts
 // baz.js
+import { foo } from './foo';
 import { bar } from './bar';
 
 console.log(foo);
@@ -237,7 +240,7 @@ This program will form the following dependency graph:
 const graph = {
   'foo.js': [],
   'bar.js': ['foo.js'],
-  'baz.js': ['bar.js']
+  'baz.js': ['foo.js', 'bar.js']
 };
 ```
 
@@ -261,9 +264,9 @@ In other words, trees are  **acyclic connected graph**.
 
 For example, we may have the following routing tree in our application:
 
-<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
-As you can see, the root of the tree is `/`, its children are `/a` and `/b`, where `/a` has children `/a/a` and `/a/b`. From the diagram above, we can see that the **lowest-common ancestor (or LCA)** of `/a/a` and `/a/b` is `/a`.
+As we can see, the root of the tree is `/`, its children are `/a` and `/b`, where `/a` has children `/a/a` and `/a/b`. From the diagram above, we can see that the **lowest-common ancestor (or LCA)** of `/a/a` and `/a/b` is `/a`.
 
 ## Basics Probability Theory
 
