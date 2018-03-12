@@ -9,7 +9,7 @@ categories:
 - Webpack
 - Machine Learning
 date: 2018-03-11T00:00:00Z
-draft: false
+draft: true
 tags:
 - TypeScript
 - JavaScript
@@ -22,17 +22,17 @@ title: JavaScript Decorators for Declarative and Readable Code
 url: /2018/03/11/machine-learning-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven bundling and data-driven pre-fetching of our single-page applications. For the purpose, I'll explain how we can use data from Google Analytics, in order to automate the process of bundling of our assets based on the users' behavior.
+In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven bundling and data-driven pre-fetching in our single-page applications. For the purpose, I'll explain how we can use data from Google Analytics, in order to automate the process of bundling and pre-fetching of the application's assets based on the users' behavior.
 
 # Introduction
 
-Over the past a couple of years, we started shipping web applications which provide user experience close to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought we'd be able to achieve with JavaScript in the browser.
+Over the past a couple of years, we started shipping web applications which provide a user experience comparable to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought would possible to achieve with JavaScript in the browser.
 
-The developers behind this amazing jump know that everything came with a cost. The complexity of our applications is growing exponentially! Together with the complexity is also growing the amount of assets that we need to transfer over the network. There are a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[1] of [publications](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[2] proving that how quickly our page loads can directly impacts the conversion rate and therefore the revenue.
+Of course, everything comes at a cost. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[N] of [publications](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[N] proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
 
-It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)[3]. JavaScript compared to image assets, for instance, is much more expensive because of it's non-trivial processing mechanism (parsing, compilation, and execution).
+It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)[3]. JavaScript compared to images, for instance, is much more expensive because of its non-trivial processing mechanism (parsing, compilation, and execution).
 
-If this wasn't convinsing enough, well, slow pages are also stressful:
+Well, slow pages are also stressful:
 
 <center>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Waiting for slow web pages to load is as stressful as watching a horror movie: <a href="https://t.co/spwEC1P9ct">https://t.co/spwEC1P9ct</a> <a href="https://twitter.com/hashtag/perfmatters?src=hash&amp;ref_src=twsrc%5Etfw">#perfmatters</a> <a href="https://t.co/3JmcGPZij2">pic.twitter.com/3JmcGPZij2</a></p>&mdash; Addy Osmani (@addyosmani) <a href="https://twitter.com/addyosmani/status/711330814827569152?ref_src=twsrc%5Etfw">March 19, 2016</a></blockquote>
@@ -41,129 +41,53 @@ If this wasn't convinsing enough, well, slow pages are also stressful:
 
 ## JavaScript Bundling
 
-A common practice for dealing with large amounts of JavaScript is dividing it to multiple bundles and loading it on demand. There are two main practices for achieving this:
+A common practice for dealing with a large amount of JavaScript is dividing it into multiple chunks and loading them on demand. There are two main practices for achieving this:
 
-- Page level - the individual JavaScript bundles correspond to one or more pages. While the user navigates across the different pages of the application they also trigger network requests which download the required by given page bundle.
-- Feature level - imagine one of the pages contains a heavy widget which is not very likely to be used by our application. We can simply move the JavaScript for this widget outside of the main bundle of the application and download it on demand, when the user intents to interract with the widget. This can be considered as subset of the "On page level" category but, as I'll mention below, it's convenient to consider it separate.
+- Page level - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates through the pages of the application they trigger network requests which download the associated with the target page chunk.
+- Feature level - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the main chunk of the application and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "page level chunking" category but, as I'll mention below, it's convenient to consider it in a different category.
 
-There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)[4] and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)[5], which tell us when we haven't done a good job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess.
+There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)[4] and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)[5], which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we load at the initial page load is too much. The logical approach, of course, is to apply either a feature or page level chunking.
 
-Interesting question to ask is: how do we decide which features and pages should be moved to their own bundles, in order to make Lighthouse happier. Often, this based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open given page or interact with given feature, so we create a "split point" and download the corresponding JavaScript lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
+Taking this approach, an interesting question to consider is: how do we decide which features and/or pages should be moved to their own chunks, in order to improve our app. Often, this decision is based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open a given page or interact with a given feature so we move it to its own chunk and download this JavaScript lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
 
-A better approach is to chose our bundle layout based on data. There are different platforms which provide us an insight how the users use our application. Google Analytics is a great example. Looking at the data which Google Analytics provide, we can decide which pages should be grouped together and what we can load lazily. This way we can make our "page-level" bundling data-driven which will make our judgment less error-prone.
+A better approach is to choose our chunk layout based on data. There are different platforms which provide us an insight into how the users use our application. Google Analytics is a great example. Looking at the data which Google Analytics provide, we can decide which pages should be grouped together and what we can load lazily. This way we can make our "page-level" chunking data-driven which will make our decision less error-prone.
 
-A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user does while navigating in this state machine, we can decide which pages it's likely the user to visit next, so we can pre-fetch them. In my article, the priority were completely based on my subjective judgment, however, with tools such as Google Analytics, we can make them data-driven, and respectively, more accurate.
+A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can make such decisions more accurately.
 
-**But why not load everything lazily and let our bundler decide what makes sense to be grouped bundled together and what not?** In this blog post, I'll demonstrate how combining a few tools which can be found at my [GitHub profile](https://github.com/mgechev/mlx), we can automate the process of data-driven bundling and data-driven pre-fetching.
+Now let's focus only on the page level chunking. **What if we load every page lazily and let our bundler decide, based on data, what should be grouped together and what should be pre-fetched?** In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven bundling and data-driven pre-fetching. All code examples can be found at my [GitHub profile](https://github.com/mgechev/mlx).
 
-In the first a couple of pages we'll cover the individual tools from [`mlx`](https://github.com/mgechev/mlx) and explain how they work together. After that we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation used in the project. Although, mathematical foundation may sound a bit frustrating, it's not. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to simplify the communication. For example, we'll cover what's Page Graph and how it differs from the Routing Bundle Tree. We'll finish our discussion by explaining how the different algorithms combined together form the entire system of packages.
+In the first a couple of sections, we'll cover the individual tools from [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, we'll discuss how everything from `@mlx` works together in details.
 
 # Tooling Introduction
 
-**Disclaimer**: the packages that we're going to cover are in a very early stage of their development. Most likely at this phase, they will be incompatible with your projects. Over time their implementation will mature and get more robust.
+**Disclaimer**: the packages that we're going to cover are in a very early stage of their development. It's very likely that they are incompatible with your projects. Keep in mind that their APIs are not finalized. Over time their implementation will mature and get more robust.
 
-In this section we'll cover the tools:
-
-- `@mlx/ga` - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application paremetrized routes. This means that even if we have `/a/:id`, Google Analytics will consider `/a/1` and `/a/2` as separate routes. In order to aggragate the data you can either provide an array of the routes in your application manually, or let the following module extract them for you:
-- `@mlx/parser` - a module which extracts the routes of our application, finds the associated bundle entry points, and builds the routing bundle tree.
-- `@mlx/clusterize` - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree.
-- `@mlx/webpack` - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application.
-
-## Usage
-
-The set of tools is as **framework agnostic** as possible. In fact, the only package which is framework dependent is `@mlx/parser` because with static analysis it extracts the routes of the application. Currently, `@mlx/parser` **works with both - Angular and React**. This means, that long-term, the data-driven bundling will be possible for **any framework**.
-
-The Angular implementation of the route extractor is much more robust because of the standard way of route definition. Also, the Angular compiler, and the abstraction that I built in top [6], allows us to extract the routes of the application quite easily. The React implementation relys on a specific way of route definition:
+An Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)[N] and a React one [here](https://github.com/mgechev/react-dd-bundled)[N]. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
 
 ```ts
-class App extends React.Component {
-  render() {
-    return (
-      <Router history={history}>
-        <div className="App">
-          <Link to="/intro">Intro</Link>
-          <Link to="/main">Main</Link>
-          <div>
-            <Switch>
-              <Redirect exact={true} from="/" to="/intro" />
-              <Route path="/intro" component={AsyncComponent(() => import('./intro/Intro'))} />
-              <Route path="/main" component={AsyncComponent(() => import('./main/Main'))} />
-            </Switch>
-          </div>
-        </div>
-      </Router>
-    );
-  }
-}
-```
-
-Currently, you can use the `@mlx/webpack` package in your Angular CLI project after you eject it and add the following line in the end of the plugin configuration:
-
-```ts
+...
+const { MLPlugin } = require('@mlx/webpack');
+...
 new MLPlugin({ data })
+...
 ```
+Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example can be found [here](https://github.com/mgechev/mlx-ga-demo)[N].
 
-For React, you can find a working example [here](https://github.com/mgechev/react-ml-bundled/blob/master/config/webpack.config.prod.js#L329-L334)[7]. In general, the webpack configuration for React and Angular is identical. The `MLPlugin` internally recognizes the used framework based on `package.json` and applies different routing extractor.
+For both, the Angular and the React application, once you run `npm build` the following is going to happen:
 
-In fact, the `MLPlugin` has more flexible API:
+- Based on the extracted Google Analytics data logically connected chunks will be grouped together.
+- The `MLPlugin` will inject some JavaScript in the main chunk of your application. This code will trace the user's navigation behavior and pre-fetch the chunks associated with the pages which the user is likely to visit.
 
-```ts
-export type Neighbors = { [key: string]: number };
+I'd encourage you to play with the examples. Keep in mind that the React example will work properly only if you strictly follow the route definition convention in the project.
 
-export interface Graph {
-  [key: string]: Neighbors;
-}
-
-export interface BuildConfig {
-  minChunks?: number;
-  algorithm?: ClusterizationAlgorithm;
-}
-
-export interface RuntimeConfig {
-  basePath: string;
-}
-
-export interface MLPluginConfig {
-  debug?: boolean;
-  data: Graph;
-  routeProvider?: RouteProvider;
-  runtime?: false | RuntimeConfig;
-  build?: false | BuildConfig;
-}
-```
-
-- `debug` indicates if you want to see a verbose output from the bundling process.
-- `data` is the data gathered from Google Analytics. We'll stop in more details on this graph in later section.
-- `routeProvider` is a function which returns the mapping between routes and bundle entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a react application, and `@mlx/parser` is not able to discover the routes in it you can provide a custom function which returns them:
-
-  ```ts
-  new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
-  ```
-- `runtime` configures the plugin for data-driven bundle pre-fetching. Basically, you can either specify an optional `basePath` or disable the prefetching.
-- `build` is the part of the `@mlx/webpack` plugin which groups the webpack chunks based on a clusterization algorithm performed by `@mlx/clusterize`. This may sound a bit abstract at first. You can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group some chunks.
-
-Keep in mind that **the plugin will not do any code splitting**. It relys that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
-
-### Side note on feature-level bundling
-
-So far we only discussed how we can group bundles together based on Google Analytics data. Athough that's what we need in most of the cases, often we have feature-level bundling where we lazy-load a feature which is part of given page. In order to decide if we want to introduce the lazy-loaded bundle as part of the page bundle we cannot use Google Analytics data because loading the feature-bundle is not related to page navigation.
-
-For such cases, we can import `ClusterizeChunksPlugin` from `@mlx/webpack`. This plugin is used under the hood by `MLPlugin` for the data-driven bundling. `ClusterizeChunksPlugin` accepts as an argument a graph similar to the one that we pass to `MLPlugin`, however, in this case, instead of routes the individual nodes represent bundle entry fines.
-
-How to collect such data? An easy way is to just monkey patch the `import` function and sent statistics to the backend once given bundle is requested. In order to form graph consumable by `ClusterizeChunksPlugin` all we need to aggregate is: which is the entry point of the bundle which requested the lazy-loaded bundle and how many times the lazy-loaded bundle got requested.
-
-## High-Level Architecture
-
-On this diagram you can see how the individual tools work with each other:
-
-![]()
+Now, we'll follow with the mathematical foundation of the project, right after which we'll dig into some technical details how everything works together.
 
 # Mathematical Background
 
-You can expand this section to get familiar with the mathematica foundations between this article. Here we're going to cover:
+You can expand this section to get familiar with the mathematical foundations of this article. Here we're going to cover:
 
 - Graphs, trees, weighted graphs, and connected components
-- Basics of theory of probability and Markov chains
+- Basics of the theory of probability and Markov chains
 
 <div style="cursor: pointer; color: #5694f1;" id="expand">Expand &#9658;</div>
 <div style="cursor: pointer; display: none; color: #5694f1;" id="collapse">Collapse &#9660;</div>
@@ -171,7 +95,7 @@ You can expand this section to get familiar with the mathematica foundations bet
 
 ## Basics of Graph Theory
 
-Graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices. In this article we're often going to mention the term "dependency graph". This is just a graph which represents the dependencies between something. For example:
+A graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices. In this article, we're often going to mention the term "dependency graph". This is just a graph which represents the dependencies between something. For example:
 
 ```ts
 // foo.ts
@@ -189,13 +113,13 @@ The program above can be represented with the following dependency graph:
 
 ![]()
 
-Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because `bar.ts` depends on `foo.ts`. In this example, the graph looks like:
+Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because `bar.ts` depends on `foo.ts`. Mathematically this graph looks like:
 
 ```text
 G = ([('bar.ts', 'foo.ts')], ['bar.ts', 'foo.ts'])
 ```
 
-Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge - from `bar.ts` to `foo.ts`. Graphs with edges which point from one vertex to another are called **directed** graphs, otherwise, if there's path in both directions, we call the graph **indirected**.
+Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from `bar.ts` to `foo.ts`. Graphs with edges which point from one vertex to another are called **directed** graphs, otherwise, if there's path in both directions, we call the graph **undirected**.
 
 Let's now suppose we have the following graph:
 
@@ -211,7 +135,7 @@ const graph = {
 };
 ```
 
-Often we have numeric value associated with the edge between two nodes. For example, in our Google Analytics case we may have number of visits from page `A` to page `B`. In this case, we can model this data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
+Often we have a numeric value associated with the edge between two nodes. For example, in our Google Analytics case, we may have a number of visits from page `A` to page `B`. In such case, we can model the data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
 
 ```ts
 const grpah = {
@@ -225,11 +149,11 @@ const grpah = {
 };
 ```
 
-From the graph above we can see that there are `10` visits from `/a` to page `/b`, `3` visits from `/a` to `/c`, and `4` visits from `/b` to `/a`.
+From the graph, above we can see that there are `10` visits from `/a` to page `/b`, `3` visits from `/a` to `/c`, and `4` visits from `/b` to `/a`.
 
 ### Connected Components
 
-Often, however, users visit different parts of our application. For example, let's suppose that the following graph represents the navigation behavior:
+Often, however, users visit different parts of our application. For example, let's suppose that the following graph represents the Google Analytics data:
 
 ```ts
 const graph = {
@@ -253,7 +177,7 @@ Let's look at the graphical representation of this graph:
 
 ![]()
 
-We can see that the entire graph consists of two smaller graphs: one which contains the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**.
+We can see that the entire graph consists of two smaller graphs: one which contains the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
 
 ### Cyclic Graphs and Topological Sorting
 
@@ -273,9 +197,9 @@ const graph = {
 };
 ```
 
-We can see that we have path from `/a -> /b -> /c -> /a`, so basically, starting from `/a` we can reach `/a` again. Often, in order to figure out the dependencies in a graph and if there's a cycle, we use the topological sorting algorithm.
+We can see that we have path from `/a -> /b -> /c -> /a`, so basically, starting from `/a` we can reach `/a` again. In such case, we say that our graph has a cycle.
 
-For example, let's say that we have the following dependencies between our files:
+Often, we want to sort the vertices of our graph based on the dependencies they have. For example, let's say that we have the following dependencies between three JavaScript files:
 
 ```ts
 // foo.js
@@ -306,19 +230,19 @@ const graph = {
 };
 ```
 
-As we all know, our bundler needs to figure out which is the entry point in our application in order to bundle all the files together. Well, the bundler can figure this out if it uses the topological sorting algorithm. In this algorithm:
+Now our bundler needs to figure out which is the entry point in our application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
 
-- We'll first find the file which has no dependencies, which in our case will be `foo.js`.
-- After that we'll remove `foo.js` from the graph, together with all edges pointing to it.
-- As next step we'll find the next node without dependencies. This is going to be `bar.js`, since it no longer points to `foo.js` (this file is not in the graph anymore).
-- We'll remove `bar.js` from the graph and keep going.
-- Finally, we'll find `baz.js` - the only node in the graph left.
+- We'll first find the file which has no dependencies, which in our case will be `foo.js` and add it to the result list.
+- After that, we'll remove `foo.js` from the graph, together with all edges pointing to it.
+- As next step, we'll find the next node without dependencies. This is going to be `bar.js` since it no longer points to `foo.js` (this file is not in the graph anymore).
+- We'll remove `bar.js` from the graph, add it to the result list and keep going.
+- Finally, we'll find `baz.js` - the only node in the graph left. We'll add it to the result list and remove it from the graph.
 
-This way, topologically sorted our graph will be transformed to the list `['foo.js', 'bar.js', 'baz.js']`. If the bundler now takes `baz.js` it can use it as entry point for our bundle.
+This way the topological order of the graph will be `['foo.js', 'bar.js', 'baz.js']`. The bundler now can use 'baz.js` as the entry point of the chunk. It turns out that topological sorting is very convenient for detecting cycles in the graph. If at a given point we cannot find a node without a dependency, this means that we have a cycle.
 
 ### Trees
 
-Trees are graphs. Special kind of graphs:
+Trees are graphs. A special kind of graphs:
 
 >...tree is an undirected graph in which any two vertices are connected by exactly one path...
 
@@ -335,7 +259,7 @@ As you can see, the root of the tree is `/`, its children are `/a` and `/b`, whe
 Let's go back to our aggregated Google Analytics data from the example above:
 
 ```ts
-const grpah = {
+const graph = {
   '/a': {
     '/b': 10,
     '/c': 3
@@ -346,7 +270,7 @@ const grpah = {
 };
 ```
 
-We can see that 10 out of 13 visits the user goes from page `/a` to page `/b` (we're ignoring the cases when the user leaves the page). This means that `10/13` is the **probability** the user to go from `/a` to `/b` and `3/13` is the probability the user to go from `/a` to `/c`.
+We can see that when the user is at page `/a`, `10` out of `13` visits they are going to go to `/b` (we're ignoring the cases when the user leaves the page). This means that `10/13` is the **probability** the user to go from `/a` to `/b` and `3/13` is the probability the user to go from `/a` to `/c`.
 
 Now, based on the probabilities for all the pages, we can form a matrix:
 
@@ -356,7 +280,7 @@ Now, based on the probabilities for all the pages, we can form a matrix:
 | **/b** | 4/4 | 0     | 0    |
 | **/c** | 0   | 0     | 0    |
 
-What we can conclude from the matrix is that:
+From the matrix, we can conclude that:
 
 - There's `0` probability the user to go from `/a` to `/a`.
 - There's `10/13` probability the user to go from `/a` to `/b`.
@@ -390,7 +314,7 @@ collapse.onclick = function () {
 
 # Definitions
 
-To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded, this is just for simplicity, it's not restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
+To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
 
 ![]()
 
@@ -404,13 +328,13 @@ To make sure we're all on the same page with the concepts that we're going to di
 
 ## Navigation Graph
 
-The graph above we'll call **navigation graph**. Why it's a graph? Because it has cycles. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are representsd by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
+The graph above we'll call **navigation graph**. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
 
 For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`.
 
 ## Page Graph
 
-Although the navigation graph look pretty handy, it's not usable for our bundling purposes becase usually our applications have parametrized routes. For example, let's suppose we have the routes:
+Although the navigation graph looks pretty handy, it's not usable for our purposes because often our applications' routes are parametrized. For example, let's suppose we have the routes:
 
 ```text
 /a
@@ -419,17 +343,17 @@ Although the navigation graph look pretty handy, it's not usable for our bundlin
 /c
 ```
 
-In this case, most likely, we want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**.
+In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**.
 
 ## Routing Tree
 
-The routes of our application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call **routing tree**.
+The routes of the application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call a **routing tree**.
 
 ## Bundle Routing Tree
 
-If we suppose that all the routes in our application are entry points of bundles in our application than our bundle tree matches the routing tree, in shape. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the bundles.
+If we suppose that all the routes in our application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the bundles.
 
-In case, however, we have the following situation:
+Now let's suppose we have the following route declaration:
 
 ```ts
 // React
@@ -460,11 +384,210 @@ export const appRoutes: Routes = [
 ];
 ```
 
-In this case tree routing tree will differ from the bundle routing tree:
+In this case, tree routing tree will differ from the bundle routing tree:
 
 - The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
-- The bundle routing tree will have root node named after the file while the routes definition is (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`).
+- The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). This is because two routes in this case point to the same bundle entry point.
 
+# Technical Details
 
+Alright, now we understand all the mathematics behind the tool and we defined all the concepts. Let's dig into some technical details!
 
+If you take a look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
+- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application paremetrized routes, i.e. **we get a navigation graph which we need to translate to page graph**. `@mlx/ga` can do this automaticallt for us, if we provide a list of all the paths in our application.
+- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes, and builds the routing bundle tree.
+- [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
+- [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
+
+Let's first explain how we can use `@mlx/ga` and how it works internally.
+
+## `@mlx/ga`
+
+In the repository [mlx-ga-demo](https://github.com/mgechev/mlx-ga-demo), there's code which shows how this module can be used. Here's the main file which illustrates the module's API:
+
+```ts
+const { fetch } = require('@mlx/ga');
+const { parseRoutes, ProjectType } = require('@mlx/parser');
+const { writeFileSync } = require('fs');
+
+// Credentials from the Google Console with access to the Google Analytics API
+const key = require('./credentials.json');
+// Google Analytics View ID
+const viewId = '000000000';
+
+const applicationRoutes = parseRoutes(
+  '<Path_to_tsconfig.json>',
+  ProjectType.Angular // or ProjectType.React
+);
+
+fetch(
+  key,
+  viewId,
+  {
+    startDate: new Date('2016-1-1'),
+    endDate: new Date('2018-2-24')
+  },
+  r => r.replace('/app', ''),
+  applicationRoutes.map(f => f.path)
+).then(g => writeFileSync('data.json', JSON.stringify(g, null, 2)));
+```
+
+In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported symbol from the package. The `fetch` method accepts:
+
+- Key for access to the Google Analytics API [N]
+- Google Analytics View ID [N]
+- Start & end intervals for the Google Analytics report
+- Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manupulation over them. In the example above, it drops the `/app` prefix.
+- Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use `@mlx/parser` in order to extract them automatically. This array is essential in order to allow `@mlx/ga` to map the navigation graph to a page graph.
+
+Internally, **`@mlx/ga` will build the weighted page graph of the application**. The tool will query Google Analytics' API and will get the previous page for each visited page, together with the number of visits. This way, in the end we'll have graph similar to this one:
+
+```json
+{
+  "": {
+    "/intro/parent": 144,
+    "/intro": 36,
+    "/intro/parent/personalize": 23,
+    "/main/kid/question/:standard/:question/:id": 25,
+    "/main/kid/question/:standard/:question": 4,
+    "/main/kid/reports": 2,
+  },
+  "/intro": {
+    "": 69,
+    "/intro/parent": 18,
+    "/main/kid/question/:standard/:question": 7,
+    "/main/kid/question/:standard/:question/:id": 20,
+    "/main/parent/home": 1,
+    "/main/parent/settings": 2
+  },
+  "/intro/parent": {
+    "/intro": 28,
+    "": 17,
+    "/intro/parent/info": 7,
+    "/main/kid/question/:standard/:question/:id": 10,
+  },
+  // ...
+}
+```
+
+This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)[N] and [React](https://github.com/mgechev/react-dd-bundled)[N]. Here's an interactive visualization of the entire aggregated data:
+
+![]()
+
+You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)[N]. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the view ID with the one of your web app.
+
+## `@mlx/webpack`
+
+Now, once we have collected the data from Google Analytics, we can plug `@mlx/webpack` in our build process. For the purpose, we should eject our Angular CLI application (or `create-react-app` one) and in `webpack.config.js` add the following lines:
+
+```ts
+const { MLPlugin } = require('@mlx/webpack');
+
+plugins: [
+  // ...
+  new MLPlugin({ data: require('./path/to/data.json') })
+  // ...
+]
+```
+
+...and that's it! Our application now will be bundled according to the data gotten from Google Analytics. There are a couple of magical things going on but before explaining them, let's take a look at the detailed configuration of `MLPlugin`:
+
+```ts
+export type Neighbors = { [key: string]: number };
+
+export interface Graph {
+  [key: string]: Neighbors;
+}
+
+export interface BuildConfig {
+  minChunks?: number;
+  algorithm?: ClusterizationAlgorithm;
+}
+
+export interface RuntimeConfig {
+  basePath: string;
+}
+
+export interface MLPluginConfig {
+  debug?: boolean;
+  data: Graph;
+  routeProvider?: RouteProvider;
+  runtime?: false | RuntimeConfig;
+  build?: false | BuildConfig;
+}
+```
+
+- `debug` indicates if the plugin's verbose logging should be enabled.
+- `data` is the data gathered from Google Analytics.
+- `routeProvider` is a function which returns the mapping between routes and chunk entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a React application and the default `routeProvider` doesn't work (which is very likely) you can provide a custom function which returns them:
+  ```ts
+  new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
+  ```
+- `runtime` configures the plugin for data-driven bundle pre-fetching. With this property we can either specify an optional `basePath` or disable the pre-fetching completely.
+- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clusterization algorithm performed by `@mlx/clusterize`. This may sound a bit abstract at first. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
+
+Keep in mind that **the plugin will not do any code splitting**. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
+
+### Performed Algorithm
+
+Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets evaluated, few important things will happen:
+
+- `MLPlugin` will check for a `routeProvider`. If it doesn't discover such, it'll try to guess your application type (i.e. Angular or React) and discover the `tsconfig.json` file of the project.
+- If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, the associated with them chunk entry points, and their parent chunk entry point.
+- It'll initialize the `ClusterizeChunksPlugin` and `RuntimePrefetchPlugin`.
+
+As you might have already guessed, **`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting some small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and network speed**!
+
+The module that we're going to take a look at is `@mlx/parser`.
+
+## `@mlx/parser`
+
+This package is optional for both - `@mlx/webpack` and `@mlx/ga` but it's also quite convenient. The parser does two key things:
+
+- Finds the route declarations in our application. This allows us to aggregate the navigation graph that we get from Google Analytics and transform it to a page graph.
+- Finds the entry points of the routing bundles, and their parent modules. Although we can do this manually as well, and provide information for where your bundles are defined and which routes are associated to them, it's still much more convenient to use `@mlx/parser`.
+
+The second point is crucial for the work of `@mlx/webpack` and `@mlx/clusterize`. Once we provide a project type and a `tsconfig.json` file to `@mlx/parser`'s `parseRoutes` method, it'll automatically extract all the metadata and populate it into a JavaScript array of the form:
+
+```js
+[
+  {
+    path: '/main',
+    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/main.module.ts',
+    lazy: true,
+    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/app.module.ts'
+  },
+  {
+    path: '/main/parent',
+    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/parent/parent.module.ts',
+    lazy: true,
+    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/main.module.ts'
+  },
+  {
+    path: '/intro/parent/reward/:id',
+    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-reward/intro-reward.module.ts',
+    lazy: true,
+    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-parent.module.ts'
+  }
+  // ...
+]
+```
+
+This is stripped version of the array produced after parsing the [sample Angular project](https://github.com/mgechev/ng-dd-bundled). There are several important things to notice:
+
+- The array contains the routes from our definitions. This means that the parameterized routes look the way we define them in the source code.
+- Each array element has a `modulePath` property which points to the entry point of the JavaScript chunk which will to be loaded when the user navigates to the given `path`.
+- Each element also has a `parentModulePath`. This is the entry point of the chunk which contains the actual route definition. For non-lazy routes the `modulePath` will have the same value as the `parentModulePath`.
+
+You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser).
+
+Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) [N]. For now, the React parser, relies on a lot of conventions. It's built on top of TypeScript.
+
+## `@mlx/clusterize`
+
+The final package that we'
+
+## Building the Bundle Routing Tree
+
+Now we have enough information in order build the bundle routing tree of the application. For the purpose we should go through similar aggregation we went through for the parametrized routes. The buildle routing tree is a data structure which `@mlx/webpack` is going to build automatically for us by merging the output of `@mlx/parser` (or the custom `routeProvider`)
