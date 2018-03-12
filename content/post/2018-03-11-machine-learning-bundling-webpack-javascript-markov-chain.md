@@ -389,6 +389,12 @@ In this case, tree routing tree will differ from the bundle routing tree:
 - The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
 - The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). This is because two routes in this case point to the same bundle entry point.
 
+## Bundle Page Graph
+
+We already defined the page graph as the navigation graph which we got from given source, with aggregated routes. If instead of the routes, we get the entry points of their corresponding chunks, we'll get the bundle page graph.
+
+Keep in mind that we may not have 1:1 correspondance between chunk entry point and a route. This is possible in case not all the routes are lazy. In such case, we may need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well.
+
 # Technical Details
 
 Alright, now we understand all the mathematics behind the tool and we defined all the concepts. Let's dig into some technical details!
@@ -539,6 +545,25 @@ Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets eval
 
 As you might have already guessed, **`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting some small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and network speed**!
 
+### Runtime Pre-fetching
+
+The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the martix. For example:
+
+```ts
+{
+  '/a': [
+    { chunk: 'b.js', probability: 0.6 },
+    { chunk: 'c.js', probability: 0.3 },
+    { chunk: 'd.js', probability: 0.1 },
+  ],
+  '/b': [
+    { chunk: 'a.js', probability: 1 },
+  ]
+}
+```
+
+In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. You can also notice that `RuntimePrefetchPlugin` sorts the chunks based on their probability. Another feature of the plugin is that it's going to have different probability threshold depending on the user's network speed. For example, if the user is with effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability to be needed `0.3`.
+
 The module that we're going to take a look at is `@mlx/parser`.
 
 ## `@mlx/parser`
@@ -586,8 +611,20 @@ Both parsers perform static analysis. The Angular parser uses an abstraction on 
 
 ## `@mlx/clusterize`
 
-The final package that we'
+The final package that we're going to cover is the clusterization algorithm. As input, it accepts:
 
-## Building the Bundle Routing Tree
+- `bundleGraph: Graph` - a weighted bundle page graph which is result of the transformation of the weighed page graph.
+- `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. That's the `modules` argument.
+- `n: number` - `n` is the minimum number of chunks that we want to get in the end of the clusterization algorithm.
 
-Now we have enough information in order build the bundle routing tree of the application. For the purpose we should go through similar aggregation we went through for the parametrized routes. The buildle routing tree is a data structure which `@mlx/webpack` is going to build automatically for us by merging the output of `@mlx/parser` (or the custom `routeProvider`)
+Once this information is available, the clusterization algorithm will:
+
+1. Try to find the connected components in the `bundleGraph`.
+2. In case the connected components are more than the minumum, the algorithm will return them.
+3. In case the connected components are less than the minimum, the algorithm will find the edge with smallest weight, and subtract it from all other edges.
+4. After that the algorithm will go back to step 1. and repeat the procedure until it finds a clusterization of the graph satisfying `n`.
+
+For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)[N].
+
+# Conclusion
+
