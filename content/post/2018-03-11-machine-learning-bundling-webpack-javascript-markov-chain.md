@@ -344,19 +344,26 @@ For our purposes, we're going to use the navigation graph from Google Analytics 
 
 Although the navigation graph looks pretty handy, it's not usable for our purposes because often our applications' routes are parametrized. For example, let's suppose we have the routes:
 
+```text
+/a
+/a/:id
+/b
+/c
+```
+
 In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**. The navigation graph from above, translated to page graph will look like:
 
 <img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Routing Tree
 
-The routes of the application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call a **routing tree**.
+The declarations of the routes of the application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call a **routing tree**.
 
 ## Bundle Routing Tree
 
-If we suppose that all the routes in our application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the bundles.
+If we suppose that all the routes in our application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the chunks.
 
-Now let's suppose we have the following route declaration:
+Now let's suppose we have the following route declarations:
 
 ```ts
 // React
@@ -387,16 +394,16 @@ export const appRoutes: Routes = [
 ];
 ```
 
-In this case, tree routing tree will differ from the bundle routing tree:
+In this case, the routing tree will differ from the bundle routing tree:
 
 - The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
 - The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
 
 ## Bundle Page Graph
 
-We already defined the page graph as the navigation graph which we got from given source, with aggregated routes. If instead of the routes, we get the entry points of their corresponding chunks, we'll get the bundle page graph.
+We already defined the page graph as the navigation graph which we got from given source with aggregated routes (Google Analytics, let's say). If instead of the routes, we get the entry points of their corresponding chunks, we'll get the bundle page graph.
 
-Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we may need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well.
+Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well. The difference is that the weights of the edges going from a given chunk entry point will equal to the sum of the corresponding edges of the merged nodes from the page graph.
 
 # Technical Details
 
