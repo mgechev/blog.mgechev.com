@@ -81,12 +81,13 @@ const { MLPlugin } = require('@mlx/webpack');
 new MLPlugin({ data })
 ...
 ```
-Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
+
+Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
 
 For both, the Angular and the React application, once you run `npm build` the following is going to happen:
 
 - Based on the extracted Google Analytics data logically connected chunks will be grouped together.
-- The `MLPlugin` will inject some JavaScript in the main chunk of your application. This code will trace the user's navigation behavior and pre-fetch the chunks associated with the pages which the user is likely to visit.
+- The `MLPlugin` will inject some JavaScript in the main chunk of your application. This code will track the user's navigation and pre-fetch the chunks associated with the pages which the user is likely to visit.
 
 I'd encourage you to play with the examples. Keep in mind that the React example will work properly only if you strictly follow the route definition convention in the project.
 
