@@ -89,16 +89,16 @@ For both, the Angular and the React application, once you run `npm build` the fo
 - Based on the extracted Google Analytics data logically connected chunks will be grouped together.
 - The `MLPlugin` will inject some JavaScript in the main chunk of your application. This code will track the user's navigation and pre-fetch the chunks associated with the pages which the user is likely to visit.
 
-I'd encourage you to play with the examples. Keep in mind that the React example will work properly only if you strictly follow the route definition convention in the project.
+I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project.
 
-Now, we'll follow with the mathematical foundation of the project, right after which we'll dig into some technical details how everything works together.
+Now, we'll continue with the mathematical foundation of the project, right after which we'll dig into some technical details how everything works together.
 
 # Mathematical Background
 
 You can expand this section to get familiar with the mathematical foundations of this article. Here we're going to cover:
 
 - Graphs, trees, weighted graphs, and connected components
-- Basics of the theory of probability and Markov chains
+- Probability and Markov chains
 
 <div style="cursor: pointer; color: #5694f1;" id="expand">Expand &#9658;</div>
 <div style="cursor: pointer; display: none; color: #5694f1;" id="collapse">Collapse &#9660;</div>
