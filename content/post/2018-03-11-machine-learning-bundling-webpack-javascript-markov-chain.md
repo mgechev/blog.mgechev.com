@@ -9,7 +9,7 @@ categories:
 - Webpack
 - Machine Learning
 date: 2018-03-11T00:00:00Z
-draft: true
+draft: false
 tags:
 - TypeScript
 - JavaScript
@@ -28,9 +28,9 @@ In this article, I'll introduce the early implementation of a few tools which ba
 
 Over the past a couple of years, we started shipping web applications which provide a user experience comparable to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought would possible to achieve with JavaScript in the browser.
 
-Of course, everything comes at a cost. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[N] of [publications](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)[N] proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
+Of course, everything comes at a cost. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)<sup>[1]</sup> of [publications](https://blog.hubspot.com/marketing/page-load-time-conversion-rates)<sup>[2]</sup> proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
 
-It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)[3]. JavaScript compared to images, for instance, is much more expensive because of its non-trivial processing mechanism (parsing, compilation, and execution).
+It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)<sup>[3]</sup>. JavaScript compared to images, for instance, is much more expensive because of its non-trivial processing mechanism (parsing, compilation, and execution).
 
 Well, slow pages are also stressful:
 
@@ -46,7 +46,7 @@ A common practice for dealing with a large amount of JavaScript is dividing it i
 - Page level - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates through the pages of the application they trigger network requests which download the associated with the target page chunk.
 - Feature level - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the main chunk of the application and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "page level chunking" category but, as I'll mention below, it's convenient to consider it in a different category.
 
-There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)[4] and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)[5], which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we load at the initial page load is too much. The logical approach, of course, is to apply either a feature or page level chunking.
+There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we load at the initial page load is too much. The logical approach, of course, is to apply either a feature or page level chunking.
 
 Taking this approach, an interesting question to consider is: how do we decide which features and/or pages should be moved to their own chunks, in order to improve our app. Often, this decision is based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open a given page or interact with a given feature so we move it to its own chunk and download this JavaScript lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
 
@@ -62,7 +62,7 @@ In the first a couple of sections, we'll cover the individual tools from [`mlx`]
 
 **Disclaimer**: the packages that we're going to cover are in a very early stage of their development. It's very likely that they are incompatible with your projects. Keep in mind that their APIs are not finalized. Over time their implementation will mature and get more robust.
 
-An Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)[N] and a React one [here](https://github.com/mgechev/react-dd-bundled)[N]. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
+An Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and a React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
 
 ```ts
 ...
@@ -71,7 +71,7 @@ const { MLPlugin } = require('@mlx/webpack');
 new MLPlugin({ data })
 ...
 ```
-Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example can be found [here](https://github.com/mgechev/mlx-ga-demo)[N].
+Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
 
 For both, the Angular and the React application, once you run `npm build` the following is going to happen:
 
@@ -111,7 +111,7 @@ console.log(foo);
 
 The program above can be represented with the following dependency graph:
 
-![]()
+<img src="/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because `bar.ts` depends on `foo.ts`. Mathematically this graph looks like:
 
@@ -123,7 +123,7 @@ Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from 
 
 Let's now suppose we have the following graph:
 
-![]()
+<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 In our program, we can represent this graph in different ways. For our purposes, we'll often use a **list of neighbors** representation:
 
@@ -168,14 +168,14 @@ const graph = {
     '/e': 5
   },
   '/e': {
-    '/c': 5
+    '/d': 5
   }
 };
 ```
 
 Let's look at the graphical representation of this graph:
 
-![]()
+<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 We can see that the entire graph consists of two smaller graphs: one which contains the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
 
@@ -250,7 +250,7 @@ In other words, trees are  **acyclic connected graph**.
 
 For example, we may have the following routing tree in our application:
 
-![]()
+<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 As you can see, the root of the tree is `/`, its children are `/a` and `/b`, where `/a` has children `/a/a` and `/a/b`. From the diagram above, we can see that the **lowest-common ancestor (or LCA)** of `/a/a` and `/a/b` is `/a`.
 
@@ -316,15 +316,7 @@ collapse.onclick = function () {
 
 To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
 
-![]()
-
-```txt
-/a -> /b
-/a -> /c
-/a -> /a/b
-/b -> /a
-/b -> /a/a
-```
+<img src="/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Navigation Graph
 
@@ -336,14 +328,9 @@ For our purposes, we're going to use the navigation graph from Google Analytics 
 
 Although the navigation graph looks pretty handy, it's not usable for our purposes because often our applications' routes are parametrized. For example, let's suppose we have the routes:
 
-```text
-/a
-/a/:id
-/b
-/c
-```
+In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**. The navigation graph from above, translated to page graph will look like:
 
-In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**.
+<img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Routing Tree
 
@@ -441,8 +428,8 @@ fetch(
 
 In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported symbol from the package. The `fetch` method accepts:
 
-- Key for access to the Google Analytics API [N]
-- Google Analytics View ID [N]
+- Key for access to the Google Analytics API <sup>[9]</sup>
+- Google Analytics View ID <sup>[9]</sup>
 - Start & end intervals for the Google Analytics report
 - Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manupulation over them. In the example above, it drops the `/app` prefix.
 - Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use `@mlx/parser` in order to extract them automatically. This array is essential in order to allow `@mlx/ga` to map the navigation graph to a page graph.
@@ -477,11 +464,11 @@ Internally, **`@mlx/ga` will build the weighted page graph of the application**.
 }
 ```
 
-This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)[N] and [React](https://github.com/mgechev/react-dd-bundled)[N]. Here's an interactive visualization of the entire aggregated data:
+This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and [React](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Here's an interactive visualization of the entire aggregated data:
 
 ![]()
 
-You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)[N]. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the view ID with the one of your web app.
+You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the view ID with the one of your web app.
 
 ## `@mlx/webpack`
 
@@ -605,9 +592,9 @@ This is stripped version of the array produced after parsing the [sample Angular
 - Each array element has a `modulePath` property which points to the entry point of the JavaScript chunk which will to be loaded when the user navigates to the given `path`.
 - Each element also has a `parentModulePath`. This is the entry point of the chunk which contains the actual route definition. For non-lazy routes the `modulePath` will have the same value as the `parentModulePath`.
 
-You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser).
+You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser) <sup>[10]</sup>.
 
-Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) [N]. For now, the React parser, relies on a lot of conventions. It's built on top of TypeScript.
+Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser, relies on a lot of conventions. It's built on top of TypeScript.
 
 ## `@mlx/clusterize`
 
@@ -624,7 +611,20 @@ Once this information is available, the clusterization algorithm will:
 3. In case the connected components are less than the minimum, the algorithm will find the edge with smallest weight, and subtract it from all other edges.
 4. After that the algorithm will go back to step 1. and repeat the procedure until it finds a clusterization of the graph satisfying `n`.
 
-For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)[N].
+For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)<sup>[12]</sup>.
 
 # Conclusion
 
+
+1. https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/
+2. https://blog.hubspot.com/marketing/page-load-time-conversion-rates
+3. https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e
+4. https://www.webpagetest.org/
+5. https://developers.google.com/web/tools/lighthouse/
+6. https://github.com/mgechev/ng-dd-bundled
+7. https://github.com/mgechev/react-dd-bundled
+8. https://github.com/mgechev/mlx-ga-demo
+9. http://2ality.com/2015/10/google-analytics-api.html
+10. https://github.com/mgechev/mlx/tree/master/packages/parser
+11. https://github.com/mgechev/ngast
+12. https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
