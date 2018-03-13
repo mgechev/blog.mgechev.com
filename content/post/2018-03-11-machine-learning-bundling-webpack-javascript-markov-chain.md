@@ -80,9 +80,9 @@ The examples with the article use two identical, simple Angular and React applic
 
 The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework.
 
-Let's take a look at how we can use the tool in the context of both React and Angular.
+Let's take a look at how we can use the tools in the contexts of both React and Angular.
 
-First, clone the repo of your choice:
+First, clone the example of your choice:
 
 ```bash
 # Angular example
@@ -103,13 +103,13 @@ As next step, let's build the project:
 npm run build
 ```
 
-The last step is going to produce a non-minified build of the application. All we need to do now is serve them, for the purpose we can use the npm package `serve`. You can instsall it with:
+The last step is going to produce a non-minified build of the application. All we need to do now is serve the static assets. For the purpose we can use the npm package `serve`. You can instsall it with:
 
 ```bash
 npm i -g serve
 ```
 
-Now in order to serve your application run:
+Now run:
 
 ```bash
 # For Angular
@@ -118,11 +118,13 @@ serve -s dist
 serve -s build
 ```
 
-Now open [http://localhost:5000](http://localhost:5000). You should see screen similar to the gif below:
+When you open [http://localhost:5000](http://localhost:5000), tou should see a screen similar to the gif below:
 
 ![Demo](/assets/images/mlx/demo.gif)
 
-As you can see in the repositories of the demos, all routes are loaded lazily. Notice how when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" page. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we've provided. Also, see how when we go to settings, we pre-fetch the FAQ module, together with the intro module. This, again, is based on the data we got from Google Analytics.
+Notice that we have only lazy-loaded route definitions in both demos. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to.
+
+In the gif above, notice how when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" route. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we've provided. Also, see how when we go to "Settings", we pre-fetch the "FAQ" module, together with the "Intro" module. This, again, is based on the data we got from Google Analytics which hint our tooling that once the user goes to "Settings" after that, they will most likely visit "FAQ" or "Intro".
 
 Now, let's look at the extra configuration that we've provided on top of the default Angular CLI/Create React App setup. Look at `webpack.config.js` for Angular CLI, and `config/webpack.config.prod.js` for the React project. You'll notice the following lines:
 
