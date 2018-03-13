@@ -553,15 +553,15 @@ Keep in mind that **the plugin will not do any code splitting**. It relies that 
 
 ### Performed Algorithm
 
-Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets evaluated, few important things will happen:
+Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets evaluated, few important steps will happen:
 
-- `MLPlugin` will check for a `routeProvider`. If it doesn't discover such, it'll try to guess your application type (i.e. Angular or React) and discover the `tsconfig.json` file of the project.
+- `MLPlugin` will check for a `routeProvider`. If it doesn't discover such, it'll try to guess your application type (i.e. Angular or React) by looking at `package.json` and discover the `tsconfig.json` file of the project.
 - If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, the associated with them chunk entry points, and their parent chunk entry point.
 - It'll initialize the `ClusterizeChunksPlugin` and `RuntimePrefetchPlugin`.
 
-As you might have already guessed, **`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting some small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and network speed**!
+**`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting some small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and network speed**!
 
-### Runtime Pre-fetching
+### Runtime Pre-Fetching
 
 The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the matrix. For example:
 
@@ -578,9 +578,32 @@ The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated 
 }
 ```
 
-In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. You can also notice that `RuntimePrefetchPlugin` sorts the chunks based on their probability. Another feature of the plugin is that it's going to have different probability threshold depending on the user's network speed. For example, if the user is with effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability to be needed `0.3`.
+In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. Notice also that `RuntimePrefetchPlugin` gets the chunks in a sorted order, based on probability. Another feature of the plugin is that it's going to have different probability threshold depending on the user's network speed. For example, if the user is with effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability to be needed `0.3`.
 
-The module that we're going to take a look at is `@mlx/parser`.
+`RuntimePrefetchPlugin` can be configured with the following options:
+
+```ts
+export interface PrefetchConfig {
+  '4g': number;
+  '3g': number;
+  '2g': number;
+  'slow-2g': number;
+}
+
+export interface RuntimePrefetchConfig {
+  debug?: boolean;
+  data: Graph;
+  basePath?: string;
+  prefetchConfig?: PrefetchConfig;
+  routes: RoutingModule[];
+}
+```
+
+The `graph` passed here is the Google Analytics graph we got from `@mlx/ga`. The `routes` array contains one object per route. Each object has a `modulePath` of the chunk entry point associated with the given route, `parentModulePath` which equals the path of the entry point of the parent module, and a `path` which equals to the route that this object represents.
+
+`prefetchConfig` is also configurable! It contains the pre-fetching thresoulds depending on the value of `window.navigator.connection.effectiveType`. Since `connection.effectiveType` is currently supported only by Chrome, the plugin will take use the `3g` threshoud by default.
+
+The module that we're going to take a look at next is `@mlx/parser`.
 
 ## `@mlx/parser`
 
