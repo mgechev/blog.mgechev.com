@@ -602,7 +602,7 @@ Keep in mind that **the plugin will not do any code splitting**. It relies that 
 As I mentioned, if `routeProvider` is not passed to the plugin configuration object, the default one will be used. The default route provider will return an array of objects in the following format:
 
 ```ts
-interface Route {
+interface RoutingModule {
   path: string;
   lazy: boolean;
   modulePath: string;
@@ -669,9 +669,9 @@ export interface RuntimePrefetchConfig {
 }
 ```
 
-The `graph` passed here is the Google Analytics graph we got from `@mlx/ga`. The `routes` array contains one object per route. Each object has a `modulePath` of the chunk entry point associated with the given route, `parentModulePath` which equals the path of the entry point of the parent module, and a `path` which equals to the route that this object represents.
+The `graph` passed here is the Google Analytics graph we got from `@mlx/ga` (i.e., either a navigation or a page graph). The `routes` array contains one object per route. Each object has a `modulePath` of the chunk entry point associated with the given route, `parentModulePath` which equals the path of the entry point of the parent module, and a `path` which equals to the route that this object represents.
 
-`prefetchConfig` is also configurable! It contains the pre-fetching thresoulds depending on the value of `window.navigator.connection.effectiveType`. Since `connection.effectiveType` is currently supported only by Chrome, the plugin will take use the `3g` threshoud by default.
+`prefetchConfig` is also configurable! It contains the pre-fetching thresholds depending on the value of `window.navigator.connection.effectiveType`. Since `connection.effectiveType` is currently supported only by Chrome, the plugin will use the `3g` thresholds by default.
 
 The module that we're going to take a look at next is `@mlx/parser`.
 
