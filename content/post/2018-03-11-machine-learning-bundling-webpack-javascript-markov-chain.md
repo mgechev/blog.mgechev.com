@@ -644,6 +644,8 @@ In this blog post, we introduced the idea of data-driven chunk clusterization an
 
 After we looked at a brief introduction to graph theory and the probability theory, we introduced a few concepts, including navigation graph, page graph, and bundle page graph. Stepping on this solid foundation we explained the implementation of data-driven clusterization at `@mlx`.
 
+# References
+
 1. https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/
 2. https://blog.hubspot.com/marketing/page-load-time-conversion-rates
 3. https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e
