@@ -669,7 +669,17 @@ For finding the connected components in the graph, the current implementation us
 
 In this blog post, we introduced the idea of data-driven chunk clusterization and pre-fetching. We explained how we can apply it by consuming aggregated data from one of the most popular services for web application analysis - Google Analytics.
 
-After we looked at a brief introduction to graph theory and the probability theory, we introduced a few concepts, including navigation graph, page graph, and bundle page graph. Stepping on this solid foundation we explained the implementation of data-driven clusterization at `@mlx`.
+After we looked at a brief introduction to graph theory and the probability theory, we defined a few concepts, including navigation graph, page graph, and bundle page graph. Stepping on this solid foundation we explained the implementation of data-driven clusterization at `@mlx`.
+
+As mentioned previously, the demonstrated packages are still in early stage of their development. The list of short-term goals include:
+
+- More robust and generic parser for React router
+- Improvement of the clusterization heuristics
+- Reduced chunk over fetching
+
+The future goals of the project include more personalized bundle pre-fetching and clusterization. For example, different pre-fetching strategies depending on features of the users (geolocation, navigation history, etc). This will require the development of a more sophisticated model based on hidden Markov chains.
+
+Regarding clusterization of the chunks, it might not be practical to provide a personalized build of the application for each individual user. This will require a lot of computational resources and storage. On the other hand, performing clusterization of the users (using k-means, for example) based on their features and providing a personalized build to each group (or the highly valued groups) is realistic.
 
 # References
 
