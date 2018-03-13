@@ -22,7 +22,7 @@ title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/11/machine-learning-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clusterization and pre-fetching for our single-page applications. **The purpose of the project is to provide a zero-configuration mechanism which based on data from Google Analytics performs the most optimal build based on the user data.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
+In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for our single-page applications. **The purpose of the project is to provide a zero-configuration mechanism which based on data from Google Analytics performs the most optimal build based on the user data.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
 
 Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven! This effect is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested in the same user session together.
 
@@ -58,7 +58,7 @@ For example, let's suppose that the graph below represents data collected from G
 
 <img src="/static/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
 
-We talked about grouping chunks (i.e. **chunk clusterization**). Now let's say a few words about pre-fetching!
+We talked about grouping chunks (i.e. **chunk clustering**). Now let's say a few words about pre-fetching!
 
 ## Chunk Pre-Fetching
 
@@ -66,9 +66,9 @@ A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angular
 
 ## Thinking About What Matters
 
-Data-driven chunk clusterization and pre-fetching are both quite useful but why should we do them manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! We, as engineers, should focus on what requires our attention and leave everything else, which can be automated, to the tooling.**
+Data-driven chunk clustering and pre-fetching are both quite useful but why should we do them manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! We, as engineers, should focus on what requires our attention and leave everything else, which can be automated, to the tooling.**
 
-In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clusterization and data-driven pre-fetching. All [tools](https://github.com/mgechev/mlx) and [code](https://github.com/mgechev/ng-dd-bundled) [examples](https://github.com/mgechev/react-dd-bundled) can be found at my [GitHub profile](https://github.com/mgechev).
+In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clustering and data-driven pre-fetching. All [tools](https://github.com/mgechev/mlx)<sup>[6]</sup> and [code](https://github.com/mgechev/ng-dd-bundled) [examples](https://github.com/mgechev/react-dd-bundled) can be found at my [GitHub profile](https://github.com/mgechev).
 
 In the first a couple of sections, we'll cover the individual tools from the [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, in details, we'll discuss how everything from `@mlx` works together.
 
@@ -78,7 +78,7 @@ In the first a couple of sections, we'll cover the individual tools from the [`m
 
 The examples with the article use two identical, simple Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
 
-The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.
+The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[7]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[8]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.
 
 Let's take a look at how we can use the tools in the contexts of both React and Angular.
 
@@ -137,7 +137,7 @@ const data = require('./data.json');
 ...
 ```
 
-Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of the data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
+Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of the data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[9]</sup>.
 
 I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project. We'll talk more about the limitations of the current React route parser in the `@mlx/parser` section of the project.
 
@@ -461,7 +461,7 @@ If you look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will fi
 
 - [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
 - [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
-- [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
+- [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clustering algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
 - [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
 
 Let's first explain how we can use `@mlx/ga` and how it works internally.
@@ -499,8 +499,8 @@ fetch(
 
 In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported symbol from the package. The `fetch` method accepts:
 
-- Key for access to the Google Analytics API <sup>[9]</sup>
-- Google Analytics View ID <sup>[9]</sup> for our application
+- Key for access to the Google Analytics API <sup>[10]</sup>
+- Google Analytics View ID <sup>[10]</sup> for our application
 - Start & end intervals for the Google Analytics report
 - Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manipulation over them. In the example above, it drops the `/app` prefix from all of them.
 - Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use `@mlx/parser` in order to extract them automatically. This array is essential in order to allow `@mlx/ga` to map the navigation graph to a page graph.
@@ -535,7 +535,7 @@ Internally, **`@mlx/ga` will build the weighted page graph of the application**.
 }
 ```
 
-This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and [React](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Here's an interactive visualization of the entire aggregated data:
+This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)<sup>[7]</sup> and [React](https://github.com/mgechev/react-dd-bundled)<sup>[8]</sup>. Here's an interactive visualization of the entire aggregated data:
 
 <div style="height: 600px; width: 100%" id="canvas"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
@@ -543,7 +543,7 @@ This is stripped version of the graph that I used for developing the two example
 
 The thicker given edge is, the more likely it is the user to perform the corresponding transition. The graph from the visualization is intentionally undirected to make the diagram less noisy.
 
-You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the [view ID with the one of your web app](http://2ality.com/2015/10/google-analytics-api.html) <sup>[9]</sup>.
+You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[9]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the [view ID with the one of your web app](http://2ality.com/2015/10/google-analytics-api.html) <sup>[10]</sup>.
 
 ## `@mlx/webpack`
 
@@ -570,7 +570,7 @@ export interface Graph {
 
 export interface BuildConfig {
   minChunks?: number;
-  algorithm?: ClusterizationAlgorithm;
+  algorithm?: ClusteringAlgorithm;
 }
 
 export interface RuntimeConfig {
@@ -593,7 +593,7 @@ export interface MLPluginConfig {
   new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
   ```
 - `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` and/or `prefetchConfig` or disable the pre-fetching completely.
-- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clusterization algorithm performed by `@mlx/clusterize`. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
+- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clustering algorithm performed by `@mlx/clusterize`. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
 
 Keep in mind that **the plugin will not do any code splitting**. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
 
@@ -720,42 +720,42 @@ This is stripped version of the array produced after parsing the [sample Angular
 - Each array element has a `modulePath` property which points to the entry point of the JavaScript chunk which will be loaded when the user navigates to the given `path`.
 - Each element also has a `parentModulePath`. This is the entry point of the chunk which contains the actual route definition. For non-lazy routes, the `modulePath` will have the same value as the `parentModulePath`.
 
-You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser) <sup>[10]</sup>.
+You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser)<sup>[11]</sup>.
 
-Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser relies on a lot of syntactical conventions. It's built on top of TypeScript.
+Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[12]</sup>. For now, the React parser relies on a lot of syntactical conventions. It's built on top of TypeScript.
 
 ## `@mlx/clusterize`
 
-The final package that we're going to cover is the clusterization algorithm. As input, it accepts:
+The final package that we're going to cover is the clustering algorithm. As input, it accepts:
 
 - `bundleGraph: Graph` - a weighted bundle page graph which is the result of the transformation of the weighed page graph.
 - `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. This is the bundle page graph that we defined above.
-- `n: number` - `n` is the minimum number of chunks that we want to get at the end of the clusterization algorithm.
+- `n: number` - `n` is the minimum number of chunks that we want to get at the end of the clustering algorithm.
 
-Once this information is available, the clusterization algorithm will:
+Once this information is available, the clustering algorithm will:
 
 1. Try to find the connected components in the `bundleGraph`.
 2. In case the connected components are more than the minimum, the algorithm will return them.
 3. In case the connected components are less than the minimum, the algorithm will find the edge with the smallest weight, and subtract it from all other edges.
-4. After that the algorithm will go back to step 1. and repeat the procedure until it finds a clusterization of the graph satisfying `n`.
+4. After that the algorithm will go back to step 1. and repeat the procedure until it finds a clustering of the graph satisfying `n`.
 
-For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)<sup>[12]</sup>.
+For finding the connected components in the graph, the current implementation uses [Tarjan's algorithm](https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm)<sup>[13]</sup>.
 
 # Conclusion
 
-In this blog post, we introduced the idea of data-driven chunk clusterization and pre-fetching. We explained how we can apply it by consuming aggregated data from one of the most popular services for web application analysis - Google Analytics.
+In this blog post, we introduced the idea of data-driven chunk clustering and pre-fetching. We explained how we can apply it by consuming aggregated data from one of the most popular services for web application analysis - Google Analytics.
 
-After we looked at a brief introduction to graph theory and the probability theory, we defined a few concepts, including navigation graph, page graph, and bundle page graph. Stepping on this solid foundation we explained the implementation of data-driven clusterization at `@mlx`.
+After that we did a brief introduction to graph theory and the probability theory. As next step we defined a common terminology for the variety of graphs used in the `@mlx` packages. Stepping on this solid foundation we explained the implementation of data-driven clustering and pre-fetching at `@mlx`.
 
 As mentioned previously, the demonstrated packages are still in early stage of their development. The list of short-term goals include:
 
 - More robust and generic parser for React router
-- Improvement of the clusterization heuristics
+- Improvement of the clustering heuristics (for example, do not combine chunks over given size threshold)
 - Reduced chunk over fetching
 
-The future goals of the project include more personalized bundle pre-fetching and clusterization. For example, different pre-fetching strategies depending on features of the users (geolocation, navigation history, etc). This will require the development of a more sophisticated model based on hidden Markov chains.
+The future goals of the project include more personalized bundle pre-fetching and clustering. For example, different pre-fetching strategies depending on features of the users (geolocation, navigation history, etc). This will require the development of a more sophisticated machine learning model based on [hidden Markov chains](https://en.wikipedia.org/wiki/Hidden_Markov_model) <sup>[14]</sup>.
 
-Regarding clusterization of the chunks, it might not be practical to provide a personalized build of the application for each individual user. This will require a lot of computational resources and storage. On the other hand, performing clusterization of the users (using k-means, for example) based on their features and providing a personalized build to each group (or the highly valued groups) is realistic.
+Regarding clustering of the chunks, it might not be practical to provide a personalized build of the application for each individual user. This will require a lot of computational resources and storage. On the other hand, performing clustering of the users (using [k-means](https://en.wikipedia.org/wiki/K-means_clustering) <sup>[15]</sup>, for example) based on their features and providing a personalized build to each group (or the highly valued groups) is realistic.
 
 # References
 
@@ -764,10 +764,13 @@ Regarding clusterization of the chunks, it might not be practical to provide a p
 3. https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e
 4. https://www.webpagetest.org/
 5. https://developers.google.com/web/tools/lighthouse/
-6. https://github.com/mgechev/ng-dd-bundled
-7. https://github.com/mgechev/react-dd-bundled
-8. https://github.com/mgechev/mlx-ga-demo
-9. http://2ality.com/2015/10/google-analytics-api.html
-10. https://github.com/mgechev/mlx/tree/master/packages/parser
-11. https://github.com/mgechev/ngast
-12. https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+6. https://github.com/mgechev/mlx
+7. https://github.com/mgechev/ng-dd-bundled
+8. https://github.com/mgechev/react-dd-bundled
+9. https://github.com/mgechev/mlx-ga-demo
+10. http://2ality.com/2015/10/google-analytics-api.html
+11. https://github.com/mgechev/mlx/tree/master/packages/parser
+12. https://github.com/mgechev/ngast
+13. https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+14. https://en.wikipedia.org/wiki/Hidden_Markov_model
+15. https://en.wikipedia.org/wiki/K-means_clustering
