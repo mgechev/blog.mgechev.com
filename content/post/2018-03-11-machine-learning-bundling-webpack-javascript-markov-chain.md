@@ -68,7 +68,7 @@ A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angular
 
 Data-driven chunk clusterization and pre-fetching are both quite useful but why should we do them manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! We, as engineers, should focus on what requires our attention and leave everything else, which can be automated, to the tooling.**
 
-In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clusterization and data-driven pre-fetching. All code examples can be found at my [GitHub profile](https://github.com/mgechev/mlx).
+In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clusterization and data-driven pre-fetching. All [tools](https://github.com/mgechev/mlx) and [code](https://github.com/mgechev/ng-dd-bundled) [examples](https://github.com/mgechev/react-dd-bundled) can be found at my [GitHub profile](https://github.com/mgechev).
 
 In the first a couple of sections, we'll cover the individual tools from the [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, in details, we'll discuss how everything from `@mlx` works together.
 
@@ -78,7 +78,7 @@ In the first a couple of sections, we'll cover the individual tools from the [`m
 
 The examples with the article use two identical, simple Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
 
-The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework.
+The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.
 
 Let's take a look at how we can use the tools in the contexts of both React and Angular.
 
@@ -103,7 +103,7 @@ As next step, let's build the project:
 npm run build
 ```
 
-The last step is going to produce a non-minified build of the application. All we need to do now is serve the static assets. For the purpose we can use the npm package `serve`. You can instsall it with:
+The last step is going to produce a non-minified build of the application. All we need to do now is serve the static assets. For the purpose we can use the npm package `serve`. You can install it with:
 
 ```bash
 npm i -g serve
@@ -118,7 +118,7 @@ serve -s dist
 serve -s build
 ```
 
-When you open [http://localhost:5000](http://localhost:5000), tou should see a screen similar to the gif below:
+When you open [http://localhost:5000](http://localhost:5000), you should see a screen similar to the gif below:
 
 ![Demo](/static/images/mlx/demo.gif)
 
@@ -132,7 +132,7 @@ Now, let's look at the extra configuration that we've provided on top of the def
 ...
 const { MLPlugin } = require('@mlx/webpack');
 ...
-new MLPlugin({ data })
+  new MLPlugin({ data })
 ...
 ```
 
