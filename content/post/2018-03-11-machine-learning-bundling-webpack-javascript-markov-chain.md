@@ -124,21 +124,22 @@ When you open [http://localhost:5000](http://localhost:5000), you should see a s
 
 Notice that we have only lazy-loaded route definitions in both demos. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to.
 
-In the gif above, notice how when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" route. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we've provided. Also, see how when we go to "Settings", we pre-fetch the "FAQ" module, together with the "Intro" module. This, again, is based on the data we got from Google Analytics which hint our tooling that once the user goes to "Settings" after that, they will most likely visit "FAQ" or "Intro".
+In the gif above, when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" route. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we provided. Also, notice how when we navigate to "Settings", the application pre-fetches the "FAQ" module, together with the "Intro" module. This, again, is based on the data we got from Google Analytics which hint our tooling that once the user goes to "Settings" after that, they will most likely visit "FAQ" or "Intro".
 
 Now, let's look at the extra configuration that we've provided on top of the default Angular CLI/Create React App setup. Look at `webpack.config.js` for Angular CLI, and `config/webpack.config.prod.js` for the React project. You'll notice the following lines:
 
 ```ts
 ...
 const { MLPlugin } = require('@mlx/webpack');
+const data = require('./data.json');
 ...
   new MLPlugin({ data })
 ...
 ```
 
-Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
+Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of the data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
 
-I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project.
+I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project. We'll talk more about the limitations of the current React route parser in the `@mlx/parser` section of the project.
 
 We're going to dig in implementation details and what happens under the hood but before that we'll continue with the mathematical foundation of the project.
 
