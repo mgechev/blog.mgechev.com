@@ -48,9 +48,9 @@ A common practice for dealing with a large amount of JavaScript is dividing it i
 - **Route-based chunking** - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates through the pages of the application they trigger network requests which download the associated with the target route chunk.
 - **Component-based chunking** - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the route chunk and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "route-based chunking" category but, as I'll mention below, it's convenient to put it into a different category.
 
-There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we include during the initial page load is too much. The logical approach, of course, is to apply either a component-based or a route-based chunking.
+There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we include during the initial page load is too much. The logical approach is to apply either a component-based or a route-based chunking, in order to delay the requests for code which is not essential for the user's initial interaction with the application.
 
-Taking this approach, an interesting question to consider is: how do we decide which features and/or pages should be moved to their own chunks, in order to improve our app? Often, this decision is based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open a given page or interact with a given feature so we move it to its own chunk and download it lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
+Taking this approach, an interesting question to consider is: how do we decide which features and/or pages should be moved to their own chunks? Often, this decision is based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open a given page or interact with a given feature so we move it to its own chunk and download it lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
 
 **A better approach is to choose our chunk layout based on data.** There are different platforms which provide us an insight into how the users use our application. Google Analytics is a great example. Looking at a Google Analytics report, we can decide which pages should be grouped together and what we can load lazily. This way we can make our route-level chunking to be data-driven, and respectively, less error-prone.
 
@@ -58,9 +58,9 @@ For example, let's suppose that the graph below represents data collected from G
 
 <img src="/static/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
 
-We talked about grouping chunks (i.e. chunk clusterization). Now let's say a few words about pre-fetching!
+We talked about grouping chunks (i.e. **chunk clusterization**). Now let's say a few words about pre-fetching!
 
-## Chunk Clusterization
+## Chunk Pre-Fetching
 
 A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can make such decisions more accurately.
 
