@@ -62,11 +62,11 @@ We talked about grouping chunks (i.e. **chunk clusterization**). Now let's say a
 
 ## Chunk Pre-Fetching
 
-A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can make such decisions more accurately.
+A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can set priorities much more accurately.
 
 ## Thinking About What Matters
 
-So, data-driven chunk clusterization and pre-fetching could be useful but why should we do it manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code, it's just a graph traversal in the end. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application**!
+Data-driven chunk clusterization and pre-fetching are both quite useful but why should we do them manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! We, as engineers, should focus on what requires our attention and leave everything else, which can be automated, to the tooling.**
 
 In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clusterization and data-driven pre-fetching. All code examples can be found at my [GitHub profile](https://github.com/mgechev/mlx).
 
