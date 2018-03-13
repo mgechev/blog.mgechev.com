@@ -673,14 +673,20 @@ The `graph` passed here is the Google Analytics graph we got from `@mlx/ga` (i.e
 
 `prefetchConfig` is also configurable! It contains the pre-fetching thresholds depending on the value of `window.navigator.connection.effectiveType`. Since `connection.effectiveType` is currently supported only by Chrome, the plugin will use the `3g` thresholds by default.
 
+### How Pre-Fetching Works
+
+Currently, when given chunk needs to be pre-fetched, the plugin will create a new `link` element with `rel="prefetch"` and `href` attribute equal to the path to the chunk. This element will be added as child element to the `head` element, or the parent of the first `script` item in the page in case the `head` doesn't exist. Using this technique allows the browser to prioritize the pre-fetching process.
+
 The module that we're going to take a look at next is `@mlx/parser`.
 
 ## `@mlx/parser`
 
 This package is optional for both - `@mlx/webpack` and `@mlx/ga` but it's also quite convenient. The parser does two key things:
 
-- Finds the route declarations in our application. This allows us to aggregate the navigation graph that we get from Google Analytics and transform it to a page graph.
-- Finds the entry points of the routing bundles, and their parent modules. Although we can do this manually as well, and provide information for where your bundles are defined and which routes are associated to them, it's still much more convenient to use `@mlx/parser`.
+1. Finds the route declarations in our application. This allows us to aggregate the navigation graph that we get from Google Analytics and transform it to a page graph.
+2. Finds the entry points of the routing bundles, and their parent modules.
+
+Although we can do this manually, it's still much more convenient to use `@mlx/parser` because your application will always be the single source of truth.
 
 The second point is crucial for the work of `@mlx/webpack` and `@mlx/clusterize`. Once we provide a project type and a `tsconfig.json` file to `@mlx/parser`'s `parseRoutes` method, it'll automatically extract all the metadata and populate it into a JavaScript array of the form:
 
@@ -688,21 +694,21 @@ The second point is crucial for the work of `@mlx/webpack` and `@mlx/clusterize`
 [
   {
     path: '/main',
-    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/main.module.ts',
+    modulePath: '/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts',
     lazy: true,
-    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/app.module.ts'
+    parentModulePath: '/home/foo/Projects/ng-dd-bundled/src/app/app.module.ts'
   },
   {
     path: '/main/parent',
-    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/parent/parent.module.ts',
+    modulePath: '/home/foo/Projects/ng-dd-bundled/src/app/main/parent/parent.module.ts',
     lazy: true,
-    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/main/main.module.ts'
+    parentModulePath: '/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts'
   },
   {
     path: '/intro/parent/reward/:id',
-    modulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-reward/intro-reward.module.ts',
+    modulePath: '/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-reward/intro-reward.module.ts',
     lazy: true,
-    parentModulePath: '/Users/mgechev/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-parent.module.ts'
+    parentModulePath: '/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-parent.module.ts'
   }
   // ...
 ]
@@ -716,14 +722,14 @@ This is stripped version of the array produced after parsing the [sample Angular
 
 You can find the Angular and the React parsers of `@mlx/parser` [here](https://github.com/mgechev/mlx/tree/master/packages/parser) <sup>[10]</sup>.
 
-Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser relies on a lot of conventions. It's built on top of TypeScript.
+Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[11]</sup>. For now, the React parser relies on a lot of syntactical conventions. It's built on top of TypeScript.
 
 ## `@mlx/clusterize`
 
 The final package that we're going to cover is the clusterization algorithm. As input, it accepts:
 
 - `bundleGraph: Graph` - a weighted bundle page graph which is the result of the transformation of the weighed page graph.
-- `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. That's the `modules` argument.
+- `modules: Module[]` - since the `bundleGraph` can represent only a partial part of the entire application (because of limited information from Google Analytics, for example), we need the entry points of the lazy-loaded chunks and their parents to be provided separately. This is the bundle page graph that we defined above.
 - `n: number` - `n` is the minimum number of chunks that we want to get at the end of the clusterization algorithm.
 
 Once this information is available, the clusterization algorithm will:
