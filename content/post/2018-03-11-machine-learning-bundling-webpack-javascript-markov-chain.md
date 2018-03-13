@@ -52,7 +52,7 @@ Taking this approach, an interesting question to consider is: how do we decide w
 
 **A better approach is to choose our chunk layout based on data.** There are different platforms which provide us an insight into how the users use our application. Google Analytics is a great example. Looking at the data which Google Analytics provide, we can decide which pages should be grouped together and what we can load lazily. This way we can make our "page-level" chunking data-driven, and respectively, less error-prone. For example, let's suppose that the graph below represents data gathered from Google Analytics. We can think of the nodes as the pages in the app and of the edges as the transitions between them. The thicker given edge is, the most likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/b` into another chunk, and leave the root into a third chunk.
 
-<img src="/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
+<img src="/static/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
 
 We talked about grouping chunks (i.e. chunk clusterization). Now let's say a few words about pre-fetching!
 
@@ -124,7 +124,7 @@ console.log(foo);
 
 The program above can be represented with the following dependency graph:
 
-<img src="/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/static/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because `bar.ts` depends on `foo.ts`. Mathematically this graph looks like:
 
@@ -136,7 +136,7 @@ Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from 
 
 Let's now suppose we have the following graph:
 
-<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/static/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
 In our program, we can represent this graph in different ways. For our purposes, we'll often use a **list of neighbors** representation:
 
@@ -190,7 +190,7 @@ const graph = {
 
 Let's look at the graphical representation of this graph:
 
-<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/static/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
 We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
 
@@ -266,7 +266,7 @@ In other words, trees are **acyclic connected graph**.
 
 For example, we may have the following *routing tree* in our application:
 
-<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/static/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
 As we can see, the root of the tree is `/`, its children are `/a` and `/b`, where `/a` has children `/a/a` and `/a/b`. From the diagram above, we can see that the **lowest-common ancestor (or LCA)** of `/a/a` and `/a/b` is `/a`.
 
@@ -332,7 +332,7 @@ collapse.onclick = function () {
 
 To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
 
-<img src="/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/static/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Navigation Graph
 
@@ -353,7 +353,7 @@ Although the navigation graph looks pretty handy, it's not usable for our purpos
 
 In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**. The navigation graph from above, translated to page graph will look like:
 
-<img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/static/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Routing Tree
 
@@ -411,7 +411,7 @@ Alright, now we understand all the mathematics behind the tool and we defined al
 
 If you take a look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
-- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
+- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
 - [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree.
 - [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
 - [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
