@@ -120,7 +120,7 @@ serve -s build
 
 When you open [http://localhost:5000](http://localhost:5000), tou should see a screen similar to the gif below:
 
-![Demo](/assets/images/mlx/demo.gif)
+![Demo](/static/images/mlx/demo.gif)
 
 Notice that we have only lazy-loaded route definitions in both demos. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to.
 
