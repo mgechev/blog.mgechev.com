@@ -148,7 +148,7 @@ We're going to dig in implementation details and what happens under the hood but
 You can expand this section to get familiar with the mathematical foundations of this article. Here we're going to cover:
 
 - Graphs, trees, weighted graphs, and connected components
-- Probability and Markov chains
+- Probabilities and Markov chains
 
 <div style="cursor: pointer; color: #5694f1;" id="expand">Expand &#9658;</div>
 <div style="cursor: pointer; display: none; color: #5694f1;" id="collapse">Collapse &#9660;</div>
@@ -156,7 +156,7 @@ You can expand this section to get familiar with the mathematical foundations of
 
 ## Basics of Graph Theory
 
-A graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices (nodes). In this article, we're often going to mention the term "dependency graph". This is just a graph which represents the dependencies between something. The individual entities of the problem domain are represented with the nodes of the graph and the dependencies between them are represented with the edges. For example:
+A graph in graph theory is represented as the tuple **`G = (E, V)`** where `E` is a set of edges and `V` is a set of vertices (nodes). In this article, we're often going to mention the term "dependency graph". This is a graph which represents the dependencies between entities (source files, people, chunks, etc.). The individual entities of the problem domain are represented with the nodes of the graph and the dependencies between them are represented with the edges. For example:
 
 ```ts
 // foo.ts
@@ -186,7 +186,7 @@ Let's now suppose we have the following graph:
 
 <img src="/static/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
-In our program, we can represent this graph in different ways. For our purposes, we'll often use a **list of neighbors** representation:
+In our program, we can represent it in different ways. For our purposes, we'll often use a **list of neighbors** representation:
 
 ```ts
 const graph = {
@@ -198,7 +198,7 @@ const graph = {
 
 The object above has three keys - one for each node of the graph. Each of the keys has an associated array which lists the neighbors of the current node.
 
-Often we have a numeric value associated with the edge between two nodes. For example, in our Google Analytics case, this numeric value may represent the number of visits from page `A` to page `B`. In such case, we can model the data as a **weighted graph**. Here's how we can represent the Google Analytics data with JavaScript:
+Often we have a numeric value associated with the edge between two nodes. For example, if we have a Google Analytics report, we can represent the pages as nodes and the transitions between them as edges. The numeric values from the report which represent the number of visits from page `A` to page `B`, we can associate with the edges and call them **weights**. A graph which has weights associated with its edges we are going to call a **weighted graph**. Here's the data structure we can use for representing the Google Analytics report in our program:
 
 ```ts
 const graph = {
@@ -240,7 +240,7 @@ Let's look at the graphical representation of this graph:
 
 <img src="/static/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
-We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript.
+We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, **it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript**.
 
 ### Cyclic Graphs and Topological Sorting
 
