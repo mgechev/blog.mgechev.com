@@ -22,15 +22,15 @@ title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/11/machine-learning-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven chunk clusterization and pre-fetching for our single-page applications. **The purpose of the project is to provide a zero-configuration mechanism which based on data from Google Analytics performs the most optimal build for our users.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
+In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine-learning allow us to perform data-driven chunk clusterization and pre-fetching for our single-page applications. **The purpose of the project is to provide a zero-configuration mechanism which based on data from Google Analytics performs the most optimal build based on the user data.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
 
-Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!
+Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven! This effect is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested in the same user session together.
 
 # Introduction
 
 Over the past a couple of years, we started shipping web applications which provide a user experience comparable to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought would possible to achieve with JavaScript in the browser.
 
-Of course, everything comes at a cost. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)<sup>[1]</sup> of [research](https://blog.hubspot.com/marketing/page-load-time-conversion-rates)<sup>[2]</sup> proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
+Of course, everything comes at a price. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)<sup>[1]</sup> of [research](https://blog.hubspot.com/marketing/page-load-time-conversion-rates)<sup>[2]</sup> proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
 
 It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)<sup>[3]</sup>. JavaScript compared to images, for instance, is much more expensive because of its non-trivial processing mechanism (parsing, compilation, and execution).
 
@@ -46,7 +46,7 @@ Well, slow pages are also stressful:
 A common practice for dealing with a large amount of JavaScript is dividing it into multiple chunks and loading them on demand. There are two main approaches we can apply:
 
 - **Route-based chunking** - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates through the pages of the application they trigger network requests which download the associated with the target route chunk.
-- **Component-based chunking** - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the route chunk and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "Route-based chunking" category but, as I'll mention below, it's convenient to put it into a different category.
+- **Component-based chunking** - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the route chunk and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "route-based chunking" category but, as I'll mention below, it's convenient to put it into a different category.
 
 There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we include during the initial page load is too much. The logical approach, of course, is to apply either a component-based or a route-based chunking.
 
