@@ -78,7 +78,53 @@ In the first a couple of sections, we'll cover the individual tools from the [`m
 
 The examples with the article use two identical, simple Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
 
-The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework. The only addition to their webpack configuration is:
+The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[6]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[7]</sup>. Both applications are ejected from the official CLI tools of the framework.
+
+Let's take a look at how we can use the tool in the context of both React and Angular.
+
+First, clone the repo of your choice:
+
+```bash
+# Angular example
+git clone https://github.com/mgechev/ng-dd-bundled demo
+# React example
+git clone https://github.com/mgechev/react-dd-bundled demo
+```
+
+After that, install the dependencies of the project:
+
+```bash
+cd demo && npm i
+```
+
+As next step, let's build the project:
+
+```bash
+npm run build
+```
+
+The last step is going to produce a non-minified build of the application. All we need to do now is serve them, for the purpose we can use the npm package `serve`. You can instsall it with:
+
+```bash
+npm i -g serve
+```
+
+Now in order to serve your application run:
+
+```bash
+# For Angular
+serve -s dist
+# For React
+serve -s build
+```
+
+Now open [http://localhost:5000](http://localhost:5000). You should see screen similar to the gif below:
+
+![Demo](/assets/images/mlx/demo.gif)
+
+As you can see in the repositories of the demos, all routes are loaded lazily. Notice how when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" page. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we've provided. Also, see how when we go to settings, we pre-fetch the FAQ module, together with the intro module. This, again, is based on the data we got from Google Analytics.
+
+Now, let's look at the extra configuration that we've provided on top of the default Angular CLI/Create React App setup. Look at `webpack.config.js` for Angular CLI, and `config/webpack.config.prod.js` for the React project. You'll notice the following lines:
 
 ```ts
 ...
@@ -89,11 +135,6 @@ new MLPlugin({ data })
 ```
 
 Here `data` is a configuration property which contains processed data from Google Analytics. This data is extracted using `@mlx/ga`. A working example of data extraction can be found [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>.
-
-For both, the Angular and the React application, once you run `npm build` the following is going to happen:
-
-- Based on the extracted Google Analytics data logically connected chunks will be grouped together.
-- The `MLPlugin` will inject some JavaScript in the main chunk of your application. This code will track the user's navigation and pre-fetch the chunks associated with the pages which the user is likely to visit.
 
 I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project.
 
