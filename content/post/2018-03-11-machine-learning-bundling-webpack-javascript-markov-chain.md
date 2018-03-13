@@ -140,7 +140,7 @@ Here `data` is a configuration property which contains processed data from Googl
 
 I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project.
 
-Now, we'll continue with the mathematical foundation of the project, right after which we'll dig into some technical details how everything works together.
+We're going to dig in implementation details and what happens under the hood but before that we'll continue with the mathematical foundation of the project.
 
 # Mathematical Background
 
