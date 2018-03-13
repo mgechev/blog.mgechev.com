@@ -457,10 +457,10 @@ Keep in mind that we may not have 1:1 correspondence between chunk entry point a
 
 Alright, now we understand all the mathematics behind the tool and we defined all the concepts. Let's dig into some technical details!
 
-If you take a look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
+If you look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
 - [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
-- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree.
+- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
 - [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clusterization algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
 - [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
 
@@ -489,8 +489,8 @@ fetch(
   key,
   viewId,
   {
-    startDate: new Date('2016-1-1'),
-    endDate: new Date('2018-2-24')
+    startDate: new Date('YYYY-MM-DD'),
+    endDate: new Date('YYYY-MM-DD')
   },
   r => r.replace('/app', ''),
   applicationRoutes.map(f => f.path)
@@ -500,12 +500,12 @@ fetch(
 In the snippet above we import `fetch` from `@mlx/ga`. That's the only exported symbol from the package. The `fetch` method accepts:
 
 - Key for access to the Google Analytics API <sup>[9]</sup>
-- Google Analytics View ID <sup>[9]</sup>
+- Google Analytics View ID <sup>[9]</sup> for our application
 - Start & end intervals for the Google Analytics report
-- Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manipulation over them. In the example above, it drops the `/app` prefix.
+- Optional URL formatter. The URL formatter is a function which accepts the individual URLs coming from Google Analytics and performs manipulation over them. In the example above, it drops the `/app` prefix from all of them.
 - Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use `@mlx/parser` in order to extract them automatically. This array is essential in order to allow `@mlx/ga` to map the navigation graph to a page graph.
 
-Internally, **`@mlx/ga` will build the weighted page graph of the application**. The tool will query Google Analytics' API and will get the previous page for each visited page, together with the number of visits. This way, in the end, we'll have a graph similar to this one:
+Internally, **`@mlx/ga` will build the weighted page graph of the application**. In case we don't provide a list of the routes, the result of the invocation will be the weighted navigation graph. Internally, the tool will query Google Analytics' API and get the previous page for each visited page, together with the number of visits. This way, in the end, we'll have a graph similar to this one:
 
 ```js
 {
@@ -541,7 +541,9 @@ This is stripped version of the graph that I used for developing the two example
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
 <script src="/assets/js/mlx/graph.js"></script>
 
-You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the view ID with the one of your web app.
+The thicker given edge is, the more likely it is the user to perform the corresponding transition. The graph from the visualization is intentionally undirected to make the diagram less noisy.
+
+You can find demo of this module [here](https://github.com/mgechev/mlx-ga-demo)<sup>[8]</sup>. All you need to do is download your private key from the Google Developer Console, place it in `credentials.json` and replace the [view ID with the one of your web app](http://2ality.com/2015/10/google-analytics-api.html) <sup>[9]</sup>.
 
 ## `@mlx/webpack`
 
@@ -557,7 +559,7 @@ plugins: [
 ]
 ```
 
-...and that's it! Our application now will be bundled according to the data gotten from Google Analytics. There are a couple of magical things going on but before explaining them, let's take a look at the detailed configuration of `MLPlugin`:
+...and that's it! Our application now will be bundled according to the data gotten from Google Analytics. There are a couple of magical things going on but before explaining them, let's take a look at the detailed configuration of the `MLPlugin`:
 
 ```ts
 export type Neighbors = { [key: string]: number };
@@ -585,15 +587,39 @@ export interface MLPluginConfig {
 ```
 
 - `debug` indicates if the plugin's verbose logging should be enabled.
-- `data` is the data gathered from Google Analytics.
-- `routeProvider` is a function which returns the mapping between routes and chunk entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a React application and the default `routeProvider` doesn't work (which is very likely) you can provide a custom function which returns them:
+- `data` is the page graph gathered from Google Analytics.
+- `routeProvider` is a function which returns the mapping between routes and chunk entry points. If a `routeProvider` is not specified, `@mlx/webpack` will use the default route provider implementation from `@mlx/parser`. This is **extremely powerful configuration property**. If you have a React application and the default `routeProvider` doesn't work (which is very likely) you can provide a custom function which returns the metadata:
   ```ts
   new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
   ```
-- `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` or disable the pre-fetching completely.
-- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clusterization algorithm performed by `@mlx/clusterize`. This may sound a bit abstract at first. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
+- `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` and/or `prefetchConfig` or disable the pre-fetching completely.
+- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clusterization algorithm performed by `@mlx/clusterize`. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
 
 Keep in mind that **the plugin will not do any code splitting**. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
+
+### Custom Route Provider
+
+As I mentioned, if `routeProvider` is not passed to the plugin configuration object, the default one will be used. The default route provider will return an array of objects in the following format:
+
+```ts
+interface Route {
+  path: string;
+  lazy: boolean;
+  modulePath: string;
+  parentModulePath: string;
+}
+```
+
+In case the default route provider doesn't work for you, you can implement a function which parses your application and returns the routes in the specified format. If an entire parser seems like an overhead for your application, you can even collect the metadata manually and return it as the result of a constant function:
+
+```ts
+const routeProvider = () => [
+  { path: 'foo', lazy: true, modulePath: '/foo', parentModulePath: null },
+  { path: 'bar', lazy: true, modulePath: '/bar', parentModulePath: '/foo' }
+];
+```
+
+My recommendation would be to implement a parser in order to keep your application as the single source of truth (SSOT). You can find the Angular & React parsers in the `@mlx/parser` package.
 
 ### Performed Algorithm
 
@@ -603,11 +629,11 @@ Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets eval
 - If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, the associated with them chunk entry points, and their parent chunk entry point.
 - It'll initialize the `ClusterizeChunksPlugin` and `RuntimePrefetchPlugin`.
 
-**`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting some small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and network speed**!
+**`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting a small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and the user's connection speed**!
 
 ### Runtime Pre-Fetching
 
-The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the matrix. For example:
+The `RuntimePrefetchPlugin` will generate a Markov Chain model based on the generated weighted bundle page graph. For each route in the application, we'll get a row from the matrix. For example:
 
 ```ts
 {
@@ -622,7 +648,7 @@ The `RuntimePrefetchPlugin` will generate a Markov Chain based on the generated 
 }
 ```
 
-In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. Notice also that `RuntimePrefetchPlugin` gets the chunks in a sorted order, based on probability. Another feature of the plugin is that it's going to have different probability threshold depending on the user's network speed. For example, if the user is with effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability to be needed `0.3`.
+In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. Notice also that `RuntimePrefetchPlugin` gets the chunks in a sorted order, based on probability. Another feature of the plugin is that it's going to have a different probability threshold depending on the user's connection speed. For example, if the user has effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability over `0.3`.
 
 `RuntimePrefetchPlugin` can be configured with the following options:
 
