@@ -260,9 +260,9 @@ const graph = {
 };
 ```
 
-We can see that we have path from `/a -> /b -> /c -> /a`, so basically, starting from `/a` we can reach `/a` again. In such case, we say that our graph has a cycle.
+We can see that we have the path `/a -> /b -> /c -> /a`, so basically, starting from `/a` we can reach `/a` again. In such case, we say that our graph has a cycle.
 
-Often, we want to sort the vertices of our graph based on the dependencies they have. For example, let's say that we have the following dependencies between three JavaScript files:
+Often, we want to sort the vertices of a graph based on the dependencies they have. For example, let's say that we have the following dependencies between three JavaScript files:
 
 ```ts
 // foo.js
@@ -294,9 +294,9 @@ const graph = {
 };
 ```
 
-Now our bundler needs to figure out which is the entry point in the application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
+Now the bundler needs to figure out which is the entry point in the application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
 
-- We'll first find the file which has no dependencies, which in our case will be `foo.js`, and add it to the result list.
+- We'll first find the file which has no dependencies and add it to the result list. In our case will be `foo.js`.
 - After that, we'll remove `foo.js` from the graph, together with all edges pointing to it.
 - As next step, we'll find the next node without dependencies. This is going to be `bar.js` since it no longer points to `foo.js` (this file is not in the graph anymore).
 - We'll remove `bar.js` from the graph, add it to the result list and keep going.
@@ -352,7 +352,7 @@ From the matrix, we can conclude that:
 - There's `4/4` probability (or `1`) the user to go from `/b` to `/a`.
 - There's `0` probability for all other cases: `/b` to `/b`, `/b` to `/c`, `/c` to `/a`, `/c` to `/b`, and `/c` to `/c`.
 
-A matrix like that, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**. In fact, this is a machine learning model
+A matrix like this, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**. This is the basic machine learning model that we're going to use for page pre-fetching.
 
 That's it! That's all the math we need.
 
@@ -378,7 +378,7 @@ collapse.onclick = function () {
 
 # Definitions
 
-To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have the following page:
+To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have an application with the pages `/a`, `/a/a`, `/a/b`, `/b`, and `/c`, with the following transitions between them:
 
 <img src="/static/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
@@ -386,7 +386,7 @@ To make sure we're all on the same page with the concepts that we're going to di
 
 The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
 
-For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`.
+We're going to build the navigation graph from a report that we've gotten from an analysis service. We may not have (and, in our case, don't need), the information what was the source of the transition between two pages, i.e. if it's a link or change from the address bar. For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`. We'll cover this tool later in the article.
 
 ## Page Graph
 
@@ -399,7 +399,7 @@ Although the navigation graph looks pretty handy, it's not usable for our purpos
 /c
 ```
 
-In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**. The navigation graph from above, translated to page graph will look like:
+In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**, or **route graph**. The navigation graph from above, translated to page graph will look like:
 
 <img src="/static/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
@@ -445,13 +445,13 @@ export const appRoutes: Routes = [
 In this case, the routing tree will differ from the bundle routing tree:
 
 - The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
-- The bundle routing tree will have root node named after the file which contains the routes definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
+- The bundle routing tree will have root node named after the file which contains the routes' definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
 
 ## Bundle Page Graph
 
-We already defined the page graph as the navigation graph which we got from given source with aggregated routes (Google Analytics, let's say). If instead of the routes, we get the entry points of their corresponding chunks, we'll get the bundle page graph.
+We already defined the page graph as the navigation graph which we got from given source with aggregated routes (Google Analytics, let's say). If instead of the routes, we get the entry points of their corresponding chunks, we'll get the **bundle page graph**.
 
-Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we need to combine several nodes from the page graph to one. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well. The difference is that the weights of the edges going from a given chunk entry point will equal to the sum of the corresponding edges of the merged nodes from the page graph.
+Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we need to combine several nodes from the page graph. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well. The difference is that the weights of the edges going from a given chunk entry point will equal to the sum of the corresponding edges of the merged nodes from the page graph.
 
 # Technical Details
 
