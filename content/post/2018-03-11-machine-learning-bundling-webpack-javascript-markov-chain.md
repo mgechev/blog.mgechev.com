@@ -463,10 +463,10 @@ Alright, now we understand all the mathematics behind the tool and we defined al
 
 If you look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
-- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
-- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
-- [`@mlx/clusterize`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/clusterize) - a module which performs a clustering algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
-- [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/01fb7db67efe30b6fed1623ea64d2ba190c4b316/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/clusterize` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
+- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
+- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
+- [`@mlx/cluster`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/cluster) - a module which performs a clustering algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
+- [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/cluster` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
 
 Let's first explain how we can use `@mlx/ga` and how it works internally.
 
@@ -597,7 +597,7 @@ export interface MLPluginConfig {
   new MLPlugin({ data, routeProvider: () => [{...}, {...}] })
   ```
 - `runtime` configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional `basePath` and/or `prefetchConfig` or disable the pre-fetching completely.
-- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clustering algorithm performed by `@mlx/clusterize`. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
+- `build` is the part of the `@mlx/webpack` plugin which by default groups the webpack chunks based on the clustering algorithm performed by `@mlx/cluster`. We can think of it as a piece of code which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.
 
 Keep in mind that **the plugin will not do any code splitting**. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.
 
@@ -631,9 +631,9 @@ Once the line `new MLPlugin({ data: require('./path/to/data.json') })` gets eval
 
 - `MLPlugin` will check for a `routeProvider`. If it doesn't discover such, it'll try to guess your application type (i.e. Angular or React) by looking at `package.json` and discover the `tsconfig.json` file of the project.
 - If it succeeds, it'll invoke the `@mlx/parser` and collect all the routes, the associated with them chunk entry points, and their parent chunk entry point.
-- It'll initialize the `ClusterizeChunksPlugin` and `RuntimePrefetchPlugin`.
+- It'll initialize the `ClusterChunksPlugin` and `RuntimePrefetchPlugin`.
 
-**`ClusterizeChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting a small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and the user's connection speed**!
+**`ClusterChunksPlugin` is used for combining chunks** and **`RuntimePrefetchPlugin` is used for** injecting a small piece of code which will make our application **pre-fetch bundles based on the user's behavior, the provided data from Google Analytics, and the user's connection speed**!
 
 ### Runtime Pre-Fetching
 
@@ -692,7 +692,7 @@ This package is optional for both - `@mlx/webpack` and `@mlx/ga` but it's also q
 
 Although we can do this manually, it's still much more convenient to use `@mlx/parser` because your application will always be the single source of truth.
 
-The second point is crucial for the work of `@mlx/webpack` and `@mlx/clusterize`. Once we provide a project type and a `tsconfig.json` file to `@mlx/parser`'s `parseRoutes` method, it'll automatically extract all the metadata and populate it into a JavaScript array of the form:
+The second point is crucial for the work of `@mlx/webpack` and `@mlx/cluster`. Once we provide a project type and a `tsconfig.json` file to `@mlx/parser`'s `parseRoutes` method, it'll automatically extract all the metadata and populate it into a JavaScript array of the form:
 
 ```js
 [
@@ -728,7 +728,7 @@ You can find the Angular and the React parsers of `@mlx/parser` [here](https://g
 
 Both parsers perform static analysis. The Angular parser uses an abstraction on top of the Angular compiler - [ngast](https://github.com/mgechev/ngast) <sup>[15]</sup>. For now, the React parser relies on a lot of syntactical conventions. It's built on top of TypeScript.
 
-## `@mlx/clusterize`
+## `@mlx/cluster`
 
 The final package that we're going to cover is the clustering algorithm. As input, it accepts:
 
