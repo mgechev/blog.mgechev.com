@@ -541,7 +541,7 @@ Internally, **`@mlx/ga` will build the weighted page graph of the application**.
 
 This is stripped version of the graph that I used for developing the two examples for [Angular](https://github.com/mgechev/ng-dd-bundled)<sup>[8]</sup> and [React](https://github.com/mgechev/react-dd-bundled)<sup>[9]</sup>. Here's an interactive visualization of the entire aggregated data:
 
-<div style="height: 600px; width: 100%" id="canvas"></div>
+<div style="height: 600px; width: 100%; background-color: #23283B;" id="canvas"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
 <script src="/assets/js/mlx/graph.js"></script>
 

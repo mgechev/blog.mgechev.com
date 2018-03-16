@@ -278,20 +278,43 @@
         .style({
           width: function (n) {
             return n.data().weight;
+          },
+          'line-color': function (n) {
+            var w = n.data().weight;
+            console.log(w);
+            if (w > 19) {
+              return '#F5AB35';
+            } else if (w > 10) {
+              return '#ED8F3B';
+            }
+            return '#D46455';
           }
         })
         .selector('node')
         .style({
           width: function (n) {
             return n.data().width / 2;
-          }
-        })
-        .style({
+          },
+          'background-color': function (n) {
+            var w = n.data().width / 2;
+            if (w > 90) {
+              return '#F5AB35';
+            } else if (w > 40) {
+              return '#ED8F3B';
+            }
+            return '#D46455';
+          },
           height: function (n) {
             return n.data().width / 2;
           },
           label: function (n) {
             return n.data().name;
+          },
+          color: function () {
+            return '#ccc';
+          },
+          'font-size': function () {
+            return 35;
           }
         }),
       container: document.getElementById('canvas'),
