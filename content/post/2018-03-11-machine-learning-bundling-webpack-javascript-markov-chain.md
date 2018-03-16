@@ -56,7 +56,7 @@ Taking this approach, an interesting question to consider is: how do we decide w
 
 **A better approach is to choose our chunk layout based on data.** There are different platforms which provide us an insight into how the users use our application. Google Analytics is a great example. Looking at a Google Analytics report, we can decide which pages should be grouped together and what we can load lazily. This way we can make our route-level chunking to be data-driven, and respectively, less error-prone.
 
-For example, let's suppose that the graph below represents data collected from Google Analytics. We can think of the nodes as the pages in the app and of the edges as the transitions between them. The thicker given edge is, the more likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/b` into another chunk, and leave the root into a third chunk.
+For example, let's suppose that the graph below represents data collected from Google Analytics. We can think of the nodes as the pages in the app and of the edges as the transitions between them. The thicker given edge is, the more likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/a` into another chunk, and leave the root into a third chunk.
 
 <img src="/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
 
