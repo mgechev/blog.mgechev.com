@@ -656,12 +656,11 @@ The `graph` passed here is the Google Analytics graph we got from `@mlx/ga` (i.e
 
 Currently, when given chunk needs to be pre-fetched, the plugin will create a new `link` element with [`rel="prefetch"`](https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf)<sup>[13]</sup> and `href` attribute equal to the path to the chunk. This element will be added as child element to the `head` element, or the parent of the first `script` item in the page in case the `head` doesn't exist. Using this technique allows the browser to prioritize the pre-fetching process.
 
-
 In order to get a better understanding of the process, let's quickly look at the animation below.
 
 The shadow around a node represents the current page the user is at. The black border represents the nodes which are downloaded and available in the browser's cache. For the purpose of the example, we suppose that we have three chunks `root.js` (for the assets in `/`), `a.js` (for the assets in `/a`, `/a/:id`), and `b.js` (for `/b`, `/b/a`). Our second assumption in the example is that the probability threshold is `0.5`.
 
-*Here's the flow of events:*
+Here's the flow of events:
 
 - First, the user visits the `/` page. The algorithm will look at the Markov chain and iterate over the elements. The algorithm will discover that `b.js` has `0.7` probability to be needed next, so it'll insert a `link[rel="prefetch"]` with `href="b.js"` to the page.
 - After that, the user navigates to `/b`. Since `/b` and `/b/a` are already in the same bundle, and there are no other edges going from `/b`, nothing is going to happen.
