@@ -62,7 +62,7 @@ Taking this approach, an interesting question to consider is: how do we decide w
 
 For example, let's suppose that the graph below represents data collected from Google Analytics. We can think of the nodes as the pages and of the edges as the transitions between them. The thicker given edge is, the more likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/a` into another chunk, and leave the root into a third chunk.
 
-<img src="/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
+<img src="/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 We talked about grouping chunks (i.e. **chunk clustering**). Now let's discuss pre-fetching.
 
@@ -180,7 +180,7 @@ console.log(foo);
 
 The program above can be represented with the following dependency graph:
 
-<img src="/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because `bar.ts` depends on `foo.ts`. Mathematically this graph looks like:
 
@@ -192,7 +192,7 @@ Or in other words, we have the nodes `foo.ts` and `bar.ts` and one edge from `ba
 
 Let's now suppose we have the following graph:
 
-<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 In our program, we can represent it in different ways. For our purposes, we'll often use a **list of neighbors** representation:
 
@@ -246,7 +246,7 @@ const graph = {
 
 Let's look at the graphical representation of this graph:
 
-<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, **it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript**.
 
@@ -260,7 +260,7 @@ In other words, trees are **acyclic connected graph**.
 
 For example, we may have the following *routing tree* in our application:
 
-<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/images/mlx/tree.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 As we can see, the root of the tree is `/`, its children are `/a` and `/b`, where `/a` has children `/a/a` and `/a/b`. From the diagram above, we can see that the **lowest-common ancestor (or LCA)** of `/a/a` and `/a/b` is `/a`.
 
@@ -333,7 +333,7 @@ To make sure we're all on the same page with the concepts that we're going to di
 
 Let's suppose we have an application with the pages `/a`, `/a/a`, `/a/b`, `/b`, and `/c`, with the following transitions between them:
 
-<img src="/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 ## Navigation Graph
 
@@ -354,13 +354,13 @@ Although the navigation graph looks pretty handy, it's not usable for our purpos
 
 In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of the application we'll call a **page graph**, or a **route graph**. The navigation graph from above, translated to a page graph will look like:
 
-<img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
+<img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 ## Routing Tree
 
 The declarations of the routes of the application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call a **routing tree**.
 
-<img src="/images/mlx/routing-tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/images/mlx/routing-tree.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 ## Bundle Routing Tree
 
@@ -402,7 +402,7 @@ In this case, the routing tree will differ from the bundle routing tree:
 - The routing tree will have a single root node called `/` with three children: `/a`, `/b`, and `/c`.
 - The bundle routing tree will have root node named after the file which contains the routes' definitions  (`app.ts` for Angular and `app.tsx` for React), and two children (for Angular - `./com` and `./c`, and for React - `./com.tsx` and `./c.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
 
-<img src="/images/mlx/bundle-routing-tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+<img src="/images/mlx/bundle-routing-tree.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;">
 
 ## Bundle Page Graph
 
@@ -1000,22 +1000,22 @@ Regarding clustering of the chunks, it might not be practical to provide a perso
 
 # References
 
-1. https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/
-2. https://blog.hubspot.com/marketing/page-load-time-conversion-rates
-3. https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e
-4. https://www.webpagetest.org/
-5. https://developers.google.com/web/tools/lighthouse/
-6. http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/
-7. https://github.com/addyosmani/predictive-fetching
-8. https://github.com/mgechev/mlx
-9. https://github.com/mgechev/ng-dd-bundled
-10. https://github.com/mgechev/react-dd-bundled
-11. https://github.com/mgechev/mlx-ga-demo
-12. http://2ality.com/2015/10/google-analytics-api.html
-13. https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf
-14. https://en.wikipedia.org/wiki/Markov_chain
-15. https://github.com/mgechev/mlx/tree/master/packages/parser
-16. https://github.com/mgechev/ngast
-17. https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
-18. https://en.wikipedia.org/wiki/Hidden_Markov_model
-19. https://en.wikipedia.org/wiki/K-means_clustering
+1. Why marketers should care about mobile page speed - https://mgv.io/load-time-impact
+2. How Page Load Time Affects Conversion Rates: 12 Case Studies - https://mgv.io/conversion-rates
+3. The Cost Of JavaScript - https://mgv.io/cost-of-js
+4. WebPageTest - https://mgv.io/webpagetest
+5. Lighthouse - https://mgv.io/lighthouse
+6. Lazy prefetching of AngularJS partials - https://mgv.io/angularjs-prefetching
+7. Predictive Fetching - https://mgv.io/predictive-fetching
+8. mlx - https://mgv.io/mlx
+9. mlx Angular demo - https://mgv.io/ng-mlx
+10. mlx React demo - https://mgv.io/react-mlx
+11. mlx Google Analytics demo - https://mgv.io/ga-mlx
+12. Using the Google Analytics Core Reporting API from Node.js - https://mgv.io/ga-api
+13. Preload, Prefetch And Priorities in Chrome - https://mgv.io/prefetch-preload
+14. Markov Chains - https://mgv.io/markov
+15. mlx parser - https://mgv.io/parser-mlx
+16. ngast - https://mgv.io/ngast
+17. Tarjan's strongly connected components algorithm - https://mgv.io/tarjan
+18. Hidden Markov Chains - https://mgv.io/hidden-markov
+19. k-means clustering - https://mgv.io/k-means
