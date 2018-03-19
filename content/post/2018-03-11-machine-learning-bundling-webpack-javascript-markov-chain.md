@@ -22,6 +22,11 @@ title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
+<meta property="og:title" content="Machine Learning-Driven Bundling. The Future of JavaScript Tooling.">
+<meta property="og:description" content="Teach your bundler users' habits">
+<meta property="og:image" content="http://blog.mgechev.com/images/mlx/card.png">
+<meta property="og:url" content="http://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">
+
 In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. **The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users' behavior performs the most optimal build.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
 
 **Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!** The final result is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested together in the same user session.
