@@ -9,7 +9,7 @@ categories:
 - Webpack
 - Machine Learning
 date: 2018-03-11T00:00:00Z
-draft: true
+draft: false
 tags:
 - TypeScript
 - JavaScript
@@ -22,17 +22,21 @@ title: Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
 url: /2018/03/11/machine-learning-bundling-webpack-javascript-markov-chain-angular-react
 ---
 
-In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for our single-page applications. **The purpose of the project is to provide a zero-configuration mechanism which based on data from Google Analytics performs the most optimal build based on the user data.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
+In this article, I'll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. **The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users' behavior performs the most optimal build.** We're also going to introduce a **webpack plugin which works with Angular CLI and Create React App**.
 
-Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven! This effect is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested in the same user session together.
+**Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!** The final result is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested together in the same user session.
 
 *I want to thank to [Addy Osamani](https://twitter.com/addyosmani) for the review and his feedback of the early drafts of this post and the described tools!*
 
+<section style="background: #eee; padding: 15px;">
+If you're only interested in the practical applications of the described packages, you can read the "Introduction" and the "Tooling Introduction" sections. In case you want to know more about the implementation details, you can focus on the sections "Definitions" and "Technical Details".
+</section>
+
 # Introduction
 
-Over the past a couple of years, we started shipping web applications which provide a user experience comparable to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought would possible to achieve with JavaScript in the browser.
+Over the past a couple of years, we started shipping web apps which provide a user experience comparable to the native applications. This wouldn't be possible without all the advancements in the web platform. We have hundreds of new APIs which allow us to do what we've never thought would possible to achieve with JavaScript in the browser.
 
-Of course, everything comes at a price. The complexity of the single-page applications is growing exponentially! Together with the complexity is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)<sup>[1]</sup> of [research](https://blog.hubspot.com/marketing/page-load-time-conversion-rates)<sup>[2]</sup> proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
+Of course, everything comes at a price. The complexity of the single-page applications is growing exponentially! Together with it is also growing the number of assets that we need to transfer over the network. There is a [lot](https://www.thinkwithgoogle.com/marketing-resources/experience-design/mobile-page-speed-load-time/)<sup>[1]</sup> of [research](https://blog.hubspot.com/marketing/page-load-time-conversion-rates)<sup>[2]</sup> proving that the load time of our apps directly impacts the conversion rate and therefore our revenue.
 
 It's also clear that some assets are more [expensive than others](https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e)<sup>[3]</sup>. JavaScript compared to images, for instance, is much more expensive because of its non-trivial processing mechanism (parsing, compilation, and execution).
 
@@ -47,32 +51,32 @@ Well, slow pages are also stressful:
 
 A common practice for dealing with a large amount of JavaScript is dividing it into multiple chunks and loading them on demand. There are two main approaches we can apply:
 
-- **Route-based chunking** - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates through the pages of the application they trigger network requests which download the associated with the target route chunk.
-- **Component-based chunking** - imagine one of the pages contains a heavy widget which is not very likely to be used by the user. We can simply move the JavaScript for this widget outside of the route chunk and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "route-based chunking" category but, as I'll mention below, it's convenient to put it into a different category.
+- **Route-based chunking** - the given JavaScript chunks correspond to one or more pages in the app. While the user navigates in the application they trigger network requests which download the chunk associated with the target route.
+- **Component-based chunking** - imagine one of the pages contains a heavy widget which is not very likely to be used. We can simply move the associated JavaScript outside of the route chunk and download it on demand when the user intends to interact with the widget. This can be considered as a superset of the "route-based chunking" category but, as I'll mention below, it's convenient to put it into a different category.
 
-There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. Once they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we include during the initial page load is too much. The logical approach is to apply either a component-based or a route-based chunking, in order to delay the requests for code which is not essential for the user's initial interaction with the application.
+There are brilliant tools, such as [webpagetest](https://www.webpagetest.org/)<sup>[4]</sup> and [Lighthouse](https://developers.google.com/web/tools/lighthouse/)<sup>[5]</sup>, which tell us when we've done a poor job with the production build of our apps. After they give us a bunch of pointers, it's our responsibility to fix the mess. One of the common warnings we get from Lighthouse, for instance, is that the JavaScript we include during the initial page load is too much. The logical approach is to apply either component- or route-based chunking, in order to delay the request for code which is not essential for the user's initial interaction with the application.
 
 Taking this approach, an interesting question to consider is: how do we decide which features and/or pages should be moved to their own chunks? Often, this decision is based on a completely subjective judgment. We subjectively decide that it's unlikely the user to open a given page or interact with a given feature so we move it to its own chunk and download it lazily. There's no point explaining how such a subjective judgment call could be completely irrelevant. Our users often behave in a way we don't expect them to.
 
-**A better approach is to choose our chunk layout based on data.** There are different platforms which provide us an insight into how the users use our application. Google Analytics is a great example. Looking at a Google Analytics report, we can decide which pages should be grouped together and what we can load lazily. This way we can make our route-level chunking to be data-driven, and respectively, less error-prone.
+**A better approach is to choose our chunk layout based on data.** There are different platforms which provide us an insight into how the users behave. Google Analytics is a great example. Looking at a Google Analytics report, we can decide which pages should be grouped together and what we can load lazily. This way we can make the route-level chunking data-driven and respectively less error-prone.
 
-For example, let's suppose that the graph below represents data collected from Google Analytics. We can think of the nodes as the pages in the app and of the edges as the transitions between them. The thicker given edge is, the more likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/a` into another chunk, and leave the root into a third chunk.
+For example, let's suppose that the graph below represents data collected from Google Analytics. We can think of the nodes as the pages and of the edges as the transitions between them. The thicker given edge is, the more likely is the user to perform given transition. It makes logical sense to group the JavaScript from pages `/a`, `/a/a`, and `/a/b` into one chunk, the JavaScript from the pages `/b` and `/b/a` into another chunk, and leave the root into a third chunk.
 
 <img src="/images/mlx/ga-graph.svg" style="display: block; margin: auto; margin-top: 55px; margin-bottom: 55px; transform: scale(1.2);">
 
-We talked about grouping chunks (i.e. **chunk clustering**). Now let's say a few words about pre-fetching!
+We talked about grouping chunks (i.e. **chunk clustering**). Now let's discuss pre-fetching.
 
 ## Chunk Pre-Fetching
 
 A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/) on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can set priorities much more accurately.
 
-With this in mind, I decided to go one step further and based on an existing report, to develop a machine learning model for chunk pre-fetching. My idea was validated, got more accurate, and polished after going through the summary document for [predictive fetching](https://github.com/addyosmani/predictive-fetching)<sup>[6]</sup>
+With this in mind, I decided to go one step further and based on an existing report, to **develop a machine learning model for chunk pre-fetching**. My idea was validated, got more accurate, and polished after going through the summary article for [predictive fetching](https://github.com/addyosmani/predictive-fetching)<sup>[6]</sup>
 
 ## Thinking About What Matters
 
-Data-driven chunk clustering and pre-fetching are both quite useful but why should we do them manually? Computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! We, as engineers, should focus on what requires our attention and leave everything else, which can be automated, to the tooling.**
+Obviously, data-driven chunk clustering and pre-fetching are both quite useful. The process of implementing them at the moment is manual and error-prone. On the other hand, computers are good in analyzing data based on models. Computers are also good in static analysis of code - it's just a graph traversal. Let's leave the **bundler to decide what's the best possible chunk layout and pre-fetching strategy based on the data we get from Google Analytics and the structure of our application! This way we can completely automate our data-driven build process and focus on what really matters.**
 
-In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clustering and data-driven pre-fetching. All [tools](https://github.com/mgechev/mlx)<sup>[7]</sup> and [code](https://github.com/mgechev/ng-dd-bundled) [examples](https://github.com/mgechev/react-dd-bundled) can be found at my [GitHub profile](https://github.com/mgechev).
+In this blog post, I'll demonstrate how combining a few tools we can automate the process of data-driven chunk clustering and data-driven pre-fetching. The [packages](https://github.com/mgechev/mlx)<sup>[7]</sup> and the [code](https://github.com/mgechev/ng-dd-bundled)<sup>[8]</sup> [samples](https://github.com/mgechev/react-dd-bundled)<sup>[9]</sup> can be found at my [GitHub profile](https://github.com/mgechev).
 
 In the first a couple of sections, we'll cover the individual tools from the [`mlx`](https://github.com/mgechev/mlx) monorepo and explain how they work together. After that, we'll dig into implementation details starting with an optional, theoretical introduction to the mathematical foundation of the project. Although, saying "mathematical foundation" may sound a bit frustrating, the covered topics are essential and it's very likely you're already familiar with them. We're going to mention few algorithms from the graph theory and one popular machine learning model. Right after that, we're going to define few concepts in order to make sure we speak the same language. Finally, in details, we'll discuss how everything from `@mlx` works together.
 
@@ -80,7 +84,7 @@ In the first a couple of sections, we'll cover the individual tools from the [`m
 
 **Disclaimer**: the packages that we're going to cover are in a very early stage of their development. It's very likely that they are incompatible with your projects. Keep in mind that their APIs are not finalized. Over time their implementation will mature and get more robust.
 
-The examples with the article use two identical, simple Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
+The examples with the article use two identical Angular and React applications. The routing trees of these apps are the same as the routing tree of a production application that I've worked on in the past. The Google Analytics data used for the data-driven build is based on the original application.
 
 The Angular application which uses the `mlx` package can be found [here](https://github.com/mgechev/ng-dd-bundled)<sup>[8]</sup> and the React one [here](https://github.com/mgechev/react-dd-bundled)<sup>[9]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.
 
@@ -126,9 +130,9 @@ When you open [http://localhost:5000](http://localhost:5000), you should see a s
 
 ![Demo](/images/mlx/demo.gif)
 
-Notice that we have only lazy-loaded route definitions in both demos. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to.
+**Notice that we have only lazy-loaded route definitions in both demos**. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to. The build from the gif above is using the automated data-driven clustering and pre-fetching from mlx.
 
-In the gif above, when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" route. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we provided. Also, notice how when we navigate to "Settings", the application pre-fetches the "FAQ" module, together with the "Intro" module. This, again, is based on the data we got from Google Analytics which hint our tooling that once the user goes to "Settings" after that, they will most likely visit "FAQ" or "Intro".
+Notice that when the user navigates from "Parent" to "Settings" the browser doesn't send an extra HTTP request to load the chunk associated with the "Settings" route. This is because the webpack plugin combined the "Settings" and the "Parent" chunks based on the Google Analytics data which we provided. Another interesting observation is that when we navigate to "Settings", the application pre-fetches the "FAQ" module, together with the "Intro" module. Again, this is based on the data we got from Google Analytics which hints the tooling that after the user goes to "Settings" they will most likely visit "FAQ" or "Intro".
 
 Now, let's look at the extra configuration that we've provided on top of the default Angular CLI/Create React App setup. Look at `webpack.config.js` for Angular CLI, and `config/webpack.config.prod.js` for the React project. You'll notice the following lines:
 
@@ -145,7 +149,7 @@ Here `data` is a configuration property which contains processed data from Googl
 
 I'd encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project. We'll talk more about the limitations of the current React route parser in the `@mlx/parser` section of the project.
 
-We're going to dig in implementation details and what happens under the hood but before that we'll continue with the mathematical foundation of the project.
+We're going to dig in implementation details and what happens under the hood but before that we'll continue with explanation of the mathematical foundation of the project.
 
 # Mathematical Background
 
@@ -184,7 +188,7 @@ Notice that we have an arrow pointing from `bar.ts` to `foo.ts`. This is because
 G = ([('bar.ts', 'foo.ts')], ['bar.ts', 'foo.ts'])
 ```
 
-Or in other words, we have the vertices `foo.ts` and `bar.ts` and one edge from `bar.ts` to `foo.ts`. Graphs with edges which point from one vertex to another are called **directed** graphs, otherwise, if there's path in both directions, we call the graph **undirected**. In directed graphs, the edges are ordered tuples, in undirected graphs the edges are unordered tuples.
+Or in other words, we have the nodes `foo.ts` and `bar.ts` and one edge from `bar.ts` to `foo.ts`. Graphs with edges which point from one node to another are called **directed** graphs, otherwise, if there's a path in both directions, we call the graph **undirected**. In directed graphs, the edges are ordered tuples, in undirected graphs the edges are unordered tuples.
 
 Let's now suppose we have the following graph:
 
@@ -202,7 +206,7 @@ const graph = {
 
 The object above has three keys - one for each node of the graph. Each of the keys has an associated array which lists the neighbors of the current node.
 
-Often we have a numeric value associated with the edge between two nodes. For example, if we have a Google Analytics report, we can represent the pages as nodes and the transitions between them as edges. The numeric values from the report which represent the number of visits from page `A` to page `B`, we can associate with the edges and call them **weights**. A graph which has weights associated with its edges we are going to call a **weighted graph**. Here's the data structure we can use for representing the Google Analytics report in our program:
+Often we have a numeric value associated with an edge between two nodes. For example, if we have a Google Analytics report, we can represent the pages as nodes and the transitions between them as edges. The numeric values from the report which represent the number of visits from page `A` to page `B`, we can associate with the edges and call them **weights**. A graph which has weights associated with its edges we are going to call a **weighted graph**. Here's the data structure we can use for representing the Google Analytics report in our program:
 
 ```ts
 const graph = {
@@ -246,71 +250,9 @@ Let's look at the graphical representation of this graph:
 
 We can see that the entire graph consists of two smaller graphs: one which has the nodes `/a`, `/b`, and another one, with the nodes `/c`, `/d`, `/e`. Such "sub-graphs" in our graph are called **connected components**. In fact, **it's convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript**.
 
-### Cyclic Graphs and Topological Sorting
-
-In some cases, the edges in a graph can form a cycle. For example:
-
-```ts
-const graph = {
-  '/a': {
-    '/b': 10,
-  },
-  '/b': {
-    '/c': 4
-  },
-  '/c': {
-    '/a': 6
-  }
-};
-```
-
-We can see that we have the path `/a -> /b -> /c -> /a`, so basically, starting from `/a` we can reach `/a` again. In such case, we say that our graph has a cycle.
-
-Often, we want to sort the vertices of a graph based on the dependencies they have. For example, let's say that we have the following dependencies between three JavaScript files:
-
-```ts
-// foo.js
-export const foo = 42;
-```
-
-```ts
-// bar.js
-import { foo } from './foo';
-
-export const bar = foo + 1.617;
-```
-
-```ts
-// baz.js
-import { foo } from './foo';
-import { bar } from './bar';
-
-console.log(foo);
-```
-
-This program will form the following dependency graph:
-
-```ts
-const graph = {
-  'foo.js': [],
-  'bar.js': ['foo.js'],
-  'baz.js': ['foo.js', 'bar.js']
-};
-```
-
-Now the bundler needs to figure out which is the entry point in the application in order to bundle all the files together. The bundler can do this, using the topological sorting algorithm. In this algorithm:
-
-- We'll first find the file which has no dependencies and add it to the result list. In our case will be `foo.js`.
-- After that, we'll remove `foo.js` from the graph, together with all edges pointing to it.
-- As next step, we'll find the next node without dependencies. This is going to be `bar.js` since it no longer points to `foo.js` (this file is not in the graph anymore).
-- We'll remove `bar.js` from the graph, add it to the result list and keep going.
-- Finally, we'll find `baz.js` - the only node left in the graph. We'll add it to the result list and remove it from the graph.
-
-This way the topological order of the graph will be `['foo.js', 'bar.js', 'baz.js']`. The bundler now can use `baz.js` as the entry point of the chunk. It turns out that topological sorting is very convenient for detecting cycles in the graph. If at a given point we cannot find a node without a dependency, this means that we have a cycle.
-
 ### Trees
 
-Trees are graphs. A special kind of graphs:
+Trees are special kind of graphs:
 
 >...tree is an undirected graph in which any two vertices are connected by exactly one path...
 
@@ -334,6 +276,10 @@ const graph = {
   },
   '/b': {
     '/a': 4
+  },
+  '/c': {
+    '/a': 1,
+    '/b': 8
   }
 };
 ```
@@ -346,7 +292,7 @@ Now, based on the probabilities for all the pages, we can form a matrix:
 |--------|:---:|-------|------|
 | **/a** | 0   | 10/13 | 3/13 |
 | **/b** | 4/4 | 0     | 0    |
-| **/c** | 0   | 0     | 0    |
+| **/c** | 1/9 | 8/9   | 0    |
 
 From the matrix, we can conclude that:
 
@@ -354,9 +300,10 @@ From the matrix, we can conclude that:
 - There's `10/13` probability the user to go from `/a` to `/b`.
 - There's `3/13` probability the user to go from `/a` to `/c`.
 - There's `4/4` probability (or `1`) the user to go from `/b` to `/a`.
-- There's `0` probability for all other cases: `/b` to `/b`, `/b` to `/c`, `/c` to `/a`, `/c` to `/b`, and `/c` to `/c`.
+- There's `1/9` probability the user to go from `/c` to `/a`.
+- There's `8/9` probability the user to go from `/c` to `/b`.
 
-A matrix like this, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov Chain**. This is the basic machine learning model that we're going to use for page pre-fetching.
+A matrix like this, which describes a sequence of possible events in which the probability of each event depends only on the state attained in the previous event, we're going to call a **Markov chain**. This is the basic machine learning model that we're going to use for page pre-fetching.
 
 That's it! That's all the math we need.
 
@@ -382,15 +329,17 @@ collapse.onclick = function () {
 
 # Definitions
 
-To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply. Let's suppose we have an application with the pages `/a`, `/a/a`, `/a/b`, `/b`, and `/c`, with the following transitions between them:
+To make sure we're all on the same page with the concepts that we're going to discuss, I want to start with a few definitions. The only pre-requirement for now is that each of the routes of the application will be lazy-loaded unless specified otherwise. This is just for simplicity, it's not a restriction of the algorithms that we're going to apply.
+
+Let's suppose we have an application with the pages `/a`, `/a/a`, `/a/b`, `/b`, and `/c`, with the following transitions between them:
 
 <img src="/images/mlx/navigation-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
 ## Navigation Graph
 
-The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser.
+The graph above we'll call **navigation graph**. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It's important to mention that the **navigation graph is directed**. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between `/a` and `/b`, we most likely have a link between these two pages. Of course, another way the user to navigate between `/a` and `/b` is by directly using the address bar of the browser. The navigation graph encapsulates both types of transitions.
 
-We're going to build the navigation graph from a report that we've gotten from an analysis service. We may not have (and, in our case, don't need), the information what was the source of the transition between two pages, i.e. if it's a link or change from the address bar. For our purposes, we're going to use the navigation graph from Google Analytics which we have extracted with `@mlx/ga`. We'll cover this tool later in the article.
+We're going to build the navigation graph from a Google Analytics report using the package `@mlx/ga`. We'll cover this tool later in the article.
 
 ## Page Graph
 
@@ -403,7 +352,7 @@ Although the navigation graph looks pretty handy, it's not usable for our purpos
 /c
 ```
 
-In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of our application we'll call **page graph**, or **route graph**. The navigation graph from above, translated to page graph will look like:
+In this case, if we're interested in analyzing the application we most likely want to think of both `/a/a` and `/a/b` as `/a/:id`. The navigation graph, which contains aggregated information based on the routes of the application we'll call a **page graph**, or a **route graph**. The navigation graph from above, translated to a page graph will look like:
 
 <img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 25px; margin-bottom: 25px; transform: scale(1.2);">
 
@@ -411,62 +360,66 @@ In this case, if we're interested in analyzing the application we most likely wa
 
 The declarations of the routes of the application form a tree-like structure. For example, we have the root route `/`, which has three children routes `/a`, `/b`, and `/c`. The route `/a` has a single child route `/a/:id`. This tree we're going to call a **routing tree**.
 
+<img src="/images/mlx/routing-tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
+
 ## Bundle Routing Tree
 
-If we suppose that all the routes in our application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the chunks.
+If we suppose that all the routes in the application are associated with entry points of chunks then our bundle tree's shape matches the routing tree. The only difference is that the routing tree's nodes will be named after the routes and the bundle routing tree's nodes are going to be named after the entry points of the chunks.
 
 Now let's suppose we have the following route declarations:
 
 ```ts
 // React
-// App.tsx
-<Route path="/intro" component={AsyncComponent(() => import('./Main'))} />
-<Route path="/main" component={AsyncComponent(() => import('./Main'))} />
-<Route path="/about" component={AsyncComponent(() => import('./About'))} />
+// app.tsx
+<Route path="/a" component={AsyncComponent(() => import('./com'))} />
+<Route path="/b" component={AsyncComponent(() => import('./com'))} />
+<Route path="/c" component={AsyncComponent(() => import('./c'))} />
 ```
 
 or in Angular:
 
 ```ts
 // Angular
-// app.routing-module.ts
+// app.ts
 export const appRoutes: Routes = [
   {
-    loadChildren: './main/main.module#IntroModule',
-    path: 'intro'
+    loadChildren: './com#A',
+    path: 'a'
   },
   {
-    loadChildren: './main/main.module#MainModule',
-    path: 'main'
+    loadChildren: './com#B',
+    path: 'b'
   },
   {
-    loadChildren: './about/about.module#AboutModule',
-    path: 'about'
+    loadChildren: './c#C',
+    path: 'c'
   }
 ];
 ```
 
 In this case, the routing tree will differ from the bundle routing tree:
 
-- The routing tree will have a single root node called `/` with three children: `/intro`, `/main`, and `/about`.
-- The bundle routing tree will have root node named after the file which contains the routes' definitions (`app.routing-module.ts` for Angular and `App.tsx` for React), and two children (for Angular - `./main/main.module` and `./about/about.module`, and for React - `./Main.tsx` and `./About.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
+- The routing tree will have a single root node called `/` with three children: `/a`, `/b`, and `/c`.
+- The bundle routing tree will have root node named after the file which contains the routes' definitions  (`app.ts` for Angular and `app.tsx` for React), and two children (for Angular - `./com` and `./c`, and for React - `./com.tsx` and `./c.tsx`). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.
+
+<img src="/images/mlx/bundle-routing-tree.svg" style="display: block; margin: auto; margin-top: 45px; margin-bottom: 45px; transform: scale(1.2);">
 
 ## Bundle Page Graph
 
 We already defined the page graph as the navigation graph which we got from given source with aggregated routes (Google Analytics, let's say). If instead of the routes, we get the entry points of their corresponding chunks, we'll get the **bundle page graph**.
 
-Keep in mind that we may not have 1:1 correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we need to combine several nodes from the page graph. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well. The difference is that the weights of the edges going from a given chunk entry point will equal to the sum of the corresponding edges of the merged nodes from the page graph.
+Keep in mind that we may not have one-to-one correspondence between chunk entry point and a route. This is possible in the case when not all the routes are loaded lazily. In such case, we need to combine several nodes from the page graph. If we form the bundle page graph from a weighted page graph, the bundle page graph will be weighted as well. The difference is that the weights of the edges going from a given chunk entry point will equal to the sum of the corresponding edges of the merged nodes from the page graph.
 
 # Technical Details
 
-Alright, now we understand all the mathematics behind the tool and we defined all the concepts. Let's dig into some technical details!
+Now we understand all the mathematics behind the tool and we defined all the concepts. Let's dig into some technical details!
 
 If you look at the [`mlx` monorepo](https://github.com/mgechev/mlx), you will find the following four packages:
 
-- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/ga) - a module which is used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in our application.
-- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
-- [`@mlx/cluster`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/cluster) - a module which performs a clustering algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
-- [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/3ea7b42268308136ce771f0e7c344408cdeff93a/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/cluster` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
+- [`@mlx/ga`](https://github.com/mgechev/mlx/tree/720822fbf92729da0c0df28877838b4e2958fd28/packages/ga) - a module used to fetch structured information from Google Analytics. Keep in mind that the information coming from Google Analytics is not aware of our application parametrized routes, i.e. **we get a navigation graph which we need to translate to a page graph**. `@mlx/ga` can do this automatically for us, if we provide a list of all the paths in the application.
+- [`@mlx/parser`](https://github.com/mgechev/mlx/tree/720822fbf92729da0c0df28877838b4e2958fd28/packages/parser) - a module which extracts the routes of our application, finds the associated chunk entry points of the lazy-loaded routes and builds the routing bundle tree. In other words, once we parse our application with the `@mlx/parser`, we'll get an array with all the routes, their corresponding chunk entry points, and their parent chunk entry points.
+- [`@mlx/cluster`](https://github.com/mgechev/mlx/tree/720822fbf92729da0c0df28877838b4e2958fd28/packages/cluster) - a module which performs a clustering algorithm based on the data from Google Analytics and the bundle routing tree, which we got from `@mlx/parser`.
+- [`@mlx/webpack`](https://github.com/mgechev/mlx/tree/720822fbf92729da0c0df28877838b4e2958fd28/packages/webpack) - a set of webpack plugins which use `@mlx/parser` and `@mlx/cluster` in order to produce data-driven bundle layout for our application, and generate code for data-driven pre-fetching.
 
 Let's first explain how we can use `@mlx/ga` and how it works internally.
 
@@ -653,6 +606,255 @@ The `RuntimePrefetchPlugin` will generate a Markov Chain model based on the gene
 ```
 
 In the example above, we can see that when the user is in page `/a` there's `0.6` probability the bundle `b.js` to be required next, `0.3` probability for the bundle `c.js`, and `0.1` for the bundle `d.js`. Notice also that `RuntimePrefetchPlugin` gets the chunks in a sorted order, based on probability. Another feature of the plugin is that it's going to have a different probability threshold depending on the user's connection speed. For example, if the user has effective speed `4g`, we'll download all chunks which probability is over `0.15`, if the user is with `3g` we will download only chunks with probability over `0.3`.
+
+<style>
+  .current-row td {
+    background-color: #90CAF9 !important;
+  }
+  .diagram-wrapper {
+    display: flex;
+    justify-content: space-around;
+  }
+  .diagram-wrapper section {
+    width: 30%;
+  }
+  @media (max-width: 660px) { 
+    .diagram-wrapper {
+      display: block;
+    }
+    .diagram-wrapper section {
+      width: 100%;
+      height: 120px;
+    }
+  }
+</style>
+<div class="diagram-wrapper">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="350px" height="310px" version="1.1">
+  <defs/>
+<filter id="dropshadow" height="130%">
+  <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+  <feOffset dx="0" dy="0" result="offsetblur"/>
+  <feComponentTransfer>
+    <feFuncA type="linear" slope="0.9"/>
+  </feComponentTransfer>
+  <feMerge> 
+    <feMergeNode/>
+    <feMergeNode in="SourceGraphic"/>
+  </feMerge>
+</filter>
+  <g transform="translate(10,10)">
+    <path d="M 163.24 69.73 L 135.02 101.09" fill="none" stroke="#434678" stroke-width="3" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 129 107.78 L 132.79 99.08 L 137.25 103.09 Z" fill="#434678" stroke="#434678" stroke-width="3" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 218.28 68.28 L 254.76 104.76" fill="none" stroke="#434678" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 260.42 110.42 L 252.88 106.65 L 256.65 102.88 Z" fill="#434678" stroke="#434678" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <ellipse id="root" cx="190" cy="40" rx="40" ry="40" fill="#434678" stroke="10" stroke-color pointer-events="none"/>
+    <g transform="translate(185.5,30.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="8" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 10px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/</div>
+              </div>
+          </foreignObject>
+          <text x="4" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/</text>
+        </switch>
+    </g>
+    <ellipse id="a" cx="40" cy="250" rx="40" ry="40" fill="#2ba57b" stroke="none" pointer-events="none"/>
+    <g transform="translate(20.5,240.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="38" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 38px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/a/a</div>
+              </div>
+          </foreignObject>
+          <text x="19" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/a/a</text>
+        </switch>
+    </g>
+    <path d="M 80.98 175.19 L 68.17 198.49" fill="none" stroke="#2ba57b" stroke-width="6" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 62.39 209.01 L 64.66 196.56 L 71.67 200.42 Z" fill="#2ba57b" stroke="#2ba57b" stroke-width="6" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 140 140 L 233.41 140" fill="none" stroke="#3da47c" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 244.41 140 L 233.41 143.67 L 233.41 136.33 Z" fill="#3da47c" stroke="#3da47c" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 114.54 177.26 L 123.66 200.63" fill="none" stroke="#2ba57b" stroke-width="8" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 128.75 213.67 L 119.31 202.32 L 128.01 198.93 Z" fill="#2ba57b" stroke="#2ba57b" stroke-width="8" stroke-miterlimit="10" pointer-events="none"/>
+    <ellipse id="a-a" cx="100" cy="140" rx="40" ry="40" fill="#2ba57b" stroke="none" pointer-events="none"/>
+    <g transform="translate(90.5,130.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="18" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 20px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/a</div>
+              </div>
+          </foreignObject>
+          <text x="9" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/a</text>
+        </switch>
+    </g>
+    <path d="M 145.46 212.74 L 134.03 183.45" fill="none" stroke="#2ba57b" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 130.03 173.21 L 137.45 182.12 L 130.62 184.79 Z" fill="#2ba57b" stroke="#2ba57b" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <ellipse id="a-b" cx="160" cy="250" rx="40" ry="40" fill="#2ba57b" stroke="none" pointer-events="none"/>
+    <g transform="translate(140.5,240.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="38" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 40px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/a/b</div>
+              </div>
+          </foreignObject>
+          <text x="19" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/a/b</text>
+        </switch>
+    </g>
+    <path d="M 290 180 L 290 193.41" fill="none" stroke="#fc9022" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 290 204.41 L 286.33 193.41 L 293.67 193.41 Z" fill="#fc9022" stroke="#fc9022" stroke-width="5" stroke-miterlimit="10" pointer-events="none"/>
+    <ellipse id="b" cx="290" cy="140" rx="40" ry="40" fill="#fc9022" stroke="none" pointer-events="none"/>
+    <g transform="translate(279.5,130.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="20" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 20px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/b</div>
+              </div>
+          </foreignObject>
+          <text x="10" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/b</text>
+        </switch>
+    </g>
+    <path d="M 255.31 230.08 L 145.3 166.24" fill="none" stroke="#fc9022" stroke-width="3" stroke-miterlimit="10" pointer-events="none"/>
+    <path d="M 137.52 161.72 L 146.81 163.65 L 143.8 168.84 Z" fill="#fc9022" stroke="#fc9022" stroke-width="3" stroke-miterlimit="10" pointer-events="none"/>
+    <ellipse id="b-a" cx="290" cy="250" rx="40" ry="40" fill="#fc9022" stroke="none" pointer-events="none"/>
+    <g transform="translate(270.5,240.5)">
+        <switch>
+          <foreignObject style="overflow:visible;" pointer-events="all" width="38" height="19" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+              <div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; font-size: 18px; font-family: Verdana; color: rgb(255, 255, 255); line-height: 1.2; vertical-align: top; width: 40px; white-space: nowrap; word-wrap: normal; text-align: center;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="display:inline-block;text-align:inherit;text-decoration:inherit;">/b/a</div>
+              </div>
+          </foreignObject>
+          <text x="19" y="19" fill="#FFFFFF" text-anchor="middle" font-size="18px" font-family="Verdana">/b/a</text>
+        </switch>
+    </g>
+  </g>
+</svg>
+<section>
+  <h2>Activity:</h2>
+  <ul id="activity-list">
+  </ul>
+</section>
+</div>
+<table>
+  <tr>
+    <td>
+    </td>
+    <td>
+      <strong>/</strong>
+    </td>
+    <td>
+      <strong>/a</strong>
+    </td>
+    <td>
+      <strong>/a/:id</strong>
+    </td>
+    <td>
+      <strong>/b</strong>
+    </td>
+    <td>
+      <strong>/b/a</strong>
+    </td>
+  </tr>
+  <tr id="root-row">
+    <td>
+      <strong>/</strong>
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0.3
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0.7
+    </td>
+    <td>
+      0
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>/a</strong>
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0.9
+    </td>
+    <td>
+      0.1
+    </td>
+    <td>
+      0
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <strong>/a/:id</strong>
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      1
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+  </tr>
+  <tr id="b-row">
+    <td>
+      <strong>/b</strong>
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      1
+    </td>
+  </tr>
+  <tr id="b-a-row">
+    <td>
+      <strong>/b/a</strong>
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      1
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+    <td>
+      0
+    </td>
+  </tr>
+</table>
+<script src="/assets/js/mlx/prefetch.js"></script>
 
 `RuntimePrefetchPlugin` can be configured with the following options:
 
