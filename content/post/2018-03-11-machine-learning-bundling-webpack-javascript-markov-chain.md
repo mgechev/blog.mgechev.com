@@ -26,7 +26,7 @@ In this article, I'll introduce the early implementation of a few tools which ba
 
 **Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!** The final result is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested together in the same user session.
 
-*I want to thank [Addy Osamani](https://twitter.com/addyosmani) for the review and his feedback of the early drafts of this post and the described tools!*
+*I want to thank [Addy Osmani](https://twitter.com/addyosmani) for the review and his feedback of the early drafts of this post and the described tools!*
 
 <section style="background: #eee; padding: 15px;">
 If you're only interested in the practical applications of the described packages, you can read the "Introduction" and the "Tooling Introduction" sections. In case you want to know more about the implementation details, you can focus on the sections "Definitions" and "Technical Details".
