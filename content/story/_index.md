@@ -17,6 +17,36 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2017</header>
     <section class="timeline-event">
+      <h1>Release of Rhyme.com</h1>
+      <section>
+        <img src="/images/story/rhyme-release.jpg">
+        <p>
+          On ng-conf 2018, during my session "Optimizing an Angular Application", I had the opportunity to share with the world the product that our team has been working on since early 2017.
+        </p>
+        <p>
+          During the conference, another workshop for Bazel by a Google engineer used Rhyme.com in order to let their attendees practice along.
+        </p>
+        <p>
+          In these two sessions, over 250 people were using Rhyme in order to solidify their engineering skills.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
+      <h1>Data-Driven Bundling</h1>
+      <section>
+        <img src="/images/story/ddb.jpg">
+        <p>
+          In March I <a href="https://twitter.com/mgechev/status/976120561070845959">shared</a> my research on topic "Machine Learning-Driven JavaScript Bundling".
+        </p>
+        <p>
+          The article includes an extensive research in the area, a novel approach for achieving data-driven bundling on low level of granularity by using static analysis, and a working prototype with the state of the art Web tooling.
+        </p>
+        <p>
+          The techniques include data-driven pre-fetching and data-driven chunk clustering. A few weeks after I published my article, I had the opportunity to present the research in Oxford, UK during Render 2018.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>"Switching to Angular" got published</h1>
       <section>
         <img src="/images/sta.png">
