@@ -23,7 +23,7 @@ The code for this blog post is available at my [GitHub account](https://github.c
 
 # Why runtime performance
 
-A big issue in the modern single-page applications is reducing the initial load time. This includes reducing the number of bytes transferred over the network and minimizing the number of network requests. Last year I wrote a few articles related to reducing the bundle size (you can find them [here](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/) and [here](http://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)). Although it's always a good idea to invest time in exploring the bundles of our apps in details with tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) and reducing its size, there are a lot of folks working in this direction.
+A big issue in the modern single-page applications is reducing the initial load time. This includes reducing the number of bytes transferred over the network and minimizing the number of network requests. Last year I wrote a few articles related to reducing the bundle size (you can find them [here](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/) and [here](https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)). Although it's always a good idea to invest time in exploring the bundles of our apps in details with tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) and reducing its size, there are a lot of folks working in this direction.
 
 For instance, the Google Closure Compiler team is constantly trying to provide the most optimal minification and dead code elimination, same for the webpack team. On top of that, we have the Angular CLI team who combines the best from both worlds by allowing us to have the most efficient and well encapsulated build possible.
 
@@ -296,7 +296,7 @@ To handle these two issues we can use efficiently implemented immutable data str
 
 ## Introducing Immutable.js
 
-I've written a lot about immutable.js in the past ([here](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/) and [here](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)), so now I'll just make a very brief introduction.
+I've written a lot about immutable.js in the past ([here](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/) and [here](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)), so now I'll just make a very brief introduction.
 
 Immutable.js provides a collection of immutable data structures. All of them have two very important properties:
 

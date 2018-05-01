@@ -13,7 +13,7 @@ title: 2.5X Smaller Angular 2 Applications with Google Closure Compiler
 url: /2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/
 ---
 
-In the post "[Building an Angular 2 Application for Production](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/)" we explored how we can decrease the bundle size of a "Hello world!" application to from about 1.6M (non-minified & uncompressed) to 49K! We did this by using the following techniques:
+In the post "[Building an Angular 2 Application for Production](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/)" we explored how we can decrease the bundle size of a "Hello world!" application to from about 1.6M (non-minified & uncompressed) to 49K! We did this by using the following techniques:
 
 - Angular offline template compiler for generating tree-shakable code.
 - Tree-shaking of ES2015 modules with rollup.
@@ -110,7 +110,7 @@ The code from above is hosted in my [GitHub account](https://github.com/mgechev/
 
 ### Comparison
 
-On the diagram below you can find how the Google Closure Compiler + ngc bundle stays next to the other ones produced by the different bundling strategies explored in the [previous post](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/):
+On the diagram below you can find how the Google Closure Compiler + ngc bundle stays next to the other ones produced by the different bundling strategies explored in the [previous post](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/):
 
 <a href="/images/ng2-build/ngc-closure-compiler-all.png">
   <img src="/images/ng2-build/ngc-closure-compiler-all.png" alt="ngc + Google Closure Compiler bundle comparison" width="500">

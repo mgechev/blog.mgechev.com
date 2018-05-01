@@ -166,7 +166,7 @@ export class PuppyListComponent {
 }
 ```
 
-Now things are getting interesting. Notice that in the class definition we have decorated the `puppyTemplate` property with the `@ContentChild` decorator and we pass `TemplateRef` as its argument. This argument is a selector that Angular will match against the content children of the given component (more about content and view children can be found [here](http://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/)). The type of the `puppyTemplate` property is `TemplateRef<NgForOfContext<Puppy>>` we'll explain this in details in the final section of this article.
+Now things are getting interesting. Notice that in the class definition we have decorated the `puppyTemplate` property with the `@ContentChild` decorator and we pass `TemplateRef` as its argument. This argument is a selector that Angular will match against the content children of the given component (more about content and view children can be found [here](https://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/)). The type of the `puppyTemplate` property is `TemplateRef<NgForOfContext<Puppy>>` we'll explain this in details in the final section of this article.
 
 In short, this means that Angular will get the template reference, that `NgForOf` will use, as content child passed to the `PuppyListComponent` from its parent.
 

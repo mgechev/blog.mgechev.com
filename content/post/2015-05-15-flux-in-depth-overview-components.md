@@ -192,7 +192,7 @@ What we can do is to:
 - Use Immutable.js for our data structures
 - Deep freeze our data items
 
-Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns ([or](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/) [not](https://facebook.github.io/react/docs/advanced-performance.html)) but it will make your debugging experience even easier since your components won't produce any side effects, in case you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
+Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns ([or](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/) [not](https://facebook.github.io/react/docs/advanced-performance.html)) but it will make your debugging experience even easier since your components won't produce any side effects, in case you've already stopped touching the global things! If you're using immutable data you will also make sure you've put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won't find someone trying to take cross cuts by changing the mutable state.
 
 #### Stateful vs Stateless
 

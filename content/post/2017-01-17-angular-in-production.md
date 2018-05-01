@@ -56,7 +56,7 @@ Well, in the end we bet on Angular based on the following reasons:
 
 Although initially we weren't sure which statically typed dialect of JavaScript to use, Angular made the choice obvious and we bet on TypeScript. It's unsoundness was something we weren't really bothered about because it's quite limited and well thought out.
 
-If at this time I wasn't familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write [custom functionality for the Angular's router](http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/). In the end, this is the risk you take when you start using a technology in a beta version. The good thing is that once the framework got stable almost no breaking changes were introduced, although it has a decent API.
+If at this time I wasn't familiar with the codebase of Angular most likely we were going to bet on React. During the implementation of our application we went through a few painful migrations and I had to fork and write [custom functionality for the Angular's router](https://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/). In the end, this is the risk you take when you start using a technology in a beta version. The good thing is that once the framework got stable almost no breaking changes were introduced, although it has a decent API.
 
 # Architecture
 
@@ -74,7 +74,7 @@ class CounterComponent {
 }
 ```
 
-Based on a couple of other constraints, we came up with the **["Scalable Application Architecture"](http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)** that I talked about on a couple of [conferences](https://www.youtube.com/watch?v=gtOPAj9_FSM). Although even now it has some edges that could be polished, the entire team was happy using it. We were able to **scale the application to about 40k SLOC (source line of code)** and didn't experience any issues with state inconsistencies, neither scalability and separation of concerns.
+Based on a couple of other constraints, we came up with the **["Scalable Application Architecture"](https://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)** that I talked about on a couple of [conferences](https://www.youtube.com/watch?v=gtOPAj9_FSM). Although even now it has some edges that could be polished, the entire team was happy using it. We were able to **scale the application to about 40k SLOC (source line of code)** and didn't experience any issues with state inconsistencies, neither scalability and separation of concerns.
 
 The only drawback we experienced was that the architecture was a bit too verbose (for state change you need to define an action, action creator a model method, eventually store property). However, I'm not sure being explicit to this level is a bad thing.
 
@@ -288,7 +288,7 @@ Although we experienced some issues with runtime performance, it wasn't a big co
 
 Our initial production build process was to rsync the `dist/prod` directory produced by [Angular Seed](https://github.com/mgechev/angular-seed) to the remote server. Although it was simple, it was far from optimal. nginx was using gzip to provide compressed content to the end users but our gzipped bundle size was still about 800k.
 
-Later we migrated the application to RC.5 to took advantage of the **[Ahead-of-Time compilation](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/). This increased our bundle size** even further - now it was close to 1M. Loading the bundle was not the only problem. On low-end devices it's parsing was taking up to a few seconds.
+Later we migrated the application to RC.5 to took advantage of the **[Ahead-of-Time compilation](https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/). This increased our bundle size** even further - now it was close to 1M. Loading the bundle was not the only problem. On low-end devices it's parsing was taking up to a few seconds.
 
 *In fact, although you're able to get rid of the compiler, AoT can increases your bundle size. What AoT does is to generate code for your templates and DI, so if you have a lot of components the JavaScript generated for the templates may exceed the size of the compiler.*
 
@@ -298,7 +298,7 @@ We took advantage of techniques such as:
 - Minification.
 - Tree-shaking.
 
-And later I blogged about this in ["Building an Angular 2 Application for Production"](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/).
+And later I blogged about this in ["Building an Angular 2 Application for Production"](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/).
 
 
 Although we applied everything from the list we still didn't have satisfying results.
@@ -329,7 +329,7 @@ One of the bundles we built represents the intro screen of the application (whic
 
 <img src="/images/ng-prod/bundles.png" alt="Bundles relation" style="display: block; margin: auto;">
 
-In the prefetch scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
+In the prefetch scenario, we wanted to download the specific set of bundles required by the selected page once the user loads the application and after that prefetch the other bundles. We used similar strategy in the previous version of the application for [prefetching templates](https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/).
 
 Luckily, **Angular provides a solution for prefetching of lazy-loaded modules out of the box**. All we had to do was:
 
@@ -381,7 +381,7 @@ The best thing about the "interactive App Shell" is that it doesn't change often
 
 ## Ahead-of-Time compilation
 
-This optimization is more related to improvements of the runtime performance, however, I'll explain it here because using the static application we can clearly illustrate the performance boost we get. If you're not familiar with the Ahead-of-Time compilation in Angular, you can take a look at [this post](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/).
+This optimization is more related to improvements of the runtime performance, however, I'll explain it here because using the static application we can clearly illustrate the performance boost we get. If you're not familiar with the Ahead-of-Time compilation in Angular, you can take a look at [this post](https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/).
 
 As I mentioned above, once Angular RC5 was released, we migrated the application and introduced AoT compilation as part of the build process. In short, the core benefits of AoT compilation are:
 
@@ -440,9 +440,9 @@ Using Web Workers also sound quite tempting. Unfortunately, at the time of writi
 
 # Resources
 
-1. [Ahead-of-Time compilation in Angular](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/)
-2. [Building an Angular Application for Production](http://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/)
-3. [Scalable Single-Page Application Architecture](http://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)
+1. [Ahead-of-Time compilation in Angular](https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/)
+2. [Building an Angular Application for Production](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/)
+3. [Scalable Single-Page Application Architecture](https://blog.mgechev.com/2016/04/10/scalable-javascript-single-page-app-angular2-application-architecture/)
 4. [Angular Seed](https://github.com/mgechev/angular-seed)
 5. [An Overview of SVG Sprite Creation Techniques](https://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/)
 6. [Angular Mobile Toolkit](https://github.com/angular/mobile-toolkit)
@@ -451,5 +451,5 @@ Using Web Workers also sound quite tempting. Unfortunately, at the time of writi
 9. [ngrx](https://github.com/ngrx)
 10. [immutable.js](https://facebook.github.io/immutable-js/)
 11. [Angular 2 RC5 - NgModules, Lazy Loading and AoT compilation](https://angularjs.blogspot.com/2016/08/angular-2-rc5-ngmodules-lazy-loading.html)
-12. [Implementing the Missing "resolve" Feature of the Angular 2 Router](http://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/)
+12. [Implementing the Missing "resolve" Feature of the Angular 2 Router](https://blog.mgechev.com/2016/05/21/angular2-router-implementing-missing-resolve-feature-deprecated-defer/)
 

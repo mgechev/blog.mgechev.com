@@ -97,7 +97,7 @@ In the sample application above, loading a couple of files more is not such a bi
 
 ### Lazy Loading
 
-The practice of lazy loading is quite common in web development. We lazy load [assets](https://css-tricks.com/snippets/javascript/lazy-loading-images/), [partials](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/), basically whatever we need in order to speedup our load time and we load it on demand!
+The practice of lazy loading is quite common in web development. We lazy load [assets](https://css-tricks.com/snippets/javascript/lazy-loading-images/), [partials](https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/), basically whatever we need in order to speedup our load time and we load it on demand!
 
 #### The Problem
 

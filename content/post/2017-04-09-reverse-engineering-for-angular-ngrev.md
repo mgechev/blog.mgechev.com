@@ -34,7 +34,7 @@ Now let's suppose that the runtime performance of our application suffers. Clust
 
 # Introducing ngrev
 
-For a while, I've been doing [static code analysis](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/) for Angular apps. My purpose for the last a couple of months was style checking with [codelyzer](https://github.com/mgechev/codelyzer). A few weeks ago, I decided to reuse some of the modules I already built and developed a project which provides visualization and navigation through the structure of a project.
+For a while, I've been doing [static code analysis](https://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/) for Angular apps. My purpose for the last a couple of months was style checking with [codelyzer](https://github.com/mgechev/codelyzer). A few weeks ago, I decided to reuse some of the modules I already built and developed a project which provides visualization and navigation through the structure of a project.
 
 This is how ended up developing [ngrev](https://github.com/mgechev/ngrev). [ngrev](https://github.com/mgechev/ngrev) is an Electron application which uses the tooling I built around codelyzer on top of the Angular compiler. In case your application is compatible with Angular's Ahead-of-Time compiler [ngast](https://github.com/mgechev/ngast) can parse your entire codebase and return an abstract representation of it. Later, [ngrev](https://github.com/mgechev/ngrev) will render this abstract representation onto the screen, letting you to navigate between the different levels of abstraction of your project. This can be on level modules, providers, components, templates, etc.
 

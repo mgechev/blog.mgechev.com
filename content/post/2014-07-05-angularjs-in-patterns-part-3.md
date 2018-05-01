@@ -28,8 +28,8 @@ url: /2014/07/05/angularjs-in-patterns-part-3/
 This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
 </blockquote>
 
-[Link](http://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/) to the first part of the series.
-[Link](http://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/) to the second part of the series.
+[Link](https://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/) to the first part of the series.
+[Link](https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/) to the second part of the series.
 
 This is the last blog post of the series "AngularJS in Patterns". You can find the original GitHub repository, which contains all the information at [github.com/mgechev/angularjs-in-patterns](https://github.com/mgechev/angularjs-in-patterns). If you want to be aware of my up-coming work, you can follow me at [github.com/mgechev](https://github.com/mgechev).
 

@@ -68,7 +68,7 @@ We talked about grouping chunks (i.e. **chunk clustering**). Now let's discuss p
 
 ## Chunk Pre-Fetching
 
-A few years ago I posted [an article](http://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/)<sup>[6]</sup> on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can set priorities much more accurately.
+A few years ago I posted [an article](https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/)<sup>[6]</sup> on how we can consider our page as a state machine. Based on the transitions that the user performs while navigating in this state machine, we can decide which pages are likely to be visited next, so we can pre-fetch them. In my article, the priorities of the pages were arbitrary, based on my subjective judgment. Fortunately, with tools such as Google Analytics, we can set priorities much more accurately.
 
 With this in mind, I decided to go one step further and based on an existing report, to **develop a machine learning model for chunk pre-fetching**. My idea was validated, got more accurate, and polished after going through the summary article for [predictive fetching](https://github.com/addyosmani/predictive-fetching)<sup>[7]</sup>
 

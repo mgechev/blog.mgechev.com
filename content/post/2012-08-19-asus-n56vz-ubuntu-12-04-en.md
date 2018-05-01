@@ -12,7 +12,7 @@ title: Asus N56VZ + Ubuntu 12.04 (en)
 url: /2012/08/19/asus-n56vz-ubuntu-12-04-en/
 ---
 
-[<img class="alignright size-medium wp-image-156" title="Asus N56VZ + Ubuntu 12.04" src="/images/legacy/uploads2012/08/UNSET1-300x225.jpg" alt="" width="300" height="225" />][1]It seems that it’s common a problem to setup Ubuntu on the new Asus N56VZ so I decided to create an English version of <a href="http://blog.mgechev.com/2012/07/22/asus-n56vz-ubuntu-12-04/" target="_blank">my post</a>.  
+[<img class="alignright size-medium wp-image-156" title="Asus N56VZ + Ubuntu 12.04" src="/images/legacy/uploads2012/08/UNSET1-300x225.jpg" alt="" width="300" height="225" />][1]It seems that it’s common a problem to setup Ubuntu on the new Asus N56VZ so I decided to create an English version of <a href="https://blog.mgechev.com/2012/07/22/asus-n56vz-ubuntu-12-04/" target="_blank">my post</a>.  
 I was struggling with three issues about two weeks. Here are they:
 
 1.  Multimedia buttons (Fn+F*)

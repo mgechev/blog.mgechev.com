@@ -18,7 +18,7 @@ title: Boost the Performance of an AngularJS Application Using Immutable Data - 
 url: /2015/04/11/immutability-in-angularjs-immutablejs-part-2/
 ---
 
-A few weeks ago I posted the article ["Boost the Performance of an AngularJS Application Using Immutable Data"](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/). It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from `O(n)` to `O(1)`.
+A few weeks ago I posted the article ["Boost the Performance of an AngularJS Application Using Immutable Data"](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/). It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from `O(n)` to `O(1)`.
 
 In the post I did simple profiling using the built-in `Date` but it didn't give enough information in exactly which cases it is more suitable to use immutable data and when you should bet on the standard collections. It also didn't include any information about the garbage collection, although we know that using immutable collections will eventually lead to highly intensive memory management. All the code for the benchmarks and the charts [generation is available in my GitHub account](https://github.com/mgechev/benchpress-angularjs-immutable).
 
@@ -302,7 +302,7 @@ After 20 bindings the running time of the script using standard array gets crazy
 This metric indicates the time required for garbage collection. I'm exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection time during her experience using our application.
 It is interesting that the information we got from the benchmarks doesn't imply any significant advantage of the standard array compared to the immutable list.
 
-I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you're welcome to drop a line as a comment or reach me over e-mail (take a look at the [About](http://blog.mgechev.com/about/) section above).
+I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you're welcome to drop a line as a comment or reach me over e-mail (take a look at the [About](https://blog.mgechev.com/about/) section above).
 
 #### 5 entries
 
@@ -326,7 +326,7 @@ I will not provide further explanation for the following sections because I thin
 
 ## Conclusion
 
-Some of the ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the [two parts of this blog post on using immutable data with AngularJS](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/), immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I'd recommend usage of standard arrays.
+Some of the ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the [two parts of this blog post on using immutable data with AngularJS](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/), immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I'd recommend usage of standard arrays.
 
 The immutable data helps us speedup the watchers from `O(n)` (looping over the whole data structure) to `O(1)` (comparing only references, since on change a new immutable data structure will be created) but it also has its drawbacks:
 
@@ -337,7 +337,7 @@ But can't we build something, which takes the best of both worlds? Can't we buil
 
 ## Parts of the series:
 
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
-- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
 

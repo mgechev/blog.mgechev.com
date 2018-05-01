@@ -33,7 +33,7 @@ We can achieve this simplification by:
 
 This is what I did in my "Lightweight AngularJS" implementation, which is [hosted on GitHub](https://github.com/mgechev/light-angularjs). The code is **only with educational purpose and should not be used in production** otherwise a kitty somewhere will suffer. I used this method of explaining AngularJS in classes I taught at [HackBulgaria](http://hackbulgaria.com) and [Sofia University](http://fmi.uni-sofia.bg/en). You can also find slides from my talk "Lightweight AngularJS" in the bottom of the blog post.
 
-Before reading the rest of the article I strongly recommend you first to get familiar with the basics of AngularJS. A good start could be this [short overview of AngularJS](http://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/).
+Before reading the rest of the article I strongly recommend you first to get familiar with the basics of AngularJS. A good start could be this [short overview of AngularJS](https://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/).
 
 Here are some links with code snippets/demos for the following article:
 

@@ -427,6 +427,6 @@ In general, the AoT compilation is a good technique which is already integrated 
 ## References
 
 - [Inline Caches](http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html)
-- [2.5X Smaller Angular 2 Applications with Google Closure Compiler](http://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)
+- [2.5X Smaller Angular 2 Applications with Google Closure Compiler](https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)
 - [Who Killed My Battery: Analyzing Mobile Browser Energy Consumption](https://crypto.stanford.edu/~dabo/pubs/abstracts/browserpower.html)
 - [Angular's Source Code](https://github.com/angular/angular)

@@ -40,7 +40,7 @@ Angular uses **dirty-checking mechanism** in order to detect changes in the temp
 
 The snippet above will produce an unordered list of items. The list can change if the `items` collection we're iterating over changes. Once Angular has to render the template above for first time it'll simply get the `items` property from the controller of the component associated with this template and render the list items.
 
-After that, **on special events Angular will check whether the value of `items` property has changed**. What are these special events? Well, basically almost any asynchronous event which happens in the browser. In fact, by default the framework is going to check if any of the bindings in any of the templates in any of the instances of any of the components in our application has changed. Although this sounds slow it's not because of the numerous optimizations that Angular performs. Although that's an interesting topic, it's part of another discussion. Check [this article](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/) for more details.
+After that, **on special events Angular will check whether the value of `items` property has changed**. What are these special events? Well, basically almost any asynchronous event which happens in the browser. In fact, by default the framework is going to check if any of the bindings in any of the templates in any of the instances of any of the components in our application has changed. Although this sounds slow it's not because of the numerous optimizations that Angular performs. Although that's an interesting topic, it's part of another discussion. Check [this article](https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/) for more details.
 
 In short, **by default, after each task from the queue, Angular is going to perform dirty checking, i.e. check whether the value of any of the expressions in the templates has changed and update the view**.
 
@@ -431,6 +431,6 @@ Finally, we looked at benchmarks which show the performance boost we got from th
 - ["Purely Fast" benchmarks](https://github.com/mgechev/purely-fast-benchmarks)
 - [Persistent data structures](https://en.wikipedia.org/wiki/Persistent_data_structure)
 - [Immutable.js](https://facebook.github.io/immutable-js/)
-- [Ahead-of-Time compilation in Angular](http://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/)
+- [Ahead-of-Time compilation in Angular](https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/)
 - [Iterators and Generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators)
 - [Single-Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle)

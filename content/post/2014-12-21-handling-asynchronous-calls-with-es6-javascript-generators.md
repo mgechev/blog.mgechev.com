@@ -29,7 +29,7 @@ The code from the demo is at my [GitHub](https://github.com/mgechev/generators-a
 
 You must be familiar with how JavaScript promises work. You can read this amazing [HTML5 rocks article](http://www.html5rocks.com/en/tutorials/es6/promises/) about them and take a look at my [Light Q implementation](https://github.com/mgechev/light-q) for the underlaying details.
 
-You should be also familiar with how generators work. For some initial, quick background I can recommend you ["Binary Tree iterator with ES6 generators"](http://blog.mgechev.com/2014/09/11/binary-tree-iterator-with-es6-generators/).
+You should be also familiar with how generators work. For some initial, quick background I can recommend you ["Binary Tree iterator with ES6 generators"](https://blog.mgechev.com/2014/09/11/binary-tree-iterator-with-es6-generators/).
 
 ## Getting started
 

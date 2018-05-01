@@ -342,7 +342,7 @@ This way the `log` method will be called only before the invocation of methods w
 
 The aspect-oriented paradigm is extremely powerful. With `aspect.js` we can achieve the effect of any of the decorators listed above...and do much more!
 
-You can find more about AOP [here](http://blog.mgechev.com/2015/07/29/aspect-oriented-programming-javascript-aop-js/).
+You can find more about AOP [here](https://blog.mgechev.com/2015/07/29/aspect-oriented-programming-javascript-aop-js/).
 
 ### How to use?
 
@@ -405,7 +405,7 @@ Also, keep in mind that at the moment both snippets can be compiled only with Ty
 
 ### How to use?
 
-Just install [`injection-js`](https://npmjs.com/package/injection-js). For further instructions on how to use the DI in your Vue, React, Node.js application you can just [follow the Angular documentation](https://angular.io/guide/dependency-injection-pattern). Also, here's how I introduced `injection-js` support in my React app, [sometime back](http://blog.mgechev.com/2017/01/30/implementing-dependency-injection-react-angular-element-injectors/).
+Just install [`injection-js`](https://npmjs.com/package/injection-js). For further instructions on how to use the DI in your Vue, React, Node.js application you can just [follow the Angular documentation](https://angular.io/guide/dependency-injection-pattern). Also, here's how I introduced `injection-js` support in my React app, [sometime back](https://blog.mgechev.com/2017/01/30/implementing-dependency-injection-react-angular-element-injectors/).
 
 ## Conclusion
 

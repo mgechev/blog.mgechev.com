@@ -17,14 +17,14 @@ url: /2016/02/29/static-code-analysis-angular-typescript/
 
 So far, most of the blog posts I've written are tutorials; they explain how we can use given technologies, architectures, algorithm etc. For instance:
 
-- [Flux in Depth. Store and Network Communication.](http://blog.mgechev.com/2015/07/18/flux-in-depth-store-network-communication-services)
-- [ViewChildren and ContentChildren in Angular 2](http://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders)
-- [Build Your own Simplified AngularJS in 200 Lines of JavaScript](http://blog.mgechev.com/2015/03/09/build-learn-your-own-light-lightweight-angularjs)
-- [Remote Desktop Client with AngularJS and Yeoman](http://blog.mgechev.com/2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/)
+- [Flux in Depth. Store and Network Communication.](https://blog.mgechev.com/2015/07/18/flux-in-depth-store-network-communication-services)
+- [ViewChildren and ContentChildren in Angular 2](https://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders)
+- [Build Your own Simplified AngularJS in 200 Lines of JavaScript](https://blog.mgechev.com/2015/03/09/build-learn-your-own-light-lightweight-angularjs)
+- [Remote Desktop Client with AngularJS and Yeoman](https://blog.mgechev.com/2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/)
 
 *The code for the current research could be found [here](https://github.com/mgechev/ng2lint/tree/master) and [here](https://github.com/mgechev/ng2lint/tree/advanced).*
 
-The current post is about an exciting project I am working on in my spare time. A few days ago I [explained my motivation](http://blog.mgechev.com/2016/02/18/angular2-style-guide-best-practices-lint-tslint) behind the ["Community-drive Style Guide" for Angular 2](https://github.com/mgechev/angular2-style-guide) that we're working on. I also mentioned that I am planning to build a configurable static-code analyzer, which makes sure given project follows best practices and contains "correct" Angular 2 code. I called this project [`ng2lint`](https://github.com/mgechev/ng2lint).
+The current post is about an exciting project I am working on in my spare time. A few days ago I [explained my motivation](https://blog.mgechev.com/2016/02/18/angular2-style-guide-best-practices-lint-tslint) behind the ["Community-drive Style Guide" for Angular 2](https://github.com/mgechev/angular2-style-guide) that we're working on. I also mentioned that I am planning to build a configurable static-code analyzer, which makes sure given project follows best practices and contains "correct" Angular 2 code. I called this project [`ng2lint`](https://github.com/mgechev/ng2lint).
 
 In this article I will explain the main goals of the project, as well as its core challenges and possible solutions. I will also show my current progress. Lets start with the main goals:
 

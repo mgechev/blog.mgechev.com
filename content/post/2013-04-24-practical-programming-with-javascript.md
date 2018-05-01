@@ -20,7 +20,7 @@ title: Practical programming with JavaScript
 url: /2013/04/24/practical-programming-with-javascript/
 ---
 
-Before few months I was invited by Telerik Academy to make a talk about JavaScript. Last Monday Marian Kostadinov, Radoslav Georgiev and me made a whole seminar about the topic. I’m addicted to the Object-Oriented programming so I choose to talk about that. You can find my slides at <a href="http://blog.mgechev.com/slides/javascript-patterns" target="_blank">http://blog.mgechev.com/slides/javascript-patterns</a> and a video (in Bulgarian) below in the post:
+Before few months I was invited by Telerik Academy to make a talk about JavaScript. Last Monday Marian Kostadinov, Radoslav Georgiev and me made a whole seminar about the topic. I’m addicted to the Object-Oriented programming so I choose to talk about that. You can find my slides at <a href="https://blog.mgechev.com/slides/javascript-patterns" target="_blank">https://blog.mgechev.com/slides/javascript-patterns</a> and a video (in Bulgarian) below in the post:
 
 
 

@@ -28,7 +28,7 @@ url: /2014/06/08/angularjs-in-patterns-part-2-services/
 This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
 </blockquote>
 
-[Link](http://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/) to the first part of the series.
+[Link](https://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/) to the first part of the series.
 
 This blog post continues the series "AngularJS in Patterns". You can find the original GitHub repository, which contains all the information at [github.com/mgechev/angularjs-in-patterns](https://github.com/mgechev/angularjs-in-patterns). If you like my work you can follow me at [github.com/mgechev](https://github.com/mgechev).
 
@@ -354,7 +354,7 @@ User.get({ userid: userid });
 
 The code above will immediately return an empty object and keep reference to it. Once the response has been successfully returned and parsed, AngularJS will populate this object with the received data (see [proxy](#proxy)).
 
-You can find more details for `$resource` [The magic of $resource](http://blog.mgechev.com/2014/02/05/angularjs-resource-active-record-http/) and [AngularJS' documentation](https://docs.angularjs.org/api/ngResource/service/$resource).
+You can find more details for `$resource` [The magic of $resource](https://blog.mgechev.com/2014/02/05/angularjs-resource-active-record-http/) and [AngularJS' documentation](https://docs.angularjs.org/api/ngResource/service/$resource).
 
 Since Martin Fowler states that
 

@@ -15,9 +15,9 @@ title: Implementing a Simple Compiler on 25 Lines of JavaScript
 url: /2017/09/16/developing-simple-interpreter-transpiler-compiler-tutorial/
 ---
 
-I already wrote a couple of essays related to the development of programming languages that I was extremely excited about! For instance, in "[Static Code Analysis of Angular 2 and TypeScript Projects](http://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/)"<sup>[1]</sup> I explored the basics of the front end of the compilers, explaining the phases of lexical analysis, syntax analysis and abstract-syntax trees.
+I already wrote a couple of essays related to the development of programming languages that I was extremely excited about! For instance, in "[Static Code Analysis of Angular 2 and TypeScript Projects](https://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/)"<sup>[1]</sup> I explored the basics of the front end of the compilers, explaining the phases of lexical analysis, syntax analysis and abstract-syntax trees.
 
-Recently I published "[Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)"<sup>[2]</sup>. This post shown a simple, statically typed, functional programming language inspired by lambda calculus. There I outsourced the front end part of the compiler development to a parser generator and focused on the back end in the faces of a module for type checking and one for code generation.
+Recently I published "[Developing Statically Typed Programming Language](https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)"<sup>[2]</sup>. This post shown a simple, statically typed, functional programming language inspired by lambda calculus. There I outsourced the front end part of the compiler development to a parser generator and focused on the back end in the faces of a module for type checking and one for code generation.
 
 # Why do I need this?
 
@@ -391,7 +391,7 @@ This article explained in details the development of a very simple compiler (or 
 
 If you're interested in further reading, I'd recommend:
 
-- [Developing Statically Typed Programming Language](http://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)
+- [Developing Statically Typed Programming Language](https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/)
 - [Let’s Build A Simple Interpreter](https://ruslanspivak.com/lsbasi-part1/)
 - [Compilers: Principles, Techniques, and Tools (2nd Edition) 2nd Edition](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
 - [Types and Programming Languages](https://www.amazon.com/Types-Programming-Languages-MIT-Press/dp/0262162091)

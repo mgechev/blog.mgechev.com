@@ -17,7 +17,7 @@ url: /2015/03/02/immutability-in-angularjs-immutablejs/
 
 I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn't really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.
 
-Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic ["Functional programming with JavaScript"](http://blog.mgechev.com/2013/01/21/functional-programming-with-javascript/).
+Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic ["Functional programming with JavaScript"](https://blog.mgechev.com/2013/01/21/functional-programming-with-javascript/).
 
 Last couple of years I had the hard task to write a complex UI. A lot of user inputs, which can change the model from different places and potentially lead to inconsistent state of the application, a lot of bugs, which are hard to debug and find. Later ReactJS was released and I noticed the concept of the ["pure functions"](https://en.wikipedia.org/wiki/Pure_function) in their UI components. A react component gets rendered the same way when it receives the same input parameters and it has the same state (if you implement it properly). React even provides the [PureRenderMixin](https://facebook.github.io/react/docs/pure-render-mixin.html), which can make the "pure component" rendering even faster!
 
@@ -503,7 +503,7 @@ In the package [`angular-immutable`](https://github.com/mgechev/angular-immutabl
 
 ## Parts of the series:
 
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
-- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
 

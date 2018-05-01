@@ -18,8 +18,8 @@ url: /2015/04/20/fast-angular-data-structures-versionable/
 ---
 
 This is the last post of the series "Boost the Performance of an AngularJS Application Using Immutable Data". I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:
-- [Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Part 1](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
 
 ## Introduction
 
@@ -32,7 +32,7 @@ So far so good, but creation of a new data structure will have two major perform
 - Copying the initial collection and making the change, before "freezing it".
 - <strike>More work for the garbage collector.</strike>
 
-In "[Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)"we saw that the second point is not such a big concern but copying the entire data structure slows us down significantly.
+In "[Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)"we saw that the second point is not such a big concern but copying the entire data structure slows us down significantly.
 
 The data structure described in this blog post could be [found at my GitHub profile](https://github.com/mgechev/versionable-collections), it does further optimizations for even faster collection data bindings..
 
@@ -237,8 +237,8 @@ As I suggested in the previous blog post, before performing any of the optimizat
 
 ## References
 
-- [Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Part 1](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
 - [VersionableCollection](https://github.com/mgechev/versionable-collections)
 - [Persistent Data Structures](https://en.wikipedia.org/wiki/Persistent_data_structure)
 - [AngularJS' watchCollection interceptor](https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L563-L641)
@@ -248,7 +248,7 @@ As I suggested in the previous blog post, before performing any of the optimizat
 
 ## Parts of the series:
 
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](http://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
-- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](http://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
-- [Even Faster AngularJS Data Structures](http://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 1](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/)
+- [Boost the Performance of an AngularJS Application Using Immutable Data - Part 2](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)
+- [Even Faster AngularJS Data Structures](https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/)
 

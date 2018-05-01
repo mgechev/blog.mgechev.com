@@ -19,7 +19,7 @@ title: Flux in Depth. Store and Network Communication.
 url: /2015/07/18/flux-in-depth-store-network-communication-services/
 ---
 
-This is the second, and probably be the last, blog post of the series "Flux in Depth". In [the first post](http://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/) we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we're going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn't define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.
+This is the second, and probably be the last, blog post of the series "Flux in Depth". In [the first post](https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/) we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we're going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn't define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.
 
 ## Store
 
@@ -85,7 +85,7 @@ The tree on the left-hand side is the store, which serialized into JSON looks th
 }
 ```
 
-The tree on the right-hand side is the component tree. We already described the component trees in the [previous part](http://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/). Here is a snippet, which shows the relation between the `Chat` store and the `ChatBox` component:
+The tree on the right-hand side is the component tree. We already described the component trees in the [previous part](https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/). Here is a snippet, which shows the relation between the `Chat` store and the `ChatBox` component:
 
 ```javascript
 import React from 'react';
