@@ -39,7 +39,7 @@ In the meantime, I talked to [Addy Osmani](https://twitter.com/addyosmani) who t
 
 Guess.js is a collection of libraries & tools for enabling data-driven user-experience on the web.
 
-<img src="/images/intro-guess-js/guess.png" alt="Logo of Guess.js" style="width: 350px; display: block; margin: auto">
+<img src="/static/images/intro-guess-js/guess.png" alt="Logo of Guess.js" style="width: 350px; display: block; margin: auto">
 
 With Guess.js we want to explore the application of data-analytics driven approach to user experience in:
 
@@ -77,7 +77,7 @@ GuessPlugin({ GA: 'GA_VIEW_ID' })
 
 The end result will look like:
 
-<img src="/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" style="display: block; margin: auto">
+<img src="/static/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" style="display: block; margin: auto">
 
 During the build process the `GuessPlugin` will fetch report from Google Analytics, build a model used for predictive pre-fetching and add a small runtime to the main bundle of your application.
 
@@ -105,7 +105,7 @@ This approach is very powerful and often provides instantaneous user experience.
 
 Together with [Kyle Mathews](https://github.com/KyleAMathews) we collaborated to introduce [Guess.js plugin to Gatsby](https://github.com/guess-js/gatsby-guess). The Gatsby plugin uses lower-level APIs of Guess.js which we're going to take a look at later in this article.
 
-<img src="/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" style="display: block; margin: auto">
+<img src="/static/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" style="display: block; margin: auto">
 
 On the image above, all the visible links in the viewport are highlighted. Depending on the probability the user to visit any of them, they are colored in:
 
