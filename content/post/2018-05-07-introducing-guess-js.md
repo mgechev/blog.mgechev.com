@@ -1,0 +1,188 @@
+---
+author: minko_gechev
+categories:
+- JavaScript
+- React
+- Angular
+- Tooling
+- Webpack
+- Machine Learning
+- Guess.js
+date: 2018-05-06T00:00:00Z
+draft: true
+tags:
+- JavaScript
+- React
+- Angular
+- Tooling
+- Webpack
+- Machine Learning
+- Guess.js
+title: Introducing Guess.js
+url: /2018/05/07/introducing-guess-js
+---
+
+About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/) on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/) in Oxford, UK. You can find the video below:
+
+<div style="margin-top: 20px; margin-bottom: 20px; margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/L5tPWCB7jX0" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+
+The original goal of the article was to show **how data can help in improving the user-perceived page load performance**. There are two main techniques that I explained:
+
+- **Data-driven bundling**. All routes are loaded lazily by default. Based on data from Google Analytics, the bundler figures out how to combine chunks which are likely to be needed together (for example, in nested routes).
+- **Data-driven pre-fetching**. While the user navigates in the application, a small runtime determines which bundles are likely to be visited next based on a [model](https://en.wikipedia.org/wiki/Predictive_analytics) generated at build-time. The bundles with highest score are pre-fetched using `<link rel="prefetch">`.
+
+Some of the artifacts that I developed as part of the original article were published as scoped `@mlx/*` packages.
+
+In the meantime, I talked to [Addy Osmani](https://twitter.com/addyosmani) who turned out to be exploring data-drive approach for predictive [pre-fetching of web pages](https://github.com/addyosmani/predictive-fetching). After a few conversations we saw that there's a big intersection between what we were doing so we decided to merge everything under the hat of [Guess.js](https://github.com/guess-js)!
+
+# Introducing Guess.js
+
+Guess.js is a collection of libraries & tools for enabling data-driven user-experience on the web.
+
+<img src="/images/intro-guess-js/guess.png" alt="Logo of Guess.js" style="width: 350px; display: block; margin: auto">
+
+With Guess.js we want to explore the application of data-analytics driven approach to user experience in:
+
+- Single-page applications
+- Framework-based static sites
+- Static content sites
+- Enterprise sites
+
+## Single-Page Applications
+
+The SPA support of Guess.js is currently in **alpha** and can be tested with the following technologies:
+
+- Angular projects using either Angular CLI or custom layout with the cost of extra configuration
+- React projects using either [create-react-app](https://github.com/facebook/create-react-app) or custom layout with the cost of extra configuration. Because of the fragmented mechanism for creating multi-route React application, currently, Guess.js supports only JSX or TSX with [restricted syntax constructs for route definition](https://github.com/guess-js/guess/tree/master/packages/parser#react)
+
+Our goal with Guess.js is to minimize your bundle layout configuration, make it data-driven, and much more accurate! In the end, you should lazy load to all your routes and Guess.js will figure out which bundles to be combined together and what pre-fetching mechanism to be used! All this in less than 5 minutes setup time.
+
+In order to help everyone to apply data-driven approach to their tooling, we developed the `GuessPlugin` for webpack! Although the techniques explained in "Machine Learning-Driven Bundling. The Future of JavaScript Tooling" are tooling agnostic, webpack is a good starting point which will let a lot of people make their applications load faster & smarter.
+
+In order to use data-driven pre-fetching in your Angular CLI or Create React App project you should first install `guess-webpack`:
+
+```bash
+npm i guess-webpack --save-dev
+```
+
+...and after that add the following two lines of code to your webpack configuration:
+
+```javascript
+const { GuessPlugin } = require('guess-webpack');
+
+// Add the GuessPlugin in the end of your
+// webpack plugin configuration
+GuessPlugin({ GA: 'GA_VIEW_ID' })
+```
+
+The end result will look like:
+
+<img src="/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" style="display: block; margin: auto">
+
+During the build process the `GuessPlugin` will fetch report from Google Analytics, build a model used for predictive pre-fetching and add a small runtime to the main bundle of your application.
+
+On route change, the runtime will ask the generated model which are the pages that are likely to be visited next and pre-fetch the associated with them JavaScript bundles.
+
+How many pages will pre-fetched depends on the user's network speed. On slow 2G network we're going to pre-fetch less bundles compared to fast LTE.
+
+### Notes
+
+Keep in mind that the tool is still in alpha. We'd love to get feedback and/or contributions from you in the [Guess.js monorepo](https://github.com/guess-js/guess).
+
+Also acknowledge the following points:
+
+- You will need to eject your application in order to be able to edit your webpack config file in both Angular CLI and Create React App
+- In case you're using Angular CLI version 6 you may need to downgrade to version 1.7 because currently Angular CLI does not allow ejection
+- In React you need to make sure you're following the currently [supported route definition syntax](https://github.com/guess-js/guess/tree/master/packages/parser#react)
+
+In case you want to get faimilar with the internals of the Guess.js webpack plugin, you can take a look at the article "[Machine Learning-Driven Bundling. The Future of JavaScript Tooling](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/)"
+
+## Framework-based static sites
+
+The brilliant static site generator [Gatsby](https://www.gatsbyjs.org/) uses a smart pre-fetching strategy where it considers all the local links on the current page. Based on their visibility in the viewport, Gatsby pre-fetches their content.
+
+This approach is very powerful and often provides instantaneous user experience. In order to reduce the over-fetching, the next step to improve the current algorithm is to look at data and consider only the links which are most likely to be visited next!
+
+Together with [Kyle Mathews](https://github.com/KyleAMathews) we collaborated to introduce [Guess.js plugin to Gatsby](https://github.com/guess-js/gatsby-guess). The Gatsby plugin uses lower-level APIs of Guess.js which we're going to take a look at later in this article.
+
+<img src="/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" style="display: block; margin: auto">
+
+On the image above, all the visible links in the viewport are highlighted. Depending on the probability the user to visit any of them, they are colored in:
+
+- <span style="background-color: #FEA19B; width: 15px; height: 15px; display: inline-block; position: relative; top: 2px;"></span> high probability
+- <span style="background-color: #EDCAFE; width: 15px; height: 15px; display: inline-block; position: relative; top: 2px;"></span> mild probability
+- <span style="background-color: #A2FEFF; width: 15px; height: 15px; display: inline-block; position: relative; top: 2px;"></span> low probability
+
+Gatsby's Guess plugin can reduce the amount of pre-fetch operations by considering the likelihood given link to be requested by the user. This can reduce the bandwidth consumption on devices using mobile data dramatically.
+
+## Static content sites
+
+Together with [Addy](https://github.com/addyosmani) and [Kyle](https://github.com/KyleAMathews), I also had the opportunity to work with [Katie Hempenius](https://github.com/khempenius). She focused on a workflow for predictive pre-fetching for static content sites.
+
+The predictive pre-fetching for static sites uses client-server architecture. The back-end fetches a Google Analytics report and builds a model which can be later used to determine which pages are likely to be visited next.
+
+On navigation, the client component asks the server which are the URLs of the most probable pages to be visited and pre-fetches them using `<link rel="prefetch">`.
+
+You can find more details and the implementation of this workflow in the [guess-js/guess monorepo](https://github.com/guess-js/guess).
+
+## Lower level API
+
+Plugin or library maintainers can also leverage the data-driven prediction capabilities of Guess.js by using the lower level API it provides.
+
+Currently, the `gatsby-plugin-guess-js` uses the `GuessPlugin` for webpack only in order to be able to query the model at runtime which links are likely to be visited next. This can be achieved with the following configuration:
+
+```javascript
+new GuessPlugin({
+  // GA view ID.
+  GA: GAViewID,
+
+  // Hints Guess to not perform pre-fetching and delegate this logic to
+  // its consumer.
+  runtime: {
+    delegate: true,
+  },
+
+  // Since Gatsby already has the required metadata for pre-fetching,
+  // Guess does not have to collect the routes and the corresponding
+  // bundle entry points.
+  routeProvider: false,
+
+  // Optional argument. It takes the data for the last year if not
+  // specified.
+  period: period ? period : undefined,
+})
+```
+
+Let me explain the individual properties set to the configuration object literal passed to the `GuessPlugin` call:
+
+- `GA` - the view ID from Google Analytics
+- `runtime` - configures the runtime of the `GuessPlugin`. In this case, the `delegate` property means that the Guess.js will not handle route changes
+- `routeProvider` - the route provider is the module responsible for establishing the actual mapping between pages from the Google Analytics report and the JavaScript bundles of the application. Since Gatsby already has this information, the provider is not required
+- `period` - the period for the Google Analytics report that will be fetched
+
+Keep in mind that establishing the mapping between the JavaScript bundles of the application and the individual URLs from the Google Analytics report, is the most fragile part of the entire process. This is mostly due to frequent changes in the Angular compiler and the large fragmentation in the multi-route React applications.
+
+In case you're developing a plugin and you already have the bundle-URL mapping, you can either set the `routeProvider` to `false` or provide a custom `routeProvider` which directly returns an array with the individual routing modules in the following format:
+
+```javascript
+export interface RoutingModule {
+  path: string;
+  modulePath: string;
+  parentModulePath: string | null;
+  lazy: boolean;
+}
+```
+
+If you have any questions, do not hesitate to contact us or open an issue [here](https://github.com/guess-js/guess/issues).
+
+## Summary
+
+Guess.js' goal is to make the web faster and smarter by replacing the manual decision making with automated data-driven approach.
+
+There are few areas of focus:
+
+- Single-page applications - initially targeting popular frameworks because of already established conventions which make static analysis possible
+- Static content sites - covers a high surface. It'll let people using WordPress, Ghost, and many other platforms to leverage the smart pre-fetching of Guess.js
+- Framework-based static sites - Gatsby and many others, can use the lower level APIs of the `GuessPlugin` in order to pre-fetch content that the user will need in near future
+
+Performance is not the only area where data can bring improvements to the web. Automating our decision making and ensuring it's data-driven can positively impact many other areas of user experience but making our web applications faster is a good start!
