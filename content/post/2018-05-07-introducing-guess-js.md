@@ -8,8 +8,8 @@ categories:
 - Webpack
 - Machine Learning
 - Guess.js
-date: 2018-05-06T00:00:00Z
-draft: true
+date: 2018-05-09T00:00:00Z
+draft: false
 tags:
 - JavaScript
 - React
@@ -18,8 +18,8 @@ tags:
 - Webpack
 - Machine Learning
 - Guess.js
-title: Introducing Guess.js for enabling data-driven user-experiences on the Web
-url: /2018/05/07/introducing-guess-js-data-driven-user-experiences-web
+title: Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web
+url: /2018/05/09/introducing-guess-js-data-driven-user-experiences-web
 ---
 
 About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/)<sup>[1]</sup> on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/)<sup>[2]</sup> in Oxford, UK. You can find the video below:
@@ -44,7 +44,7 @@ In the meantime, I talked to [Addy Osmani](https://twitter.com/addyosmani) who t
 
 Guess.js is a collection of libraries & tools for enabling data-driven user-experience on the web.
 
-<img src="/static/images/intro-guess-js/guess.png" alt="Logo of Guess.js" style="width: 350px; display: block; margin: auto">
+<img src="/images/intro-guess-js/guess.png" alt="Logo of Guess.js" style="width: 350px; display: block; margin: auto">
 
 With Guess.js we want to explore the application of data-analytics driven approach to user experience in:
 
@@ -55,7 +55,7 @@ With Guess.js we want to explore the application of data-analytics driven approa
 
 You can watch the official announcement of Guess.js by Addy Osmani and Ewa Gasperowicz from Google I/O 2018 below:
 
-[EMBED YOUTUBE VIDEO WHEN AVAILABLE]
+<div style="margin-top: 20px; margin-bottom: 20px; margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:56.25%"><iframe width="560" height="315" src="https://www.youtube.com/embed/Mv-l3-tJgGk?start=2093" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;width:100%;height:100%;left:0"></iframe></div>
 
 Now let's discuss the first three bullet points from above.
 
@@ -88,7 +88,7 @@ GuessPlugin({ GA: 'GA_VIEW_ID' })
 
 The end result will look like:
 
-<img src="/static/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" style="display: block; margin: auto">
+<img src="/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" style="display: block; margin: auto">
 
 During the build process the `GuessPlugin` will fetch report from Google Analytics, build a model used for predictive pre-fetching and add a small runtime to the main bundle of your application.
 
@@ -116,7 +116,7 @@ This approach is very powerful and often provides instantaneous user experience.
 
 Together with [Kyle Mathews](https://github.com/KyleAMathews) we collaborated on introducing [Guess.js plugin to Gatsby](https://github.com/guess-js/gatsby-guess)<sup>[9]</sup>. The Gatsby plugin uses lower-level APIs of Guess.js which we're going to take a look at later in this article.
 
-<img src="/static/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" style="display: block; margin: auto">
+<img src="/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" style="display: block; margin: auto">
 
 On the image above, all the visible links in the viewport are highlighted. Depending on the probability the user to visit any of them, they are colored in:
 

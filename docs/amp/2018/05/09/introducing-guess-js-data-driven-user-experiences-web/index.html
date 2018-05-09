@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html ⚡="" amp="">
+  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+    
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.22-DEV">
+
+<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+
+
+<link rel="canonical" href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">
+
+
+    
+    
+    
+    <title>Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web - Minko Gechev&#39;s blog</title>
+    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="About two months ago I published my initial research[1] on data-driven bundling. A few weeks after that, I had the opportunity to present my work on RenderConf[2] in Oxford, UK. You can find the video below: The original goal of the article was to show how data can help in improving the user-perceived page load performance. There are two main techniques that I explained: Data-driven bundling. All routes are loaded lazily by default.">
+
+<meta property="og:title" content="Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web - Minko Gechev&#39;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">
+<meta property="og:site_name" content="Minko Gechev&#39;s blog">
+<meta property="og:description" content="About two months ago I published my initial research[1] on data-driven bundling. A few weeks after that, I had the opportunity to present my work on RenderConf[2] in Oxford, UK. You can find the video below: The original goal of the article was to show how data can help in improving the user-perceived page load performance. There are two main techniques that I explained: Data-driven bundling. All routes are loaded lazily by default.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&#39;s blog">
+<meta name="twitter:url" content="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">
+<meta name="twitter:title" content="Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web - Minko Gechev&#39;s blog">
+<meta name="twitter:description" content="About two months ago I published my initial research[1] on data-driven bundling. A few weeks after that, I had the opportunity to present my work on RenderConf[2] in Oxford, UK. You can find the video below: The original goal of the article was to show how data can help in improving the user-perceived page load performance. There are two main techniques that I explained: Data-driven bundling. All routes are loaded lazily by default.">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https://blog.mgechev.com/"
+    },
+    "headline": "Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web - Minko Gechev&#39;s blog",
+    "datePublished": "2018-05-09T00:00:00JST",
+    "dateModified": "2018-05-09T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev&#39;s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev&#39;s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://blog.mgechev.com/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "About two months ago I published my initial research[1] on data-driven bundling. A few weeks after that, I had the opportunity to present my work on RenderConf[2] in Oxford, UK. You can find the video below:
+ The original goal of the article was to show how data can help in improving the user-perceived page load performance. There are two main techniques that I explained:
+ Data-driven bundling. All routes are loaded lazily by default."
+  }
+</script>
+
+
+    <style amp-custom="">
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-5c68733b87f8b000068b3ec24de50f2d">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web</h1>
+        <ul class="p-facts">
+          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f&t=Introducing%20Guess.js%20-%20toolkit%20for%20enabling%20data-driven%20user-experiences%20on%20the%20Web" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f&text=Introducing%20Guess.js%20-%20toolkit%20for%20enabling%20data-driven%20user-experiences%20on%20the%20Web&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>About two months ago I published my <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">initial research</a><sup>[1]</sup> on data-driven bundling. A few weeks after that, I had the opportunity to present my work on <a href="https://2018.render-conf.com/">RenderConf</a><sup>[2]</sup> in Oxford, UK. You can find the video below:</p>
+
+<div><iframe src="https://www.youtube.com/embed/L5tPWCB7jX0" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe></div>
+
+<p>The original goal of the article was to show <strong>how data can help in improving the user-perceived page load performance</strong>. There are two main techniques that I explained:</p>
+
+<ul>
+<li><strong>Data-driven bundling</strong>. All routes are loaded lazily by default. Based on data from Google Analytics, the bundler figures out how to combine chunks which are likely to be needed together (for example, in nested routes).</li>
+<li><strong>Data-driven pre-fetching</strong>. While the user navigates in the application, a small runtime determines which bundles are likely to be visited next based on a <a href="https://en.wikipedia.org/wiki/Predictive_analytics">model</a><sup>[3]</sup> generated at build-time. The bundles with highest score are pre-fetched using <code>&lt;link rel=&quot;prefetch&quot;&gt;</code>.</li>
+</ul>
+
+<p>Some of the artifacts that I developed as part of the original article were published as scoped <code>@mlx/*</code> packages:</p>
+
+<ul>
+<li><code>@mlx/ga</code> - fetches structured data from Google Analytics</li>
+<li><code>@mlx/parser</code> - parses an application in order to create the mapping between routes and JavaScript bundles</li>
+<li><code>@mlx/cluster</code> - figures out the bundle layout based on the data from <code>@mlx/parser</code> and <code>@mlx/ga</code></li>
+<li><code>@mlx/webpack</code> - webpack plugin which automates the process of applying data-driven bundling &amp; pre-fetching in React &amp; Angular applications</li>
+</ul>
+
+<p>In the meantime, I talked to <a href="https://twitter.com/addyosmani">Addy Osmani</a> who turned out to be exploring data-drive approach for predictive <a href="https://github.com/addyosmani/predictive-fetching">pre-fetching of web pages</a>. After a few conversations we saw that there&rsquo;s a big intersection between what we were doing so we decided to merge everything under the hat of the project <a href="https://github.com/guess-js">Guess.js</a><sup>[4]</sup>!</p>
+
+<h1 id="introducing-guess-js">Introducing Guess.js</h1>
+
+<p>Guess.js is a collection of libraries &amp; tools for enabling data-driven user-experience on the web.</p>
+
+<p><amp-img src="/images/intro-guess-js/guess.png" alt="Logo of Guess.js" layout="responsive" width="710" height="710"></amp-img></p>
+
+<p>With Guess.js we want to explore the application of data-analytics driven approach to user experience in:</p>
+
+<ul>
+<li>Single-page applications</li>
+<li>Framework-based static sites</li>
+<li>Static content sites</li>
+<li>Enterprise sites</li>
+</ul>
+
+<p>You can watch the official announcement of Guess.js by Addy Osmani and Ewa Gasperowicz from Google I/O 2018 below:</p>
+
+<div><iframe width="560" height="315" src="https://www.youtube.com/embed/Mv-l3-tJgGk?start=2093" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
+
+<p>Now let&rsquo;s discuss the first three bullet points from above.</p>
+
+<h2 id="single-page-applications">Single-Page Applications</h2>
+
+<p>The SPA support of Guess.js is currently in <strong>alpha</strong> and can be tested with the following technologies:</p>
+
+<ul>
+<li>Angular projects using either Angular CLI or custom layout with the cost of extra configuration</li>
+<li>React projects using either <a href="https://github.com/facebook/create-react-app">create-react-app</a><sup>[5]</sup> or custom layout with the cost of extra configuration. Because of the fragmented mechanism for creating multi-route React application, currently, Guess.js supports only JSX or TSX with <a href="https://github.com/guess-js/guess/tree/master/packages/parser#react">restricted syntax constructs for route definition</a><sup>[6]</sup></li>
+</ul>
+
+<p>Our goal with Guess.js is to minimize your bundle layout configuration, make it data-driven, and much more accurate! In the end, you should lazy load to all your routes and Guess.js will figure out which bundles to be combined together and what pre-fetching mechanism to be used! All this in less than 5 minutes setup time.</p>
+
+<p>In order to help everyone to apply data-driven approach to their tooling, we developed the <code>GuessPlugin</code> for webpack! Although the techniques explained in <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">&ldquo;Machine Learning-Driven Bundling. The Future of JavaScript Tooling&rdquo;</a><sup>[6]</sup> are tooling agnostic, webpack is a good starting point which will let a lot of people make their applications load faster &amp; smarter.</p>
+
+<p>In order to use data-driven pre-fetching in your Angular CLI or Create React App project you should first install <code>guess-webpack</code>:</p>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>npm i guess-webpack --save-dev
+</code></pre></div>
+
+<p>&hellip;and after that add the following two lines of code to your webpack configuration:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="p">{</span> <span class="nx">GuessPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;guess-webpack&#39;</span><span class="p">);</span>
+
+<span class="c1">// Add the GuessPlugin in the end of your</span>
+<span class="c1">// webpack plugin configuration</span>
+<span class="nx">GuessPlugin</span><span class="p">({</span> <span class="nx">GA</span><span class="o">:</span> <span class="s1">&#39;GA_VIEW_ID&#39;</span> <span class="p">})</span>
+</code></pre></div>
+
+<p>The end result will look like:</p>
+
+<p><amp-img src="/images/intro-guess-js/guess-plugin-demo.gif" alt="Guess.js Plugin Demo" layout="responsive" width="1529" height="1307"></amp-img></p>
+
+<p>During the build process the <code>GuessPlugin</code> will fetch report from Google Analytics, build a model used for predictive pre-fetching and add a small runtime to the main bundle of your application.</p>
+
+<p>On route change, the runtime will query the generated model for the pages that are likely to be visited next and pre-fetch the associated with them JavaScript bundles.</p>
+
+<p>How many pages will pre-fetched depends on the user&rsquo;s network speed. On slow 2G network we&rsquo;re going to pre-fetch less bundles compared to fast LTE.</p>
+
+<h3 id="notes">Notes</h3>
+
+<p>Keep in mind that the tool is still in alpha. We&rsquo;d love to get feedback and/or contributions from you in the <a href="https://github.com/guess-js/guess">Guess.js monorepo</a><sup>[7]</sup>.</p>
+
+<p>Also acknowledge the following points:</p>
+
+<ul>
+<li>You will need to eject your application in order to be able to edit your webpack config file in both Angular CLI and Create React App</li>
+<li>In case you&rsquo;re using Angular CLI version 6 you may need to downgrade to version 1.7 because currently Angular CLI does not allow ejection</li>
+<li>In React you need to make sure you&rsquo;re following the currently <a href="https://github.com/guess-js/guess/tree/master/packages/parser#react">supported route definition syntax</a><sup>[7]</sup></li>
+</ul>
+
+<p>In case you want to get familiar with the internals of the Guess.js webpack plugin, you can take a look at the article &ldquo;<a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling</a><sup>[7]</sup>&ldquo;</p>
+
+<h2 id="framework-based-static-sites">Framework-based static sites</h2>
+
+<p>The brilliant static site generator <a href="https://www.gatsbyjs.org/">Gatsby</a><sup>[8]</sup> uses a smart pre-fetching strategy where it considers all the local links on the current page. Based on their visibility in the viewport, Gatsby pre-fetches the associated content.</p>
+
+<p>This approach is very powerful and often provides instantaneous user experience. In order to reduce the over-fetching, the next step to improve the current algorithm is to look at data and consider only the links which are most likely to be visited next!</p>
+
+<p>Together with <a href="https://github.com/KyleAMathews">Kyle Mathews</a> we collaborated on introducing <a href="https://github.com/guess-js/gatsby-guess">Guess.js plugin to Gatsby</a><sup>[9]</sup>. The Gatsby plugin uses lower-level APIs of Guess.js which we&rsquo;re going to take a look at later in this article.</p>
+
+<p><amp-img src="/images/intro-guess-js/pages-probability.png" alt="Guess.js Gatsby" layout="responsive" width="1200" height="959"></amp-img></p>
+
+<p>On the image above, all the visible links in the viewport are highlighted. Depending on the probability the user to visit any of them, they are colored in:</p>
+
+<ul>
+<li><span></span> high probability</li>
+<li><span></span> mild probability</li>
+<li><span></span> low probability</li>
+</ul>
+
+<p>Gatsby&rsquo;s Guess plugin can reduce the amount of pre-fetch operations by considering the likelihood given link to be visited by the user. This can minimize the bandwidth consumption on devices using mobile data dramatically.</p>
+
+<p><strong>You can find a demo of Guess.js + Gatsby on <a href="https://guess-gatsby-wikipedia.firebaseapp.com/">this wikipedia clone</a><sup>[10]</sup>.</strong> If you want to see which links are likely to be visited next press &ldquo;h&rdquo; to toggle highlighting.</p>
+
+<h2 id="static-content-sites">Static content sites</h2>
+
+<p>Together with <a href="https://github.com/addyosmani">Addy</a> and <a href="https://github.com/KyleAMathews">Kyle</a>, we also had the opportunity to work with <a href="https://github.com/khempenius">Katie Hempenius</a>. She focused on a workflow for <strong>predictive pre-fetching for static content sites</strong>.</p>
+
+<p>The predictive pre-fetching for static sites uses client-server architecture. The back-end fetches a Google Analytics report and builds a model which can be later used to determine which pages are likely to be visited next.</p>
+
+<p>On navigation, the client component asks the server which are the URLs of the most probable pages to be visited and pre-fetches them using <code>&lt;link rel=&quot;prefetch&quot;&gt;</code>.</p>
+
+<p>You can find more details and the implementation of this workflow in the <a href="https://github.com/guess-js/guess">guess-js/guess monorepo</a><sup>[10]</sup>.</p>
+
+<h2 id="lower-level-api">Lower level API</h2>
+
+<p><strong>Plugin and/or library maintainers can also leverage the data-driven prediction capabilities of Guess.js by using the lower level API</strong> it provides.</p>
+
+<p>Currently, the <code>gatsby-plugin-guess-js</code> uses the <code>GuessPlugin</code> for webpack in order to be able to query the model at runtime which links are likely to be visited next. If you have similar requirements, you can get this functionality for free with the following <code>GuessPlugin</code> config:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">new</span> <span class="nx">GuessPlugin</span><span class="p">({</span>
+  <span class="c1">// GA view ID.</span>
+  <span class="nx">GA</span><span class="o">:</span> <span class="nx">GAViewID</span><span class="p">,</span>
+
+  <span class="c1">// Hints Guess to not perform pre-fetching and delegate this logic to</span>
+  <span class="c1">// its consumer.</span>
+  <span class="nx">runtime</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">delegate</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="p">},</span>
+
+  <span class="c1">// Since Gatsby already has the required metadata for pre-fetching,</span>
+  <span class="c1">// Guess does not have to collect the routes and the corresponding</span>
+  <span class="c1">// bundle entry points.</span>
+  <span class="nx">routeProvider</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+
+  <span class="c1">// Optional argument. It takes the data for the last year if not</span>
+  <span class="c1">// specified.</span>
+  <span class="nx">period</span><span class="o">:</span> <span class="nx">period</span> <span class="o">?</span> <span class="nx">period</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+
+<p>Let me explain the individual properties set to the configuration object literal passed to the <code>GuessPlugin</code> call:</p>
+
+<ul>
+<li><code>GA</code> - the view ID from Google Analytics</li>
+<li><code>runtime</code> - configures the runtime of the <code>GuessPlugin</code>. In this case, the <code>delegate</code> property means that the Guess.js will not handle route changes</li>
+<li><code>routeProvider</code> - the route provider is the module responsible for establishing the actual mapping between pages from the Google Analytics report and the JavaScript bundles of the application. Since Gatsby already has this information, the provider is not required</li>
+<li><code>period</code> - the period for the Google Analytics report that will be fetched</li>
+</ul>
+
+<p>Keep in mind that establishing the mapping between the JavaScript bundles of the application and the individual URLs from the Google Analytics report, is the most fragile part of the entire process. This is mostly due to the highly fragmented syntax for route definition in the individual frameworks.</p>
+
+<p>In case you&rsquo;re developing a plugin and you already have the bundle to URL mapping, you can either set the <code>routeProvider</code> to <code>false</code> or provide a custom <code>routeProvider</code> which directly returns an array with the individual routing modules in the following format:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RoutingModule</span> <span class="p">{</span>
+  <span class="c1">// Entry point of the bundle associated with</span>
+  <span class="c1">// the given route</span>
+  <span class="nx">modulePath</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="c1">// Entry point of the parent bundle</span>
+  <span class="nx">parentModulePath</span><span class="o">:</span> <span class="nx">string</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
+
+  <span class="nx">path</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">lazy</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>If you have any questions, do not hesitate to contact us or <a href="https://github.com/guess-js/guess/issues">open an issue</a><sup>[11]</sup>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Guess.js&rsquo; goal is to make the web faster and smarter by replacing the manual decision making with automated data-driven approach.</p>
+
+<p>Here are few of the areas of focus of Guess.js:</p>
+
+<ul>
+<li>Single-page applications - initially targeting popular frameworks because of already established conventions which make static analysis possible</li>
+<li>Static content sites - will let people using WordPress, Ghost, and many other platforms to leverage the smart pre-fetching of Guess.js</li>
+<li>Framework-based static sites - Gatsby and many others, can use the lower level APIs of the <code>GuessPlugin</code> in order to pre-fetch content that the user will need in near future</li>
+</ul>
+
+<p>Performance is not the only area where data can bring improvements to the web. Automating our decision making and ensuring it&rsquo;s data-driven can positively impact many other areas of user experience but making our web applications faster is a good start!</p>
+
+<h2 id="references">References</h2>
+
+<ol>
+<li>Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
+<a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/</a></li>
+<li>RenderConf <a href="https://2018.render-conf.com/">https://2018.render-conf.com/</a></li>
+<li>Predictive Analysis <a href="https://en.wikipedia.org/wiki/Predictive_analytics">https://en.wikipedia.org/wiki/Predictive_analytics</a></li>
+<li>Guess.js organization on GitHub <a href="https://github.com/guess-js">https://github.com/guess-js</a></li>
+<li>Create React App <a href="https://github.com/facebook/create-react-app">https://github.com/facebook/create-react-app</a></li>
+<li>Guess.js Route Parser <a href="https://github.com/guess-js/guess/tree/master/packages/parser#react">https://github.com/guess-js/guess/tree/master/packages/parser#react</a></li>
+<li>Guess.js on GitHub <a href="https://github.com/guess-js/guess">https://github.com/guess-js/guess</a></li>
+<li>Gatsby.js <a href="https://www.gatsbyjs.org/">https://www.gatsbyjs.org/</a></li>
+<li>Guess.js plugin for Gatsby <a href="https://github.com/guess-js/gatsby-guess">https://github.com/guess-js/gatsby-guess</a></li>
+<li>Demo of Gatsby.js using Guess.js <a href="https://guess-gatsby-wikipedia.firebaseapp.com/">https://guess-gatsby-wikipedia.firebaseapp.com/</a></li>
+<li>Guess.js issues on GitHub <a href="https://github.com/guess-js/guess/issues">https://github.com/guess-js/guess/issues</a></li>
+</ol>
+</div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f&t=Introducing%20Guess.js%20-%20toolkit%20for%20enabling%20data-driven%20user-experiences%20on%20the%20Web" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f&text=Introducing%20Guess.js%20-%20toolkit%20for%20enabling%20data-driven%20user-experiences%20on%20the%20Web&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2018%2f05%2f09%2fintroducing-guess-js-data-driven-user-experiences-web%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/React/">React</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Angular/">Angular</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Tooling/">Tooling</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Webpack/">Webpack</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Machine-Learning/">Machine Learning</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Guess.js/">Guess.js</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/React/">React</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Angular/">Angular</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Tooling/">Tooling</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Webpack/">Webpack</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Machine-Learning/">Machine Learning</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Guess.js/">Guess.js</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-1ba3d07ae77c655266ce0f1522db4da3">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2018/01/29/javascript-decorators-aop-autobind-memoization/" class="thumbnail" title="JavaScript Decorators for Declarative and Readable Code"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2018/01/29/javascript-decorators-aop-autobind-memoization/">JavaScript Decorators for Declarative and Readable Code</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-29T00:00:00JST">Jan 29, 2018</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-43672564696ee352fbf3cd0b906f1e8b">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2018/01/18/react-typescript-redux-immutable/" class="thumbnail" title="3 Tricks For Using Redux and Immutable.js with TypeScript"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2018/01/18/react-typescript-redux-immutable/">3 Tricks For Using Redux and Immutable.js with TypeScript</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2018-01-18T00:00:00JST">Jan 18, 2018</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
+  </body>
+</html>
+
