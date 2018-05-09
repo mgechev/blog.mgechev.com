@@ -126,7 +126,7 @@ On the image above, all the visible links in the viewport are highlighted. Depen
 
 Gatsby's Guess plugin can reduce the amount of pre-fetch operations by considering the likelihood given link to be visited by the user. This can minimize the bandwidth consumption on devices using mobile data dramatically.
 
-**You can find a demo of Guess.js + Gatsby on [this wikipedia clone](https://guess-gatsby-wikipedia.firebaseapp.com/)<sup>10</sup>.** If you want to see which links are likely to be visited next press "h" to toggle highlighting.
+**You can find a demo of Guess.js + Gatsby on [this wikipedia clone](https://guess-gatsby-wikipedia.firebaseapp.com/)<sup>[10]</sup>.** If you want to see which links are likely to be visited next press "h" to toggle highlighting.
 
 ## Static content sites
 
@@ -136,7 +136,7 @@ The predictive pre-fetching for static sites uses client-server architecture. Th
 
 On navigation, the client component asks the server which are the URLs of the most probable pages to be visited and pre-fetches them using `<link rel="prefetch">`.
 
-You can find more details and the implementation of this workflow in the [guess-js/guess monorepo](https://github.com/guess-js/guess)<sup>10</sup>.
+You can find more details and the implementation of this workflow in the [guess-js/guess monorepo](https://github.com/guess-js/guess)<sup>[10]</sup>.
 
 ## Lower level API
 
@@ -191,7 +191,7 @@ export interface RoutingModule {
 }
 ```
 
-If you have any questions, do not hesitate to contact us or [open an issue](https://github.com/guess-js/guess/issues)<sup>11</sup>.
+If you have any questions, do not hesitate to contact us or [open an issue](https://github.com/guess-js/guess/issues)<sup>[11]</sup>.
 
 ## Summary
 
