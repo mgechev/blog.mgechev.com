@@ -18,8 +18,8 @@ tags:
 - Webpack
 - Machine Learning
 - Guess.js
-title: Introducing Guess.js
-url: /2018/05/07/introducing-guess-js
+title: Introducing Guess.js for enabling data-driven user-experiences on the Web
+url: /2018/05/07/introducing-guess-js-data-driven-user-experiences-web
 ---
 
 About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/) on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/) in Oxford, UK. You can find the video below:
