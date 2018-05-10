@@ -19,24 +19,13 @@ tags:
 - Machine Learning
 - Guess.js
 title: Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web
+og_image: /images/intro-guess-js/guess.png
 url: /2018/05/09/introducing-guess-js-data-driven-user-experiences-web
 ---
 
-About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/)<sup>[1]</sup> on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/)<sup>[2]</sup> in Oxford, UK. You can find the video below:
+About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/)<sup>[1]</sup> on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/) in Oxford, UK in my talk ["Teach Your Bundler Users' Habits"](https://www.youtube.com/watch?v=L5tPWCB7jX0)<sup>[2]</sup>.
 
-<div style="margin-top: 20px; margin-bottom: 20px; margin-top: 20px; margin-bottom: 20px; position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/L5tPWCB7jX0" width="640" height="360" frameborder="0" gesture="media" allow="encrypted-media" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
-
-The original goal of the article was to show **how data can help in improving the user-perceived page load performance**. There are two main techniques that I explained:
-
-- **Data-driven bundling**. All routes are loaded lazily by default. Based on data from Google Analytics, the bundler figures out how to combine chunks which are likely to be needed together (for example, in nested routes).
-- **Data-driven pre-fetching**. While the user navigates in the application, a small runtime determines which bundles are likely to be visited next based on a [model](https://en.wikipedia.org/wiki/Predictive_analytics)<sup>[3]</sup> generated at build-time. The bundles with highest score are pre-fetched using `<link rel="prefetch">`.
-
-Some of the artifacts that I developed as part of the original article were published as scoped `@mlx/*` packages:
-
-- `@mlx/ga` - fetches structured data from Google Analytics
-- `@mlx/parser` - parses an application in order to create the mapping between routes and JavaScript bundles
-- `@mlx/cluster` - figures out the bundle layout based on the data from `@mlx/parser` and `@mlx/ga`
-- `@mlx/webpack` - webpack plugin which automates the process of applying data-driven bundling & pre-fetching in React & Angular applications
+The original goal of the article was to show **how data can help in improving the user-perceived page load performance**. The artifacts from the article were executable node modules which can be used for predictive pre-fetching & data-driven clustering of JavaScript chunks.
 
 In the meantime, I talked to [Addy Osmani](https://twitter.com/addyosmani) who turned out to be exploring data-drive approach for predictive [pre-fetching of web pages](https://github.com/addyosmani/predictive-fetching). After a few conversations we saw that there's a big intersection between what we were doing so we decided to merge everything under the hat of the project [Guess.js](https://github.com/guess-js)<sup>[4]</sup>!
 
@@ -95,6 +84,14 @@ During the build process the `GuessPlugin` will fetch report from Google Analyti
 On route change, the runtime will query the generated model for the pages that are likely to be visited next and pre-fetch the associated with them JavaScript bundles.
 
 How many pages will pre-fetched depends on the user's network speed. On slow 2G network we're going to pre-fetch less bundles compared to fast LTE.
+
+The main modules used by the `GuessPlugin` are:
+
+- `guess-ga` - fetches structured data from Google Analytics
+- `guess-parser` - parses an application in order to create the mapping between routes and JavaScript bundles
+- `guess-webpack` - webpack plugin which automates the process of applying data-driven bundling & pre-fetching in React & Angular applications
+
+Compared to my original research, the Guess.js modules provide simplified API which aims to reduce the configuration overhead to minimum. Also, in Guess.js clustering is temporarily disabled but it's on its way back!
 
 ### Notes
 
@@ -209,7 +206,7 @@ Performance is not the only area where data can bring improvements to the web. A
 
 1. Machine Learning-Driven Bundling. The Future of JavaScript Tooling.
  https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/
-2. RenderConf https://2018.render-conf.com/
+2. Teach Your Bundler Users' Habits https://www.youtube.com/watch?v=L5tPWCB7jX0
 3. Predictive Analysis https://en.wikipedia.org/wiki/Predictive_analytics
 4. Guess.js organization on GitHub https://github.com/guess-js
 5. Create React App https://github.com/facebook/create-react-app
