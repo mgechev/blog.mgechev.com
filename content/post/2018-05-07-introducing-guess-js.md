@@ -18,7 +18,7 @@ tags:
 - Webpack
 - Machine Learning
 - Guess.js
-title: Introducing Guess.js - toolkit for enabling data-driven user-experiences on the Web
+title: Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web
 og_image: /images/intro-guess-js/guess.png
 url: /2018/05/09/introducing-guess-js-data-driven-user-experiences-web
 ---
