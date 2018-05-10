@@ -25,7 +25,7 @@ url: /2018/05/09/introducing-guess-js-data-driven-user-experiences-web
 
 About two months ago I published my [initial research](https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/)<sup>[1]</sup> on data-driven bundling. A few weeks after that, I had the opportunity to present my work on [RenderConf](https://2018.render-conf.com/) in Oxford, UK in my talk ["Teach Your Bundler Users' Habits"](https://www.youtube.com/watch?v=L5tPWCB7jX0)<sup>[2]</sup>.
 
-The original goal of the article was to show **how data can help in improving the user-perceived page load performance**. The artifacts from the article were executable node modules which can be used for predictive pre-fetching & data-driven clustering of JavaScript chunks.
+The original goal of the article was to show **how data can help in improving the user-perceived page load performance** by using [predictive analysis](https://en.wikipedia.org/wiki/Predictive_analytics)<sup>[3]</sup>. The artifacts from the article were executable node modules which can be used for predictive pre-fetching & data-driven clustering of JavaScript chunks.
 
 In the meantime, I talked to [Addy Osmani](https://twitter.com/addyosmani) who turned out to be exploring data-drive approach for predictive [pre-fetching of web pages](https://github.com/addyosmani/predictive-fetching). After a few conversations we saw that there's a big intersection between what we were doing so we decided to merge everything under the hat of the project [Guess.js](https://github.com/guess-js)<sup>[4]</sup>!
 
