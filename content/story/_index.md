@@ -31,7 +31,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
         </p>
       </section>
     </section>
-    <section class="timeline-event">
+<!--    <section class="timeline-event">
       <h1>Release of Rhyme.com</h1>
       <section>
         <img src="/images/story/rhyme-release.jpg">
@@ -45,7 +45,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           In these two sessions, over 250 people were using Rhyme in order to solidify their engineering skills.
         </p>
       </section>
-    </section>
+    </section> -->
     <section class="timeline-event">
       <h1>Data-Driven Bundling</h1>
       <section>
@@ -112,7 +112,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
         </p>
       </section>
     </section>
-    <section class="timeline-event event-rhyme">
+<!--    <section class="timeline-event event-rhyme">
       <h1>Co-founder & CTO at Rhyme</h1>
       <section>
         <p>
@@ -130,7 +130,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           After we stopped working on Brownie Points, we bootstrapped another idea we had over the years. Because of my high involvement from the beginning and the critical, high-quality modules of the product I developed, in both front end and back end, I got invited to join as a co-founder and CTO.
         </p>
       </section>
-    </section>
+    </section> -->
     <section class="timeline-event event-angular-sf">
       <h1>Organizer of Angular San Francisco</h1>
       <section>

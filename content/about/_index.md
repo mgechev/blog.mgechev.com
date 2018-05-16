@@ -20,7 +20,7 @@ My name is
 </code></pre></div>
 
 <ul>
-  <li>Co-founder & CTO at <a href="https://rhyme.com">Rhyme.com</a>, former member of the Angular mobile team.</li>
+  <li>Former member of the Angular mobile team.</li>
   <li>Awarded by <a href="/story">Google and the President of Bulgaria</a> for the impact of my open source projects.</li>
   <li>Based in San Francisco, California.</li>
   <li>See <a href="/talks">my recent talks</a>.</li>
