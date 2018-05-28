@@ -7,7 +7,7 @@ categories:
 - Tooling
 - Compilers
 date: 2018-05-27T00:00:00Z
-draft: false
+draft: true
 tags:
 - Go
 - Static analysis
