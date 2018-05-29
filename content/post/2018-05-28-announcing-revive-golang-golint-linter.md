@@ -7,7 +7,7 @@ categories:
 - Tooling
 - Compilers
 - Revive
-date: 2018-05-27T00:00:00Z
+date: 2018-05-28T00:00:00Z
 draft: false
 tags:
 - Go
@@ -16,7 +16,7 @@ tags:
 - Tooling
 title: Fast, extensible, configurable, and beautiful linter for Go
 og_image: /images/revive/revive.png
-url: /2018/05/27/announcing-revive-golang-linter
+url: /2018/05/28/announcing-revive-golang-linter
 ---
 
 About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn't use enough. What a better way to brush up your skills in a programming language other than building tools with it...for analyzing programs written in it?
@@ -141,7 +141,7 @@ revive -exclude tests/... -exclude utils/... ./...
 
 In an image in the last section, we saw that by using a config file in TOML format, we could configure the execution of `revive`. Here's an example config file:
 
-```txt
+```text
 # Ignores files with "GENERATED" header, similar to golint
 ignoreGeneratedHeader = true
 
