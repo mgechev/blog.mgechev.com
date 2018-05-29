@@ -238,3 +238,4 @@ Since **`revive`** lints the individual files in separate goroutines, it **outpe
 The project is continuously evolving and open for new contributions in the form of new rules, formatters, or bug fixes! If you want to create an even stricter linting preset, cut the coding style discussions in your team to the minimum, and focus on the essential things, `revive` may help.
 
 <img src="/images/revive/gopher.png" alt="Drop mic" style="width: 350px; display: block; margin: auto">
+
