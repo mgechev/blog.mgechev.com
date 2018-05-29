@@ -16,7 +16,7 @@ tags:
 - Tooling
 title: Fast, extensible, configurable, and beautiful linter for Go
 og_image: /images/revive/revive.png
-url: /2018/05/28/announcing-revive-golang-linter
+url: /2018/05/28/revive-golang-golint-linter
 ---
 
 About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn't use enough. What a better way to brush up your skills in a programming language other than building tools with it...for analyzing programs written in it?
