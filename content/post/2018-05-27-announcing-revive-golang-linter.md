@@ -7,7 +7,7 @@ categories:
 - Tooling
 - Compilers
 date: 2018-05-27T00:00:00Z
-draft: true
+draft: false
 tags:
 - Go
 - Static analysis
@@ -39,7 +39,7 @@ The Go team is keeping the tool opinionated and minimalistic. It follows the Go 
 - Development of [gometalinter](https://github.com/alecthomas/gometalinter) which wraps most existing tools by invoking them internally and consuming their output. The tool provides a way to filter the produced report
 
 <img src="/images/revive/revive.png" alt="Logo of Revive" style="width: 350px; display: block; margin: auto">
-<div style="margin-top: 20px; font-size: 12px; text-align: center">Logo by <a href="https://github.com/hawkgs">Georgi Sereve</a></div>
+<div style="margin-top: 20px; font-size: 12px; text-align: center">Logo by <a href="https://github.com/hawkgs">Georgi Serev</a></div>
 
 That's how I decided to make my toy linter project public and share it with the community. `Revive` implements all the rules which `golint` has and the failures have the same concept of "confidence" that `golint` introduced. In fact, t invoking `revive` with no flags has the exact same behavior as `golint`, with the difference that it runs faster. `Revive` builds on top of `golint` by:
 
@@ -65,18 +65,7 @@ Install `revive` with:
 go get github.com/mgechev/revive
 ```
 
-After that, lint any existing Go project, just like you'd do with `golint`:
-
-```bash
-revive gotests/internal/...
-```
-
-<div class="terminal">
-  <div></div><div></div><div></div>
-  <img src="/images/revive/default.svg" alt="Logo of Revive" style="width: 100%; display: block; margin: auto">
-</div>
-
-So far nothing too exciting. The magic happens when we add a `-formatter` flag:
+Using `revive` with no flags will produce the same behavior as `golint`. The magic happens when we add a `-formatter` flag:
 
 <div class="terminal">
   <div></div><div></div><div></div>
