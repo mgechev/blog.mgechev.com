@@ -25,10 +25,7 @@ About a year ago I decided to polish my Go skills. Although the language is pret
 You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mgechev/revive">github.com/mgechev/revive</a>.
 </div>
 
-<div class="terminal">
-  <div></div><div></div><div></div>
-  <img src="/images/revive/demo.svg" alt="Revive demo" style="width: 100%; display: block; margin: auto">
-</div>
+<img src="/images/revive/demo.svg" alt="Revive demo" style="width: 100%; display: block; margin: auto">
 
 # Introducing Revive
 
@@ -79,19 +76,13 @@ The command above adds the `revive` binary under `$GOPATH/bin`.
 
 Using the tool with no flags has the same behavior as `golint`. The magic happens when we add the `-formatter` flag:
 
-<div class="terminal">
-  <div></div><div></div><div></div>
-  <img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto">
-</div>
+<img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto">
 
 From the image above, we can see that we got 31 warnings for the `"exported"` rule. This rule is port of a built-in rule from `golint` which enforces practices for exported symbols (find the full set of rules [here](https://github.com/mgechev/revive#available-rules)).
 
 If we prefer to ignore these warnings for the entire project, we can use a config file in TOML format:
 
-<div class="terminal">
-  <div></div><div></div><div></div>
-  <img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto">
-</div>
+<img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto">
 
 What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:
 
