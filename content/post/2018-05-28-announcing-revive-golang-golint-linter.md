@@ -21,7 +21,7 @@ url: /2018/05/28/revive-golang-golint-linter
 
 About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn't use enough. What a better way to brush up your skills in a programming language other than building tools with it...for analyzing programs written in it?
 
-<div style="background-color: rgba(33, 150, 243, 0.1); padding: 20px;">
+<div style="background-color: rgba(33, 150, 243, 0.1); padding: 20px; margin-bottom: 10px;">
 You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mgechev/revive">github.com/mgechev/revive</a>.
 </div>
 
