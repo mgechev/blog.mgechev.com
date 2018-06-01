@@ -30,19 +30,39 @@ My name is
 
 <br>
 
-Projects I've developed:
+Currently I'm working on:
 
 ### Rhyme.com
 
 Platform for hands-on learning over the Internet.
 
-### Angular
+# Open source
+
+Open source projects I've developed in my spare time:
+
+### Selected
+
+<div class="top-projects">
+  <a href="https://github.com/guess-js/guess"><img src="/images/about/guess.png"></a>
+  <a href="http://codelyzer.com/"><img src="/images/about/codelyzer.png"></a>
+  <a href="https://github.com/mgechev/revive"><img src="/images/about/revive.png"></a>
+</div>
+
+### Popular
 
 - [The Official Angular Style Guide](https://angular.io/styleguide)
 - [The first AngularJS Style Guide](https://github.com/mgechev/angularjs-style-guide)
-- [Community-Driven Angular Style Guide (deprecated)](https://github.com/mgechev/angular2-style-guide)
 - [angular-seed](https://github.com/mgechev/angular-seed)
+- [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)
+- [Community-Driven Angular Style Guide (deprecated)](https://github.com/mgechev/angular2-style-guide)
+
+### Others
+
+#### Angular
+
+- [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
+- [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
 - [AngularAOP - a framework for Aspect-Oriented Programming with AngularJS](https://github.com/mgechev/angular-aop)
 - [AngularJS filter for binding to Immutable.js collections](https://github.com/mgechev/angular-immutable)
 - [angular-webrtc](https://github.com/mgechev/angular-webrtc)
@@ -52,26 +72,22 @@ Platform for hands-on learning over the Internet.
 - [angular-transitions](https://github.com/mgechev/angular-transitions)
 - [angular2-hot-loader](https://github.com/mgechev/angular2-hot-loader)
 
-### ReactJS
+#### React
 
 - [ReactJS Sortable Component (react-reorderable)](https://github.com/mgechev/react-reorderable)
 - [ReactJS Draggable (up to date fork of react-draggable)](https://github.com/mgechev/react-drag)
 - [Mixin for Persistent State in ReactJS Components](https://github.com/mgechev/react-pstate)
 
-### Others
+#### Other
 
 - [plainvm](http://plainvm.mgechev.com/)
-- [codelyzer - static code analyzer for Angular and TypeScript projects](http://codelyzer.com)
-- [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
+- [DistrElang - a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [aspect.js - Library for aspect-oriented programming in JavaScript](https://github.com/mgechev/aspect.js)
 - [data-adapter - Micro library which allows declarative data transformation](https://github.com/mgechev/data-adapter)
-- [Collection of Algorithms and Data-Structures](https://github.com/mgechev/javascript-algorithms)
 - [BlobReader - a simplified interface for reading Blobs](https://github.com/mgechev/blobreader)
 - [VNC plugin for Chrome DevTools](https://github.com/mgechev/devtools-vnc)
 - [mk.js](https://github.com/mgechev/mk.js)
-- [DistrElang - a programming language with distributed callstack](https://github.com/mgechev/DistrElang)
 - [movement.js](https://github.com/mgechev/movement.js) [demo here](http://movement.mgechev.com)
-- [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
 
 <br>
 
