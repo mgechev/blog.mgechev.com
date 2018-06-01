@@ -89,7 +89,8 @@ What if we want to disable a specific rule for only part of the file? In such ca
 ```go
 package models
 
-// revive:disable
+//revive:disable
+
 type Expression struct {
     Value      string
     IsStar     bool
@@ -97,7 +98,7 @@ type Expression struct {
     IsWriter   bool
     Underlying string
 }
-// revive:enable
+//revive:enable
 ```
 
 The annotations above disables all `revive` rules for the entire struct. In case we prefer to disable only the `exported` rule, we should use:
@@ -105,7 +106,8 @@ The annotations above disables all `revive` rules for the entire struct. In case
 ```go
 package models
 
-// revive:disable:exported
+//revive:disable:exported
+
 type Expression struct {
     Value      string
     IsStar     bool
@@ -113,8 +115,10 @@ type Expression struct {
     IsWriter   bool
     Underlying string
 }
-// revive:enable:exported
+//revive:enable:exported
 ```
+
+*Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see [revive: unidiomatic `// revive:` syntax](https://github.com/mgechev/revive/issues/1)*.
 
 Finally, if we want to ignore all files from a directory, we can use the `-exclude` flag:
 

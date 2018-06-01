@@ -167,7 +167,8 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
 <p>What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:</p>
 <div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kn">package</span> <span class="nx">models</span>
 
-<span class="c1">// revive:disable</span>
+<span class="c1">//revive:disable</span>
+
 <span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
     <span class="nx">Value</span>      <span class="kt">string</span>
     <span class="nx">IsStar</span>     <span class="kt">bool</span>
@@ -175,13 +176,14 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">// revive:enable</span>
+<span class="c1">//revive:enable</span>
 </code></pre></div>
 
 <p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
 <div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kn">package</span> <span class="nx">models</span>
 
-<span class="c1">// revive:disable:exported</span>
+<span class="c1">//revive:disable:exported</span>
+
 <span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
     <span class="nx">Value</span>      <span class="kt">string</span>
     <span class="nx">IsStar</span>     <span class="kt">bool</span>
@@ -189,8 +191,10 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">// revive:enable:exported</span>
+<span class="c1">//revive:enable:exported</span>
 </code></pre></div>
+
+<p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
 
 <p>Finally, if we want to ignore all files from a directory, we can use the <code>-exclude</code> flag:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>revive -exclude tests/... ./...
