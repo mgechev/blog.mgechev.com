@@ -43,9 +43,9 @@ Open source projects I've developed in my spare time:
 ### Selected
 
 <div class="top-projects">
-  <a href="https://github.com/guess-js/guess"><img src="/images/about/guess.png"></a>
+  <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
   <a href="http://codelyzer.com/"><img src="/images/about/codelyzer.png"></a>
-  <a href="https://github.com/mgechev/revive"><img src="/images/about/revive.png"></a>
+  <a href="http://revive.run"><img src="/images/about/revive.png"></a>
 </div>
 
 ### Popular
