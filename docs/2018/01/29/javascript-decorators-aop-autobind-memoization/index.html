@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>JavaScript Decorators for Declarative and Readable Code &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -104,7 +104,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <h2 id="autobind">Autobind</h2>
 
 <p>Autobind is a decorator which allows given method to be automatically bound to a class instance. For example:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
   <span class="kr">constructor</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
   <span class="p">}</span>
@@ -121,10 +121,8 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <span class="kr">const</span> <span class="nx">supermanNameGetter</span> <span class="o">=</span> <span class="nx">superman</span><span class="p">.</span><span class="nx">getName</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">batmanNameGetter</span> <span class="o">=</span> <span class="nx">batman</span><span class="p">.</span><span class="nx">getName</span><span class="p">;</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">supermanNameGetter</span><span class="p">());</span> <span class="c1">// Superman</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">batmanNameGetter</span><span class="p">());</span> <span class="c1">// Batman</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">supermanNameGetter</span><span class="p">());</span> <span class="c1">// Superman
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">batmanNameGetter</span><span class="p">());</span> <span class="err">// Batman</span></code></pre></div>
 <p>From the example above we can see that the <code>getName</code> method got automatically bound to a specific instance of the class. In case we didn&rsquo;t use <code>@autobind</code> we&rsquo;d have gotten the error:</p>
 
 <blockquote>
@@ -138,7 +136,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <h3 id="react-event-handlers">React Event Handlers</h3>
 
 <p>Firstly, it&rsquo;s quite handy to use <code>@autobind</code> with React in order to not create new functions for the event handlers each time when the <code>render</code> method gets invoked. For instance:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">prop</span> <span class="o">=</span> <span class="s1">&#39;Hello there!&#39;</span><span class="p">;</span>
 
   <span class="nx">clickHandler() {</span>
@@ -148,21 +146,17 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">render() {</span>
     <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">clickHandler</span><span class="p">()}</span><span class="o">&gt;&lt;</span><span class="err">/button&gt;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This code will create a new arrow function each time when <code>render</code> gets invoked. Another alternative is:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="c1">// ...</span>
-<span class="nx">render() {</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// ...
+</span><span class="c1"></span><span class="nx">render() {</span>
   <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">clickHandler</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;&lt;</span><span class="err">/button&gt;</span>
 <span class="p">}</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
+<span class="err">// ...</span></code></pre></div>
 <p>&hellip;which suffers from the same problem, because <code>bind</code> will create a new instance of the <code>clickHandler</code> bound to <code>this</code>.</p>
 
 <p>With <code>@autobind</code> we can refactor the code to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">prop</span> <span class="o">=</span> <span class="s1">&#39;Hello there!&#39;</span><span class="p">;</span>
 
   <span class="kd">@autobind</span>
@@ -173,13 +167,11 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">render() {</span>
     <span class="k">return</span> <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">clickHandler</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/button&gt;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <h3 id="keeping-a-reference-to-an-event-handler">Keeping a Reference to an Event Handler</h3>
 
 <p>Secondly, we can use <code>@autobind</code> to keep a reference to an event handler that we&rsquo;ve attached to given DOM element. For example, take a look at the following Angular component:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({...})</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({...})</span>
 <span class="kr">class</span> <span class="nx">DraggableComponent</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">_documentMove</span>: <span class="kt">Function</span><span class="p">;</span>
 
@@ -187,38 +179,34 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
     <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span> <span class="o">=</span> <span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span><span class="p">;</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span><span class="p">;</span>
-      <span class="c1">// More logic...</span>
-    <span class="p">});</span>
+      <span class="c1">// More logic...
+</span><span class="c1"></span>    <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="nx">ngOnDestroy() {</span>
-    <span class="c1">// Perform clean up</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span><span class="p">);</span>
+    <span class="c1">// Perform clean up
+</span><span class="c1"></span>    <span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This is a commonly used pattern for keeping a reference to an event handler so we can easily clean the subscription once the component gets destroyed. It works well, however, we can be achieved the same in a more elegant way:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Component</span><span class="p">({...})</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({...})</span>
 <span class="kr">class</span> <span class="nx">DragHandlerComponent</span> <span class="p">{</span>
   <span class="nx">ngOnInit() {</span>
     <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="nx">ngOnDestroy() {</span>
-    <span class="c1">// Perform clean up</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span><span class="p">);</span>
+    <span class="c1">// Perform clean up
+</span><span class="c1"></span>    <span class="nb">document</span><span class="p">.</span><span class="nx">removeEventListener</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_documentMove</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="kd">@autobind</span>
   <span class="kr">private</span> <span class="nx">_documentMove</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">y</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span><span class="p">;</span>
-    <span class="c1">// More logic...</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+    <span class="c1">// More logic...
+</span><span class="c1"></span>  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
 <p>This way we no longer need the arrow function to preserve the context because <code>@autobind</code> would have bound the <code>_documentMove</code> method to the proper value of <code>this</code>.</p>
 
 <h3 id="how-to-use-it">How to use it?</h3>
@@ -237,7 +225,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <p>In such cases it makes sense to perform memoization over them!</p>
 
 <p>Recently I released the decorator <code>memo-decorator</code> which does exactly that! For example, let&rsquo;s suppose we have:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
   <span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Invalid argument&#39;</span><span class="p">);</span>
@@ -247,22 +235,18 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
     <span class="p">}</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Now when we invoke <code>calculateAge</code> with given <code>n</code>, we&rsquo;re always going to get the same result:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">hero</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Superhero</span><span class="p">();</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">hero</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Superhero</span><span class="p">();</span>
 
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// 5</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// 5</span>
-
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// 610</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// 610</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// 610</span>
-</code></pre></div>
-
+<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// 5
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// 5
+</span><span class="c1"></span>
+<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// 610
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// 610
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="err">// 610</span></code></pre></div>
 <p>An obvious idea for an optimization is to cache the result and directly return it once calculated instead of going through the same computation. A simple way to perform caching is to use a <code>Map</code> with keys the arguments of the <code>calculateAge</code> method and values the results the method produces. That&rsquo;s exactly what <code>memo-decorator</code> does!</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
   <span class="kd">@memo</span><span class="p">()</span>
   <span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Calculating&#39;</span><span class="p">);</span>
@@ -274,24 +258,20 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
     <span class="p">}</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Notice the <code>console.log</code> statement that I added in the method. Here&rsquo;s what the current behavior would be:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">hero</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Superhero</span><span class="p">();</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">hero</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Superhero</span><span class="p">();</span>
 
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// return 5 and log &#39;Calculating&#39;</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// return 5, does not log &#39;Calculating&#39; since we get the result from the cache.</span>
-
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// return 610 and log &#39;Calculating&#39;</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// return 610, does not log &#39;Calculating&#39; since we get the result from the cache.</span>
-<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// return 610, does not log &#39;Calculating&#39; since we get the result from the cache.</span>
-</code></pre></div>
-
+<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// return 5 and log &#39;Calculating&#39;
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// return 5, does not log &#39;Calculating&#39; since we get the result from the cache.
+</span><span class="c1"></span>
+<span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// return 610 and log &#39;Calculating&#39;
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="c1">// return 610, does not log &#39;Calculating&#39; since we get the result from the cache.
+</span><span class="c1"></span><span class="nx">hero</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span> <span class="err">// return 610, does not log &#39;Calculating&#39; since we get the result from the cache.</span></code></pre></div>
 <p>But what about methods which have multiple arguments?</p>
 
 <p>In such cases we can provide a custom &ldquo;resolver&rdquo; which for given set of arguments returns the key to be used for caching:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">Superhero</span> <span class="p">{</span>
   <span class="kd">@memo</span><span class="p">((</span><span class="nx">n</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="nx">a</span><span class="p">)</span>
   <span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Calculating&#39;</span><span class="p">);</span>
@@ -303,13 +283,9 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
     <span class="p">}</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">a</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">calculateAge</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">a</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>As we can see from the snippet above, <code>@memo</code> receives a single, optional argument - a function. This function receives all the arguments passed to the decorated method. By default the implementation of the key resolver is the identity function:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">resolve</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">;</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">resolve</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">;</span></code></pre></div>
 <h3 id="how-to-use">How to use?</h3>
 
 <p>You can use the <code>@memo</code> decorator from the <a href="https://npmjs.com/package/memo-decorator"><code>memo-decorator</code></a> package on npm.</p>
@@ -319,7 +295,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <p>So far we discussed different JavaScript decorators. Now we&rsquo;ll briefly show an entire paradigm!</p>
 
 <p>Let&rsquo;s suppose we have a class called <code>DataMapper</code> which sends requests over the network to a RESTful API. This abstraction is supposed to create, update, and delete users and their payment information:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">class</span> <span class="nx">DataMapper</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">DataMapper</span> <span class="p">{</span>
   <span class="nx">saveUser</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fetch</span><span class="p">(...)</span>
   <span class="p">}</span>
@@ -343,16 +319,14 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">updateUserPayment</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fetch</span><span class="p">(...)</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Now, for debugging purposes we want to add logging for all of these methods. Going over each individual method and adding a log statement will be quite annoying, and what if we want to drop the log statements for our production build?</p>
 
 <p>A better approach would be to use Aspect-Oriented Programming (AOP), which can help us to resolve this issue by just:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Wove</span><span class="p">()</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Wove</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">DataMapper</span> <span class="p">{</span>
-  <span class="c1">// ...</span>
-<span class="p">}</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span>
 
 <span class="kr">class</span> <span class="nx">DataMapperAspect</span> <span class="p">{</span>
   <span class="kd">@beforeMethod</span><span class="p">({</span>
@@ -362,9 +336,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">log</span><span class="p">(</span><span class="nx">m</span>: <span class="kt">Metadata</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Method </span><span class="si">${</span><span class="nx">m</span><span class="p">.</span><span class="nx">method</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> called with </span><span class="si">${</span><span class="nx">m</span><span class="p">.</span><span class="nx">method</span><span class="p">.</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>The semantics of this snippet is:</p>
 
 <blockquote>
@@ -372,10 +344,10 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 </blockquote>
 
 <p>As value of the property <code>methodNamePattern</code> that we pass as an argument to the <code>@beforeMethod</code> decorator we specify another pattern. If we want, we can get more restrictive:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@Wove</span><span class="p">()</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Wove</span><span class="p">()</span>
 <span class="kr">class</span> <span class="nx">DataMapper</span> <span class="p">{</span>
-  <span class="c1">// ...</span>
-<span class="p">}</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span>
 
 <span class="kr">class</span> <span class="nx">DataMapperAspect</span> <span class="p">{</span>
   <span class="kd">@beforeMethod</span><span class="p">({</span>
@@ -385,9 +357,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">log</span><span class="p">(</span><span class="nx">m</span>: <span class="kt">Metadata</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Method </span><span class="si">${</span><span class="nx">m</span><span class="p">.</span><span class="nx">method</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> called with </span><span class="si">${</span><span class="nx">m</span><span class="p">.</span><span class="nx">method</span><span class="p">.</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This way the <code>log</code> method will be called only before the invocation of methods with <code>save</code> prefix.</p>
 
 <p><img src="/images/decorators/ocd.jpg" style="display: block; margin: auto" alt="Separation of Concerns"></p>
@@ -411,7 +381,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 <p>Injection-js can be use with TypeScript, ES5, ES2016, ES2017, etc, however, it looks most natural with TypeScript because of its type annotations.</p>
 
 <p>Here&rsquo;s an example with TypeScript:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="s1">&#39;reflect-metadata&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="s1">&#39;reflect-metadata&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span> <span class="nx">ReflectiveInjector</span><span class="p">,</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Injector</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;injection-js&#39;</span><span class="p">;</span>
 
 <span class="kr">class</span> <span class="nx">Http</span> <span class="p">{}</span>
@@ -426,13 +396,11 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">Http</span>
 <span class="p">]);</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Service</span><span class="p">)</span> <span class="k">instanceof</span> <span class="nx">Service</span><span class="p">);</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Service</span><span class="p">)</span> <span class="k">instanceof</span> <span class="nx">Service</span><span class="p">);</span></code></pre></div>
 <p>Once we invoke the <code>get</code> method of the <code>injector</code> instance, the injector will automatically figure out that <code>Service</code> depends on <code>Http</code> so it&rsquo;ll create an instance of <code>Http</code> and pass it to the constructor of <code>Service</code>.</p>
 
 <p>&hellip;and here&rsquo;s an equivalent example with plain JavaScript, with parameter decorators support:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">ReflectiveInjector</span><span class="p">,</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Injector</span><span class="p">,</span> <span class="nx">Inject</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;injection-js&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">ReflectiveInjector</span><span class="p">,</span> <span class="nx">Injectable</span><span class="p">,</span> <span class="nx">Injector</span><span class="p">,</span> <span class="nx">Inject</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;injection-js&#39;</span><span class="p">;</span>
 
 <span class="kr">class</span> <span class="nx">Http</span> <span class="p">{}</span>
 
@@ -446,9 +414,7 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
   <span class="nx">Http</span>
 <span class="p">]);</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Service</span><span class="p">)</span> <span class="k">instanceof</span> <span class="nx">Service</span><span class="p">);</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Service</span><span class="p">)</span> <span class="k">instanceof</span> <span class="nx">Service</span><span class="p">);</span></code></pre></div>
 <p>Notice that since in JavaScript we do not have type annotations we had to specify the type of the dependency of <code>Service</code> by using <code>@Inject</code>.</p>
 
 <p>Also, keep in mind that at the moment both snippets can be compiled only with TypeScript, since babel does not have <a href="https://github.com/babel/proposals/issues/13">parameter decorator support yet</a>.</p>
@@ -503,14 +469,17 @@ In this blog post I&rsquo;ll share a few decorators which I&rsquo;m using on a d
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

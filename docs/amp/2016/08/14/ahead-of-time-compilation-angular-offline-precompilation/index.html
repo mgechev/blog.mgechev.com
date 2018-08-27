@@ -1,137 +1,94 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Ahead-of-Time Compilation in Angular &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">
+		
 
+		<meta property="og:title" content="Ahead-of-Time Compilation in Angular">
+		<meta property="og:description" content="Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics:
+ Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">
-
-
-    
-    
-    
-    <title>Ahead-of-Time Compilation in Angular - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics: Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?">
-
-<meta property="og:title" content="Ahead-of-Time Compilation in Angular - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics: Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">
-<meta name="twitter:title" content="Ahead-of-Time Compilation in Angular - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics: Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Ahead-of-Time Compilation in Angular - Minko Gechev&#39;s blog",
-    "datePublished": "2016-08-14T00:00:00JST",
-    "dateModified": "2016-08-14T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics:
- Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?"
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-773790442f63b845d7634e06c3d35c4b">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/" class="thumbnail" title="Ahead-of-Time Compilation in Angular"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Ahead-of-Time Compilation in Angular</h1>
-        <ul class="p-facts">
-          <li><time datetime="2016-08-14T00:00:00JST">Aug 14, 2016</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f&t=Ahead-of-Time%20Compilation%20in%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f&text=Ahead-of-Time%20Compilation%20in%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body">
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Ahead-of-Time Compilation in Angular
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2016-08-14-ahead-of-time-compilation-angular-offline-precompilation.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Aug 14, 2016
+                    &#xB7; 17 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/angular">Angular</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/typescript">TypeScript</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
 
 <p>Recently I added Ahead-of-Time (AoT) compilation support to <a href="https://github.com/mgechev/angular-seed">angular-seed</a> and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics:</p>
 
@@ -149,14 +106,14 @@
 
 <p>The short answer of this question is - <strong>We need compilation for achieving higher level of efficiency of our Angular applications.</strong> By efficiency I mostly mean performance improvements but also energy and sometimes bandwidth consumption.</p>
 
-<p>AngularJS 1.x had quite a dynamic approach for both rendering and change detection. For instance, the AngularJS 1.x compiler is quite generic. It is supposed to work for any template by performing a set of dynamic computations. Although this works great in the general case, the JavaScript Virtual Machines (VM) <a href="http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html">struggles with optimizing the calculations on lower level</a> because of their dynamic nature. <strong>Since the VM doesn&rsquo;t know the shapes of the objects which provide context for the dirty-checking logic (i.e. the so called scope), it&rsquo;s inline caches get a lot of misses which slows the execution down.</strong></p>
+<p>AngularJS 1.x had quite a dynamic approach for both rendering and change detection. For instance, the AngularJS 1.x compiler is quite generic. It is supposed to work for any template by performing a set of dynamic computations. Although this works great in the general case, the JavaScript Virtual Machines (VM) <a href="http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html">struggles with optimizing the calculations on lower level</a> because of their dynamic nature. <strong>Since the VM doesn&#x2019;t know the shapes of the objects which provide context for the dirty-checking logic (i.e. the so called scope), it&#x2019;s inline caches get a lot of misses which slows the execution down.</strong></p>
 
 <p>Angular, version 2 and above, took different approach. Instead of using the same logic for performing rendering and change detection for each individual component, the framework <strong>generates</strong> VM-friendly code at runtime or build time. <strong>This allows the JavaScript virtual machine to perform property access caching and execute the change detection/rendering logic much faster.</strong></p>
 
 <p>For instance, take a look at the following example:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
-<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span><span class="c1"></span><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
   <span class="k">do</span> <span class="p">{</span>
     <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
@@ -174,31 +131,29 @@
     <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">};</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
+<span class="c1">// ...
+</span><span class="c1"></span></code></pre></div>
 <p>This snippet is copied from my <a href="https://github.com/mgechev/light-angularjs/blob/master/lib/Scope.js#L61-L79">lightweight AngularJS 1.x implementation</a>. Above we perform a Depth-First-Search over the entire scope tree, looking for changes in our bindings. This approach will work for any directive. However, it is obviously slower compared to code which is directive specific:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
-<span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
         <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
     <span class="p">}</span>
-    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
+    <span class="nx">changes</span><span class="p">[</span><span class="s1">&apos;model&apos;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
+<span class="c1">// ...
+</span><span class="c1"></span></code></pre></div>
 <p>The snippet above contains a piece of the implementation of the generated <code>detectChangesInternal</code> method of a compiled component from the <a href="https://github.com/mgechev/angular-seed">angular-seed project</a>. It gets the values of the individual bindings by using a direct property access and compares them with the new values using the most efficient way. Once it finds that their values are different, it updates only the impacted DOM elements.</p>
 
-<p>By answering the question &ldquo;Why we need compilation?&rdquo; we answered the question &ldquo;What needs to be compiled?&rdquo; as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.</p>
+<p>By answering the question &#x201C;Why we need compilation?&#x201D; we answered the question &#x201C;What needs to be compiled?&#x201D; as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.</p>
 
 <h2 id="just-in-time-jit-vs-ahead-of-time-aot">Just-in-Time (JiT) vs Ahead-of-Time (AoT)</h2>
 
-<p><amp-img src="/images/aot-angular/timing.jpg" layout="responsive" width="800" height="500"></amp-img></p>
+<p><amp-img src="/images/aot-angular/timing.jpg" style="display: block; margin: auto;"></amp-img></p>
 
 <p>This section contains answer of the question:</p>
 
@@ -206,7 +161,7 @@
 <li><em>When the compilation takes place?</em>.</li>
 </ul>
 
-<p>The cool thing about the Angular&rsquo;s compiler is that it can be invoked either runtime (i.e. in the user&rsquo;s browser) or build-time (as part of the build process). This is due to the portability property of Angular - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?</p>
+<p>The cool thing about the Angular&#x2019;s compiler is that it can be invoked either runtime (i.e. in the user&#x2019;s browser) or build-time (as part of the build process). This is due to the portability property of Angular - we can run the framework on any platform with JavaScript VM so why to not make the Angular compiler run both in browser and node?</p>
 
 <h3 id="flow-of-events-with-just-in-time-compilation">Flow of events with Just-in-Time Compilation</h3>
 
@@ -220,7 +175,7 @@
 <li>Deployment.</li>
 </ul>
 
-<p>Once we&rsquo;ve deployed the app and the user opens her browser, she will go through the following steps (without strict CSP):</p>
+<p>Once we&#x2019;ve deployed the app and the user opens her browser, she will go through the following steps (without strict CSP):</p>
 
 <ul>
 <li>Download all the JavaScript assets.</li>
@@ -260,14 +215,14 @@
 
 <ul>
 <li>The time when the compilation takes place.</li>
-<li>JiT generates JavaScript (TypeScript doesn&rsquo;t make a lot of sense since the code needs to be compiled to JavaScript in the browser), however, AoT usually generates TypeScript.</li>
+<li>JiT generates JavaScript (TypeScript doesn&#x2019;t make a lot of sense since the code needs to be compiled to JavaScript in the browser), however, AoT usually generates TypeScript.</li>
 </ul>
 
 <p>A minimalistic AoT compilation demo you can find in <a href="https://github.com/mgechev/angular2-ngc-rollup-build">my GitHub account</a>.</p>
 
 <h2 id="ahead-of-time-compilation-in-depth">Ahead-of-Time Compilation in Depth</h2>
 
-<p><amp-img src="/images/aot-angular/mechanics.jpg" layout="responsive" width="500" height="348"></amp-img></p>
+<p><amp-img src="/images/aot-angular/mechanics.jpg" style="display: block; margin: auto;"></amp-img></p>
 
 <p>This section answers the questions:</p>
 
@@ -277,37 +232,37 @@
 <li><em>How to develop both: AoT friendly and well encapsulated code?</em></li>
 </ul>
 
-<p>We will go quickly through the compilation because there&rsquo;s no point to explaining the entire <code>@angular/compiler</code> line-by-line. If you&rsquo;re interested in the process of lexing, parsing and code generation, you can take a look at the talk <a href="https://www.youtube.com/watch?v=kW9cJsvcsGo">&ldquo;The Angular 2 Compiler&rdquo; by Tobias Bosch</a> or this <a href="https://speakerdeck.com/mgechev/angular-toolset-support?slide=69">slide deck</a>.</p>
+<p>We will go quickly through the compilation because there&#x2019;s no point to explaining the entire <code>@angular/compiler</code> line-by-line. If you&#x2019;re interested in the process of lexing, parsing and code generation, you can take a look at the talk <a href="https://www.youtube.com/watch?v=kW9cJsvcsGo">&#x201C;The Angular 2 Compiler&#x201D; by Tobias Bosch</a> or this <a href="https://speakerdeck.com/mgechev/angular-toolset-support?slide=69">slide deck</a>.</p>
 
 <p>The Angular template compiler receives as an input a component and a context (we can think of the context as a position in the component tree) and produces the following files:</p>
 
 <ul>
-<li><code>*.ngfactory.ts</code> - we&rsquo;ll take a look at this file in the next section.</li>
+<li><code>*.ngfactory.ts</code> - we&#x2019;ll take a look at this file in the next section.</li>
 <li><code>*.css.shim.ts</code> - scoped CSS file based on the <code>ViewEncapsulation</code> mode of the component.</li>
 <li><code>*.metadata.json</code> - metadata associated with the current component (or <code>NgModule</code>). We can think of it as a JSON representation of the objects we pass to the <code>@Component</code>, <code>@NgModule</code> decorators.</li>
 </ul>
 
-<p><code>*</code> is a placeholder for the file&rsquo;s name. For <code>hero.component.ts</code>, the compiler will produce: <code>hero.component.ngfactory.ts</code>, <code>hero.component.css.shim.ts</code>, and <code>hero.component.metadata.json</code>.</p>
+<p><code>*</code> is a placeholder for the file&#x2019;s name. For <code>hero.component.ts</code>, the compiler will produce: <code>hero.component.ngfactory.ts</code>, <code>hero.component.css.shim.ts</code>, and <code>hero.component.metadata.json</code>.</p>
 
-<p><code>*.css.shim.ts</code> is not very interesting for the purpose of our discussion so we won&rsquo;t describe it in details. If you what to know more about <code>*.metadata.json</code> you can take a look at the section: &ldquo;AoT and third-party modules&rdquo;.</p>
+<p><code>*.css.shim.ts</code> is not very interesting for the purpose of our discussion so we won&#x2019;t describe it in details. If you what to know more about <code>*.metadata.json</code> you can take a look at the section: &#x201C;AoT and third-party modules&#x201D;.</p>
 
 <h3 id="inside-ngfactory-ts">Inside <code>*.ngfactory.ts</code>.</h3>
 
 <p>The file <code>*.ngfactory.ts</code> contains the following definitions:</p>
 
 <ul>
-<li><code>_View_{COMPONENT}_Host{COUNTER}</code> - we call this an <strong>&ldquo;internal host component&rdquo;</strong>.</li>
-<li><code>_View_{COMPONENT}{COUNTER}</code> - we call this an <strong>&ldquo;internal component&rdquo;</strong>.</li>
+<li><code>_View_{COMPONENT}_Host{COUNTER}</code> - we call this an <strong>&#x201C;internal host component&#x201D;</strong>.</li>
+<li><code>_View_{COMPONENT}{COUNTER}</code> - we call this an <strong>&#x201C;internal component&#x201D;</strong>.</li>
 </ul>
 
-<p>&hellip;and two functions:</p>
+<p>&#x2026;and two functions:</p>
 
 <ul>
 <li><code>viewFactory_{COMPONENT}_Host{COUNTER}</code></li>
 <li><code>viewFactory_{COMPONENT}{COUNTER}</code></li>
 </ul>
 
-<p>Above <code>{COMPONENT}</code> is the name of the component&rsquo;s controller and <code>{COUNTER}</code> is an unsigned integer.</p>
+<p>Above <code>{COMPONENT}</code> is the name of the component&#x2019;s controller and <code>{COUNTER}</code> is an unsigned integer.</p>
 
 <p>Both classes extend <code>AppView</code> and implement the following methods:</p>
 
@@ -319,115 +274,106 @@
 
 <p>The factory functions above are only responsible for instantiation of the generated <code>AppViews</code>.</p>
 
-<p>As I mentioned above, the <code>detectChangesInternal</code> contains VM friendly code. Let&rsquo;s take a look at the compiled version of the template:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>{{newName}}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">newName</span><span class="err">&quot;</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<p>As I mentioned above, the <code>detectChangesInternal</code> contains VM friendly code. Let&#x2019;s take a look at the compiled version of the template:</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>{{newName}}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">newName</span><span class="err">&quot;</span><span class="p">&gt;</span></code></pre></div>
 <p>The <code>detectChangesInternal</code> method going to look something like:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
-<span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
         <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
     <span class="p">}</span>
-    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
+    <span class="nx">changes</span><span class="p">[</span><span class="s1">&apos;model&apos;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
-<p>Let&rsquo;s suppose that <code>currVal_6</code> has value <code>3</code> and <code>this_expr_6</code> has value <code>1</code>, and now lets trace the method&rsquo;s execution:</p>
+<span class="c1">// ...
+</span><span class="c1"></span></code></pre></div>
+<p>Let&#x2019;s suppose that <code>currVal_6</code> has value <code>3</code> and <code>this_expr_6</code> has value <code>1</code>, and now lets trace the method&#x2019;s execution:</p>
 
 <p>For call like: <code>import4.checkBinding(1, 3)</code>, in production mode, <code>checkBinding</code> perform the following check:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="mi">1</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">||</span> <span class="k">typeof</span> <span class="mi">1</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="mi">3</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="mi">1</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">||</span> <span class="k">typeof</span> <span class="mi">1</span> <span class="o">===</span> <span class="s1">&apos;number&apos;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="mi">3</span> <span class="o">===</span> <span class="s1">&apos;number&apos;</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 </code></pre></div>
-
-<p>The expression above will return <code>false</code>, so we&rsquo;re going to store the change and update the <code>model</code> value of the <code>NgModel</code> directive instance. Right after that the <code>detectContentChildrenChanges</code> will be invoked which will invoke the <code>detectChangesInternal</code> method for all the content children. Once the <code>NgModel</code> directive finds out about the changed value of the <code>model</code> property, it&rsquo;ll update the corresponding element by (almost) directly calling the renderer.</p>
+<p>The expression above will return <code>false</code>, so we&#x2019;re going to store the change and update the <code>model</code> value of the <code>NgModel</code> directive instance. Right after that the <code>detectContentChildrenChanges</code> will be invoked which will invoke the <code>detectChangesInternal</code> method for all the content children. Once the <code>NgModel</code> directive finds out about the changed value of the <code>model</code> property, it&#x2019;ll update the corresponding element by (almost) directly calling the renderer.</p>
 
 <p>Nothing unusual and terribly complicated so far.</p>
 
 <h3 id="the-context-property">The <code>context</code> property</h3>
 
-<p>Maybe you&rsquo;ve noticed that within the <strong>internal component</strong> we&rsquo;re accessing the property <code>this.context</code>. The <code>context</code> of the internal component is the instasnce of the component&rsquo;s controller itself. So for instance:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+<p>Maybe you&#x2019;ve noticed that within the <strong>internal component</strong> we&#x2019;re accessing the property <code>this.context</code>. The <code>context</code> of the internal component is the instasnce of the component&#x2019;s controller itself. So for instance:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;hero-app&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&apos;</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
   <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>&hellip;<code>this.context</code> will equal to <code>new HeroComponent()</code>. This means that in <code>detectChangesInternal</code> we have to access <code>this.context.name</code>. Here comes a problem. <strong>If we want to emit TypeScript as output of the AoT compilation process we must make sure we access only public fields in the templates of our components.</strong> Why is that? As we already mentioned the compiler can generate both TypeScript and JavaScript. Since TypeScript has access modifiers, and enforces access only to public properties outside the inheritance chain, inside the internal component we cannot access any private properties part of the context object, so both:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+<p>&#x2026;<code>this.context</code> will equal to <code>new HeroComponent()</code>. This means that in <code>detectChangesInternal</code> we have to access <code>this.context.name</code>. Here comes a problem. <strong>If we want to emit TypeScript as output of the AoT compilation process we must make sure we access only public fields in the templates of our components.</strong> Why is that? As we already mentioned the compiler can generate both TypeScript and JavaScript. Since TypeScript has access modifiers, and enforces access only to public properties outside the inheritance chain, inside the internal component we cannot access any private properties part of the context object, so both:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;hero-app&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&apos;</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>&hellip;and&hellip;</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">class</span> <span class="nx">Hero</span> <span class="p">{</span>
+<p>&#x2026;and&#x2026;</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">Hero</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;hero-app&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&apos;</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
   <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>will throw a compile time error in the generated <code>*.ngfactory.ts</code>. In the first example the internal component cannot access <code>hero</code> since it&rsquo;s private within <code>HeroComponent</code>, and in the second case the internal component won&rsquo;t be able to access <code>hero.name</code>, since <code>name</code> is private inside <code>Hero</code>.</p>
+<p>will throw a compile time error in the generated <code>*.ngfactory.ts</code>. In the first example the internal component cannot access <code>hero</code> since it&#x2019;s private within <code>HeroComponent</code>, and in the second case the internal component won&#x2019;t be able to access <code>hero.name</code>, since <code>name</code> is private inside <code>Hero</code>.</p>
 
 <h3 id="aot-and-encapsulation">AoT and encapsulation</h3>
 
-<p>Alright, we&rsquo;ll bind only to public properties and invoke only public methods inside of the templates but what happens with the component encapsulation? This may doesn&rsquo;t seem like a big problem at first, but imagine the following scenario:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// component.ts</span>
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
-<span class="sb">    {{ _initials }}</span>
-<span class="sb">  `</span>
+<p>Alright, we&#x2019;ll bind only to public properties and invoke only public methods inside of the templates but what happens with the component encapsulation? This may doesn&#x2019;t seem like a big problem at first, but imagine the following scenario:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
+</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;third-party&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span><span class="sb">    {{ _initials }}
+</span><span class="sb">  `</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">_initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
 
   <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
   <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">_initials</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;. &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_initials</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&apos; &apos;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&apos;. &apos;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&apos;.&apos;</span><span class="p">;</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">_name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The component above has a single input - <code>name</code>. Inside of the <code>name</code> setter it calculates the value of the <code>_initials</code> property. We can use the component as follows:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&quot;name&quot;&gt;&lt;/third-party&gt;&#39;</span>
-  <span class="c1">// ...</span>
-<span class="p">})</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;third-party [name]=&quot;name&quot;&gt;&lt;/third-party&gt;&apos;</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">})</span>
+<span class="c1">// ...
+</span><span class="c1"></span></code></pre></div>
 <p>Since in JiT mode, the Angular compiler generates JavaScript, this works perfect! Each time the value of the <code>name</code> expression changes and equals to truthy value, the <code>_initials</code> property will be recomputed. However, the implementation of <code>ThirdPartyComponent</code> is not AoT-friendly (to make sure you access only public/existing fields in your templates you can use <a href="https://github.com/mgechev/codelyzer">codelyzer</a>. If we want to do so we have to change it to:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// component.ts</span>
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
-<span class="sb">    {{ initials }}</span>
-<span class="sb">  `</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
+</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;third-party&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span><span class="sb">    {{ initials }}
+</span><span class="sb">  `</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
   <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
 
@@ -435,35 +381,33 @@
   <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>And thus something like this will be possible:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">ThirdPartyComponent</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;third-party-lib&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">ThirdPartyComponent</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;third-party-lib&apos;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&quot;name&quot;&gt;&lt;/third-party&gt;&#39;</span>
-  <span class="c1">// ...</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">Consumer</span> <span class="p">{</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;third-party [name]=&quot;name&quot;&gt;&lt;/third-party&gt;&apos;</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">})</span>
+<span class="k">class</span> <span class="nx">Consumer</span> <span class="p">{</span>
   <span class="err">@</span><span class="nx">ViewChild</span><span class="p">(</span><span class="nx">ThirdPartyComponent</span><span class="p">)</span> <span class="nx">cmp</span><span class="o">:</span> <span class="nx">ThirdPartyComponent</span><span class="p">;</span>
-  <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo Bar&#39;</span><span class="p">;</span>
+  <span class="nx">name</span> <span class="o">=</span> <span class="s1">&apos;Foo Bar&apos;</span><span class="p">;</span>
 
   <span class="nx">ngAfterViewInit</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">cmp</span><span class="p">.</span><span class="nx">initials</span> <span class="o">=</span> <span class="s1">&#39;M. D.&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">cmp</span><span class="p">.</span><span class="nx">initials</span> <span class="o">=</span> <span class="s1">&apos;M. D.&apos;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>&#x2026;which will leave the <code>ThirdPartyComponent</code> component in an inconsistent state. The value of the <code>_name</code> property of the <code>ThirdPartyComponent</code>&#x2019;s instance will be <code>Foo Bar</code> but the value of <code>initials</code> will be <code>M. D.</code> (instead of <code>F. B.</code>).</p>
 
-<p>&hellip;which will leave the <code>ThirdPartyComponent</code> component in an inconsistent state. The value of the <code>_name</code> property of the <code>ThirdPartyComponent</code>&rsquo;s instance will be <code>Foo Bar</code> but the value of <code>initials</code> will be <code>M. D.</code> (instead of <code>F. B.</code>).</p>
-
-<p>The answer of how to solve this issue is rooted in the <a href="https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/common/testing/mock_location_strategy.ts#L26">Angular&rsquo;s code</a>. In case we want to make our code AoT-friendly (i.e. bind only to public properties and methods in our templates), and in the same time keep encapsulation, we can use the TypeScript annotation <code>/** @internal */</code>:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// component.ts</span>
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`</span>
-<span class="sb">    {{ initials }}</span>
-<span class="sb">  `</span>
+<p>The answer of how to solve this issue is rooted in the <a href="https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/common/testing/mock_location_strategy.ts#L26">Angular&#x2019;s code</a>. In case we want to make our code AoT-friendly (i.e. bind only to public properties and methods in our templates), and in the same time keep encapsulation, we can use the TypeScript annotation <code>/** @internal */</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
+</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;third-party&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span><span class="sb">    {{ initials }}
+</span><span class="sb">  `</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
   <span class="cm">/** @internal */</span>
   <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
@@ -472,12 +416,11 @@
   <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>The <code>initials</code> property will be public but if we compile our third-party library with <code>tsc</code> and the <code>--stripInternal</code> and <code>--declarations</code> flags set, the <code>initials</code> property will be omitted from the type declarations file (e.g. <code>d.ts</code> file) for <code>ThirdPartyComponent</code>. This way we will be able to access it within the bounderies of our library but it won&rsquo;t be accessible by its consumers.</p>
+<p>The <code>initials</code> property will be public but if we compile our third-party library with <code>tsc</code> and the <code>--stripInternal</code> and <code>--declarations</code> flags set, the <code>initials</code> property will be omitted from the type declarations file (e.g. <code>d.ts</code> file) for <code>ThirdPartyComponent</code>. This way we will be able to access it within the bounderies of our library but it won&#x2019;t be accessible by its consumers.</p>
 
 <h4 id="recap-of-ngfactory-ts">Recap of <code>ngfactory.ts</code></h4>
 
-<p>Now lets make a quick recap of what&rsquo;s going on behind the scene! Lets suppose we have the <code>HeroComponent</code> from the example above. For this component, the Angular compiler will generate two classes:</p>
+<p>Now lets make a quick recap of what&#x2019;s going on behind the scene! Lets suppose we have the <code>HeroComponent</code> from the example above. For this component, the Angular compiler will generate two classes:</p>
 
 <ul>
 <li><code>_View_HeroComponent_Host1</code> - the <strong>internal host component</strong>.</li>
@@ -490,23 +433,23 @@
 
 <p>You can find the entire example summarized on the diagram below:</p>
 
-<p><amp-img src="/images/aot-angular/aot-summary.png" alt="AoT Summary" layout="responsive" width="1366" height="896"></amp-img></p>
+<p><amp-img src="/images/aot-angular/aot-summary.png" alt="AoT Summary"></amp-img></p>
 
 <h2 id="aot-vs-jit-development-experience">AoT vs JiT - development experience</h2>
 
-<p>In this section we&rsquo;ll discuss another point of difference between the development experience in using AoT vs JiT.</p>
+<p>In this section we&#x2019;ll discuss another point of difference between the development experience in using AoT vs JiT.</p>
 
-<p>Maybe the biggest difference between JiT that impacts the development experience is the fact that in JiT mode the internal component and the internal host component will be defined in JavaScript. This means that the fields in our components&rsquo; controllers are always going to be public so we can&rsquo;t get any compile-time errors because our internal component accesses any private fields of its context.</p>
+<p>Maybe the biggest difference between JiT that impacts the development experience is the fact that in JiT mode the internal component and the internal host component will be defined in JavaScript. This means that the fields in our components&#x2019; controllers are always going to be public so we can&#x2019;t get any compile-time errors because our internal component accesses any private fields of its context.</p>
 
 <p>In JiT once we bootstrap the application we already have our root injector and all the directives available in the root component (they are included in <code>BrowserModule</code> and all other modules that we import in the root module). This metadata will be passed to the compiler for the process of compilation of the template of the root component. Once the compiler generates the code with JiT, it has all the metadata which should be used for the generation of the code for all child components. It can generate the code for all of them since it already knows not only which providers are available at this level of the component tree but also which directives are visible there.</p>
 
-<p>This will allow the compiler know what to do when it visit an element in the template. For instance, the element <code>&lt;bar-baz&gt;&lt;/bar-baz&gt;</code> can be interpreted in two different ways depending on whether there&rsquo;s a directive/component with selector <code>bar-baz</code> available or not. Whether the compiler will only create an element <code>bar-baz</code> or also instantiate the component associated with the selector <code>bar-baz</code> depends on the metadata at the current phase of the compilation process (on the current state).</p>
+<p>This will allow the compiler know what to do when it visit an element in the template. For instance, the element <code>&lt;bar-baz&gt;&lt;/bar-baz&gt;</code> can be interpreted in two different ways depending on whether there&#x2019;s a directive/component with selector <code>bar-baz</code> available or not. Whether the compiler will only create an element <code>bar-baz</code> or also instantiate the component associated with the selector <code>bar-baz</code> depends on the metadata at the current phase of the compilation process (on the current state).</p>
 
 <p>Here comes the problem. How at build time we would know what directives are accessible on all levels of the component tree? Thanks to the great design of Angular we can perform a static-code analysis and find this out! <a href="https://github.com/chuckjaz">Chuck Jazdzewski</a> and <a href="https://github.com/alexeagle">Alex Eagle</a> did amazing job in this direction by developing the <a href="https://github.com/angular/angular/blob/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped/src/collector.ts"><code>MetadataCollector</code></a> and other <a href="https://github.com/angular/angular/tree/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped">related modules</a>. What the collector does is to walk the component tree and extract the metadata for each individual component and NgModule. This involves some awesome techniques which unfortunately are out of the scope of this blog post.</p>
 
 <h3 id="aot-and-third-party-modules">AoT and third-party modules</h3>
 
-<p>Alright, so the compiler needs metadata for the components in order to compile their templates. Lets suppose that in our application we use a thrid-party component library. How does the Angular AoT compiler knows the metadata of the components defined there if they are distributed as plain JavaScript? It oesn&rsquo;t. <strong>In order to be able to compile ahead-of-time an application, referencing an external Angular library, the library needs to be distributed with the <code>*.metadata.json</code> produced by the compiler.</strong></p>
+<p>Alright, so the compiler needs metadata for the components in order to compile their templates. Lets suppose that in our application we use a thrid-party component library. How does the Angular AoT compiler knows the metadata of the components defined there if they are distributed as plain JavaScript? It oesn&#x2019;t. <strong>In order to be able to compile ahead-of-time an application, referencing an external Angular library, the library needs to be distributed with the <code>*.metadata.json</code> produced by the compiler.</strong></p>
 
 <p>For further reading on how to use the Angular compiler, you can take a look at the <a href="https://angular.io/docs/ts/latest/cookbook/aot-compiler.html">following link</a>. For an example of how you can build your custom library in order to be AoT-ready, you can peek at the <a href="https://github.com/angular/mobile-toolkit/blob/master/app-shell/gulpfile.ts#L52-L54">angular/mobile-toolkit</a>.</p>
 
@@ -516,15 +459,15 @@
 
 <p>On the image below you can see how much time it takes to perform the initial rendering with JiT:</p>
 
-<p><amp-img src="/images/aot-angular/jit.png" layout="responsive" width="544" height="336"></amp-img></p>
+<p><amp-img src="/images/aot-angular/jit.png" style="display: block; margin: auto;"></amp-img></p>
 
 <p>On the image below you can see how much time it takes to perform the initial rendering with AoT:</p>
 
-<p><amp-img src="/images/aot-angular/aot.png" layout="responsive" width="548" height="342"></amp-img></p>
+<p><amp-img src="/images/aot-angular/aot.png" style="display: block; margin: auto;"></amp-img></p>
 
 <p>Another awesome thing about the Angular compiler is that it can emit not only JavaScript but TypeScript as well. This allows us to perform <strong>type checking in templates</strong>!</p>
 
-<p>Since the templates of the application are pure JavaScript/TypeScript, we know exactly what and where is used. This allows us to perform <strong>effective tree-shaking</strong> and drop all the directives/modules which are not used by the application out of the production bundle! On top of that we don&rsquo;t need to include the <code>@angular/compiler</code> module in the application bundle since we don&rsquo;t need to perform compilation at runtime!</p>
+<p>Since the templates of the application are pure JavaScript/TypeScript, we know exactly what and where is used. This allows us to perform <strong>effective tree-shaking</strong> and drop all the directives/modules which are not used by the application out of the production bundle! On top of that we don&#x2019;t need to include the <code>@angular/compiler</code> module in the application bundle since we don&#x2019;t need to perform compilation at runtime!</p>
 
 <p><strong>Note that for large to medium size applications the bundle produced after performing AoT compilation will most likely be bigger</strong> compared to same application using JiT compilation. This is because the VM friendly JavaScript produced by <code>ngc</code> is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!</p>
 
@@ -532,17 +475,17 @@
 
 <p>Last but not least, <strong>energy efficiency</strong>! The user devices need to perform even less since it receives already compiled code. This reduces battery consumption but how much? Here are the results of a some funny calculations I did :-):</p>
 
-<p>Based on findings by the research &ldquo;Who Killed My Battery: Analyzing Mobile Browser Energy Consumption&rdquo; (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn&rsquo;t mention specific version of jQuery, based on the date when it was published I assume it&rsquo;s talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of <code>@angular/compiler</code> is 103K. This means that it&rsquo;ll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we&rsquo;re ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and <code>@angular/compiler</code> we&rsquo;re opening only a single TCP connection, which is the biggest consumer of energy).</p>
+<p>Based on findings by the research &#x201C;Who Killed My Battery: Analyzing Mobile Browser Energy Consumption&#x201D; (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn&#x2019;t mention specific version of jQuery, based on the date when it was published I assume it&#x2019;s talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of <code>@angular/compiler</code> is 103K. This means that it&#x2019;ll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we&#x2019;re ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and <code>@angular/compiler</code> we&#x2019;re opening only a single TCP connection, which is the biggest consumer of energy).</p>
 
-<p>iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular applications. Each application have ~100 users per day. <code>5 apps * 1m * 100 users = 500m</code>. In case we perform JiT and we download the <code>@angular/compiler</code> it&rsquo;ll cost to the Earth <code>500m * 12.5J = 6250000000J</code>, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that <strong>we&rsquo;ll spend about $210 for recovering the consumed energy for a day</strong>. Notice that we even didn&rsquo;t take the further optimization that we&rsquo;ll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)</p>
+<p>iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular applications. Each application have ~100 users per day. <code>5 apps * 1m * 100 users = 500m</code>. In case we perform JiT and we download the <code>@angular/compiler</code> it&#x2019;ll cost to the Earth <code>500m * 12.5J = 6250000000J</code>, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that <strong>we&#x2019;ll spend about $210 for recovering the consumed energy for a day</strong>. Notice that we even didn&#x2019;t take the further optimization that we&#x2019;ll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)</p>
 
-<p><amp-img src="/images/aot-angular/better-place.jpg" layout="responsive" width="533" height="449"></amp-img></p>
+<p><amp-img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;"></amp-img></p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>The Angular&rsquo;s compiler improves the performance of our applications dramatically by taking advantage of the inline caching mechanism of the JavaScript Virtual Machines. On top of that we can perform it as part of our build process which solves problems such as forbidden <code>eval</code>, allows us to perform more efficient tree-shaking, improves the initial rendering time.</p>
+<p>The Angular&#x2019;s compiler improves the performance of our applications dramatically by taking advantage of the inline caching mechanism of the JavaScript Virtual Machines. On top of that we can perform it as part of our build process which solves problems such as forbidden <code>eval</code>, allows us to perform more efficient tree-shaking, improves the initial rendering time.</p>
 
-<p>Do we loose anything by not performing the compilation at runtime? In some very limited cases we may need to generate the templates of the components on demand. This will require us to load non-compiled components and perform the compilation process in the browser, in such cases we&rsquo;d need to include the <code>@angular/compiler</code> module as part of our application bundle. Another potential drawback of AoT compiled large to medium applications is the increase in their bundle size. Since the produced JavaScript for the components&rsquo; templates has bigger size compared to the templates themselves, this will most likely lead to bigger final bundle.</p>
+<p>Do we loose anything by not performing the compilation at runtime? In some very limited cases we may need to generate the templates of the components on demand. This will require us to load non-compiled components and perform the compilation process in the browser, in such cases we&#x2019;d need to include the <code>@angular/compiler</code> module as part of our application bundle. Another potential drawback of AoT compiled large to medium applications is the increase in their bundle size. Since the produced JavaScript for the components&#x2019; templates has bigger size compared to the templates themselves, this will most likely lead to bigger final bundle.</p>
 
 <p>In general, the AoT compilation is a good technique which is already integrated as part of the <a href="https://github.com/mgechev/angular-seed">angular-seed</a> and <code>angular-cli</code>, so you can take advantage of it today!</p>
 
@@ -552,139 +495,70 @@
 <li><a href="http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html">Inline Caches</a></li>
 <li><a href="https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/">2.5X Smaller Angular 2 Applications with Google Closure Compiler</a></li>
 <li><a href="https://crypto.stanford.edu/~dabo/pubs/abstracts/browserpower.html">Who Killed My Battery: Analyzing Mobile Browser Energy Consumption</a></li>
-<li><a href="https://github.com/angular/angular">Angular&rsquo;s Source Code</a></li>
+<li><a href="https://github.com/angular/angular">Angular&#x2019;s Source Code</a></li>
 </ul>
-</div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f&t=Ahead-of-Time%20Compilation%20in%20Angular" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f&text=Ahead-of-Time%20Compilation%20in%20Angular&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2016%2f08%2f14%2fahead-of-time-compilation-angular-offline-precompilation%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Ahead-of-Time Compilation in Angular</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Angular/">Angular</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/TypeScript/">TypeScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Compilers/">Compilers</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Angular/">Angular</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/TypeScript/">TypeScript</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

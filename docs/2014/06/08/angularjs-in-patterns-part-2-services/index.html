@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>AngularJS in Patterns (Part 2). Services. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -144,7 +144,7 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
 <p>We can take better look at the AngularJS&rsquo; source code, which implements the method <code>getService</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">cache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">cache</span><span class="p">[</span><span class="nx">serviceName</span><span class="p">]</span> <span class="o">===</span> <span class="nx">INSTANTIATING</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="nx">$injectorMinErr</span><span class="p">(</span><span class="s1">&#39;cdep&#39;</span><span class="p">,</span> <span class="s1">&#39;Circular dependency found: {0}&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &lt;- &#39;</span><span class="p">));</span>
@@ -167,7 +167,6 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>We can think of each service as a singleton, because each service is instantiated no more than a single time. We can consider the cache as a singleton manager. There is a slight variation from the UML diagram illustrated above because instead of keeping static, private reference to the singleton inside its constructor function, we keep the reference inside the singleton manager (stated in the snippet above as <code>cache</code>).</p>
 
 <p>This way the services are actually singletons but not implemented through the Singleton pattern, which provides a few advantages over the standard implementation:</p>
@@ -189,12 +188,12 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
 <p>Lets consider the following snippet:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$provide</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">baz</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="c1">//Factory method</span>
-      <span class="nx">$get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//Factory method
+</span><span class="c1"></span>      <span class="nx">$get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">baz</span> <span class="o">=</span> <span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">();</span>
         <span class="k">return</span> <span class="p">{</span>
           <span class="nx">baz</span><span class="o">:</span> <span class="nx">baz</span>
@@ -205,22 +204,21 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>In the code above we use the <code>config</code> callback in order to define new &ldquo;provider&rdquo;. Provider is an object, which has a method called <code>$get</code>. Since in JavaScript we don&rsquo;t have interfaces and the language is duck-typed there is a convention to name the factory method of the providers that way.</p>
 
 <p>Each service, filter, directive and controller has a provider (i.e. object which factory method, called <code>$get</code>), which is responsible for creating the component&rsquo;s instance.</p>
 
 <p>We can dig a little bit deeper in AngularJS&rsquo; implementation:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//...</span>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">//...
+</span><span class="c1"></span>
 <span class="nx">createInternalInjector</span><span class="p">(</span><span class="nx">instanceCache</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">servicename</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerInjector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">servicename</span> <span class="o">+</span> <span class="nx">providerSuffix</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">);</span>
 <span class="p">},</span> <span class="nx">strictDi</span><span class="p">));</span>
 
-<span class="c1">//...</span>
-
+<span class="c1">//...
+</span><span class="c1"></span>
 <span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">serviceName</span><span class="p">){</span>
   <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">locals</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">serviceName</span> <span class="o">=</span> <span class="nx">locals</span><span class="p">;</span>
@@ -245,20 +243,18 @@ This publication aims to provide a more theoretical overview of some of the Angu
     <span class="p">);</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// this means that we must be an array.</span>
-    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">[</span><span class="nx">length</span><span class="p">];</span>
+    <span class="c1">// this means that we must be an array.
+</span><span class="c1"></span>    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">[</span><span class="nx">length</span><span class="p">];</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>From the example above we can notice how the <code>$get</code> method is actually used:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>The snippet above calls the <code>invoke</code> method of <code>instanceInjector</code> with the factory method (i.e. <code>$get</code>) of given service, as first argument. Inside <code>invoke</code>&rsquo;s body <code>annotate</code> is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is called: <code>fn.apply(self, args)</code>.</p>
 
@@ -282,7 +278,7 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
 <p>AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method <code>decorator</code> of <code>$provide</code> you can create &ldquo;wrapper&rdquo; of any service you have previously defined or used by a third-party:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">();</span>
 <span class="p">});</span>
 
@@ -308,7 +304,6 @@ This publication aims to provide a more theoretical overview of some of the Angu
   <span class="p">});</span>
 <span class="p">});</span>
 </code></pre></div>
-
 
 <p>The example above defines new service called <code>foo</code>. In the <code>config</code> callback the method <code>$provide.decorator</code> is called with first argument <code>&quot;foo&quot;</code>, which is the name of the service, we want to decorate and second argument factory function, which implements the actual decoration. <code>$delegate</code> keeps reference to the original service <code>foo</code>. Using the dependency injection mechanism of AngularJS, reference to this local dependency is passed as first argument of the constructor function.
 We decorate the service by overriding its method <code>bar</code>. The actual decoration is simply extending <code>bar</code> by invoking one more <code>console.log statement</code> - <code>console.log('Decorated');</code> and after that calls the original <code>bar</code> method with the appropriate context.</p>
@@ -337,14 +332,14 @@ We decorate the service by overriding its method <code>bar</code>. The actual de
 
 <p>For example, lets take a look at how we can create an <code>XMLHttpRequest</code> POST request:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">(),</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">(),</span>
     <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;/example/new&#39;</span><span class="p">,</span>
     <span class="nx">params</span> <span class="o">=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-<span class="nx">http</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+<span class="nx">http</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&#34;POST&#34;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
 
-<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">);</span>
-<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Content-length&quot;</span><span class="p">,</span> <span class="nx">params</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&quot;Connection&quot;</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">);</span>
+<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-type&#34;</span><span class="p">,</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">);</span>
+<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-length&#34;</span><span class="p">,</span> <span class="nx">params</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+<span class="nx">http</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Connection&#34;</span><span class="p">,</span> <span class="s2">&#34;close&#34;</span><span class="p">);</span>
 
 <span class="nx">http</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span> <span class="o">&amp;&amp;</span> <span class="nx">http</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
@@ -353,10 +348,9 @@ We decorate the service by overriding its method <code>bar</code>. The actual de
 <span class="p">}</span>
 <span class="nx">http</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
 </code></pre></div>
-
 But if we want to post this data using the AngularJS&rsquo; <code>$http</code> service we can:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$http</span><span class="p">({</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$http</span><span class="p">({</span>
   <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
   <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/example/new&#39;</span><span class="p">,</span>
   <span class="nx">data</span><span class="o">:</span> <span class="nx">data</span>
@@ -365,15 +359,13 @@ But if we want to post this data using the AngularJS&rsquo; <code>$http</code> s
   <span class="nx">alert</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 or we can even:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$http</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/someUrl&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$http</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/someUrl&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 The second option provides pre-configured version, which creates a HTTP POST request to the given URL.</p>
 
 <p>Even higher level of abstraction is being created by <code>$resource</code>, which is build over the <code>$http</code> service. We will take a further look at this service in <a href="#active-record">Active Record</a> and <a href="#proxy">Proxy</a> sections.</p>
@@ -398,26 +390,22 @@ The second option provides pre-configured version, which creates a HTTP POST req
 
 <p>In the snippet below, there is a call to the <code>get</code> method of <code>$resource</code> instance, called <code>User</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
     <span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">42</span> <span class="p">});</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">//{}</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">//{}
+</span><span class="c1"></span></code></pre></div>
 
 <p><code>console.log</code> would output an empty object. Since the AJAX request, which happens behind the scenes, when <code>User.get</code> is invoked, is asynchronous, we don&rsquo;t have the actual user when <code>console.log</code> is called. Just after <code>User.get</code> makes the GET request, it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.</p>
 
 <p>How does this works with AngularJS? Well, lets consider the following snippet:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">42</span> <span class="p">});</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
-<p><div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;user.name&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<p><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&#34;user.name&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></code></pre></div>
 Initially when the snippet above executes, the property <code>user</code> of the <code>$scope</code> object will be with value equal to an empty object (<code>{}</code>), which means that <code>user.name</code> will be undefined and nothing will be rendered. Internally AngularJS will keep reference to this empty object. Once the server returns response for the GET request, AngularJS will populate the object with the data, received from the server. During the next <code>$digest</code> loop AngularJS will detect change in <code>$scope.user</code>, which will lead to update of the view.</p>
 
 <h4 id="active-record">Active Record</h4>
@@ -439,7 +427,7 @@ The returned resource object has action methods which provide high-level behavio
 
 <p>Here is how <code>$resource</code> could be used:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
     <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">({</span>
       <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
       <span class="nx">age</span> <span class="o">:</span> <span class="mi">42</span>
@@ -448,14 +436,12 @@ The returned resource object has action methods which provide high-level behavio
 <span class="nx">user</span><span class="p">.</span><span class="nx">$save</span><span class="p">();</span>
 </code></pre></div>
 
-
 <p>The call of <code>$resource</code> will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operations.</p>
 
 <p>This way we can use the constructor function and its static methods by:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">userid</span><span class="o">:</span> <span class="nx">userid</span> <span class="p">});</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">userid</span><span class="o">:</span> <span class="nx">userid</span> <span class="p">});</span>
 </code></pre></div>
-
 
 <p>The code above will immediately return an empty object and keep reference to it. Once the response has been successfully returned and parsed, AngularJS will populate this object with the received data (see <a href="#proxy">proxy</a>).</p>
 
@@ -507,14 +493,17 @@ The returned resource object has action methods which provide high-level behavio
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

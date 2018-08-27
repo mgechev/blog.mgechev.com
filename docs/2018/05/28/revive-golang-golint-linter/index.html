@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Fast, extensible, configurable, and beautiful linter for Go &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -149,9 +149,7 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
 <h2 id="usage">Usage</h2>
 
 <p>Install <code>revive</code> with:</p>
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>go get github.com/mgechev/revive
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">go get github.com/mgechev/revive</code></pre></div>
 <p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
 
 <p>Using the tool with no flags has the same behavior as <code>golint</code>. The magic happens when we add the <code>-formatter</code> flag:</p>
@@ -165,10 +163,10 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
 <p><img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto"></p>
 
 <p>What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:</p>
-<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kn">package</span> <span class="nx">models</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
 
-<span class="c1">//revive:disable</span>
-
+<span class="c1">//revive:disable
+</span><span class="c1"></span>
 <span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
     <span class="nx">Value</span>      <span class="kt">string</span>
     <span class="nx">IsStar</span>     <span class="kt">bool</span>
@@ -176,14 +174,12 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">//revive:enable</span>
-</code></pre></div>
-
+<span class="o">//</span><span class="nx">revive</span><span class="p">:</span><span class="nx">enable</span></code></pre></div>
 <p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
-<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kn">package</span> <span class="nx">models</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
 
-<span class="c1">//revive:disable:exported</span>
-
+<span class="c1">//revive:disable:exported
+</span><span class="c1"></span>
 <span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
     <span class="nx">Value</span>      <span class="kt">string</span>
     <span class="nx">IsStar</span>     <span class="kt">bool</span>
@@ -191,36 +187,30 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">//revive:enable:exported</span>
-</code></pre></div>
-
+<span class="o">//</span><span class="nx">revive</span><span class="p">:</span><span class="nx">enable</span><span class="p">:</span><span class="nx">exported</span></code></pre></div>
 <p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
 
 <p>Finally, if we want to ignore all files from a directory, we can use the <code>-exclude</code> flag:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>revive -exclude tests/... ./...
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... ./...</code></pre></div>
 <p>The command above will lint all files from the current directory, excluding all files in <code>tests</code>, recursively. If we want to exclude more than one directory use:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span>revive -exclude tests/... -exclude utils/... ./...
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... -exclude utils/... ./...</code></pre></div>
 <h3 id="configurability">Configurability</h3>
 
 <p>In an image in the last section, we saw that by using a config file in TOML format, we could configure the execution of <code>revive</code>. Here&rsquo;s an example config file:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span># Ignores files with &quot;GENERATED&quot; header, similar to golint
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text"># Ignores files with &#34;GENERATED&#34; header, similar to golint
 ignoreGeneratedHeader = true
 
-# Sets the default severity to &quot;warning&quot;
-severity = &quot;warning&quot;
+# Sets the default severity to &#34;warning&#34;
+severity = &#34;warning&#34;
 
 # Sets the default failure confidence. The semantics behind this property
 # is that revive ignores all failures with a confidence level below 0.8.
 confidence = 0.8
 
-# Sets the error code for failures with severity &quot;error&quot;
+# Sets the error code for failures with severity &#34;error&#34;
 errorCode = 0
 
-# Sets the error code for failures with severity &quot;warning&quot;
+# Sets the error code for failures with severity &#34;warning&#34;
 warningCode = 0
 
 # Configuration of the `cyclomatic` rule. Here we specify that
@@ -228,11 +218,9 @@ warningCode = 0
 [rule.cyclomatic]
   arguments = [10]
 
-# Sets the severity of the `package-comments` rule to &quot;error&quot;.
+# Sets the severity of the `package-comments` rule to &#34;error&#34;.
 [rule.package-comments]
-  severity = &quot;error&quot;
-</code></pre></div>
-
+  severity = &#34;error&#34;</code></pre></div>
 <p>Let&rsquo;s quickly go over the individual properties.</p>
 
 <ul>
@@ -255,12 +243,10 @@ warningCode = 0
 <ul>
 <li>Contribute to the project - <code>revive</code> is open for external contributions. If a rule makes sense and passes its unit tests, it&rsquo;s more than welcome to become part of <code>revive</code>! On top of that, creating a new rule is just a matter of implementing this simple interface:</li>
 </ul>
-<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
     <span class="nx">Name</span><span class="p">()</span> <span class="kt">string</span>
     <span class="nx">Apply</span><span class="p">(</span><span class="o">*</span><span class="nx">File</span><span class="p">,</span> <span class="nx">Arguments</span><span class="p">)</span> <span class="p">[]</span><span class="nx">Failure</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <ul>
 <li>Fork the project and push the rules there. If you think your rules won&rsquo;t apply to others (although the chances are that they will), you can fork <code>revive</code> and not push them upstream. Just make sure that you sync your code with upstream once in a while to get all the new features and bug fixes from there!</li>
 </ul>
@@ -270,28 +256,22 @@ warningCode = 0
 <p><strong>What about formatters?</strong></p>
 
 <p>Well, creating a new formatter is as simple as creating a new rule. Just implement the following interface:</p>
-<div class="highlight"><pre><code class="language-go" data-lang="go"><span></span><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
     <span class="nx">Format</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">Failure</span><span class="p">,</span> <span class="nx">RulesConfig</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
     <span class="nx">Name</span><span class="p">()</span> <span class="kt">string</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Here you can find a sample implementation of a <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/formatter/json.go">JSON formatter</a>.</p>
 
 <h2 id="performance">Performance</h2>
 
 <p>I run some basic benchmarks to compare the performance of <code>golint</code> and <code>revive</code>. Here&rsquo;s what I found out after running both linters against <code>kubernetes</code>:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span><span class="nb">time</span> golint be/…
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> golint be/…
 real    0m25.389s
 user    0m29.221s
-sys     0m3.065s
-</code></pre></div>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"><span></span><span class="nb">time</span> revive be/…
+sys     0m3.065s</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> revive be/…
 real    0m6.524s
 user    0m22.882s
-sys     0m1.114s
-</code></pre></div>
-
+sys     0m1.114s</code></pre></div>
 <p>Since <strong><code>revive</code></strong> lints the individual files in separate goroutines, it <strong>outperforms <code>golint</code> about 4 times</strong>.</p>
 
 <h2 id="conclusion">Conclusion</h2>
@@ -340,14 +320,17 @@ sys     0m1.114s
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

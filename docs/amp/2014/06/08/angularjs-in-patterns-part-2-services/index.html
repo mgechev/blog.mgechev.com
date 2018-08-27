@@ -1,137 +1,108 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>AngularJS in Patterns (Part 2). Services. &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2014/06/08/angularjs-in-patterns-part-2-services/">
+		
 
+		<meta property="og:title" content="AngularJS in Patterns (Part 2). Services.">
+		<meta property="og:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series.
+This blog post continues the series &#x201C;AngularJS in Patterns&#x201D;. You can find the original GitHub repository, which contains all the information at github.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/">
-
-
-    
-    
-    
-    <title>AngularJS in Patterns (Part 2). Services. - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series.This blog post continues the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
-
-<meta property="og:title" content="AngularJS in Patterns (Part 2). Services. - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series.This blog post continues the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/">
-<meta name="twitter:title" content="AngularJS in Patterns (Part 2). Services. - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series.This blog post continues the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "AngularJS in Patterns (Part 2). Services. - Minko Gechev&#39;s blog",
-    "datePublished": "2014-06-08T00:00:00JST",
-    "dateModified": "2014-06-08T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series.
-This blog post continues the series &ldquo;AngularJS in Patterns&rdquo;. You can find the original GitHub repository, which contains all the information at github."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-d5df045a433d010a4160d0148b922173">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2014/06/08/angularjs-in-patterns-part-2-services/" class="thumbnail" title="AngularJS in Patterns (Part 2). Services."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">AngularJS in Patterns (Part 2). Services.</h1>
-        <ul class="p-facts">
-          <li><time datetime="2014-06-08T00:00:00JST">Jun 8, 2014</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f&t=AngularJS%20in%20Patterns%20%28Part%202%29.%20Services." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f&text=AngularJS%20in%20Patterns%20%28Part%202%29.%20Services.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body">
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        AngularJS in Patterns (Part 2). Services.
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2014-06-08-angularjs-in-patterns-part-2-services.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Jun 8, 2014
+                    &#xB7; 11 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/angularjs">AngularJS</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/angularjs-overview">AngularJS overview</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/design-patterns">Design patterns</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/development">Development</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/object-oriented-programming">Object-Oriented Programming</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/patterns">patterns</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/programming">Programming</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/software-engineering">Software engineering</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/web-application">web application</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
 
 <blockquote>
 This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.
@@ -139,11 +110,11 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
 <p><a href="https://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/">Link</a> to the first part of the series.</p>
 
-<p>This blog post continues the series &ldquo;AngularJS in Patterns&rdquo;. You can find the original GitHub repository, which contains all the information at <a href="https://github.com/mgechev/angularjs-in-patterns">github.com/mgechev/angularjs-in-patterns</a>. If you like my work you can follow me at <a href="https://github.com/mgechev">github.com/mgechev</a>.</p>
+<p>This blog post continues the series &#x201C;AngularJS in Patterns&#x201D;. You can find the original GitHub repository, which contains all the information at <a href="https://github.com/mgechev/angularjs-in-patterns">github.com/mgechev/angularjs-in-patterns</a>. If you like my work you can follow me at <a href="https://github.com/mgechev">github.com/mgechev</a>.</p>
 
 <h3 id="services">Services</h3>
 
-<p>In this sub-chapter we are going to take a look at the design and architectural patterns used in AngularJS&rsquo; services.</p>
+<p>In this sub-chapter we are going to take a look at the design and architectural patterns used in AngularJS&#x2019; services.</p>
 
 <p>Note: Some of the described patterns are used in other components as well but their usage is almost equivalent so they are explained here.</p>
 
@@ -155,7 +126,7 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
 <p>In the UML diagram below the singleton design pattern is illustrated.</p>
 
-<p><amp-img src="/images/legacy/uploadspatterns/singleton.png" alt="Singleton" title="Fig. 1" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/singleton.png" alt="Singleton" title="Fig. 1"></amp-img></p>
 
 <p>When given dependency is required by any component, AngularJS resolves it using the following algorithm:</p>
 
@@ -171,12 +142,12 @@ This publication aims to provide a more theoretical overview of some of the Angu
 </ul></li>
 </ul>
 
-<p>We can take better look at the AngularJS&rsquo; source code, which implements the method <code>getService</code>:</p>
+<p>We can take better look at the AngularJS&#x2019; source code, which implements the method <code>getService</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">getService</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">cache</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">serviceName</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">cache</span><span class="p">[</span><span class="nx">serviceName</span><span class="p">]</span> <span class="o">===</span> <span class="nx">INSTANTIATING</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="nx">$injectorMinErr</span><span class="p">(</span><span class="s1">&#39;cdep&#39;</span><span class="p">,</span> <span class="s1">&#39;Circular dependency found: {0}&#39;</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &lt;- &#39;</span><span class="p">));</span>
+      <span class="k">throw</span> <span class="nx">$injectorMinErr</span><span class="p">(</span><span class="s1">&apos;cdep&apos;</span><span class="p">,</span> <span class="s1">&apos;Circular dependency found: {0}&apos;</span><span class="p">,</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&apos; &lt;- &apos;</span><span class="p">));</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">serviceName</span><span class="p">];</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -196,7 +167,6 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>We can think of each service as a singleton, because each service is instantiated no more than a single time. We can consider the cache as a singleton manager. There is a slight variation from the UML diagram illustrated above because instead of keeping static, private reference to the singleton inside its constructor function, we keep the reference inside the singleton manager (stated in the snippet above as <code>cache</code>).</p>
 
 <p>This way the services are actually singletons but not implemented through the Singleton pattern, which provides a few advantages over the standard implementation:</p>
@@ -206,7 +176,7 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <li>You can control the creation of singleton objects (in our case the IoC container controls it for us, by instantiating the singletons lazy)</li>
 </ul>
 
-<p>For further discussion on this topic Miško Hevery&rsquo;s <a href="http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html">article</a> in the Google Testing blog could be considered.</p>
+<p>For further discussion on this topic Mi&#x161;ko Hevery&#x2019;s <a href="http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html">article</a> in the Google Testing blog could be considered.</p>
 
 <h4 id="factory-method">Factory Method</h4>
 
@@ -214,16 +184,16 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <p>The factory method pattern is a creational pattern, which uses factory methods to deal with the problem of creating objects without specifying the exact class of object that will be created. This is done by creating objects via a factory method, which is either specified in an interface (abstract class) and implemented in implementing classes (concrete classes); or implemented in a base class, which can be overridden when inherited in derived classes; rather than by a constructor.</p>
 </blockquote>
 
-<p><amp-img src="/images/legacy/uploadspatterns/factory-method.png" alt="Factory Method" title="Fig. 2" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/factory-method.png" alt="Factory Method" title="Fig. 2"></amp-img></p>
 
 <p>Lets consider the following snippet:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$provide</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$provide</span><span class="p">.</span><span class="nx">provider</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">baz</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="c1">//Factory method</span>
-      <span class="nx">$get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">//Factory method
+</span><span class="c1"></span>      <span class="nx">$get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">baz</span> <span class="o">=</span> <span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">();</span>
         <span class="k">return</span> <span class="p">{</span>
           <span class="nx">baz</span><span class="o">:</span> <span class="nx">baz</span>
@@ -234,24 +204,23 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <span class="p">});</span>
 </code></pre></div>
 
+<p>In the code above we use the <code>config</code> callback in order to define new &#x201C;provider&#x201D;. Provider is an object, which has a method called <code>$get</code>. Since in JavaScript we don&#x2019;t have interfaces and the language is duck-typed there is a convention to name the factory method of the providers that way.</p>
 
-<p>In the code above we use the <code>config</code> callback in order to define new &ldquo;provider&rdquo;. Provider is an object, which has a method called <code>$get</code>. Since in JavaScript we don&rsquo;t have interfaces and the language is duck-typed there is a convention to name the factory method of the providers that way.</p>
+<p>Each service, filter, directive and controller has a provider (i.e. object which factory method, called <code>$get</code>), which is responsible for creating the component&#x2019;s instance.</p>
 
-<p>Each service, filter, directive and controller has a provider (i.e. object which factory method, called <code>$get</code>), which is responsible for creating the component&rsquo;s instance.</p>
+<p>We can dig a little bit deeper in AngularJS&#x2019; implementation:</p>
 
-<p>We can dig a little bit deeper in AngularJS&rsquo; implementation:</p>
-
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//...</span>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">//...
+</span><span class="c1"></span>
 <span class="nx">createInternalInjector</span><span class="p">(</span><span class="nx">instanceCache</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">servicename</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="nx">providerInjector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">servicename</span> <span class="o">+</span> <span class="nx">providerSuffix</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">);</span>
 <span class="p">},</span> <span class="nx">strictDi</span><span class="p">));</span>
 
-<span class="c1">//...</span>
-
+<span class="c1">//...
+</span><span class="c1"></span>
 <span class="kd">function</span> <span class="nx">invoke</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">serviceName</span><span class="p">){</span>
-  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">locals</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">locals</span> <span class="o">===</span> <span class="s1">&apos;string&apos;</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">serviceName</span> <span class="o">=</span> <span class="nx">locals</span><span class="p">;</span>
     <span class="nx">locals</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">}</span>
@@ -263,9 +232,9 @@ This publication aims to provide a more theoretical overview of some of the Angu
 
   <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">length</span> <span class="o">=</span> <span class="nx">$inject</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">key</span> <span class="o">=</span> <span class="nx">$inject</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">key</span> <span class="o">!==</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">throw</span> <span class="nx">$injectorMinErr</span><span class="p">(</span><span class="s1">&#39;itkn&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;Incorrect injection token! Expected service name as string, got {0}&#39;</span><span class="p">,</span> <span class="nx">key</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">key</span> <span class="o">!==</span> <span class="s1">&apos;string&apos;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="nx">$injectorMinErr</span><span class="p">(</span><span class="s1">&apos;itkn&apos;</span><span class="p">,</span>
+              <span class="s1">&apos;Incorrect injection token! Expected service name as string, got {0}&apos;</span><span class="p">,</span> <span class="nx">key</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="nx">args</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span>
       <span class="nx">locals</span> <span class="o">&amp;&amp;</span> <span class="nx">locals</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
@@ -274,24 +243,22 @@ This publication aims to provide a more theoretical overview of some of the Angu
     <span class="p">);</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">fn</span><span class="p">.</span><span class="nx">$inject</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// this means that we must be an array.</span>
-    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">[</span><span class="nx">length</span><span class="p">];</span>
+    <span class="c1">// this means that we must be an array.
+</span><span class="c1"></span>    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">[</span><span class="nx">length</span><span class="p">];</span>
   <span class="p">}</span>
 
   <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>From the example above we can notice how the <code>$get</code> method is actually used:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">instanceInjector</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">.</span><span class="nx">$get</span><span class="p">,</span> <span class="nx">provider</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="nx">servicename</span><span class="p">)</span>
 </code></pre></div>
 
+<p>The snippet above calls the <code>invoke</code> method of <code>instanceInjector</code> with the factory method (i.e. <code>$get</code>) of given service, as first argument. Inside <code>invoke</code>&#x2019;s body <code>annotate</code> is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is called: <code>fn.apply(self, args)</code>.</p>
 
-<p>The snippet above calls the <code>invoke</code> method of <code>instanceInjector</code> with the factory method (i.e. <code>$get</code>) of given service, as first argument. Inside <code>invoke</code>&rsquo;s body <code>annotate</code> is called with first argument the factory method. Annotate resolves all dependencies through the dependency injection mechanism of AngularJS, which was considered above. When all dependencies are resolved the factory method is called: <code>fn.apply(self, args)</code>.</p>
-
-<p>If we think in terms of the UML diagram above, we can call the provider a &ldquo;ConcreteCreator&rdquo; and the actual component, which is being created a &ldquo;Product&rdquo;.</p>
+<p>If we think in terms of the UML diagram above, we can call the provider a &#x201C;ConcreteCreator&#x201D; and the actual component, which is being created a &#x201C;Product&#x201D;.</p>
 
 <p>There are a few benefits of using the factory method pattern in this case, because of the indirection it creates. This way the framework can take care of the boilerplates during the instantiation of new components like:</p>
 
@@ -307,30 +274,30 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <p>The decorator pattern (also known as Wrapper, an alternative naming shared with the Adapter pattern) is a design pattern that allows behavior to be added to an individual object, either statically or dynamically, without affecting the behavior of other objects from the same class.</p>
 </blockquote>
 
-<p><amp-img src="/images/legacy/uploadspatterns/decorator.png" alt="Decorator" title="Fig. 4" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/decorator.png" alt="Decorator" title="Fig. 4"></amp-img></p>
 
-<p>AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method <code>decorator</code> of <code>$provide</code> you can create &ldquo;wrapper&rdquo; of any service you have previously defined or used by a third-party:</p>
+<p>AngularJS provides out-of-the-box way for extending and/or enchanting the functionality of already existing services. Using the method <code>decorator</code> of <code>$provide</code> you can create &#x201C;wrapper&#x201D; of any service you have previously defined or used by a third-party:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">();</span>
 <span class="p">});</span>
 
-<span class="nx">myModule</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<span class="nx">myModule</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">bar</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;I\&#39;m bar&#39;</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;I\&apos;m bar&apos;</span><span class="p">);</span>
     <span class="p">},</span>
     <span class="nx">baz</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;I\&#39;m baz&#39;</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;I\&apos;m baz&apos;</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">};</span>
 <span class="p">});</span>
 
 <span class="nx">myModule</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$provide</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$provide</span><span class="p">.</span><span class="nx">decorator</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$delegate</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$provide</span><span class="p">.</span><span class="nx">decorator</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$delegate</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">barBackup</span> <span class="o">=</span> <span class="nx">$delegate</span><span class="p">.</span><span class="nx">bar</span><span class="p">;</span>
     <span class="nx">$delegate</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Decorated&#39;</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Decorated&apos;</span><span class="p">);</span>
       <span class="nx">barBackup</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">$delegate</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
     <span class="p">};</span>
     <span class="k">return</span> <span class="nx">$delegate</span><span class="p">;</span>
@@ -338,11 +305,10 @@ This publication aims to provide a more theoretical overview of some of the Angu
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>The example above defines new service called <code>foo</code>. In the <code>config</code> callback the method <code>$provide.decorator</code> is called with first argument <code>&quot;foo&quot;</code>, which is the name of the service, we want to decorate and second argument factory function, which implements the actual decoration. <code>$delegate</code> keeps reference to the original service <code>foo</code>. Using the dependency injection mechanism of AngularJS, reference to this local dependency is passed as first argument of the constructor function.
-We decorate the service by overriding its method <code>bar</code>. The actual decoration is simply extending <code>bar</code> by invoking one more <code>console.log statement</code> - <code>console.log('Decorated');</code> and after that calls the original <code>bar</code> method with the appropriate context.</p>
+We decorate the service by overriding its method <code>bar</code>. The actual decoration is simply extending <code>bar</code> by invoking one more <code>console.log statement</code> - <code>console.log(&apos;Decorated&apos;);</code> and after that calls the original <code>bar</code> method with the appropriate context.</p>
 
-<p>Using this pattern is especially useful when we need to modify the functionality of third party services. In cases when multiple similar decorations are required (like performance measurement of multiple methods, authorization, logging, etc.), we may have a lot of duplications and violate the DRY principle. In such cases it is useful to use <a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented programming</a>. The only AOP framework for AngularJS I&rsquo;m aware of could be found at <a href="https://github.com/mgechev/angular-aop">github.com/mgechev/angular-aop</a>.</p>
+<p>Using this pattern is especially useful when we need to modify the functionality of third party services. In cases when multiple similar decorations are required (like performance measurement of multiple methods, authorization, logging, etc.), we may have a lot of duplications and violate the DRY principle. In such cases it is useful to use <a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">aspect-oriented programming</a>. The only AOP framework for AngularJS I&#x2019;m aware of could be found at <a href="https://github.com/mgechev/angular-aop">github.com/mgechev/angular-aop</a>.</p>
 
 <h4 id="facade">Facade</h4>
 
@@ -360,14 +326,14 @@ We decorate the service by overriding its method <code>bar</code>. The actual de
 </ol>
 </blockquote>
 
-<p><amp-img src="/images/legacy/uploadspatterns/facade.png" alt="Facade" title="Fig. 11" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/facade.png" alt="Facade" title="Fig. 11"></amp-img></p>
 
 <p>There are a few facades in AngularJS. Each time you want to provide higher level API to given functionality you practically create a facade.</p>
 
 <p>For example, lets take a look at how we can create an <code>XMLHttpRequest</code> POST request:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">(),</span>
-    <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;/example/new&#39;</span><span class="p">,</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">(),</span>
+    <span class="nx">url</span> <span class="o">=</span> <span class="s1">&apos;/example/new&apos;</span><span class="p">,</span>
     <span class="nx">params</span> <span class="o">=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
 <span class="nx">http</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">url</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
 
@@ -382,27 +348,24 @@ We decorate the service by overriding its method <code>bar</code>. The actual de
 <span class="p">}</span>
 <span class="nx">http</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
 </code></pre></div>
+But if we want to post this data using the AngularJS&#x2019; <code>$http</code> service we can:</p>
 
-But if we want to post this data using the AngularJS&rsquo; <code>$http</code> service we can:</p>
-
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$http</span><span class="p">({</span>
-  <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-  <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/example/new&#39;</span><span class="p">,</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$http</span><span class="p">({</span>
+  <span class="nx">method</span><span class="o">:</span> <span class="s1">&apos;POST&apos;</span><span class="p">,</span>
+  <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/example/new&apos;</span><span class="p">,</span>
   <span class="nx">data</span><span class="o">:</span> <span class="nx">data</span>
 <span class="p">})</span>
 <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 or we can even:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$http</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/someUrl&#39;</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
+<p><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$http</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&apos;/someUrl&apos;</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 The second option provides pre-configured version, which creates a HTTP POST request to the given URL.</p>
 
 <p>Even higher level of abstraction is being created by <code>$resource</code>, which is build over the <code>$http</code> service. We will take a further look at this service in <a href="#active-record">Active Record</a> and <a href="#proxy">Proxy</a> sections.</p>
@@ -413,7 +376,7 @@ The second option provides pre-configured version, which creates a HTTP POST req
 <p>A proxy, in its most general form, is a class functioning as an interface to something else. The proxy could interface to anything: a network connection, a large object in memory, a file, or some other resource that is expensive or impossible to duplicate.</p>
 </blockquote>
 
-<p><amp-img src="/images/legacy/uploadspatterns/proxy.png" alt="Proxy" title="Fig. 9" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/proxy.png" alt="Proxy" title="Fig. 9"></amp-img></p>
 
 <p>We can distinguish three different types of proxy:</p>
 
@@ -423,30 +386,26 @@ The second option provides pre-configured version, which creates a HTTP POST req
 <li>Protection Proxy</li>
 </ul>
 
-<p>In this sub-chapter we are going to take a look at AngularJS&rsquo; implementation of Virtual Proxy.</p>
+<p>In this sub-chapter we are going to take a look at AngularJS&#x2019; implementation of Virtual Proxy.</p>
 
 <p>In the snippet below, there is a call to the <code>get</code> method of <code>$resource</code> instance, called <code>User</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&apos;/users/:id&apos;</span><span class="p">),</span>
     <span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">42</span> <span class="p">});</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">//{}</span>
-</code></pre></div>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">//{}
+</span><span class="c1"></span></code></pre></div>
 
-
-<p><code>console.log</code> would output an empty object. Since the AJAX request, which happens behind the scenes, when <code>User.get</code> is invoked, is asynchronous, we don&rsquo;t have the actual user when <code>console.log</code> is called. Just after <code>User.get</code> makes the GET request, it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.</p>
+<p><code>console.log</code> would output an empty object. Since the AJAX request, which happens behind the scenes, when <code>User.get</code> is invoked, is asynchronous, we don&#x2019;t have the actual user when <code>console.log</code> is called. Just after <code>User.get</code> makes the GET request, it returns an empty object and keeps reference to it. We can think of this object as virtual proxy (a simple placeholder), which would be populated with the actual data once the client receives response by the server.</p>
 
 <p>How does this works with AngularJS? Well, lets consider the following snippet:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$resource</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&apos;/users/:id&apos;</span><span class="p">),</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">42</span> <span class="p">});</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
-<p><div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;user.name&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<p><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;user.name&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></code></pre></div>
 Initially when the snippet above executes, the property <code>user</code> of the <code>$scope</code> object will be with value equal to an empty object (<code>{}</code>), which means that <code>user.name</code> will be undefined and nothing will be rendered. Internally AngularJS will keep reference to this empty object. Once the server returns response for the GET request, AngularJS will populate the object with the data, received from the server. During the next <code>$digest</code> loop AngularJS will detect change in <code>$scope.user</code>, which will lead to update of the view.</p>
 
 <h4 id="active-record">Active Record</h4>
@@ -455,11 +414,11 @@ Initially when the snippet above executes, the property <code>user</code> of the
 <p>The Active Record object is an object, which carries both data and behavior. Usually most of the data in these objects is persistent, responsibility of the Active Record object is to take care of the communication with the database in order to create, update, retrieve or delete the data. It may delegate this responsibility to lower level objects but calls to instance or static methods of the active record object cause the database communication.</p>
 </blockquote>
 
-<p><amp-img src="/images/legacy/uploadspatterns/active-record.png" alt="Active Record" title="Fig. 7" layout="responsive"></amp-img></p>
+<p><amp-img src="/images/legacy/uploadspatterns/active-record.png" alt="Active Record" title="Fig. 7"></amp-img></p>
 
-<p>AngularJS defines a service called <code>$resource</code>. In the current version of AngularJS (1.2+) it is being distributed in module outside of the AngularJS&rsquo; core.</p>
+<p>AngularJS defines a service called <code>$resource</code>. In the current version of AngularJS (1.2+) it is being distributed in module outside of the AngularJS&#x2019; core.</p>
 
-<p>According to the AngularJS&rsquo; documentation <code>$resource</code> is:</p>
+<p>According to the AngularJS&#x2019; documentation <code>$resource</code> is:</p>
 
 <blockquote>
 <p>A factory which creates a resource object that lets you interact with RESTful server-side data sources.
@@ -468,186 +427,95 @@ The returned resource object has action methods which provide high-level behavio
 
 <p>Here is how <code>$resource</code> could be used:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&#39;/users/:id&#39;</span><span class="p">),</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">$resource</span><span class="p">(</span><span class="s1">&apos;/users/:id&apos;</span><span class="p">),</span>
     <span class="nx">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">({</span>
-      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;foo&apos;</span><span class="p">,</span>
       <span class="nx">age</span> <span class="o">:</span> <span class="mi">42</span>
     <span class="p">});</span>
 
 <span class="nx">user</span><span class="p">.</span><span class="nx">$save</span><span class="p">();</span>
 </code></pre></div>
 
-
 <p>The call of <code>$resource</code> will create a constructor function for our model instances. Each of the model instances will have methods, which could be used for the different CRUD operations.</p>
 
 <p>This way we can use the constructor function and its static methods by:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">userid</span><span class="o">:</span> <span class="nx">userid</span> <span class="p">});</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">userid</span><span class="o">:</span> <span class="nx">userid</span> <span class="p">});</span>
 </code></pre></div>
-
 
 <p>The code above will immediately return an empty object and keep reference to it. Once the response has been successfully returned and parsed, AngularJS will populate this object with the received data (see <a href="#proxy">proxy</a>).</p>
 
-<p>You can find more details for <code>$resource</code> <a href="https://blog.mgechev.com/2014/02/05/angularjs-resource-active-record-http/">The magic of $resource</a> and <a href="https://docs.angularjs.org/api/ngResource/service/$resource">AngularJS&rsquo; documentation</a>.</p>
+<p>You can find more details for <code>$resource</code> <a href="https://blog.mgechev.com/2014/02/05/angularjs-resource-active-record-http/">The magic of $resource</a> and <a href="https://docs.angularjs.org/api/ngResource/service/$resource">AngularJS&#x2019; documentation</a>.</p>
 
 <p>Since Martin Fowler states that</p>
 
 <blockquote>
-<p>responsibility of the Active Record object is to take care of the communication with the databse in order to create&hellip;</p>
+<p>responsibility of the Active Record object is to take care of the communication with the databse in order to create&#x2026;</p>
 </blockquote>
 
-<p><code>$resource</code> does not implement exactly the Active Record pattern, since it communicates with RESTful service instead of the database. Anyway, we can consider it as &ldquo;Active Record like RESTful communication&rdquo;.</p>
-</div>
+<p><code>$resource</code> does not implement exactly the Active Record pattern, since it communicates with RESTful service instead of the database. Anyway, we can consider it as &#x201C;Active Record like RESTful communication&#x201D;.</p>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f&t=AngularJS%20in%20Patterns%20%28Part%202%29.%20Services." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f&text=AngularJS%20in%20Patterns%20%28Part%202%29.%20Services.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2014%2f06%2f08%2fangularjs-in-patterns-part-2-services%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>AngularJS in Patterns (Part 2). Services.</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/AngularJS/">AngularJS</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Object-Oriented-Programming/">Object-Oriented Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/OpenSource/">OpenSource</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Patterns/">Patterns</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Web-development/">Web development</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/AngularJS/">AngularJS</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/AngularJS-overview/">AngularJS overview</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Design-patterns/">Design patterns</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Development/">Development</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Object-Oriented-Programming/">Object-Oriented Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/patterns/">patterns</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Software-engineering/">Software engineering</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/web-application/">web application</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

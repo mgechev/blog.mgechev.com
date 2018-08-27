@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Boost the Performance of an AngularJS Application Using Immutable Data &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -101,28 +101,25 @@ Later, when my code was used in production, I started appreciating things like h
 <h2 id="immutable-js">Immutable.js</h2>
 
 <p>On 28 of May, 2014, the first commit of <a href="https://github.com/facebook/immutable-js">Immutable.js</a> was pushed in the facebook&rsquo;s organization on GitHub. Immutable.js is a set of immutable data structures (List, Set, Map, etc.) implemented in JavaScript. What exactly is an immutable data structure? Well it is a data structure, which can&rsquo;t change. Each action, which intends to change the collection creates a new one.</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">changed</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>    <span class="c1">// List [ 1, 2, 3 ]</span>
-<span class="nx">changed</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// List [ 1, 2, 3, 4 ]</span>
-<span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span>    <span class="c1">// false</span>
-</code></pre></div>
-
+<span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>    <span class="c1">// List [ 1, 2, 3 ]
+</span><span class="c1"></span><span class="nx">changed</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// List [ 1, 2, 3, 4 ]
+</span><span class="c1"></span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span>    <span class="c1">// false
+</span><span class="c1"></span></code></pre></div>
 <p>Compared to the mutable JavaScript lists:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
+</span><span class="c1"></span></code></pre></div>
 <h2 id="angularjs-data-binding">AngularJS data-binding</h2>
 
 <p>There are a lot of posts about how the AngularJS data-binding and dirty checking works. I even created a light AngularJS implementation in order <a href="https://github.com/mgechev/light-angularjs/blob/master/src/Scope.js#L61-L80">to illustrate it</a> better. Basically it involves a lot of evaluations and comparisons of the watched expression and their results. For example:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">collection</span> <span class="o">=</span> <span class="nx">generateHugeCollection</span><span class="p">();</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">collection</span> <span class="o">=</span> <span class="nx">generateHugeCollection</span><span class="p">();</span>
 <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&#39;collection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// do some stuff with the changed value</span>
-<span class="p">});</span>
+  <span class="c1">// do some stuff with the changed value
+</span><span class="c1"></span><span class="p">});</span>
 </code></pre></div>
-
 <p>Once we register watcher, which watches the expression <code>'collection'</code>, the expression gets evaluated at least once on each <code>$digest</code> loop and its current value gets compared to the previous value on each evaluation. The evaluation of this expression is with constant complexity (<code>O(1)</code>), since it only involves lookup of the property <code>collection</code>, but the equality check has a linear complexity (<code>O(n)</code>) (in case <code>$watchCollection</code> is used, otherwise it could be worst).</p>
 
 <p>Now imagine we have a few watchers of the same collection - in a directive, service and controller. This happens quite often, for example if you have a few bindings in the UI to the same value. This means that on each <code>$digest</code> loop we will need to:</p>
@@ -137,33 +134,29 @@ Later, when my code was used in production, I started appreciating things like h
 <h2 id="how-can-immutable-js-help">How can Immutable.js help?</h2>
 
 <p>Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of <code>$watch</code> to <code>O(1)</code>, since now we don&rsquo;t need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">previous</span> <span class="o">===</span> <span class="nx">current</span> <span class="c1">// O(1)</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">previous</span> <span class="o">===</span> <span class="nx">current</span> <span class="c1">// O(1)
+</span><span class="c1"></span></code></pre></div>
 <h2 id="immutable-js-and-angularjs">Immutable.js and AngularJS</h2>
 
 <p>Lets create a simple example in which we bind with <code>ng-repeat</code> to immutable list and render it in our HTML page:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[]);</span>
 
 <span class="kd">let</span> <span class="nx">SampleCtrl</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="p">};</span>
 
 <span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;SampleCtrl&#39;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
-</code></pre></div>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&quot;sampleApp&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&#34;sampleApp&#34;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;SampleCtrl&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;item in list&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&#34;item in list&#34;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&#34;item&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="result">Result:</h3>
 
 <ul>
@@ -181,19 +174,17 @@ Later, when my code was used in production, I started appreciating things like h
 <p>Not exactly what we wanted, right? What Immutable.js does is to wrap the plain JavaScript collection in a proxy. So using the code above we don&rsquo;t iterate over the collection&rsquo;s elements but over the Immutable.js&rsquo; object properties instead. Each immutable collection has a method called <code>toJS</code>, which returns the JavaScript representation of the immutable data structure.</p>
 
 <p>What we can do now? Well, we can simply watch <code>$scope.list.toJS()</code> instead of only <code>$scope.list</code>. Anyway, this will be far from effective:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">jsList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">();</span>
-<span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="o">===</span> <span class="nx">jsList</span> <span class="c1">// false</span>
-</code></pre></div>
-
+<span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="o">===</span> <span class="nx">jsList</span> <span class="c1">// false
+</span><span class="c1"></span></code></pre></div>
 <p>This mean that Immutable.js creates a new JavaScript object for each call of <code>toJS</code>. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">_tail</span><span class="p">.</span><span class="nx">array</span><span class="p">;</span>
 <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// do something with the changed value</span>
-<span class="p">});</span>
+  <span class="c1">// do something with the changed value
+</span><span class="c1"></span><span class="p">});</span>
 </code></pre></div>
-
 <p>Each time you watch a private property a kitty, somewhere, suffer! There are two reasons this is a bad choice:</p>
 
 <ul>
@@ -213,27 +204,24 @@ Later, when my code was used in production, I started appreciating things like h
 <p>In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It&rsquo;s called <code>angular-immutable</code> and could be found in my <a href="https://github.com/mgechev/angular-immutable">GitHub account</a> (also published as bower and npm modules <code>angular-immutable</code>).</p>
 
 <p>Lets take a look at the code example, which uses <code>angular-immutable</code>:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;immutable&#39;</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;immutable&#39;</span><span class="p">]);</span>
 
 <span class="kd">let</span> <span class="nx">SampleCtrl</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="p">};</span>
 
 <span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;SampleCtrl&#39;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
-</code></pre></div>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&quot;sampleApp&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&#34;sampleApp&#34;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;SampleCtrl&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">immutable</span><span class="o">=</span><span class="s">&quot;list&quot;</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;item in list&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">immutable</span><span class="o">=</span><span class="s">&#34;list&#34;</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&#34;item in list&#34;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&#34;item&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="result-1">Result:</h3>
 
 <ul>
@@ -252,7 +240,7 @@ Later, when my code was used in production, I started appreciating things like h
 <h2 id="angular-immutable-implementation">Angular Immutable Implementation</h2>
 
 <p>Since the whole library is implemented in only a few lines of code lets take a look at the <code>immutable</code> directive&rsquo;s source code:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* global angular */</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="cm">/* global angular */</span>
 
 <span class="kd">var</span> <span class="nx">immutableDirective</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">priority</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
@@ -277,7 +265,6 @@ Later, when my code was used in production, I started appreciating things like h
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;immutable&#39;</span><span class="p">,</span> <span class="p">[])</span>
   <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;immutable&#39;</span><span class="p">,</span> <span class="nx">immutableDirective</span><span class="p">);</span>
 </code></pre></div>
-
 <p>When the <code>immutableDirective</code> is used as an attribute, it accepts as value the name of the immutable property. Later, it adds watcher for this property. Once the immutable data &ldquo;changes&rdquo; we get a new reference, so the watcher can perform the check with a constant complexity (only returns <code>scope.$parent[immutable]</code>, which returns a reference, so Angular can use <code>===</code> for comparison).</p>
 
 <p>This way we:</p>
@@ -329,30 +316,30 @@ Later, when my code was used in production, I started appreciating things like h
 </ul>
 
 <p>The code I run is:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-  <span class="c1">// Current runs count</span>
-  <span class="kd">var</span> <span class="nx">runs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="c1">// Current runs count
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">runs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="c1">// Defines the amount of changes of the array</span>
-  <span class="kd">var</span> <span class="nx">TOTAL</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+  <span class="c1">// Defines the amount of changes of the array
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">TOTAL</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">start</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{});</span>
 
-  <span class="c1">// Generates a random collection</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">buildCollection</span><span class="p">(</span><span class="nx">SIZE</span><span class="p">);</span>
+  <span class="c1">// Generates a random collection
+</span><span class="c1"></span>  <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">buildCollection</span><span class="p">(</span><span class="nx">SIZE</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">changeCollection</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">runs</span> <span class="o">&gt;=</span> <span class="nx">TOTAL</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%cDone!&#39;</span><span class="p">,</span>
           <span class="s1">&#39;font-size: 50px; color: blue;&#39;</span> <span class="o">+</span>
           <span class="s1">&#39;font-weight: bold; font-family: impact;&#39;</span><span class="p">);</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%c&#39;</span> <span class="o">+</span> <span class="p">((</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">+</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%c&#39;</span> <span class="o">+</span> <span class="p">((</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="err">/ 1000) +</span>
           <span class="s1">&#39; seconds required.&#39;</span><span class="p">,</span> <span class="s1">&#39;font-size: 30px; color: red;&#39;</span><span class="p">);</span>
       <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="c1">// Changes random index of the array</span>
-      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+      <span class="c1">// Changes random index of the array
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
       <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">();</span>
       <span class="nx">runs</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
       <span class="nx">changeCollection</span><span class="p">();</span>
@@ -361,25 +348,21 @@ Later, when my code was used in production, I started appreciating things like h
   <span class="nx">changeCollection</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The code for Immutable.js is similar except that the body of <code>$timeout</code> looks like:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">());</span>
 </code></pre></div>
-
 <p>And here is the markup, which I used:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&#34;UTF-8&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&quot;sampleApp&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/scripts/all.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&#34;sampleApp&#34;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;SampleCtrl&#34;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/scripts/all.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="results">Results</h3>
 
 <h4 id="plain-javascript-array">Plain JavaScript array</h4>
@@ -463,21 +446,19 @@ Later, when my code was used in production, I started appreciating things like h
 <h3 id="dom-rendering">DOM rendering</h3>
 
 <p>Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&#34;UTF-8&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&quot;sampleApp&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&#34;sampleApp&#34;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;SampleCtrl&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">li</span> <span class="na">immutable</span><span class="o">=</span><span class="s">&quot;list&quot;</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;item in list track by $index&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span> <span class="na">immutable</span><span class="o">=</span><span class="s">&#34;list&#34;</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&#34;item in list track by $index&#34;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&#34;item&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/scripts/all.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/scripts/all.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <p>And for testing the plain JavaScript array I used the same markup with the <code>immutable</code> attribute removed. I changed the parameters of these test cases to:</p>
 
 <h4 id="collection-size-1">Collection Size</h4>
@@ -619,14 +600,17 @@ Later, when my code was used in production, I started appreciating things like h
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

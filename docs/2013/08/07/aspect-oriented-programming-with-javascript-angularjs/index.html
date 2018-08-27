@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Aspect-Oriented Programming with AngularJS &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -127,27 +127,25 @@ First things first. What is AOP? As we all know OOP is awesome! It gives us many
 <p>The most common examples for cross-cutting concerns are logging, authentication and transactions.<br />
 Let’s focus in logging. We may need to log different informations when different methods are called. That means we should have things like:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">Logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;log before&#39;</span><span class="p">);</span>
-  <span class="c1">//body</span>
-  <span class="nx">Logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;log after&#39;</span><span class="p">);</span>
+  <span class="c1">//body
+</span><span class="c1"></span>  <span class="nx">Logger</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;log after&#39;</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-
 
 <p>If we change the interface of our logger we should change it everywhere, this may affect hundreds of different files.<br />
 The situation can become even more complex if we add authentication:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">foo</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="nx">Authotization</span><span class="p">.</span><span class="nx">isAuthorized</span><span class="p">();</span>
-    <span class="c1">//body</span>
-  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">//handle the error</span>
-  <span class="p">}</span>
+    <span class="c1">//body
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//handle the error
+</span><span class="c1"></span>  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 
 <p>It may look ok for one or few functions/methods but if their count increase you can shoot yourself in the foot with so many duplicates.<br />
 OOP don’t gives us tools for handling such problems. It may suggest to create few helper classes and just copy and paste pieces of code from one place to another.</p>
@@ -162,7 +160,7 @@ OOP don’t gives us tools for handling such problems. It may suggest to create 
 
 <p>You can define the cross-cutting concerns in separate services. For example here is a definition of logging service which logs the method calls and thrown exceptions:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;Logger&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;Logger&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">exception</span><span class="p">)</span> <span class="p">{</span>
             <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%cException: &#39;</span> <span class="o">+</span> <span class="nx">args</span><span class="p">.</span><span class="nx">exception</span><span class="p">.</span><span class="nx">message</span> <span class="o">+</span> <span class="s1">&#39;. &#39;</span>
@@ -176,11 +174,10 @@ OOP don’t gives us tools for handling such problems. It may suggest to create 
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>The definition of that service doesn’t differ from the usual service definition.<br />
 Here is definition of one more service which can cause problems with the code maintenance because it is a cross-cutting concern:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;Authorization&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;Authorization&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">User</span><span class="p">.</span><span class="nx">getUsername</span><span class="p">()</span> <span class="o">!==</span> <span class="s1">&#39;foo&#39;</span> <span class="o">&amp;&amp;</span>
             <span class="nx">User</span><span class="p">.</span><span class="nx">getPassword</span><span class="p">()</span> <span class="o">!==</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span> <span class="p">{</span>
@@ -190,12 +187,11 @@ Here is definition of one more service which can cause problems with the code ma
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>The given service just checks whether user’s user name and password are equal respectively to “foo” and “bar”, if they are not equal to these values the service throws an Error(‘Not authorized’).</p>
 
 <p>We may want to apply authorization for reading news:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;ArticlesCollection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">,</span> <span class="nx">execute</span><span class="p">,</span> <span class="nx">Logger</span><span class="p">,</span> <span class="nx">Authorization</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;ArticlesCollection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">,</span> <span class="nx">execute</span><span class="p">,</span> <span class="nx">Logger</span><span class="p">,</span> <span class="nx">Authorization</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="kd">var</span> <span class="nx">sampleArticles</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Title 1&#39;</span><span class="p">,</span> <span class="nx">content</span><span class="o">:</span> <span class="s1">&#39;Content 1&#39;</span> <span class="p">},</span>
@@ -230,21 +226,19 @@ Here is definition of one more service which can cause problems with the code ma
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>This is simple service which contains two kinds of articles (simple object literals): sampleArticles and privateArticles. The api object is the actual service public interface.</p>
 
 <p>We may want to apply authorization to the private articles, before the getPrivateArticles method return its result. The usual way to do it is:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">getPrivateArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">getPrivateArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">Authorization</span><span class="p">();</span>
     <span class="k">return</span> <span class="nx">privateArticles</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>We may also want to apply authorization to the getArticleById method, so:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">getArticleById</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">getArticleById</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">Authorization</span><span class="p">();</span>
     <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">sampleArticles</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nx">sampleArticles</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">id</span> <span class="o">===</span> <span class="nx">id</span><span class="p">)</span>  <span class="p">{</span>
@@ -255,11 +249,10 @@ Here is definition of one more service which can cause problems with the code ma
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>We have two duplicate lines of code. At this moment it’s not a big deal but we may want to add logging and see special error message in the console when Error is thrown:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">//...</span>
-<span class="nx">getPrivateArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">//...
+</span><span class="c1"></span><span class="nx">getPrivateArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">try</span> <span class="p">{</span>
         <span class="nx">Authorization</span><span class="p">();</span>
         <span class="k">return</span> <span class="nx">privateArticles</span><span class="p">;</span>
@@ -282,28 +275,25 @@ Here is definition of one more service which can cause problems with the code ma
     <span class="p">}</span>
     <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="c1">//...</span>
-</code></pre></div>
-
+<span class="c1">//...
+</span><span class="c1"></span></code></pre></div>
 
 <p>Now we have a lot of duplicates and if we want to change something in the code which authorises the user and logs the error we should change it in both places. We may have service with large interface which requires logging and authorisation (or something else) in all of its methods or big part of them. In this case we need something more powerful and the Aspect-Oriented Programming gives us the tools for that.</p>
 
 <p>We can achieve the same effect as in the code above just by applying Authorization and Logger service to the api object:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">return</span> <span class="nx">execute</span><span class="p">(</span><span class="nx">Logger</span><span class="p">).</span><span class="nx">onThrowOf</span><span class="p">(</span><span class="nx">execute</span><span class="p">(</span><span class="nx">Authorization</span><span class="p">).</span><span class="nx">before</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">return</span> <span class="nx">execute</span><span class="p">(</span><span class="nx">Logger</span><span class="p">).</span><span class="nx">onThrowOf</span><span class="p">(</span><span class="nx">execute</span><span class="p">(</span><span class="nx">Authorization</span><span class="p">).</span><span class="nx">before</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span> <span class="p">{</span>
     <span class="nx">methodPattern</span><span class="o">:</span> <span class="sr">/Special|getArticleById/</span>
 <span class="p">}));</span>
 </code></pre></div>
 
-
 <p>This code will invoke the Authorization service before executing the methods which match the pattern: /Special|getArticleById/ when an Error is thrown the Logger will log it with detailed information. Notice that onThrowOf, before and all the methods listed below return object with the same methods so chaining is possible. We can also match the methods not only by their names but also by their arguments:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">return</span> <span class="nx">execute</span><span class="p">(</span><span class="nx">Logger</span><span class="p">).</span><span class="nx">onThrowOf</span><span class="p">(</span><span class="nx">execute</span><span class="p">(</span><span class="nx">Authorization</span><span class="p">).</span><span class="nx">before</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">return</span> <span class="nx">execute</span><span class="p">(</span><span class="nx">Logger</span><span class="p">).</span><span class="nx">onThrowOf</span><span class="p">(</span><span class="nx">execute</span><span class="p">(</span><span class="nx">Authorization</span><span class="p">).</span><span class="nx">before</span><span class="p">(</span><span class="nx">api</span><span class="p">,</span> <span class="p">{</span>
     <span class="nx">methodPattern</span><span class="o">:</span> <span class="sr">/Special|getArticleById/</span><span class="p">,</span>
-    <span class="nx">argsPatterns</span><span class="o">:</span> <span class="p">[</span><span class="sr">/^user$, /</span><span class="o">^</span><span class="p">[</span><span class="nx">Ii</span><span class="p">]</span><span class="nx">d</span><span class="p">(</span><span class="nx">_num</span><span class="p">)</span><span class="o">?</span><span class="nx">$</span><span class="o">/</span><span class="p">]</span>
+    <span class="nx">argsPatterns</span><span class="o">:</span> <span class="p">[</span><span class="sr">/^user$, /</span><span class="o">^</span><span class="p">[</span><span class="nx">Ii</span><span class="p">]</span><span class="nx">d</span><span class="p">(</span><span class="nx">_num</span><span class="p">)</span><span class="o">?</span><span class="nx">$</span><span class="err">/]</span>
 <span class="p">}));</span>
 </code></pre></div>
-
 
 <p>Now the aspects will be applied only to the methods which match both the methodPattern and argsPatterns rules.</p>
 
@@ -321,13 +311,12 @@ Here is definition of one more service which can cause problems with the code ma
 
 <p>Aspects can be applied not only to objects but also to functions:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;ArticlesCollection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">,</span> <span class="nx">execute</span><span class="p">,</span> <span class="nx">Logger</span><span class="p">,</span> <span class="nx">Authorization</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">DemoApp</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;ArticlesCollection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">,</span> <span class="nx">execute</span><span class="p">,</span> <span class="nx">Logger</span><span class="p">,</span> <span class="nx">Authorization</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">execute</span><span class="p">(</span><span class="nx">Logger</span><span class="p">).</span><span class="nx">before</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="c1">//body</span>
-    <span class="p">});</span>
+        <span class="c1">//body
+</span><span class="c1"></span>    <span class="p">});</span>
 <span class="p">});</span>
 </code></pre></div>
-
 
 <p><a title="GitHub" href="https://github.com/mgechev/angular-aop" target="_blank">AngularAOP</a> can be found at: <a title="GitHub" href="https://github.com/mgechev/angular-aop" target="_blank">GitHub</a></p>
 
@@ -369,14 +358,17 @@ Here is definition of one more service which can cause problems with the code ma
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

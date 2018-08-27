@@ -1,172 +1,126 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Boost the Performance of an AngularJS Application Using Immutable Data &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2015/03/02/immutability-in-angularjs-immutablejs/">
+		
 
+		<meta property="og:title" content="Boost the Performance of an AngularJS Application Using Immutable Data">
+		<meta property="og:description" content="I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&#x2019;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.
+Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic &#x201C;Functional programming with JavaScript&#x201D;.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">
-
-
-    
-    
-    
-    <title>Boost the Performance of an AngularJS Application Using Immutable Data - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&amp;rsquo;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic &amp;ldquo;Functional programming with JavaScript&amp;rdquo;.">
-
-<meta property="og:title" content="Boost the Performance of an AngularJS Application Using Immutable Data - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&amp;rsquo;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic &amp;ldquo;Functional programming with JavaScript&amp;rdquo;.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">
-<meta name="twitter:title" content="Boost the Performance of an AngularJS Application Using Immutable Data - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&amp;rsquo;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic &amp;ldquo;Functional programming with JavaScript&amp;rdquo;.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Boost the Performance of an AngularJS Application Using Immutable Data - Minko Gechev&#39;s blog",
-    "datePublished": "2015-03-02T00:00:00JST",
-    "dateModified": "2015-03-02T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&rsquo;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.
-Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic &ldquo;Functional programming with JavaScript&rdquo;."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-7f71ece671e15df2cd8a4dd49f4a0f30">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/" class="thumbnail" title="Boost the Performance of an AngularJS Application Using Immutable Data"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Boost the Performance of an AngularJS Application Using Immutable Data</h1>
-        <ul class="p-facts">
-          <li><time datetime="2015-03-02T00:00:00JST">Mar 2, 2015</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f&t=Boost%20the%20Performance%20of%20an%20AngularJS%20Application%20Using%20Immutable%20Data" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f&text=Boost%20the%20Performance%20of%20an%20AngularJS%20Application%20Using%20Immutable%20Data&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body">
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Boost the Performance of an AngularJS Application Using Immutable Data
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2015-03-02-immutability-in-angularjs-immutablejs.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Mar 2, 2015
+                    &#xB7; 11 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/immutable.js">Immutable.js</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/angularjs">AngularJS</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
 
-<p>I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&rsquo;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.</p>
+<p>I have affinity to functional programming since my first year in college. During my initial contact with a purely functional programming language (Haskell in my case) I didn&#x2019;t really understand all the advantages it provides, everything was reduced to just writing a cool recursive functions and solving algorithmic problems.</p>
 
-<p>Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic <a href="https://blog.mgechev.com/2013/01/21/functional-programming-with-javascript/">&ldquo;Functional programming with JavaScript&rdquo;</a>.</p>
+<p>Later, when my code was used in production, I started appreciating things like high-order functions, closures, currying, etc. I even wrote a blog post on topic <a href="https://blog.mgechev.com/2013/01/21/functional-programming-with-javascript/">&#x201C;Functional programming with JavaScript&#x201D;</a>.</p>
 
-<p>Last couple of years I had the hard task to write a complex UI. A lot of user inputs, which can change the model from different places and potentially lead to inconsistent state of the application, a lot of bugs, which are hard to debug and find. Later ReactJS was released and I noticed the concept of the <a href="https://en.wikipedia.org/wiki/Pure_function">&ldquo;pure functions&rdquo;</a> in their UI components. A react component gets rendered the same way when it receives the same input parameters and it has the same state (if you implement it properly). React even provides the <a href="https://facebook.github.io/react/docs/pure-render-mixin.html">PureRenderMixin</a>, which can make the &ldquo;pure component&rdquo; rendering even faster!</p>
+<p>Last couple of years I had the hard task to write a complex UI. A lot of user inputs, which can change the model from different places and potentially lead to inconsistent state of the application, a lot of bugs, which are hard to debug and find. Later ReactJS was released and I noticed the concept of the <a href="https://en.wikipedia.org/wiki/Pure_function">&#x201C;pure functions&#x201D;</a> in their UI components. A react component gets rendered the same way when it receives the same input parameters and it has the same state (if you implement it properly). React even provides the <a href="https://facebook.github.io/react/docs/pure-render-mixin.html">PureRenderMixin</a>, which can make the &#x201C;pure component&#x201D; rendering even faster!</p>
 
-<p>React is awesome, there are no two opinions. I&rsquo;m also huge AngularJS fan. A few years ago I wrote the first <a href="https://github.com/mgechev/angularjs-style-guide">AngularJS Style Guide</a>, <a href="https://github.com/mgechev/angularjs-in-patterns">&ldquo;AngularJS in Patterns&rdquo;</a>, <a href="https://github.com/mgechev/angular-aop">AngularAOP</a> and a few other AngularJS modules/components/examples, which got popular. So I started wondering whether I can use the same idea of immutability of the model in AngularJS, at least for accelerating the data-binding watchers.</p>
+<p>React is awesome, there are no two opinions. I&#x2019;m also huge AngularJS fan. A few years ago I wrote the first <a href="https://github.com/mgechev/angularjs-style-guide">AngularJS Style Guide</a>, <a href="https://github.com/mgechev/angularjs-in-patterns">&#x201C;AngularJS in Patterns&#x201D;</a>, <a href="https://github.com/mgechev/angular-aop">AngularAOP</a> and a few other AngularJS modules/components/examples, which got popular. So I started wondering whether I can use the same idea of immutability of the model in AngularJS, at least for accelerating the data-binding watchers.</p>
 
 <h2 id="immutable-js">Immutable.js</h2>
 
-<p>On 28 of May, 2014, the first commit of <a href="https://github.com/facebook/immutable-js">Immutable.js</a> was pushed in the facebook&rsquo;s organization on GitHub. Immutable.js is a set of immutable data structures (List, Set, Map, etc.) implemented in JavaScript. What exactly is an immutable data structure? Well it is a data structure, which can&rsquo;t change. Each action, which intends to change the collection creates a new one.</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<p>On 28 of May, 2014, the first commit of <a href="https://github.com/facebook/immutable-js">Immutable.js</a> was pushed in the facebook&#x2019;s organization on GitHub. Immutable.js is a set of immutable data structures (List, Set, Map, etc.) implemented in JavaScript. What exactly is an immutable data structure? Well it is a data structure, which can&#x2019;t change. Each action, which intends to change the collection creates a new one.</p>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">changed</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>    <span class="c1">// List [ 1, 2, 3 ]</span>
-<span class="nx">changed</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// List [ 1, 2, 3, 4 ]</span>
-<span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span>    <span class="c1">// false</span>
-</code></pre></div>
-
+<span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>    <span class="c1">// List [ 1, 2, 3 ]
+</span><span class="c1"></span><span class="nx">changed</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// List [ 1, 2, 3, 4 ]
+</span><span class="c1"></span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span>    <span class="c1">// false
+</span><span class="c1"></span></code></pre></div>
 <p>Compared to the mutable JavaScript lists:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
+</span><span class="c1"></span></code></pre></div>
 <h2 id="angularjs-data-binding">AngularJS data-binding</h2>
 
 <p>There are a lot of posts about how the AngularJS data-binding and dirty checking works. I even created a light AngularJS implementation in order <a href="https://github.com/mgechev/light-angularjs/blob/master/src/Scope.js#L61-L80">to illustrate it</a> better. Basically it involves a lot of evaluations and comparisons of the watched expression and their results. For example:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">collection</span> <span class="o">=</span> <span class="nx">generateHugeCollection</span><span class="p">();</span>
-<span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&#39;collection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// do some stuff with the changed value</span>
-<span class="p">});</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">collection</span> <span class="o">=</span> <span class="nx">generateHugeCollection</span><span class="p">();</span>
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&apos;collection&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// do some stuff with the changed value
+</span><span class="c1"></span><span class="p">});</span>
 </code></pre></div>
-
-<p>Once we register watcher, which watches the expression <code>'collection'</code>, the expression gets evaluated at least once on each <code>$digest</code> loop and its current value gets compared to the previous value on each evaluation. The evaluation of this expression is with constant complexity (<code>O(1)</code>), since it only involves lookup of the property <code>collection</code>, but the equality check has a linear complexity (<code>O(n)</code>) (in case <code>$watchCollection</code> is used, otherwise it could be worst).</p>
+<p>Once we register watcher, which watches the expression <code>&apos;collection&apos;</code>, the expression gets evaluated at least once on each <code>$digest</code> loop and its current value gets compared to the previous value on each evaluation. The evaluation of this expression is with constant complexity (<code>O(1)</code>), since it only involves lookup of the property <code>collection</code>, but the equality check has a linear complexity (<code>O(n)</code>) (in case <code>$watchCollection</code> is used, otherwise it could be worst).</p>
 
 <p>Now imagine we have a few watchers of the same collection - in a directive, service and controller. This happens quite often, for example if you have a few bindings in the UI to the same value. This means that on each <code>$digest</code> loop we will need to:</p>
 
@@ -179,22 +133,20 @@ Later, when my code was used in production, I started appreciating things like h
 
 <h2 id="how-can-immutable-js-help">How can Immutable.js help?</h2>
 
-<p>Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of <code>$watch</code> to <code>O(1)</code>, since now we don&rsquo;t need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">previous</span> <span class="o">===</span> <span class="nx">current</span> <span class="c1">// O(1)</span>
-</code></pre></div>
-
+<p>Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of <code>$watch</code> to <code>O(1)</code>, since now we don&#x2019;t need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:</p>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">previous</span> <span class="o">===</span> <span class="nx">current</span> <span class="c1">// O(1)
+</span><span class="c1"></span></code></pre></div>
 <h2 id="immutable-js-and-angularjs">Immutable.js and AngularJS</h2>
 
 <p>Lets create a simple example in which we bind with <code>ng-repeat</code> to immutable list and render it in our HTML page:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;sampleApp&apos;</span><span class="p">,</span> <span class="p">[]);</span>
 
 <span class="kd">let</span> <span class="nx">SampleCtrl</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="p">};</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;SampleCtrl&#39;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
-</code></pre></div>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;SampleCtrl&apos;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
@@ -204,67 +156,62 @@ Later, when my code was used in production, I started appreciating things like h
     <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;item in list&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="result">Result:</h3>
 
 <ul>
 <li>false</li>
-<li>&nbsp;</li>
-<li>&nbsp;</li>
+<li>&#xA0;</li>
+<li>&#xA0;</li>
 <li>3</li>
 <li>5</li>
 <li>0</li>
-<li>&nbsp;</li>
+<li>&#xA0;</li>
 <li>[object Object]</li>
 <li>3</li>
 </ul>
 
-<p>Not exactly what we wanted, right? What Immutable.js does is to wrap the plain JavaScript collection in a proxy. So using the code above we don&rsquo;t iterate over the collection&rsquo;s elements but over the Immutable.js&rsquo; object properties instead. Each immutable collection has a method called <code>toJS</code>, which returns the JavaScript representation of the immutable data structure.</p>
+<p>Not exactly what we wanted, right? What Immutable.js does is to wrap the plain JavaScript collection in a proxy. So using the code above we don&#x2019;t iterate over the collection&#x2019;s elements but over the Immutable.js&#x2019; object properties instead. Each immutable collection has a method called <code>toJS</code>, which returns the JavaScript representation of the immutable data structure.</p>
 
 <p>What we can do now? Well, we can simply watch <code>$scope.list.toJS()</code> instead of only <code>$scope.list</code>. Anyway, this will be far from effective:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">jsList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">();</span>
-<span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="o">===</span> <span class="nx">jsList</span> <span class="c1">// false</span>
-</code></pre></div>
-
+<span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="o">===</span> <span class="nx">jsList</span> <span class="c1">// false
+</span><span class="c1"></span></code></pre></div>
 <p>This mean that Immutable.js creates a new JavaScript object for each call of <code>toJS</code>. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">_tail</span><span class="p">.</span><span class="nx">array</span><span class="p">;</span>
 <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// do something with the changed value</span>
-<span class="p">});</span>
+  <span class="c1">// do something with the changed value
+</span><span class="c1"></span><span class="p">});</span>
 </code></pre></div>
-
 <p>Each time you watch a private property a kitty, somewhere, suffer! There are two reasons this is a bad choice:</p>
 
 <ul>
-<li>This is a private property&hellip;The underlaying implementation of Immutable.js may change so your code will break.</li>
-<li>This is a private property&hellip;There&rsquo;s a property with different name for each immutable data collection (Map, Set, List&hellip;).</li>
+<li>This is a private property&#x2026;The underlaying implementation of Immutable.js may change so your code will break.</li>
+<li>This is a private property&#x2026;There&#x2019;s a property with different name for each immutable data collection (Map, Set, List&#x2026;).</li>
 </ul>
 
 <p>So we definitely need to watch the immutable collection, this way we will:</p>
 
 <ul>
 <li>Take advantage of its immutability by checking whether it has changed with a constant complexity (comparing the references).</li>
-<li>Use the public API, so we won&rsquo;t make any kitties suffer!</li>
+<li>Use the public API, so we won&#x2019;t make any kitties suffer!</li>
 </ul>
 
 <h2 id="angular-immutable">Angular Immutable</h2>
 
-<p>In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It&rsquo;s called <code>angular-immutable</code> and could be found in my <a href="https://github.com/mgechev/angular-immutable">GitHub account</a> (also published as bower and npm modules <code>angular-immutable</code>).</p>
+<p>In order to deal with this issue, I created a simple directive, which allows binding to Immutable.js collections. It&#x2019;s called <code>angular-immutable</code> and could be found in my <a href="https://github.com/mgechev/angular-immutable">GitHub account</a> (also published as bower and npm modules <code>angular-immutable</code>).</p>
 
 <p>Lets take a look at the code example, which uses <code>angular-immutable</code>:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sampleApp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;immutable&#39;</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;sampleApp&apos;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&apos;immutable&apos;</span><span class="p">]);</span>
 
 <span class="kd">let</span> <span class="nx">SampleCtrl</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="p">};</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;SampleCtrl&#39;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
-</code></pre></div>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;SampleCtrl&apos;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
@@ -274,9 +221,7 @@ Later, when my code was used in production, I started appreciating things like h
     <span class="p">&lt;</span><span class="nt">li</span> <span class="na">immutable</span><span class="o">=</span><span class="s">&quot;list&quot;</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;item in list&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="result-1">Result:</h3>
 
 <ul>
@@ -294,8 +239,8 @@ Later, when my code was used in production, I started appreciating things like h
 
 <h2 id="angular-immutable-implementation">Angular Immutable Implementation</h2>
 
-<p>Since the whole library is implemented in only a few lines of code lets take a look at the <code>immutable</code> directive&rsquo;s source code:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="cm">/* global angular */</span>
+<p>Since the whole library is implemented in only a few lines of code lets take a look at the <code>immutable</code> directive&#x2019;s source code:</p>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="cm">/* global angular */</span>
 
 <span class="kd">var</span> <span class="nx">immutableDirective</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">priority</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
@@ -317,27 +262,26 @@ Later, when my code was used in production, I started appreciating things like h
   <span class="k">return</span> <span class="p">{</span> <span class="nx">priority</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">link</span> <span class="p">};</span>
 <span class="p">};</span>
 
-<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;immutable&#39;</span><span class="p">,</span> <span class="p">[])</span>
-  <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;immutable&#39;</span><span class="p">,</span> <span class="nx">immutableDirective</span><span class="p">);</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;immutable&apos;</span><span class="p">,</span> <span class="p">[])</span>
+  <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;immutable&apos;</span><span class="p">,</span> <span class="nx">immutableDirective</span><span class="p">);</span>
 </code></pre></div>
-
-<p>When the <code>immutableDirective</code> is used as an attribute, it accepts as value the name of the immutable property. Later, it adds watcher for this property. Once the immutable data &ldquo;changes&rdquo; we get a new reference, so the watcher can perform the check with a constant complexity (only returns <code>scope.$parent[immutable]</code>, which returns a reference, so Angular can use <code>===</code> for comparison).</p>
+<p>When the <code>immutableDirective</code> is used as an attribute, it accepts as value the name of the immutable property. Later, it adds watcher for this property. Once the immutable data &#x201C;changes&#x201D; we get a new reference, so the watcher can perform the check with a constant complexity (only returns <code>scope.$parent[immutable]</code>, which returns a reference, so Angular can use <code>===</code> for comparison).</p>
 
 <p>This way we:</p>
 
 <ul>
 <li>Take advantage of the immutability of the property by improving the runtime of the <code>$watch</code> function</li>
 <li>Do not change the implementation of already existing software (do not change <code>ng-repeat</code> neither Immutable.js), so we follow the Open-Closed principle</li>
-<li>We don&rsquo;t use any private properties</li>
+<li>We don&#x2019;t use any private properties</li>
 </ul>
 
-<p>This approach has some limitations. For example, if the immutable value is result of some complex expression we can&rsquo;t do anything.</p>
+<p>This approach has some limitations. For example, if the immutable value is result of some complex expression we can&#x2019;t do anything.</p>
 
 <h2 id="benchmarks">Benchmarks</h2>
 
-<p><a href="/images/unicorn.jpg"><amp-img src="/images/unicorn.jpg" alt="" layout="responsive" width="550" height="657"></amp-img></a></p>
+<p><a href="/images/unicorn.jpg"><amp-img src="/images/unicorn.jpg" alt=""></amp-img></a></p>
 
-<p>Using immutable data structures seems exciting and amazing! Anyway, it has some drawbacks. The <code>$watch</code> expressions became extremely fast but there&rsquo;s a big overhead of creating a new data structure once we add or remove items. This gets even slower when we have a complex nested composition.</p>
+<p>Using immutable data structures seems exciting and amazing! Anyway, it has some drawbacks. The <code>$watch</code> expressions became extremely fast but there&#x2019;s a big overhead of creating a new data structure once we add or remove items. This gets even slower when we have a complex nested composition.</p>
 
 <p>So we have:</p>
 
@@ -372,30 +316,30 @@ Later, when my code was used in production, I started appreciating things like h
 </ul>
 
 <p>The code I run is:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
-  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-  <span class="c1">// Current runs count</span>
-  <span class="kd">var</span> <span class="nx">runs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
+  <span class="c1">// Current runs count
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">runs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="c1">// Defines the amount of changes of the array</span>
-  <span class="kd">var</span> <span class="nx">TOTAL</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+  <span class="c1">// Defines the amount of changes of the array
+</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">TOTAL</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">start</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{});</span>
+  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="s1">&apos;list&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{});</span>
 
-  <span class="c1">// Generates a random collection</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">buildCollection</span><span class="p">(</span><span class="nx">SIZE</span><span class="p">);</span>
+  <span class="c1">// Generates a random collection
+</span><span class="c1"></span>  <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">buildCollection</span><span class="p">(</span><span class="nx">SIZE</span><span class="p">);</span>
   <span class="kd">function</span> <span class="nx">changeCollection</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">runs</span> <span class="o">&gt;=</span> <span class="nx">TOTAL</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%cDone!&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;font-size: 50px; color: blue;&#39;</span> <span class="o">+</span>
-          <span class="s1">&#39;font-weight: bold; font-family: impact;&#39;</span><span class="p">);</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;%c&#39;</span> <span class="o">+</span> <span class="p">((</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">+</span>
-          <span class="s1">&#39; seconds required.&#39;</span><span class="p">,</span> <span class="s1">&#39;font-size: 30px; color: red;&#39;</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;%cDone!&apos;</span><span class="p">,</span>
+          <span class="s1">&apos;font-size: 50px; color: blue;&apos;</span> <span class="o">+</span>
+          <span class="s1">&apos;font-weight: bold; font-family: impact;&apos;</span><span class="p">);</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;%c&apos;</span> <span class="o">+</span> <span class="p">((</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="err">/ 1000) +</span>
+          <span class="s1">&apos; seconds required.&apos;</span><span class="p">,</span> <span class="s1">&apos;font-size: 30px; color: red;&apos;</span><span class="p">);</span>
       <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="c1">// Changes random index of the array</span>
-      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+      <span class="c1">// Changes random index of the array
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
       <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">();</span>
       <span class="nx">runs</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
       <span class="nx">changeCollection</span><span class="p">();</span>
@@ -404,14 +348,12 @@ Later, when my code was used in production, I started appreciating things like h
   <span class="nx">changeCollection</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The code for Immutable.js is similar except that the body of <code>$timeout</code> looks like:</p>
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="nx">SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">());</span>
 </code></pre></div>
-
 <p>And here is the markup, which I used:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
@@ -420,9 +362,7 @@ Later, when my code was used in production, I started appreciating things like h
 <span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-app</span><span class="o">=</span><span class="s">&quot;sampleApp&quot;</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/scripts/all.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <h3 id="results">Results</h3>
 
 <h4 id="plain-javascript-array">Plain JavaScript array</h4>
@@ -506,7 +446,7 @@ Later, when my code was used in production, I started appreciating things like h
 <h3 id="dom-rendering">DOM rendering</h3>
 
 <p>Lets explore what will happen if we render the collection we used for profiling. For testing the immutable list I used this markup:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
@@ -518,9 +458,7 @@ Later, when my code was used in production, I started appreciating things like h
 <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/scripts/all.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 <p>And for testing the plain JavaScript array I used the same markup with the <code>immutable</code> attribute removed. I changed the parameters of these test cases to:</p>
 
 <h4 id="collection-size-1">Collection Size</h4>
@@ -573,19 +511,19 @@ Later, when my code was used in production, I started appreciating things like h
 
 <p>Here is a chart for better understanding of the benchmark:</p>
 
-<p><a href="/images/immutable-angular/immutable-angular-1.png"><amp-img src="/images/immutable-angular/immutable-angular-1.png" alt="" layout="responsive" width="1177" height="767"></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-angular-1.png"><amp-img src="/images/immutable-angular/immutable-angular-1.png" alt=""></amp-img></a></p>
 
 <p>Initially the plain JavaScript array does better but once we increase the number of bindings the performance decreases dramatically.</p>
 
-<p>But lets go a little bit further&hellip;Lets do CPU profiling for the test cases, which runs with immutable collection and 30 watchers.</p>
+<p>But lets go a little bit further&#x2026;Lets do CPU profiling for the test cases, which runs with immutable collection and 30 watchers.</p>
 
-<p><a href="/images/immutable-angular/cpu-profile.png"><amp-img src="/images/immutable-angular/cpu-profile.png" alt="" layout="responsive" width="1598" height="388"></amp-img></a></p>
+<p><a href="/images/immutable-angular/cpu-profile.png"><amp-img src="/images/immutable-angular/cpu-profile.png" alt=""></amp-img></a></p>
 
-<p>The biggest slowdown comes from the watcher added by <code>ng-repeat</code>. Lets dig into AngularJS&rsquo;s source code and change that watcher to a simple <code>$watch</code> instead of <code>$watchCollection</code> (<strong>do not do this in AngularJS copy you are going to use in production otherwise <code>ng-repeat</code>&rsquo;s binding will not work with mutable data structures</strong>) and see what will happen&hellip;</p>
+<p>The biggest slowdown comes from the watcher added by <code>ng-repeat</code>. Lets dig into AngularJS&#x2019;s source code and change that watcher to a simple <code>$watch</code> instead of <code>$watchCollection</code> (<strong>do not do this in AngularJS copy you are going to use in production otherwise <code>ng-repeat</code>&#x2019;s binding will not work with mutable data structures</strong>) and see what will happen&#x2026;</p>
 
-<p><a href="/images/immutable-angular/immutable-watch.png"><amp-img src="/images/immutable-angular/immutable-watch.png" alt="" layout="responsive" width="898" height="210"></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-watch.png"><amp-img src="/images/immutable-angular/immutable-watch.png" alt=""></amp-img></a></p>
 
-<p>After running the 30 bindings benchmark with the immutable list with changed <code>ng-repeat</code>&rsquo;s implementation, we got almost 1 second improvement!</p>
+<p>After running the 30 bindings benchmark with the immutable list with changed <code>ng-repeat</code>&#x2019;s implementation, we got almost 1 second improvement!</p>
 
 <h3 id="heap-profiling">Heap Profiling</h3>
 
@@ -593,17 +531,17 @@ Later, when my code was used in production, I started appreciating things like h
 
 <p>When running the Chrome DevTools Heap Profiler, in the test case with 30 watchers and plain JavaScript object, we get pretty low memory usage:</p>
 
-<p><a href="/images/immutable-angular/plain-memory.png"><amp-img src="/images/immutable-angular/plain-memory.png" alt="" layout="responsive" width="1914" height="244"></amp-img></a></p>
+<p><a href="/images/immutable-angular/plain-memory.png"><amp-img src="/images/immutable-angular/plain-memory.png" alt=""></amp-img></a></p>
 
 <p>As expected, when using Immutable.js the memory usage is a bit higher because of the overhead of creating new data structure on change.</p>
 
-<p><a href="/images/immutable-angular/immutable-memory.png"><amp-img src="/images/immutable-angular/immutable-memory.png" alt="" layout="responsive" width="1652" height="242"></amp-img></a></p>
+<p><a href="/images/immutable-angular/immutable-memory.png"><amp-img src="/images/immutable-angular/immutable-memory.png" alt=""></amp-img></a></p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>The benchmarks I did aren&rsquo;t using the best profiling APIs available nowadays, probably a better idea would be to use <a href="https://github.com/angular/angular/tree/master/modules/benchpress">benchpress</a> instead but they still give quite accurate perspective of when it is reasonable to use immutable data structures in an AngularJS application.</p>
+<p>The benchmarks I did aren&#x2019;t using the best profiling APIs available nowadays, probably a better idea would be to use <a href="https://github.com/angular/angular/tree/master/modules/benchpress">benchpress</a> instead but they still give quite accurate perspective of when it is reasonable to use immutable data structures in an AngularJS application.</p>
 
-<p>The main content of the blog post clearly shows that, when dealing with a big data set with a lot of bindings it is definitely a good idea to make it immutable, especially if it changes rarely. Model&rsquo;s immutability boost the performance of the watchers, checking for change, by allowing them to use simple equality check instead of linear algorithm.</p>
+<p>The main content of the blog post clearly shows that, when dealing with a big data set with a lot of bindings it is definitely a good idea to make it immutable, especially if it changes rarely. Model&#x2019;s immutability boost the performance of the watchers, checking for change, by allowing them to use simple equality check instead of linear algorithm.</p>
 
 <p>On the other hand, we noticed that we have a little overhead by the creation of the immutable data on change. We also have a slightly bigger memory usage, which when dealing with enormous amount data might be a deal breaker.</p>
 
@@ -613,7 +551,7 @@ Later, when my code was used in production, I started appreciating things like h
 
 <ul>
 <li>Allow two-way data-binding to immutable data</li>
-<li>Implement optimized version of <code>ng-repeat</code>, which uses <code>$watch</code> instead of <code>$watchCollection</code>, for increasing the watcher&rsquo;s speed.</li>
+<li>Implement optimized version of <code>ng-repeat</code>, which uses <code>$watch</code> instead of <code>$watchCollection</code>, for increasing the watcher&#x2019;s speed.</li>
 </ul>
 
 <h2 id="parts-of-the-series">Parts of the series:</h2>
@@ -623,139 +561,68 @@ Later, when my code was used in production, I started appreciating things like h
 <li><a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">Boost the Performance of an AngularJS Application Using Immutable Data - Part 2</a></li>
 <li><a href="https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/">Even Faster AngularJS Data Structures</a></li>
 </ul>
-</div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f&t=Boost%20the%20Performance%20of%20an%20AngularJS%20Application%20Using%20Immutable%20Data" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f&text=Boost%20the%20Performance%20of%20an%20AngularJS%20Application%20Using%20Immutable%20Data&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2015%2f03%2f02%2fimmutability-in-angularjs-immutablejs%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Boost the Performance of an AngularJS Application Using Immutable Data</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/AngularJS/">AngularJS</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Immutability/">Immutability</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Functional-Programming/">Functional Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Performance/">Performance</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/Immutable.js/">Immutable.js</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/AngularJS/">AngularJS</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

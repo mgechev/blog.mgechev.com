@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Redux Anti-Patterns - Part 1. State Management. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -110,30 +110,24 @@ All of the anti-patterns below have the following structure:
 <h2 id="problem">Problem</h2>
 
 <p>For example, lets suppose we are developing an application which provides tutoring functionality. A tutor can schedule sessions and also, once the time for given session comes, the tutor can join it. Lets model the session with the following interface:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&rsquo;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">Session</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Although such shape of the store is logically correct, it introduces state duplication. For example, lets suppose the user schedules the following session and later joins it:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Introduction to Go&#39;</span><span class="p">,</span>
   <span class="nx">start</span>: <span class="kt">startTime</span><span class="p">,</span>
   <span class="nx">end</span>: <span class="kt">endTime</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>This way we&rsquo;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
 
 <ul>
@@ -144,23 +138,17 @@ All of the anti-patterns below have the following structure:
 <h2 id="solution">Solution</h2>
 
 <p>The solution is to keep a value pointing to the current session in the <code>sessions</code> array as value of the <code>currentSession</code> property. For instance, we can use the <code>Session</code>&rsquo;s <code>id</code> for the purpose:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This has an implication - we need to select the correct session from the &ldquo;master&rdquo; property. In this specific case, it&rsquo;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This way we will be able to access the current session with constant complexity:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span></code></pre></div>
 <h1 id="incorrect-information-expert">Incorrect Information Expert</h1>
 
 <p>There&rsquo;s a collection of patterns called <a href="https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)">GRASP</a>, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book &ldquo;<a href="https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062">Applying UML and Patterns</a>&rdquo;. One of them is called &ldquo;Information Expert&rdquo;. The book describes this practice as:</p>
@@ -216,17 +204,13 @@ All of the anti-patterns below have the following structure:
 <h2 id="problem-2">Problem</h2>
 
 <p>Lets suppose we have the following global store:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">totalSessions</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Notice that there&rsquo;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span></code></pre></div>
 <p><img src="/images/redux-anti-patterns/encapsulation.jpg" style="display: block; margin: auto" alt="Hidden dependencies"></p>
 
 <h2 id="solution-2">Solution</h2>
@@ -242,17 +226,15 @@ All of the anti-patterns below have the following structure:
 <h2 id="problem-3">Problem</h2>
 
 <p>Lets suppose that our redux project uses immutable.js and we have a record for the <code>Session</code> model which has the following interface.</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">guide</span>: <span class="kt">User</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>&hellip;and the following actions&rsquo; definitions:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
 
 <span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
@@ -270,19 +252,15 @@ All of the anti-patterns below have the following structure:
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span>
-</code></pre></div>
-
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span></code></pre></div>
 <p>And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>The code looks fine at first but lets trace what is actually going on:</p>
 
 <ol>
@@ -307,22 +285,20 @@ All of the anti-patterns below have the following structure:
 <h3 id="using-getstate">Using <code>getState</code></h3>
 
 <p>We can update <code>setGuide</code> to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">getStore</span><span class="p">().</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>This way we can make sure that we always get the latest session inside of the <code>setGuide</code> async action.</p>
 
 <h3 id="using-resolve-argument">Using Resolve Argument</h3>
 
 <p>We can refactor <code>setGuide</code> in a different way:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
@@ -332,36 +308,28 @@ All of the anti-patterns below have the following structure:
       <span class="nx">updateSession</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
       <span class="k">return</span> <span class="nx">s</span><span class="p">;</span>
     <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>Respectively, we can update the component to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">s</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">s</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:</p>
 
 <h3 id="updated-props">Updated Props</h3>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of <code>updateSession</code> looks like:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">));</span>
   <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">session</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>&hellip;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
 
 <h1 id="conclusion">Conclusion</h1>
@@ -415,14 +383,17 @@ All of the anti-patterns below have the following structure:
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

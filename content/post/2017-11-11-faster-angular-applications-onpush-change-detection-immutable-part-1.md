@@ -11,9 +11,9 @@ title: Faster Angular Applications - Part 1. On Push Change Detection and Immuta
 url: /2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/
 ---
 
-On AngularConnect 2017 in London I gave a talk called "Purely Fast". In the presentation I shown how step by step we can improve the performance of a business application. In the example I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation I got great feedback for the content so I decided to write a series of blog posts which aim to explain the content from "Purely Fast" in details.
+On AngularConnect 2017 in London, I gave a talk called "Purely Fast." In the presentation, I showed how step by step we can improve the performance of a business application. In the example, I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation, I got great feedback for the content, so I decided to write a series of blog posts which aim to explain the content from "Purely Fast" in details.
 
-In this part we will focus on immutable data structures and `OnPush` change detection.
+In this part, we will focus on immutable data structures and `OnPush` change detection.
 
 The code for this blog post is available at my [GitHub account](https://github.com/mgechev):
 
@@ -23,11 +23,11 @@ The code for this blog post is available at my [GitHub account](https://github.c
 
 # Why runtime performance
 
-A big issue in the modern single-page applications is reducing the initial load time. This includes reducing the number of bytes transferred over the network and minimizing the number of network requests. Last year I wrote a few articles related to reducing the bundle size (you can find them [here](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/) and [here](https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)). Although it's always a good idea to invest time in exploring the bundles of our apps in details with tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) and reducing its size, there are a lot of folks working in this direction.
+A big issue in the modern single-page applications is reducing the initial load time. This includes reducing the number of bytes transferred over the network and minimizing the number of network requests. Last year I wrote a few articles related to reducing the bundle size (you can find them [here](https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/) and [here](https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/)). Although it's always a good idea to invest time in exploring the bundles of our apps in details with tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) and reducing its size, there are many folks working in this direction.
 
-For instance, the Google Closure Compiler team is constantly trying to provide the most optimal minification and dead code elimination, same for the webpack team. On top of that, we have the Angular CLI team who combines the best from both worlds by allowing us to have the most efficient and well encapsulated build possible.
+For instance, the Google Closure Compiler team is continuously trying to provide the most optimal minification and dead code elimination, same for the webpack team. On top of that, we have the Angular CLI team which combines the best from both worlds by allowing us to have the most efficient and well-encapsulated build possible.
 
-In the end, all we can do is either combine effort with any of these teams in order to improve the minification that their tools provide or apply some application-specific optimizations such as lazy-loading.
+In the end, all we can do is either combine effort with any of these teams to improve the minification that their tools provide or apply some application-specific optimizations such as lazy-loading.
 
 On the other hand, the runtime performance of our applications is entirely in our own hands. Before going any further, lets put the practices that we're going to look at into the context of a simplified business application.
 
@@ -40,11 +40,11 @@ We're going to put all the practices for performance improvement into the contex
 On the GIF above you can see the business application that we're going to optimize. On the screen we have:
 
 - Two lists of the employees in two different departments - Sales and R&D.
-- Each employee has a name and a numeric value associated with them. The numeric value is represented in a material design chip component and goes through some kind of a business computation (for instance, standard deviation or any other meaningful calculation). The value we see in the material design chip component is the resulted number.
+- Each employee has a name and a numeric value associated with them. The numeric value is represented in a material design chip component and goes through some business computation (for instance, standard deviation or any other meaningful calculation). The value we see in the material design chip component is the resulted number.
 - Right next to each employee we have a button for deleting it.
-- Each of the department lists has a text input where we can enter the name of a new employee. When we add a new item we get the employees numeric value somehow (in our case we'll generate it), process it with our business calculation and visualize it on the screen.
+- Each of the department lists has a text input where we can enter the name of a new employee. When we add a new item, we get the employees numeric value somehow (in our case we'll generate it), process it with our business calculation and visualize it on the screen.
 
-That's pretty much all we have! Lets take a brief look at the component structure of the application.
+That's pretty much all we have! Let's take a brief look at the component structure of the application.
 
 <img src="/images/faster-ng-apps-1/structure.png">
 
@@ -74,9 +74,9 @@ Now lets take a look at the template of the `EmployeeListComponent`:
 </mat-list>
 ```
 
-Firstly, we print the department name. After that we declare a material design form field where with `ngModel` we create two-way data-binding between the `label` property declared inside of the `EmployeeListComponent`'s controller and the text input.
+Firstly, we print the department name. After that, we declare a material design form field where with `ngModel` we create two-way data-binding between the `label` property declared inside of the `EmployeeListComponent`'s controller and the text input.
 
-Right after that we declare a list of items and we iterate over the individual employees, show their name and calculate the numeric value associated with them. We directly invoke the `calculate` method inside the template. The `calculate` method is defined inside the controller of `EmployeeListComponent`:
+Right after that, we declare a list of items, and we iterate over the individual employees, show their name and calculate the numeric value associated with them. We directly invoke the `calculate` method inside the template. The `calculate` method is defined inside the controller of `EmployeeListComponent`:
 
 ```ts
 const fibonacci = (num: number): number => {
@@ -113,12 +113,12 @@ The definition of the `EmployeeListComponent` is quite simple:
 
 - It has two inputs:
   - `data` - a list of the employees from the specific department.
-  - `department` - name of the department.
+  - `department` - the name of the department.
 - ...and two outputs:
   - `remove` - triggered when we remove an employee from the list.
-  - `add` - triggered when we add a new employee in the list.
+  - `add` - triggered when we add a new employee to the list.
 
-The inputs are going to be passed from the `AppComponent` to it's child `EmployeeListComponent` instances.
+The inputs are going to be passed from the `AppComponent` to its child `EmployeeListComponent` instances.
 
 ## Business Calculation
 
@@ -128,13 +128,13 @@ You might have also noticed that we're calculating the `n`<sup>th</sup> number o
 
 <img src="/images/faster-ng-apps-1/fibonacci.png" style="border: 1px solid #ccc;">
 
-We do that in order to slow down our application artificially and simulate as precisely as possible a computationally intensive business calculation.
+We do that to slow down our application artificially and simulate as precisely as possible a computationally intensive business calculation.
 
 ## Application Structure Recap
 
 - We have an application root component with two children components.
-- Each children component is an instance of the `EmployeeListComponent` which has a number of list items.
-- For each list item we have a computationally intensive calculation.
+- Each children component is an instance of the `EmployeeListComponent` which has some list items.
+- For each list item, we have a computationally intensive calculation.
 
 # Typing Speed
 
@@ -159,9 +159,9 @@ The image above shows that the `fibonacci` function gets invoked multiple times 
 - Once after the callbacks associated with the `mousedown` event of the input.
 - Once after the callbacks associated with the `mouseup` event of the input.
 
-Although we have calculated the numeric values for all the employees in the list and we have visualized them we're recomputing them again, multiple times. This happens because the Angular's change detection gets triggered after each of the listed events above. Once the change detection gets triggered, it'll re-evaluate all the expressions in the templates and compare them with their previous values. If there's a change, the Angular's change detection will update the DOM in the most efficient manner. This means that **each change detection tick will re-evaluate all the expressions in the templates of the components.** Based on this, an very important advice that I included in the ["Angular Performance Checklist"](https://github.com/mgechev/angular-performance-checklist) is - **do not perform heavy computations in templates**.
+Although we have calculated the numeric values for all the employees in the list and we have visualized them we're recomputing them again, multiple times. This happens because the Angular's change detection gets triggered after each of the listed events above. Once the change detection gets triggered, it'll re-evaluate all the expressions in the templates and compare them with their previous values. If there's a change, the Angular's change detection will update the DOM most efficiently. This means that **each change detection tick will re-evaluate all the expressions in the templates of the components.** Based on this, very important advice that I included in the ["Angular Performance Checklist"](https://github.com/mgechev/angular-performance-checklist) is - **do not perform heavy computations in templates**.
 
-Well, in our case we're 100% sure that the numeric values for the two lists of employees haven't changed, which means that Angular will not find any reason to update the DOM. The question is - how to tell to Angular to not recompute the numeric values for the employees unless it gets new lists for the two departments?
+Well, in our case we're 100% sure that the numeric values for the two lists of employees haven't changed, which means that Angular will not find any reason to update the DOM. The question is - how to tell Angular to not recompute the numeric values for the employees unless it gets new lists for the two departments?
 
 # On Push Change Detection Strategy
 
@@ -169,7 +169,7 @@ The answer to this question is to use a custom change detection strategy. In fac
 
 ## Components as Functions
 
-In order to explain this, lets suppose for a second that `EmployeeListComponent` is a function. Lets also suppose that the function's arguments are the inputs of the `EmployeeListComponent` and the result that the function returns is the DOM rendered on the screen. So:
+In order to explain this, let's suppose for a second that `EmployeeListComponent` is a function. Let's also suppose that the function's arguments are the inputs of the `EmployeeListComponent` and the result that the function returns is the DOM rendered on the screen. So:
 
 ```ts
 function runChangeDetection() {
@@ -212,7 +212,7 @@ Object.keys(args).forEach(i => {
 });
 ```
 
-This simply sets the "inputs". Finally we have:
+This simply sets the "inputs." Finally, we have:
 
 ```ts
 if (shouldRun) {
@@ -222,21 +222,21 @@ if (shouldRun) {
 
 Which runs the change detection.
 
-Now `f` is our `EmployeeListComponent` and `data` is the list of employees which initially contains only a single item - `e1`. If we invoke `f` and pass `data` as an argument (in the language of Angular, as an input):
+Now, `f` is our `EmployeeListComponent` and `data` is the list of employees which initially contains only a single item - `e1`. If we invoke `f` and pass `data` as an argument (in the language of Angular, as an input):
 
 ```ts
 // will invoke `runChangeDetection`.
 f({ data: data });
 ```
 
-...the change detection will be triggered, since the initial value of the input `data` was `undefined`. This will be the behavior in Angular as well if we pass an input with a different value. However, if run:
+...the change detection will be triggered since the initial value of the input `data` was `undefined`. This will be the behavior in Angular as well if we pass an input with a different value. However, if run:
 
 ```ts
 data.push(e2);
 f({ data: data });
 ```
 
-Although, we pass `data` as an argument (or input) again, the change detection will not be invoked because after performing an equality check we will determine that the previous value of the input `data` has the same reference. On the other hand, if we:
+Although we pass `data` as an argument (or input) again, the change detection will not be invoked because after performing an equality check we will determine that the previous value of the input `data` has the same reference. On the other hand, if we:
 
 ```ts
 f({ data: data.slice() });
@@ -285,25 +285,25 @@ export class AppComponent implements OnInit {
 }
 ```
 
-This way, each time when the user presses "Enter" we will emit the value of the `label` using the `add` output. `AppComponent` will handle the output with its `addToSales` method which will push a new employee to the `salesList`, copy the entire list and set the returned new reference as value of the `salesList`.
+This way, each time when the user presses "Enter" we will emit the value of the `label` using the `add` output. `AppComponent` will handle the output with its `addToSales` method which will push a new employee to the `salesList`, copy the entire list and set the returned new reference as the value of the `salesList`.
 
-Alright, this will work, however, we introduce two issues:
+All right, this will work; however, we introduce two issues:
 
-- It'll be slow. Every time we add an employee we need to copy the entire list. The garbage collector should also run in order to clean the unused memory.
+- It'll be slow. Every time we add an employee we need to copy the entire list. The garbage collector should also run to clean the unused memory.
 - It'll require a lot of memory. Well, the memory we allocated for the new list could be a lot depending on the size of the list.
 
 To handle these two issues we can use efficiently implemented immutable data structures such as Immutable.js.
 
 ## Introducing Immutable.js
 
-I've written a lot about immutable.js in the past ([here](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/) and [here](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)), so now I'll just make a very brief introduction.
+I've written a lot about immutable.js in the past ([here](https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/) and [here](https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/)), so now I'll make a very brief introduction.
 
-Immutable.js provides a collection of immutable data structures. All of them have two very important properties:
+Immutable.js provides a collection of immutable data structures. All of them have two essential properties:
 
-1. They are immutable (obviously), so when we aim to apply an operation which will mutate an instance of any of these data structures we will get a new instance (which respectively has a new reference).
-1. In order to produce a new data structure based on the applied operation with mutation immutable.js won't copy the entire data structure, instead it'll reuse as much as it can from the original one.
+1. They are immutable (apparently), so when we aim to apply an operation which will mutate an instance of any of these data structures, we will get a new instance (which respectively has a new reference).
+1. To produce a new data structure based on the applied operation with mutation immutable.js won't copy the entire data structure; instead it'll reuse as much as it can from the original one.
 
-Here's an example for the first point:
+Here's an example of the first point:
 
 ```ts
 import { List } from 'immutable';
@@ -336,17 +336,17 @@ Lets see the typing speed again:
 
 <img src="/images/faster-ng-apps-1/slow-on-push.gif" style="border: 1px solid #ccc;">
 
-Alright, so we're still quite slow. As we can see, the `calculate` method gets executed less frequently but still gets invoked quite a lot. If we take a more careful look we can notice that this time we recalculate only the numeric values for all the employees in the sales department. So, `OnPush` optimization *almost worked*.
+All right, so we're still quite slow. As we can see, the `calculate` method gets executed less frequently but still gets invoked quite a lot. If we take a more careful look, we can notice that this time we recalculate only the numeric values for all the employees in the sales department. So, `OnPush` optimization *almost worked*.
 
-While typing we're not getting new instances of the `salesList` since we're not applying any operations which are mutating it. Why we're getting the change detection for the sales department triggered?
+While typing, we're not getting new instances of the `salesList` since we're not applying any operations which are mutating it. Why we're getting the change detection for the sales department triggered?
 
-The answer lies in the way `OnPush` works. Using `OnPush` change detection strategy the change detection for given component will be triggered when we pass a new value to any of its inputs **or when an event inside of the component happens**. The second part is not completely obvious from the documentation but it can be clearly seen in **[this e2e test](https://github.com/angular/angular/blob/56238fe94e5022f2a4c450ba9a23022bfff81eb9/packages/core/test/linker/integration_spec.ts#L641-L677)** in the Angular's core repository.
+The answer lies in the way `OnPush` works. Using `OnPush` change detection strategy the change detection for a given component will be triggered when we pass a new value to any of its inputs **or when an event inside of the component happens**. The second part is not completely obvious from the documentation, but it can be seen in **[this e2e test](https://github.com/angular/angular/blob/56238fe94e5022f2a4c450ba9a23022bfff81eb9/packages/core/test/linker/integration_spec.ts#L641-L677)** in the Angular's core repository.
 
 ## Enforcing Separation of Concerns
 
-In order to fix this we need to do some refactoring. This will help us not only to eliminate the unnecessary change detection invocations but also enforce better separation of concerns in our application.
+To fix this, we need to do some refactoring. This will help us not only to eliminate the unnecessary change detection invocations but also enforce better separation of concerns in our application.
 
-For this purpose we will decompose the `EmployeeListComponent` to:
+For this purpose, we will decompose the `EmployeeListComponent` to:
 
 - `NameInputComponent` - responsible for holding the new name of the employee we want to add to the list.
 - `ListComponent` - will list the individual employees and calculate their numeric values:
@@ -357,7 +357,7 @@ Now lets run the e2e tests again and see what we got:
 
 <img src="/images/faster-ng-apps-1/fast-typing.png" style="border: 1px solid #ccc;">
 
-It may look like there's a glitch in the chart. No there isn't, we're just hundreds of times faster - 13124.81ms vs 10.45ms for typing the string "AngularConnect".
+It may look like there's a glitch in the chart. No there isn't, we're just hundreds of times faster - 13124.81ms vs. 10.45ms for typing the string "AngularConnect."
 
 And here's the user experience when typing in the text input for the optimized version:
 
@@ -365,12 +365,12 @@ And here's the user experience when typing in the text input for the optimized v
 
 # Conclusion
 
-In this part of the series "Faster Angular Applications" we covered how we can optimize an Angular application in terms of runtime performance by using immutable data structures and custom change detection strategy.
+In this part of the series "Faster Angular Applications," we covered how we can optimize an Angular application regarding runtime performance by using immutable data structures and a custom change detection strategy.
 
 We started by introducing a sample business application which lists two departments of employees and using a heavy computation calculates a numeric value for each of them.
 
-There were some obvious slowdowns in the app caused by the two-way data-binding that we're using - the typing experience for entering a new employee was extremely slow. In order to reduce the number of computations going on we used `OnPush` change detection strategy and immutable data structures.
+There were some apparent slowdowns in the app caused by the two-way data-binding that we're using - the typing experience for entering a new employee was extremely slow. To reduce the number of computations going on we used `OnPush` change detection strategy and immutable data structures.
 
 Although `OnPush` introduced a significant improvement we missed a very important detail - it causes Angular to detect for changes when an event inside of the given component gets triggered. We fixed this issue by decomposing the `EmployeeListComponent` and enforcing better separation of concerns.
 
-In the next blog post from the series we'll take a look at pure pipes. We'll also illustrate how pure pipes and `OnPush` change detection relate to functional programming and more precisely pure functions & memoization.
+In the next blog post from the series, we'll take a look at pure pipes. We'll also illustrate how pure pipes and `OnPush` change detection relate to functional programming and more precisely pure functions & memoization.

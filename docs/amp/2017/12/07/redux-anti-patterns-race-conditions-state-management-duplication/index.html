@@ -1,140 +1,97 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Redux Anti-Patterns - Part 1. State Management. &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
+		
 
-
-<link rel="canonical" href="https://blog.mgechev.com/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
-
-
-    
-    
-    
-    <title>Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
-
-<meta property="og:title" content="Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
-<meta name="twitter:title" content="Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="For the past year I&amp;rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&amp;rsquo;m planning to share lessons learned while combining these technologies. In this article I&amp;rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&amp;rsquo;ll focus on testability.All of the anti-patterns below have the following structure: Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Redux Anti-Patterns - Part 1. State Management. - Minko Gechev&#39;s blog",
-    "datePublished": "2017-12-07T00:00:00JST",
-    "dateModified": "2017-12-07T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.
+		<meta property="og:title" content="Redux Anti-Patterns - Part 1. State Management.">
+		<meta property="og:description" content="For the past year I&#x2019;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&#x2019;m planning to share lessons learned while combining these technologies. In this article I&#x2019;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&#x2019;ll focus on testability.
 All of the anti-patterns below have the following structure:
- Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts."
-  }
-</script>
+ Introduction Problem definition Sample solutions with discussion of their pros and cons  State Duplication Sometimes we have instances of the same business entity used in different contexts.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-6462257f7dffe7a4f4bc80054188e5d5">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2017/12/07/redux-anti-patterns-race-conditions-state-management-duplication/" class="thumbnail" title="Redux Anti-Patterns - Part 1. State Management."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Redux Anti-Patterns - Part 1. State Management.</h1>
-        <ul class="p-facts">
-          <li><time datetime="2017-12-07T00:00:00JST">Dec 7, 2017</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&t=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&text=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body">
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Redux Anti-Patterns - Part 1. State Management.
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2017-12-07-redux-anti-patterns-race-conditions-testability.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Dec 7, 2017
+                    &#xB7; 9 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/react">React</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/redux">Redux</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/architecture">Architecture</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
 
-<p>For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.</p>
+<p>For the past year I&#x2019;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&#x2019;m planning to share lessons learned while combining these technologies. In this article I&#x2019;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&#x2019;ll focus on testability.</p>
 
 <p>All of the anti-patterns below have the following structure:</p>
 
@@ -148,71 +105,59 @@ All of the anti-patterns below have the following structure:
 
 <p>Sometimes we have instances of the same business entity used in different contexts. In such cases, instead of keeping the instances under the same store property we treat them differently.</p>
 
-<p><amp-img src="/images/redux-anti-patterns/duplicate.jpg" alt="Duplication" layout="responsive" width="1280" height="853"></amp-img></p>
+<p><amp-img src="/images/redux-anti-patterns/duplicate.jpg" style="display: block; margin: auto" alt="Duplication"></amp-img></p>
 
 <h2 id="problem">Problem</h2>
 
 <p>For example, lets suppose we are developing an application which provides tutoring functionality. A tutor can schedule sessions and also, once the time for given session comes, the tutor can join it. Lets model the session with the following interface:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&rsquo;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<span class="p">}</span></code></pre></div>
+<p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&#x2019;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">Session</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Although such shape of the store is logically correct, it introduces state duplication. For example, lets suppose the user schedules the following session and later joins it:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span>
-  <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Introduction to Go&#39;</span><span class="p">,</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s1">&apos;Introduction to Go&apos;</span><span class="p">,</span>
   <span class="nx">start</span>: <span class="kt">startTime</span><span class="p">,</span>
   <span class="nx">end</span>: <span class="kt">endTime</span>
-<span class="p">};</span>
-</code></pre></div>
-
-<p>This way we&rsquo;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
+<span class="p">};</span></code></pre></div>
+<p>This way we&#x2019;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
 
 <ul>
 <li>If we modify the current session, we need to update the <code>sessions</code> array and <code>currentSession</code>.</li>
-<li>If we switch between sessions we need to clean the <code>currentSession</code> and replace it with the session corresponding to the page we&rsquo;ve navigated to.</li>
+<li>If we switch between sessions we need to clean the <code>currentSession</code> and replace it with the session corresponding to the page we&#x2019;ve navigated to.</li>
 </ul>
 
 <h2 id="solution">Solution</h2>
 
-<p>The solution is to keep a value pointing to the current session in the <code>sessions</code> array as value of the <code>currentSession</code> property. For instance, we can use the <code>Session</code>&rsquo;s <code>id</code> for the purpose:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<p>The solution is to keep a value pointing to the current session in the <code>sessions</code> array as value of the <code>currentSession</code> property. For instance, we can use the <code>Session</code>&#x2019;s <code>id</code> for the purpose:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>This has an implication - we need to select the correct session from the &ldquo;master&rdquo; property. In this specific case, it&rsquo;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<span class="p">}</span></code></pre></div>
+<p>This has an implication - we need to select the correct session from the &#x201C;master&#x201D; property. In this specific case, it&#x2019;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This way we will be able to access the current session with constant complexity:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span></code></pre></div>
 <h1 id="incorrect-information-expert">Incorrect Information Expert</h1>
 
-<p>There&rsquo;s a collection of patterns called <a href="https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)">GRASP</a>, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book &ldquo;<a href="https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062">Applying UML and Patterns</a>&rdquo;. One of them is called &ldquo;Information Expert&rdquo;. The book describes this practice as:</p>
+<p>There&#x2019;s a collection of patterns called <a href="https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)">GRASP</a>, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book &#x201C;<a href="https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062">Applying UML and Patterns</a>&#x201D;. One of them is called &#x201C;Information Expert&#x201D;. The book describes this practice as:</p>
 
 <blockquote>
 <p>Assign a responsibility to the information expert class that has the information necessary to fulfill the responsibility.</p>
 </blockquote>
 
-<p>The pattern suggests that we should assign the responsibilities to given class based on the information it holds. At first this doesn&rsquo;t seem applicable to the functional approach of redux (sounds soo &ldquo;object-orienty&rdquo;, doesn&rsquo;t it).</p>
+<p>The pattern suggests that we should assign the responsibilities to given class based on the information it holds. At first this doesn&#x2019;t seem applicable to the functional approach of redux (sounds soo &#x201C;object-orienty&#x201D;, doesn&#x2019;t it).</p>
 
 <p>If we suppose that the pattern is symmetric, we can take a look at it the another angle:</p>
 
@@ -232,7 +177,7 @@ All of the anti-patterns below have the following structure:
 
 <h2 id="solution-1">Solution</h2>
 
-<p>The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components&rsquo; children.</p>
+<p>The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components&#x2019; children.</p>
 
 <p>Sometimes, it makes more sense to move the state directly to the store and use more systematic mechanism for mutating it (through actions and reducers).</p>
 
@@ -240,13 +185,13 @@ All of the anti-patterns below have the following structure:
 
 <h3 id="coupling">Coupling</h3>
 
-<p>Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn&rsquo;t allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it&rsquo;s often is not good enough.</p>
+<p>Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn&#x2019;t allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it&#x2019;s often is not good enough.</p>
 
 <p>Take a look at the next figure:</p>
 
-<p><amp-img src="/images/redux-anti-patterns/cmp.png" alt="Component tree" layout="responsive" width="300" height="405"></amp-img></p>
+<p><amp-img src="/images/redux-anti-patterns/cmp.png" style="display: block; margin: auto" alt="Component tree"></amp-img></p>
 
-<p>If component <code>A</code> holds the state that <code>C</code> and <code>D</code> consume then <code>B</code> should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven&rsquo;t experienced any serious issues with it for medium sized applications (above 40k SLOC).</p>
+<p>If component <code>A</code> holds the state that <code>C</code> and <code>D</code> consume then <code>B</code> should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven&#x2019;t experienced any serious issues with it for medium sized applications (above 40k SLOC).</p>
 
 <h3 id="mutation">Mutation</h3>
 
@@ -259,18 +204,14 @@ All of the anti-patterns below have the following structure:
 <h2 id="problem-2">Problem</h2>
 
 <p>Lets suppose we have the following global store:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">totalSessions</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>Notice that there&rsquo;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span>
-</code></pre></div>
-
-<p><amp-img src="/images/redux-anti-patterns/encapsulation.jpg" alt="Hidden dependencies" layout="responsive" width="1280" height="592"></amp-img></p>
+<span class="p">}</span></code></pre></div>
+<p>Notice that there&#x2019;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span></code></pre></div>
+<p><amp-img src="/images/redux-anti-patterns/encapsulation.jpg" style="display: block; margin: auto" alt="Hidden dependencies"></amp-img></p>
 
 <h2 id="solution-2">Solution</h2>
 
@@ -280,29 +221,27 @@ All of the anti-patterns below have the following structure:
 
 <h1 id="overwriting-state-updates">Overwriting State Updates</h1>
 
-<p>In this section we&rsquo;ll take a look at another issue which is related to inconsistent state mutation.</p>
+<p>In this section we&#x2019;ll take a look at another issue which is related to inconsistent state mutation.</p>
 
 <h2 id="problem-3">Problem</h2>
 
 <p>Lets suppose that our redux project uses immutable.js and we have a record for the <code>Session</code> model which has the following interface.</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">guide</span>: <span class="kt">User</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
-<p>&hellip;and the following actions&rsquo; definitions:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
+<span class="p">}</span></code></pre></div>
+<p>&#x2026;and the following actions&#x2019; definitions:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
 
 <span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span><span class="p">,</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&apos;put&apos;</span><span class="p">,</span>
       <span class="nx">body</span>: <span class="kt">JSON.stringify</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()),</span>
       <span class="nx">headers</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s1">&#39;content-type&#39;</span><span class="o">:</span> <span class="s1">&#39;application/json&#39;</span>
+        <span class="s1">&apos;content-type&apos;</span><span class="o">:</span> <span class="s1">&apos;application/json&apos;</span>
       <span class="p">}</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
@@ -310,22 +249,18 @@ All of the anti-patterns below have the following structure:
 
 <span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
-      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&apos;put&apos;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span>
-</code></pre></div>
-
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;guide&apos;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span></code></pre></div>
 <p>And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;title&apos;</span><span class="p">,</span> <span class="s1">&apos;Advanced Go&apos;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>The code looks fine at first but lets trace what is actually going on:</p>
 
 <ol>
@@ -350,62 +285,52 @@ All of the anti-patterns below have the following structure:
 <h3 id="using-getstate">Using <code>getState</code></h3>
 
 <p>We can update <code>setGuide</code> to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">getStore</span><span class="p">().</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
-      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&apos;put&apos;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
-<span class="p">};</span>
-</code></pre></div>
-
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;guide&apos;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
+<span class="p">};</span></code></pre></div>
 <p>This way we can make sure that we always get the latest session inside of the <code>setGuide</code> async action.</p>
 
 <h3 id="using-resolve-argument">Using Resolve Argument</h3>
 
 <p>We can refactor <code>setGuide</code> in a different way:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
-      <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+      <span class="nx">method</span><span class="o">:</span> <span class="s1">&apos;put&apos;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">));</span>
+      <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;guide&apos;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">));</span>
       <span class="nx">updateSession</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
       <span class="k">return</span> <span class="nx">s</span><span class="p">;</span>
     <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>Respectively, we can update the component to:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;title&apos;</span><span class="p">,</span> <span class="s1">&apos;Advanced Go&apos;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">s</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">s</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:</p>
 
 <h3 id="updated-props">Updated Props</h3>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;title&apos;</span><span class="p">,</span> <span class="s1">&apos;Advanced Go&apos;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span>
-</code></pre></div>
-
+<span class="p">...</span></code></pre></div>
 <p>The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of <code>updateSession</code> looks like:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">));</span>
   <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">session</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div>
-
-<p>&hellip;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
+<span class="p">};</span></code></pre></div>
+<p>&#x2026;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
 
 <h1 id="conclusion">Conclusion</h1>
 
@@ -418,136 +343,69 @@ All of the anti-patterns below have the following structure:
 <li>Overwriting state updates</li>
 </ul>
 
-<p>We discussed their consequences and proposed sample solutions. In the next post I&rsquo;ll share a few lessons I learned about testing.</p>
-</div>
+<p>We discussed their consequences and proposed sample solutions. In the next post I&#x2019;ll share a few lessons I learned about testing.</p>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&t=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management." title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f&text=Redux%20Anti-Patterns%20-%20Part%201.%20State%20Management.&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f12%2f07%2fredux-anti-patterns-race-conditions-state-management-duplication%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Redux Anti-Patterns - Part 1. State Management.</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/React/">React</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Redux/">Redux</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Architecture/">Architecture</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/React/">React</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Redux/">Redux</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Architecture/">Architecture</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

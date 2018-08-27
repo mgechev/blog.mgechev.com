@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Angular2 - First Impressions &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -137,14 +137,14 @@ Traceur will create source maps for you. You will debug the code you&rsquo;ve al
 No. You can use the <a href="https://github.com/google/traceur-compiler">traceur compiler</a> and a task runner, like gulp or grunt, with the corresponding plugins (<a href="https://github.com/sindresorhus/gulp-traceur">here</a> and <a href="https://github.com/aaronfrost/grunt-traceur">here</a>). The actual type checking should be implemented inside external &ldquo;assertion&rdquo; library. For example, Angular2 uses the <a href="https://www.npmjs.com/package/rtts_assert">rtts_assert module</a>.</p>
 
 <p>Here is a sample configuration of <code>gulp-traceur</code>, using type assertion:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">gulp</span><span class="p">.</span><span class="nx">task</span><span class="p">(</span><span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;copy&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">gulp</span><span class="p">.</span><span class="nx">task</span><span class="p">(</span><span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;copy&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">gulp</span><span class="p">.</span><span class="nx">src</span><span class="p">([</span>
-      <span class="c1">// some files here</span>
-      <span class="nx">traceur</span><span class="p">.</span><span class="nx">RUNTIME_PATH</span>
+      <span class="c1">// some files here
+</span><span class="c1"></span>      <span class="nx">traceur</span><span class="p">.</span><span class="nx">RUNTIME_PATH</span>
     <span class="p">])</span>
-    <span class="c1">// some other plugins</span>
-    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">traceur</span><span class="p">({</span>
+    <span class="c1">// some other plugins
+</span><span class="c1"></span>    <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">traceur</span><span class="p">({</span>
       <span class="nx">modules</span><span class="o">:</span> <span class="s1">&#39;instantiate&#39;</span><span class="p">,</span>
       <span class="nx">sourceMaps</span><span class="o">:</span> <span class="s1">&#39;inline&#39;</span><span class="p">,</span>
       <span class="nx">annotations</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
@@ -156,7 +156,6 @@ No. You can use the <a href="https://github.com/google/traceur-compiler">traceur
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">gulp</span><span class="p">.</span><span class="nx">dest</span><span class="p">(</span><span class="s1">&#39;./dist/&#39;</span><span class="p">));</span>
 <span class="p">});</span>
 </code></pre></div>
-
 <p><em>What is this thing called AtScript I&rsquo;ve heard of?</em><br></p>
 
 <p><blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
@@ -277,7 +276,7 @@ You can use <a href="https://github.com/angular/router">this repo</a>.</p>
 <p>There are a lot of statements the <code>$scope</code> was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there&rsquo;s no such thing as <code>$scope</code> in Angular2! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our &ldquo;components&rdquo;.</p>
 
 <p>For example, the component below has selector <code>sample-app</code> (i.e. we can use it as <code>&lt;sample-app&gt;&lt;/sample-app&gt;</code>) and template located inside <code>./templates/sample-app.html</code> (you can find the whole source code at my <a href="https://github.com/mgechev/angular2-seed">GitHub repository</a>).</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;sample-app&#39;</span><span class="p">,</span>
   <span class="nx">componentServices</span><span class="o">:</span> <span class="p">[</span>
     <span class="nx">NameList</span>
@@ -287,7 +286,7 @@ You can use <a href="https://github.com/angular/router">this repo</a>.</p>
   <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;./templates/sample-app.html&#39;</span><span class="p">,</span>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">Foreach</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">SampleApp</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">SampleApp</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">NameList</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
@@ -298,15 +297,12 @@ You can use <a href="https://github.com/angular/router">this repo</a>.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>We can directly bind to <code>this.names</code> inside our template, like this:</p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span>...
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html">...
 <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">li</span> <span class="err">*</span><span class="na">foreach</span><span class="o">=</span><span class="s">&quot;#name in names&quot;</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span> <span class="err">*</span><span class="na">foreach</span><span class="o">=</span><span class="s">&#34;#name in names&#34;</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-...
-</code></pre></div>
-
+...</code></pre></div>
 <p>No scope at all! Awesome, isn&rsquo;t it? So far, so good. We do not have scope. But remember, we used to use <code>$scope.$apply</code> in order to force execution of the <code>$digest</code> loop and perform dirty checking? How are we going to do this now? Well, we cant.</p>
 
 <h3 id="quick-faq-5">Quick FAQ:</h3>
@@ -363,9 +359,8 @@ Most likely, no. I&rsquo;m not aware whether the <code>angular-translate</code> 
 <p><strong>There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will do the best based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.</strong></p>
 
 <p>Another completely innovative idea I found, digging inside AngularJS&rsquo; source code was inside the <code>JITChangeDetector</code>. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">oldValue</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">oldValue</span><span class="p">;</span>
 </code></pre></div>
-
 <p>The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look <a href="http://jsperf.com/object-observe-polyfill-sandbox">at these benchmarks</a>). How does it work? According to my quick research:</p>
 
 <ul>
@@ -403,11 +398,11 @@ If you use your debugger properly you should not have any issues. Take a look at
 <h3 id="improved-di">Improved DI</h3>
 
 <p>The dependency injection mechanism will be used with the decorators syntax provided by TypeScript. You can take a look at the source code <a href="https://github.com/angular/di.js">here</a>. Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of <code>di.js</code>:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;di&#39;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="p">{</span><span class="nx">Electricity</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./electricity&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;di&#39;</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span><span class="nx">Electricity</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./electricity&#39;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="nx">Electricity</span><span class="p">)</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Fridge</span> <span class="p">{</span>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">Fridge</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">electricity</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">electricity</span> <span class="o">=</span> <span class="nx">electricity</span><span class="p">;</span>
   <span class="p">}</span>
@@ -417,7 +412,6 @@ If you use your debugger properly you should not have any issues. Take a look at
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h2 id="conclusion">Conclusion</h2>
 
 <p>Angular2 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don&rsquo;t have to use it if you don&rsquo;t want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the <a href="https://facebook.github.io/react/docs/flux-overview.html">flux architecture</a>. It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components&rsquo; APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).</p>
@@ -476,14 +470,17 @@ If you use your debugger properly you should not have any issues. Take a look at
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

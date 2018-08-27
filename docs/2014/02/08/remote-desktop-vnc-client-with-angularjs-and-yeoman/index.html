@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Remote Desktop Client with AngularJS and Yeoman &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -119,71 +119,62 @@ It seems I have affinity to the remote desktop protocols, because this is my thi
 
 <p>We can now continue with our proxy server. Create a directory called <code>angular-vnc</code>. Inside it create another one called <code>proxy</code>:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>mkdir angular-vnc
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">mkdir angular-vnc
 <span class="nb">cd</span> angular-vnc
 mkdir proxy
 <span class="nb">cd</span> proxy
-<span class="c1"># Initialize the node.js application, creates package.json</span>
-npm init
-</code></pre></div>
-
+<span class="c1"># Initialize the node.js application, creates package.json
+</span><span class="c1"></span>npm init</code></pre></div>
 
 <p>Now lets install all the dependencies required for our proxy server:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1"># Required for the communication with the AngularJS client</span>
-npm install socketio --save
-<span class="c1"># Required for the communication with the VNC server</span>
-npm install rfb --save
-<span class="c1"># It provides the static files of the AngularJS client</span>
-npm install express --save
-<span class="c1"># We use it to create HTTP server</span>
-npm install http --save
-<span class="c1"># We use it to process the received frames</span>
-npm i git+https://github.com/pkrumins/node-png --save
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Required for the communication with the AngularJS client
+</span><span class="c1"></span>npm install socketio --save
+<span class="c1"># Required for the communication with the VNC server
+</span><span class="c1"></span>npm install rfb --save
+<span class="c1"># It provides the static files of the AngularJS client
+</span><span class="c1"></span>npm install express --save
+<span class="c1"># We use it to create HTTP server
+</span><span class="c1"></span>npm install http --save
+<span class="c1"># We use it to process the received frames
+</span><span class="c1"></span>npm i git+https://github.com/pkrumins/node-png --save</code></pre></div>
 
 <p>All dependencies are installed, now your <code>package.json</code> should look something like this:</p>
 
-<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;js-vnc&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;repository&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;git&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;js-vnc&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;0.0.1&#34;</span><span class="p">,</span>
+  <span class="nt">&#34;repository&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;git&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
   <span class="p">},</span>
-  <span class="nt">&quot;dependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;socket.io&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.9.16&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;rfb&quot;</span><span class="p">:</span> <span class="s2">&quot;~0.2.3&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;express&quot;</span><span class="p">:</span> <span class="s2">&quot;~3.4.8&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;http&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;png&quot;</span><span class="p">:</span> <span class="s2">&quot;git+https://github.com/pkrumins/node-png&quot;</span>
+  <span class="nt">&#34;dependencies&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;socket.io&#34;</span><span class="p">:</span> <span class="s2">&#34;~0.9.16&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;rfb&#34;</span><span class="p">:</span> <span class="s2">&#34;~0.2.3&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;express&#34;</span><span class="p">:</span> <span class="s2">&#34;~3.4.8&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;http&#34;</span><span class="p">:</span> <span class="s2">&#34;0.0.0&#34;</span><span class="p">,</span>
+    <span class="nt">&#34;png&#34;</span><span class="p">:</span> <span class="s2">&#34;git+https://github.com/pkrumins/node-png&#34;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 
 <p>We will put our proxy in folder called <code>lib</code>, located inside <code>angular-vnc/proxy</code>:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>mkdir lib
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">mkdir lib
 touch lib/server.js
-touch index.js
-</code></pre></div>
-
+touch index.js</code></pre></div>
 
 <p>Note that we created one more file in the root directory of our proxy, we will use it to start the proxy server.</p>
 
 <p>Add the following content inside <code>index.js</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./lib/server&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./lib/server&#39;</span><span class="p">);</span>
 
 <span class="nx">server</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
 </code></pre></div>
 
-
 <p>Using CommonJS we require our server, located inside the <code>lib</code> folder and call its <code>run</code> method. In order to make this code work, we should define <code>run</code> method in <code>./lib/server.js</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">clients</span> <span class="o">=</span> <span class="p">[],</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">clients</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">),</span>
     <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">),</span>
     <span class="nx">Config</span> <span class="o">=</span> <span class="p">{</span>
@@ -216,13 +207,12 @@ touch index.js
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>In the snippet above we create new Express application, with static directory <code>/../../client/app</code> and also start HTTP server, listening on port <code>8090</code>.<br />
 As next step we wrap the HTTP server with socket.io, add event handler for incoming socket.io connections and initialize variable called <code>clients</code>. In the connection handler we add one more event handler, which is invoked when the AngularJS application sends <code>init</code> message. When <code>init</code> message is received, we add three more handlers, which are responsible for handling the incoming mouse, keyboard and disconnect events.</p>
 
 <p>Lets take a quick look at <code>createRfbConnection</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">createRfbConnection</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">createRfbConnection</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">try</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">RFB</span><span class="p">({</span>
       <span class="nx">host</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">hostname</span><span class="p">,</span>
@@ -238,16 +228,14 @@ As next step we wrap the HTTP server with socket.io, add event handler for incom
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>With the received by the client configuration we initialize new RFB connection and add some event handlers. Note that you should require <code>RFB</code> in <code>server.js</code>, in order to make the script work:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">RFB</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;rfb&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">RFB</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;rfb&#39;</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p><code>addEventHandlers</code> adds event handlers, which should handle RFB events, like errors and new incoming frames.</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">addEventHandlers</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">addEventHandlers</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
 
   <span class="kd">var</span> <span class="nx">initialized</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
       <span class="nx">screenWidth</span><span class="p">,</span> <span class="nx">screenHeight</span><span class="p">;</span>
@@ -299,20 +287,18 @@ As next step we wrap the HTTP server with socket.io, add event handler for incom
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>Lets take a look at the handler of the <code>raw</code> event. It takes very important role in the initialization of the connection. When we receive a <code>raw</code> event for first time the value of <code>initialized</code> is <code>false</code>, because of the way boolean expressions are being evaluated (see <a href="https://en.wikipedia.org/wiki/Lazy_evaluation">Lazy evaluation</a>), <code>!initialized</code> is evaluated to <code>true</code>, which leads to the call of <code>handleConnection</code>. <code>handleConnection</code> is responsible for notifying the AngularJS client that now we are connected to the VNC server. It also adds the client to the <code>clients</code> collection and changes the value of <code>initialized</code> to <code>true</code>, so when next time we receive new frame this won’t lead to call of <code>handleConnection</code>.</p>
 
 <p>In other words, <code>!initialized &amp;&amp; handleConnection(rect.width, rect.height);</code> is short version of:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">initialized</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">initialized</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">handleConnection</span><span class="p">(</span><span class="nx">rect</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>The next method of our proxy, we are going to look at is <code>encodeFrame</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">encodeFrame</span><span class="p">(</span><span class="nx">rect</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">encodeFrame</span><span class="p">(</span><span class="nx">rect</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">rgb</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="nx">rect</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">height</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;binary&#39;</span><span class="p">),</span>
       <span class="nx">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
@@ -326,18 +312,16 @@ As next step we wrap the HTTP server with socket.io, add event handler for incom
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>Don’t forget to require <code>node-png</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">Png</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../node_modules/png/build/Release/png&#39;</span><span class="p">).</span><span class="nx">Png</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Png</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../node_modules/png/build/Release/png&#39;</span><span class="p">).</span><span class="nx">Png</span><span class="p">;</span>
 </code></pre></div>
-
 
 <p>All that <code>encodeFrame</code> does is reordering the received pixels and converting them to PNG. The handler of the <code>raw</code> event converts the binary result, received by <code>encodeFrame</code> to base64, in order to make it readable for the AngularJS client.</p>
 
 <p>And the last method in the proxy is <code>disconnectClient</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">disconnectClient</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">disconnectClient</span><span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">clients</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nx">socket</span> <span class="o">===</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">client</span><span class="p">.</span><span class="nx">rfb</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
@@ -350,7 +334,6 @@ As next step we wrap the HTTP server with socket.io, add event handler for incom
 <span class="p">}</span>
 </code></pre></div>
 
-
 <p>As its name states it disconnects clients. This method is called with socket. First, it finds the client, which corresponds to the given socket, ends its RFB connection and removes it from the <code>clients</code> array.</p>
 
 <p>And now we are done with the proxy! Lets continue with the fun part, AngularJS and Yeoman!</p>
@@ -359,22 +342,18 @@ As next step we wrap the HTTP server with socket.io, add event handler for incom
 
 <p>First, of all you will need to install Yeoman, if you don’t already have it on your computer:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="c1"># Installs Yeoman</span>
-npm install -g yeoman
-<span class="c1"># Installs the AngularJS generator for Yeoman</span>
-npm install -g generator-angular
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Installs Yeoman
+</span><span class="c1"></span>npm install -g yeoman
+<span class="c1"># Installs the AngularJS generator for Yeoman
+</span><span class="c1"></span>npm install -g generator-angular</code></pre></div>
 
 <p>Now we can begin! Inside the directory <code>angular-vnc</code> create a directory called <code>client</code>:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="nb">cd</span> angular-vnc
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> angular-vnc
 mkdir client
 <span class="nb">cd</span> client
-<span class="c1"># Creates new AngularJS application</span>
-yo angular
-</code></pre></div>
-
+<span class="c1"># Creates new AngularJS application
+</span><span class="c1"></span>yo angular</code></pre></div>
 
 <p>Yeoman will ask you few questions, you should answer as follows:</p>
 
@@ -384,7 +363,7 @@ yo angular
 
 <p>Look at: <code>app/scripts/app.js</code>, its content should be something like:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;angApp&#39;</span><span class="p">,</span> <span class="p">[</span>
   <span class="s1">&#39;ngRoute&#39;</span>
@@ -401,16 +380,14 @@ yo angular
   <span class="p">});</span>
 </code></pre></div>
 
-
 <p>Now in the <code>client</code> directory run:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">yo</span> <span class="nx">angular</span><span class="o">:</span><span class="nx">route</span> <span class="nx">vnc</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">yo</span> <span class="nx">angular</span><span class="o">:</span><span class="nx">route</span> <span class="nx">vnc</span>
 </code></pre></div>
-
 
 <p>After the command completes, the content of <code>app/scripts/app.js</code>, should be magically turned into:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;angApp&#39;</span><span class="p">,</span> <span class="p">[</span>
   <span class="s1">&#39;ngRoute&#39;</span>
@@ -431,51 +408,48 @@ yo angular
   <span class="p">});</span>
 </code></pre></div>
 
-
 <p>For next step, replace the content of <code>app/views/main.html</code> with:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;container&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;container&#34;</span><span class="p">&gt;</span>
 
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;row&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;margin-top:20px&quot;</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3&quot;</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">form</span> <span class="na">role</span><span class="o">=</span><span class="s">&quot;form&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;vnc-form&quot;</span> <span class="na">novalidate</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;row&#34;</span> <span class="na">style</span><span class="o">=</span><span class="s">&#34;margin-top:20px&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3&#34;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">form</span> <span class="na">role</span><span class="o">=</span><span class="s">&#34;form&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;vnc-form&#34;</span> <span class="na">novalidate</span><span class="p">&gt;</span>
         <span class="p">&lt;</span><span class="nt">fieldset</span><span class="p">&gt;</span>
           <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>VNC Login<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">hr</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;colorgraph&quot;</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-error&quot;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;errorMessage&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
-              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;hostname&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;hostname-input&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-control input-lg&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Hostname&quot;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&quot;host.hostname&quot;</span> <span class="na">required</span> <span class="na">ng-minlength</span><span class="o">=</span><span class="s">&quot;3&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">hr</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;colorgraph&#34;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-error&#34;</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&#34;errorMessage&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-group&#34;</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;text&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;hostname&#34;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;hostname-input&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-control input-lg&#34;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&#34;Hostname&#34;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&#34;host.hostname&#34;</span> <span class="na">required</span> <span class="na">ng-minlength</span><span class="o">=</span><span class="s">&#34;3&#34;</span><span class="p">&gt;</span>
           <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
-              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;number&quot;</span> <span class="na">min</span><span class="o">=</span><span class="s">&quot;1&quot;</span> <span class="na">max</span><span class="o">=</span><span class="s">&quot;65535&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;port&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;port-input&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-control input-lg&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Port&quot;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&quot;host.port&quot;</span> <span class="na">required</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-group&#34;</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;number&#34;</span> <span class="na">min</span><span class="o">=</span><span class="s">&#34;1&#34;</span> <span class="na">max</span><span class="o">=</span><span class="s">&#34;65535&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;port&#34;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;port-input&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-control input-lg&#34;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&#34;Port&#34;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&#34;host.port&#34;</span> <span class="na">required</span><span class="p">&gt;</span>
           <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
-              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;password&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;password&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;password-input&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-control input-lg&quot;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Password&quot;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&quot;host.password&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-group&#34;</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;password&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;password&#34;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;password-input&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-control input-lg&#34;</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&#34;Password&#34;</span> <span class="na">ng-model</span><span class="o">=</span><span class="s">&#34;host.password&#34;</span><span class="p">&gt;</span>
           <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form-group&quot;</span><span class="p">&gt;</span>
-              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-lg btn-primary btn-block&quot;</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;login()&quot;</span><span class="p">&gt;</span>Login<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;form-group&#34;</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;&#34;</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;btn btn-lg btn-primary btn-block&#34;</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&#34;login()&#34;</span><span class="p">&gt;</span>Login<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
           <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-          <span class="p">&lt;</span><span class="nt">hr</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;colorgraph&quot;</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">hr</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;colorgraph&#34;</span><span class="p">&gt;</span>
         <span class="p">&lt;/</span><span class="nt">fieldset</span><span class="p">&gt;</span>
       <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
     <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
 
 <p>You should also insert some CSS at <code>app/styles/main.css</code>:</p>
 
-<div class="highlight"><pre><code class="language-css" data-lang="css"><span></span><span class="p">.</span><span class="nc">colorgraph</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-css" data-lang="css"><span class="p">.</span><span class="nc">colorgraph</span> <span class="p">{</span>
   <span class="k">margin-bottom</span><span class="p">:</span> <span class="mi">7</span><span class="kt">px</span><span class="p">;</span>
   <span class="k">height</span><span class="p">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
   <span class="k">border-top</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">background</span><span class="p">:</span> <span class="mh">#c4e17f</span><span class="p">;</span>
   <span class="k">border-radius</span><span class="p">:</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
-  <span class="k">background-image</span><span class="p">:</span> <span class="bp">-webkit-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
-  <span class="k">background-image</span><span class="p">:</span> <span class="bp">-moz-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
-  <span class="k">background-image</span><span class="p">:</span> <span class="bp">-o-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
+  <span class="k">background-image</span><span class="p">:</span> <span class="kp">-webkit-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
+  <span class="k">background-image</span><span class="p">:</span> <span class="kp">-moz-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
+  <span class="k">background-image</span><span class="p">:</span> <span class="kp">-o-</span><span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">left</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
   <span class="k">background-image</span><span class="p">:</span> <span class="nb">linear-gradient</span><span class="p">(</span><span class="kc">to</span> <span class="kc">right</span><span class="p">,</span> <span class="mh">#c4e17f</span><span class="p">,</span> <span class="mh">#c4e17f</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mf">12.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f7fdca</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mi">25</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#fecf71</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mf">37.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#f0776c</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mi">50</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#db9dbe</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mf">62.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#c49cde</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mi">75</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#669ae1</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span> <span class="mf">87.5</span><span class="kt">%</span><span class="p">,</span> <span class="mh">#62c2e4</span><span class="p">);</span>
 <span class="p">}</span>
 
@@ -488,18 +462,14 @@ yo angular
   <span class="k">height</span><span class="p">:</span> <span class="mi">25</span><span class="kt">px</span><span class="p">;</span>
   <span class="k">color</span><span class="p">:</span> <span class="kc">red</span><span class="p">;</span>
   <span class="k">text-align</span><span class="p">:</span> <span class="kc">center</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 
 <p>This defines the markup and styles for simple Bootstrap form.</p>
 
 <p>After you start the proxy:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="nb">cd</span> ../proxy
-node index.js
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ../proxy
+node index.js</code></pre></div>
 
 <p>and open <a href="http://localhost:8090">http://localhost:8090</a>, you should see something like this:</p>
 
@@ -511,7 +481,7 @@ node index.js
 
 <p>Replace the content of <code>app/scripts/controllers/main.js</code> with the following snippet:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;clientApp&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span>
@@ -537,18 +507,15 @@ node index.js
   <span class="p">});</span>
 </code></pre></div>
 
-
 <p>The most interesting part of <code>MainCtrl</code> is the <code>login</code> method. In it, we first check wether the form is invalid (<code>form.$invalid</code>), if it is we make the it “dirty”. We do this in order to remove the <code>ng-pristine</code> class from the form and force the validation. This scenario will happen if the user does not enter anything in the form and press the “Login” button. If the form is valid, we call the <code>connect</code> method of the service <code>VNCClient</code>. As you see it returns promise, when the promise is resolved we redirect the user to the page <a href="http://localhost:8090/#/vnc">http://localhost:8090/#/vnc</a>, otherwise we show him or her the message: <code>'Connection timeout. Please, try again.'</code> (checkout <code>&lt;div class=&quot;form-error&quot; ng-bind=&quot;errorMessage&quot;&gt;&lt;/div&gt;</code>).</p>
 
 <p>The next component we are going to look at is the service <code>VNCClient</code>. Before that, lets create it using Yeoman:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>yo angular:service VNCClient
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:service VNCClient</code></pre></div>
 
 <p>Now open the file: <code>app/scripts/services/vncclient.js</code> and place the following content there:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="kd">var</span> <span class="nx">CONNECTION_TIMEOUT</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">;</span>
 
@@ -648,12 +615,11 @@ node index.js
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;clientApp&#39;</span><span class="p">).</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;VNCClient&#39;</span><span class="p">,</span> <span class="nx">VNCClient</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>I know it is a lot of code but we will look only at the most important methods. You might noticed that we don’t follow the best practices for defining constructor functions – we don’t add the methods to the function’s prototype. Don’t worry about this, AngularJS will create a single instance of this constructor function and keep it in the services cache.</p>
 
 <p>Lets take a quick look at <code>connect</code>:</p>
 
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">connect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">connect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">$q</span><span class="p">.</span><span class="nx">defer</span><span class="p">(),</span>
         <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">forceNewConnection</span><span class="p">)</span> <span class="p">{</span>
@@ -678,7 +644,6 @@ node index.js
     <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
   <span class="p">};</span>
 </code></pre></div>
-</p>
 
 <p><code>connect</code> accepts a single argument – a configuration object. When the method is called it creates new socket using the service <code>Io</code>, which is simple wrapper of the global <code>io</code> provided by socket.io. We need this wrapper in order to be able to test the application easier and prevent monkey patching. After the socket is created we send new <code>init</code> message to the proxy (do you remember the init message?), with the required configuration for connecting to the VNC server. We also create a connection timeout. The connection timeout is quite important, if we receive a late response by the proxy or don’t receive any response at all. The next important part of the <code>connect</code> method is the handler of the response <code>init</code> message, by the proxy. When we receive the response within the acceptable time limit (remember the timeout) we resolve the promise, which was instantiated earlier in the beginning of the <code>connect</code> method.</p>
 
@@ -686,7 +651,7 @@ node index.js
 
 <p>This is the implementation of the <code>addHandlers</code> method:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">addHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">addHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">self</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">frame</span><span class="p">);</span>
@@ -694,10 +659,9 @@ node index.js
   <span class="p">};</span>
 </code></pre></div>
 
-
 <p>Actually we add a single handler, which handles the <code>frame</code> events, which carries new (changed) screen fragments. When new frame is received we invoke the <code>update</code> method. It may look familiar to you – this is actually the <a href="https://en.wikipedia.org/wiki/Observer_pattern">observer pattern</a>. We add/remove callbacks using the following methods:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">addFrameCallback</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">addFrameCallback</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">frameCallbacks</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">fn</span><span class="p">);</span>
   <span class="p">};</span>
 
@@ -707,20 +671,18 @@ node index.js
   <span class="p">};</span>
 </code></pre></div>
 
-
 <p>And in <code>update</code> we simply:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">frameCallbacks</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">cb</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">frame</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">};</span>
 </code></pre></div>
 
-
 <p>Since we need to capture events in the browsers (like pressing keys, mouse events&hellip;) and send them to the server we need methods for this:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">this</span><span class="p">.</span><span class="nx">sendMouseEvent</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">mask</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">sendMouseEvent</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">mask</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;mouse&#39;</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">x</span><span class="o">:</span> <span class="nx">x</span><span class="p">,</span>
       <span class="nx">y</span><span class="o">:</span> <span class="nx">y</span><span class="p">,</span>
@@ -738,18 +700,15 @@ node index.js
   <span class="p">};</span>
 </code></pre></div>
 
-
 <p>The <a href="https://github.com/mgechev/angular-vnc/blob/master/client/app/scripts/directives/vnc-screen.js">VNC screen</a> directive is responsible for calling these methods. In the <code>sendKeyboardEvent</code> we transform the <code>keyCode</code>, received by handling the keydown/up event with JavaScript, to one, which is understandable by the RFB protocol. We do this using the array <code>keyMap</code> defined above.</p>
 
 <p>Since we didn’t create the <code>Io</code> service, you can instantiate it by:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>yo angular:factory Io
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory Io</code></pre></div>
 
 <p>And place the following snippet inside <code>app/scripts/services/io.js</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;clientApp&#39;</span><span class="p">).</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;Io&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
@@ -760,28 +719,23 @@ node index.js
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>Don’t forget to include the line:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/socket.io/socket.io.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/socket.io/socket.io.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
 
 <p>in <code>app/index.html</code>.</p>
 
 <p>And now, the last component is the VNC screen directive! But before looking at it, replace the content of <code>app/views/vnc.html</code> with the following markup:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;screen-wrapper&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;screen-wrapper&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">vnc-screen</span><span class="p">&gt;&lt;/</span><span class="nt">vnc-screen</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-danger&quot;</span> <span class="na">ng-show</span><span class="o">=</span><span class="s">&quot;connected()&quot;</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;disconnect()&quot;</span><span class="p">&gt;</span>Disconnect<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#/&quot;</span> <span class="na">ng-hide</span><span class="o">=</span><span class="s">&quot;connected()&quot;</span><span class="p">&gt;</span>Back<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</code></pre></div>
-
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;btn btn-danger&#34;</span> <span class="na">ng-show</span><span class="o">=</span><span class="s">&#34;connected()&#34;</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&#34;disconnect()&#34;</span><span class="p">&gt;</span>Disconnect<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;#/&#34;</span> <span class="na">ng-hide</span><span class="o">=</span><span class="s">&#34;connected()&#34;</span><span class="p">&gt;</span>Back<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
 
 <p>as you see we include our VNC screen completely declaratively: <code>&lt;vnc-screen&gt;&lt;/vnc-screen&gt;</code>. In the markup above, we have few directives: <code>ng-show=&quot;connected()&quot;, ng-click=&quot;disconnect()&quot;, ng-hide=&quot;connected()&quot;</code>, they has expressions referring to methods attached to the scope in the <code>VncCtrl</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;clientApp&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;VncCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">VNCClient</span><span class="p">)</span> <span class="p">{</span>
@@ -795,36 +749,32 @@ node index.js
   <span class="p">});</span>
 </code></pre></div>
 
-
 <p><code>VncCtrl</code> is already located in <code>app/scripts/controllers/vnc.js</code>. You don’t have to worry about it because when we instantiated the <code>vnc</code> route, Yeoman was smart enough to create this controller for us.</p>
 
 <p>Now lets create the VNC screen directive:</p>
 
-<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span>yo angular:directive vnc-screen
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:directive vnc-screen</code></pre></div>
 
 <p>&hellip;and now open <code>app/scripts/directives/vnc-screen.js</code>. This is our directive definition:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">VNCScreenDirective</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">VNCClient</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">VNCScreenDirective</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">VNCClient</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;canvas class=&quot;vnc-screen&quot;&gt;&lt;/canvas&gt;&#39;</span><span class="p">,</span>
+    <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;canvas class=&#34;vnc-screen&#34;&gt;&lt;/canvas&gt;&#39;</span><span class="p">,</span>
     <span class="nx">replace</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
     <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span>
     <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="nx">postLink</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">//body...</span>
-    <span class="p">}</span>
+      <span class="c1">//body...
+</span><span class="c1"></span>    <span class="p">}</span>
   <span class="p">};</span>
 <span class="p">};</span>
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;clientApp&#39;</span><span class="p">).</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;vncScreen&#39;</span><span class="p">,</span> <span class="nx">VNCScreenDirective</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>The show is in the link function in, which we will look at later. Now lets take a quick look at the other properties of the directive. The template of our directive is simple canvas with class <code>vnc-screen</code>, it should replace the directive. We define that the user of the <code>vnc-screen</code> directive should use it as element. It is also quite important to notice that we have a single dependency – the <code>VNCClient</code> service, we described above.</p>
 
 <p>Now lets look what happens in the link function:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">VNCClient</span><span class="p">.</span><span class="nx">connected</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">VNCClient</span><span class="p">.</span><span class="nx">connected</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">angular</span><span class="p">.</span><span class="nx">element</span><span class="p">(</span><span class="s1">&#39;&lt;span&gt;No VNC connection.&lt;/span&gt;&#39;</span><span class="p">).</span><span class="nx">insertAfter</span><span class="p">(</span><span class="nx">element</span><span class="p">);</span>
   <span class="nx">element</span><span class="p">.</span><span class="nx">hide</span><span class="p">();</span>
   <span class="k">return</span><span class="p">;</span>
@@ -864,12 +814,11 @@ node index.js
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>As first step the link function checks whether the <code>VNCClient</code> is connected, if it isn’t the directive simply adds the text <code>&quot;No VNC connection.&quot;</code> and hides the template (actually now a DOM element). We can also take more advanced approach here, we can watch the <code>connected</code> property and undertake different actions depending on its value. Doing this will make our directive more dynamic. But for simplicity lets stick to the current implementation.</p>
 
 <p>The line <code>var bufferCanvas = createHiddenCanvas(VNCClient.screenWidth, VNCClient.screenHeight)</code> creates new hidden canvas. It is responsible for capturing the current state of the remote screen in size the same as the screen itself. So if the size of the remote screen is 1024x768px this hidden canvas will be with 1024px width and 768px height. We instantiate new instance of <code>VNCClientScreen</code> with parameter the hidden canvas. The constructor function <code>VNCClientScreen</code> wraps the canvas and provides method for drawing on it:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">VNCClientScreen</span><span class="p">(</span><span class="nx">canvas</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">VNCClientScreen</span><span class="p">(</span><span class="nx">canvas</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">onUpdateCbs</span> <span class="o">=</span> <span class="p">[];</span>
@@ -894,7 +843,6 @@ node index.js
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>As next step we create new instance of <code>Screen</code>. This is the last component we are going to look at in the current tutorial but before taking a look at it lets see how we use it.</p>
 
 <p>We instantiate the <code>Screen</code> instance by passing our “visible” canvas and the VNC screen buffer (the wrapper of the “hidden” canvas) to it. For each received frame we are going to draw the buffer canvas over the VNC screen. We do this because the VNC screen could be scaled (i.e. with size different from the one of the remote machine’s screen) and we simplify our work by using this approach. Otherwise, we should calculate the relative position of each received frame before drawing it onto the canvas, taking in account the scale factor.</p>
@@ -910,7 +858,7 @@ node index.js
 
 <p>They simply delegate handling of mouse and keyboard event to the <code>VNCClient</code>. Here is the implementation of the <code>addKeyboardHandlers</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">Screen</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addKeyboardHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Screen</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addKeyboardHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cb</span><span class="p">)</span> <span class="p">{</span>
   <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;keydown&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">keyDownHandler</span><span class="p">(</span><span class="nx">cb</span><span class="p">),</span> <span class="kc">false</span><span class="p">);</span>
   <span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;keyup&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">keyUpHandler</span><span class="p">(</span><span class="nx">cb</span><span class="p">),</span> <span class="kc">false</span><span class="p">);</span>
 <span class="p">};</span>
@@ -930,12 +878,11 @@ node index.js
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>Now you also see why we used <code>VNCClient.sendKeyboardEvent.bind(VNCClient)</code>, because in <code>keyDownHandler</code> and <code>keyUpHandler</code> we invoke the callback with context <code>null</code>. By using <code>bind</code> we force the context to be the <code>VNCClient</code> itself.</p>
 
 <p>And we are done! We skipped some of the methods of <code>Screen</code> because I think their consideration is not that essential for the purpose of this tutorial. Anyway, here is the whole implementation of the <code>Screen</code> constructor function:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">Screen</span><span class="p">(</span><span class="nx">canvas</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Screen</span><span class="p">(</span><span class="nx">canvas</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">bufferCanvas</span> <span class="o">=</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">getCanvas</span><span class="p">();</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">originalWidth</span> <span class="o">=</span> <span class="nx">bufferCanvas</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">originalHeight</span> <span class="o">=</span> <span class="nx">bufferCanvas</span><span class="p">.</span><span class="nx">height</span><span class="p">;</span>
@@ -947,12 +894,12 @@ node index.js
 
 <span class="nx">Screen</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">resize</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">buffer</span><span class="p">.</span><span class="nx">getCanvas</span><span class="p">(),</span>
-      <span class="nx">ratio</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">/</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
+      <span class="nx">ratio</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="err">/ canvas.height,</span>
       <span class="nx">parent</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">parentNode</span><span class="p">,</span>
       <span class="nx">width</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">offsetWidth</span><span class="p">,</span>
       <span class="nx">height</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">offsetHeight</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">width</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">width</span> <span class="o">/</span> <span class="nx">ratio</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">width</span> <span class="err">/ ratio;</span>
   <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">&gt;</span> <span class="nx">height</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="nx">height</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">height</span> <span class="o">*</span> <span class="nx">ratio</span><span class="p">;</span>
@@ -978,11 +925,11 @@ node index.js
         <span class="nx">height</span> <span class="o">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
         <span class="nx">oWidth</span> <span class="o">=</span> <span class="nx">oc</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
         <span class="nx">oHeight</span> <span class="o">=</span> <span class="nx">oc</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
-        <span class="nx">widthRatio</span> <span class="o">=</span> <span class="nx">width</span> <span class="o">/</span> <span class="nx">oWidth</span><span class="p">,</span>
-        <span class="nx">heightRatio</span> <span class="o">=</span> <span class="nx">height</span> <span class="o">/</span> <span class="nx">oHeight</span><span class="p">;</span>
+        <span class="nx">widthRatio</span> <span class="o">=</span> <span class="nx">width</span> <span class="err">/ oWidth,</span>
+        <span class="nx">heightRatio</span> <span class="o">=</span> <span class="nx">height</span> <span class="err">/ oHeight;</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="nx">x</span><span class="o">:</span> <span class="p">(</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">.</span><span class="nx">left</span><span class="p">)</span> <span class="o">/</span> <span class="nx">widthRatio</span><span class="p">,</span>
-      <span class="nx">y</span><span class="o">:</span> <span class="p">(</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">.</span><span class="nx">top</span><span class="p">)</span> <span class="o">/</span> <span class="nx">heightRatio</span>
+      <span class="nx">x</span><span class="o">:</span> <span class="p">(</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">.</span><span class="nx">left</span><span class="p">)</span> <span class="err">/ widthRatio,</span>
+      <span class="nx">y</span><span class="o">:</span> <span class="p">(</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">.</span><span class="nx">top</span><span class="p">)</span> <span class="err">/ heightRatio</span>
     <span class="p">};</span>
   <span class="p">}</span>
 
@@ -1047,16 +994,13 @@ node index.js
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>The last step is to run the VNC client! Make sure you have a computer with VNC server on it.</p>
 
 <p>Run the following command:</p>
 
-<p><div class="highlight"><pre><code class="language-bash" data-lang="bash"><span></span><span class="nb">cd</span> angular-vnc
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> angular-vnc
 <span class="nb">cd</span> proxy
-node index.js
-</code></pre></div>
-</p>
+node index.js</code></pre></div>
 
 <p>Now open the url: <a href="http://localhost:8090">http://localhost:8090</a>, and rock!</p>
 
@@ -1102,14 +1046,17 @@ node index.js
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

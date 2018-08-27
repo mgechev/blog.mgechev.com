@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>ELang &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -93,11 +93,9 @@
 
 <p>I opened my Java IDE (I decided to not write the language in JavaScript) and I created few different classes&hellip;Actually I had idea to create something very basic, just variables, if, while, number expressions and boolean expressions. Oh&hellip;I almost forgot to tell that my language is interpreted so that’s why I decided to have three different stages in the execution process: lexing, parsing and interpreting. The lexing process was straight-forward so there’s nothing interesting about it&hellip;I’ve just created different tokens from the long string which is the actual program. Here’s more information about that <a href="https://en.wikipedia.org/wiki/Tokenization">https://en.wikipedia.org/wiki/Tokenization</a>. After I finished with the lexing&hellip;ahh after that&hellip;it was the Parsing&hellip;Actually that was the process which has been scaring me :-). I’ve created an interface IStatement which was something that has a void method called “execute”. Here’s the interface:</p>
 
-<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IStatement</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IStatement</span> <span class="o">{</span>
     <span class="kt">void</span> <span class="nf">execute</span><span class="o">();</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 
 <div>
 </div>
@@ -110,11 +108,9 @@
 </div>
 
 <div>
-  <div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IExpression</span> <span class="o">{</span>
+  <div class="highlight"><pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IExpression</span> <span class="o">{</span>
     <span class="n">Value</span> <span class="nf">evaluate</span><span class="o">();</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 </div>
 
 <div>
@@ -134,30 +130,26 @@
 <div>
 </div>
 
-<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="kt">void</span> <span class="nf">interpret</span><span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">interpret</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">Iterator</span> <span class="n">iter</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">statements</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
     <span class="n">IStatement</span> <span class="n">current</span><span class="o">;</span>
     <span class="k">while</span> <span class="o">(</span><span class="n">iter</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
         <span class="n">current</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
         <span class="n">current</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
     <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 
 <p>I also want to have interaction with the user. So there are also implementations of read and print methods. That’s why I’ve created special kind of IExpression (actually there’s nothing special but just separated in different package :-) ). The print function is a list of IExpressions. After the list is evaluated everything is just put on the user’s screen&hellip;Here is the implementation:</p>
 
-<div class="highlight"><pre><code class="language-Java" data-lang="Java"><span></span><span class="kd">public</span> <span class="n">Value</span> <span class="nf">evaluate</span><span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="n">Value</span> <span class="nf">evaluate</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">Value</span> <span class="n">result</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">toPrint</span><span class="o">.</span><span class="na">evaluate</span><span class="o">();</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>
     <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div>
-
+<span class="o">}</span></code></pre></div>
 
 <p>Easy, right? With this kind of language I’ve achieved programs like that:</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>def fibonacci(n)
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">def fibonacci(n)
     if n &gt;= 0:
         a1 = 0;
         a2 = 1;
@@ -195,13 +187,11 @@ print &#39;Enter n for factorial: &#39;;
 n = read;
 print &#39;The result for the number you entered for factorial is: &#39;;
 print factorial(n);
-print &#39;\n&#39;;
-</code></pre></div>
-
+print &#39;\n&#39;;</code></pre></div>
 
 <p>It also allows recursion:</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>def recursiveFibonacci(n)
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">def recursiveFibonacci(n)
     if n == 0:
         return 0;
     endif;
@@ -209,9 +199,7 @@ print &#39;\n&#39;;
         return 1;
     endif;
     return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
-enddef;
-</code></pre></div>
-
+enddef;</code></pre></div>
 
 <p>The github repository can be found here: <a href="https://github.com/mgechev/ELang/">https://github.com/mgechev/ELang/</a></p>
 
@@ -257,14 +245,17 @@ enddef;
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

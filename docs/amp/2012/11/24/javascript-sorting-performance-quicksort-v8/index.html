@@ -1,161 +1,129 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Looking for performance? Probably you should NOT use [].sort (V8) &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2012/11/24/javascript-sorting-performance-quicksort-v8/">
+		
 
+		<meta property="og:title" content="Looking for performance? Probably you should NOT use [].sort (V8)">
+		<meta property="og:description" content="A few days ago, I&#x2019;ve created a GitHub repository. It&#x2019;s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones &#x2013; sorting (insertion, selection, bubble sort..). After that I implemented few &#x201C;more advance&#x201D; like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
+function sort() { [native code] }  That&#x2019;s why I&#x2019;ve wrote not optimized version of mergesort and I&#x2019;ve run it with generated array with 500k elements.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/">
-
-
-    
-    
-    
-    <title>Looking for performance? Probably you should NOT use [].sort (V8) - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:function sort() { [native code] }  That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements.">
-
-<meta property="og:title" content="Looking for performance? Probably you should NOT use [].sort (V8) - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:function sort() { [native code] }  That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/">
-<meta name="twitter:title" content="Looking for performance? Probably you should NOT use [].sort (V8) - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:function sort() { [native code] }  That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Looking for performance? Probably you should NOT use [].sort (V8) - Minko Gechev&#39;s blog",
-    "datePublished": "2012-11-24T00:00:00JST",
-    "dateModified": "2012-11-24T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
-function sort() { [native code] }  That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-69bd33df806ecb788c11711f8681688d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/" class="thumbnail" title="Looking for performance? Probably you should NOT use [].sort (V8)"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Looking for performance? Probably you should NOT use [].sort (V8)</h1>
-        <ul class="p-facts">
-          <li><time datetime="2012-11-24T00:00:00JST">Nov 24, 2012</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f&t=Looking%20for%20performance%3f%20Probably%20you%20should%20NOT%20use%20%5b%5d.sort%20%28V8%29" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f&text=Looking%20for%20performance%3f%20Probably%20you%20should%20NOT%20use%20%5b%5d.sort%20%28V8%29&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body"><p>A few days ago, I’ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:</p>
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Looking for performance? Probably you should NOT use [].sort (V8)
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2012-11-24-javascript-sorting-performance-quicksort-v8.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Nov 24, 2012
+                    &#xB7; 11 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/algorithms">Algorithms</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/development">Development</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/heapsort">Heapsort</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/mergesort">Mergesort</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/performance">performance</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/programming">Programming</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/quicksort">Quicksort</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/sorting">Sorting</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>A few days ago, I&#x2019;ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It&#x2019;s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones &#x2013; sorting (insertion, selection, bubble sort..). After that I implemented few &#x201C;more advance&#x201D; like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">sort</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sort</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span>
 </code></pre></div>
 
+<p>That&#x2019;s why I&#x2019;ve wrote not optimized version of mergesort and I&#x2019;ve run it with generated array with 500k elements. I waited&#x2026;waited&#x2026;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I&#x2019;ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google&#x2019;s V8 engine</a>). After merge sort I&#x2019;ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I&#x2019;ve generated another array with 500k elements using a simple perl script. The result was very interesting&#x2026;In the chart below you can see mergesort compared to heapsort for array with 50k elements.</p>
 
-<p>That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements. I waited&hellip;waited&hellip;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I’ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google’s V8 engine</a>). After merge sort I’ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I’ve generated another array with 500k elements using a simple perl script. The result was very interesting&hellip;In the chart below you can see mergesort compared to heapsort for array with 50k elements.</p>
-
-<div id="attachment_237" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/50k-heap-vs-merge.png"><amp-img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_237" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/50k-heap-vs-merge.png"><amp-img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs Mergesort 50k elements
   </p>
 </div>
 
-<p>In the X-axis it’s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).</p>
+<p>In the X-axis it&#x2019;s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).</p>
 
 <p>Here is the implementation of the Mergesort:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="cm">/* Mergesort */</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="cm">/* Mergesort */</span>
 <span class="kd">var</span> <span class="nx">mergeSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">function</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span> <span class="p">[];</span>
         <span class="p">}</span>
-        <span class="kd">var</span> <span class="nx">middle</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">middle</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">end</span><span class="p">)</span> <span class="err">/ 2);</span>
 
         <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">);</span>
         <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
@@ -204,10 +172,9 @@ function sort() { [native code] }  That’s why I’ve wrote not optimized versi
 <span class="p">}());</span>
 </code></pre></div>
 
-
 <p>And the heapsort:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="cm">/* Heapsort */</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="cm">/* Heapsort */</span>
 <span class="kd">var</span> <span class="nx">heapSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">function</span> <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
@@ -229,7 +196,7 @@ function sort() { [native code] }  That’s why I’ve wrote not optimized versi
     <span class="p">}</span>
 
     <span class="kd">function</span> <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="err">/ 2); i &gt;= 0; i -= 1) {</span>
             <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
@@ -251,21 +218,20 @@ function sort() { [native code] }  That’s why I’ve wrote not optimized versi
 <span class="p">}());</span>
 </code></pre></div>
 
+<p>If you find any mistakes in any of the implementations I&#x2019;ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.
+After I&#x2019;ve made the test between merge and heap sorts I noticed that there&#x2019;s a quite big difference&#x2026;So that&#x2019;s why I started heap vs the default sort to see how faster the native sort will be:</p>
 
-<p>If you find any mistakes in any of the implementations I’ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.
-After I’ve made the test between merge and heap sorts I noticed that there’s a quite big difference&hellip;So that’s why I started heap vs the default sort to see how faster the native sort will be:</p>
-
-<div id="attachment_239" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/500k-heap-vs-default.png"><amp-img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-heap-vs-default.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_239" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/500k-heap-vs-default.png"><amp-img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-heap-vs-default.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs the default sort 500k elements
   </p>
 </div>
 
-<p>As you see the result is quite unexpected&hellip;I’ve checked my algorithm many times because I thought that it isn’t correct&hellip;In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays. The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.</p>
+<p>As you see the result is quite unexpected&#x2026;I&#x2019;ve checked my algorithm many times because I thought that it isn&#x2019;t correct&#x2026;In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays.&#xA0;The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.</p>
 
 <p>That is the perl script which I used for the test:</p>
 
-<div class="highlight"><pre><code class="language-perl" data-lang="perl"><span></span><span class="ch">#!/usr/bin/perl</span>
+<div class="highlight"><pre class="chroma"><code class="language-perl" data-lang="perl"><span class="ch">#!/usr/bin/perl</span>
 
 <span class="k">use</span> <span class="nn">strict</span><span class="p">;</span>
 <span class="k">use</span> <span class="nn">warnings</span><span class="p">;</span>
@@ -274,14 +240,14 @@ After I’ve made the test between merge and heap sorts I noticed that there’s
 <span class="k">my</span> <span class="nv">%sorts</span> <span class="o">=</span> <span class="p">();</span>
 <span class="k">my</span> <span class="nv">%algorithm_source</span> <span class="o">=</span> <span class="p">();</span>
 
-<span class="c1">#Generates JavaScript array with defined size and maximum size of it&#39;s elements</span>
+<span class="c1">#Generates JavaScript array with defined size and maximum size of it&apos;s elements</span>
 <span class="k">sub</span> <span class="nf">generate_js_array</span><span class="p">($ $) {</span>
     <span class="k">my</span> <span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$array</span> <span class="o">=</span> <span class="s">&#39;var array = [&#39;</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$array</span> <span class="o">=</span> <span class="s">&apos;var array = [&apos;</span><span class="p">;</span>
     <span class="nb">map</span> <span class="p">{</span> <span class="nv">$array</span> <span class="o">.=</span> <span class="nb">rand</span><span class="p">(</span><span class="nv">$max</span><span class="p">)</span> <span class="o">.</span> <span class="s">&quot;,\n&quot;</span> <span class="p">}</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="nv">$size</span><span class="p">);</span>
     <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
     <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
-    <span class="nv">$array</span> <span class="o">.=</span> <span class="s">&#39;];&#39;</span><span class="p">;</span>
+    <span class="nv">$array</span> <span class="o">.=</span> <span class="s">&apos;];&apos;</span><span class="p">;</span>
     <span class="k">return</span> <span class="nv">$array</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -328,7 +294,7 @@ After I’ve made the test between merge and heap sorts I noticed that there’s
 <span class="k">sub</span> <span class="nf">get_algorithm</span><span class="p">($)</span> <span class="p">{</span>
     <span class="k">my</span> <span class="nv">$sort_type</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
     <span class="k">my</span> <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$sorts</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
-    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="s">&apos;&apos;</span><span class="p">;</span>
     <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&quot;&lt;./algorithms/$file&quot;</span><span class="p">);</span>
     <span class="k">while</span> <span class="p">(</span><span class="sr">&lt;FH&gt;</span><span class="p">)</span> <span class="p">{</span>
         <span class="nv">$result</span> <span class="o">.=</span> <span class="nv">$_</span><span class="p">;</span>
@@ -368,16 +334,16 @@ After I’ve made the test between merge and heap sorts I noticed that there’s
     <span class="k">my</span> <span class="nv">@algorithms</span> <span class="o">=</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%result</span><span class="p">);</span>
     <span class="k">my</span> <span class="nv">$current</span><span class="p">;</span>
     <span class="k">my</span> <span class="nv">@current_result</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s">&apos;&apos;</span><span class="p">;</span>
     <span class="k">print</span> <span class="s">&quot;Building a CSV statistics...\n&quot;</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@algorithms</span><span class="p">);</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
         <span class="nv">$current</span> <span class="o">=</span> <span class="nv">$algorithms</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
-        <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current</span> <span class="o">.</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
+        <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current</span> <span class="o">.</span> <span class="s">&apos;,&apos;</span><span class="p">;</span>
         <span class="nv">@current_result</span> <span class="o">=</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$current</span><span class="p">}};</span>
         <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">);</span> <span class="nv">$j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
             <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current_result</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
             <span class="k">if</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
+                <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&apos;,&apos;</span><span class="p">;</span>
             <span class="p">}</span>
         <span class="p">}</span>
         <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&quot;\n&quot;</span><span class="p">;</span>
@@ -389,64 +355,61 @@ After I’ve made the test between merge and heap sorts I noticed that there’s
     <span class="k">my</span> <span class="nv">$max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">my</span> <span class="nv">$array_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
     <span class="k">my</span> <span class="nv">$tests_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">print</span> <span class="s">&quot;Starting $tests_count test cases for all</span>
-<span class="s">algorithms (&quot;</span> <span class="o">.</span> <span class="nb">join</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="p">,</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="o">.</span> <span class="s">&quot;) with parementers:</span>
-<span class="s">arrays with size $array_size, maximum size of each element $max.\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;Starting $tests_count test cases for all
+</span><span class="s">algorithms (&quot;</span> <span class="o">.</span> <span class="nb">join</span><span class="p">(</span><span class="s">&apos;, &apos;</span><span class="p">,</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="o">.</span> <span class="s">&quot;) with parementers:
+</span><span class="s">arrays with size $array_size, maximum size of each element $max.\n&quot;</span><span class="p">;</span>
 
     <span class="n">cache_algorithms_source</span><span class="p">();</span>
     <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="n">test_algorithms</span><span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$array_size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
     <span class="k">my</span> <span class="nv">$csv_result</span> <span class="o">=</span> <span class="n">build_csv</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
 
-    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#39;&gt;result.csv&#39;</span><span class="p">);</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&apos;&gt;result.csv&apos;</span><span class="p">);</span>
     <span class="k">print</span> <span class="n">FH</span> <span class="nv">$csv_result</span><span class="p">;</span>
     <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
     <span class="k">print</span> <span class="s">&quot;Exiting\n&quot;</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
+<span class="p">}</span></code></pre></div>
 
+<p>If you find any issue in the script please let me know, I&#x2019;ll fix it as soon as possible.
+For the test cases I used both &#x2013; different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn&#x2019;t found any difference between both alternatives that&#x2019;s why I choose to generate a single array for each test (for faster testing).</p>
 
-<p>If you find any issue in the script please let me know, I’ll fix it as soon as possible.
-For the test cases I used both – different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn’t found any difference between both alternatives that’s why I choose to generate a single array for each test (for faster testing).</p>
+<p>So let me tell you few words about the script because not everyone is familiar with perl and it&#x2019;s syntax. I have three configuration variables: $max, $array_size and $tests_count. $max defines the maximum size of the array&#x2019;s elements, $array_size is the size of the arrays we want to test with and $tests_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort =&gt; &#x2018;heapsort.js&#x2019;, Default =&gt; &#x2018;default.js&#x2019; ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I&#x2019;ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven&#x2019;t mentioned explicitly&#xA0;that I use something different). In all test cases I&#x2019;ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven&#x2019;t mentioned explicitly different CPU) with Fedora 18, x86_64. The content of default.js is:</p>
 
-<p>So let me tell you few words about the script because not everyone is familiar with perl and it’s syntax. I have three configuration variables: $max, $array_size and $tests_count. $max defines the maximum size of the array’s elements, $array_size is the size of the arrays we want to test with and $tests_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort =&gt; ‘heapsort.js’, Default =&gt; ‘default.js’ ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I’ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven’t mentioned explicitly that I use something different). In all test cases I’ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven’t mentioned explicitly different CPU) with Fedora 18, x86_64. The content of default.js is:</p>
-
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
 <span class="p">});</span>
 </code></pre></div>
-</p>
 
-<p>Let start&hellip;
-In the charts below there’s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).</p>
+<p>Let start&#x2026;
+In the charts below there&#x2019;s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).</p>
 
-<div id="attachment_240" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/100-all.png"><amp-img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="/images/legacy/uploads2012/11/100-all.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_240" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/100-all.png"><amp-img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="/images/legacy/uploads2012/11/100-all.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with arrays with 100 elements
   </p>
 </div>
 
-<p>In this first chart there’s a statistic with 100 elements. In this case there’s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.</p>
+<p>In this first chart there&#x2019;s a statistic with 100 elements. In this case there&#x2019;s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.</p>
 
-<div id="attachment_241" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/10k-all.png"><amp-img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="/images/legacy/uploads2012/11/10k-all.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_241" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/10k-all.png"><amp-img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="/images/legacy/uploads2012/11/10k-all.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements
   </p>
 </div>
 
-<p>In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let’s increase the array&hellip;Let’s try with 250k elements:</p>
+<p>In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let&#x2019;s increase the array&#x2026;Let&#x2019;s try with 250k elements:</p>
 
-<div id="attachment_242" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/250k-heap-merge-default.png"><amp-img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="/images/legacy/uploads2012/11/250k-heap-merge-default.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_242" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/250k-heap-merge-default.png"><amp-img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="/images/legacy/uploads2012/11/250k-heap-merge-default.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs mergesort vs the default sort 250k elements
   </p>
 </div>
 
-<p>From the chart it’s easy to see that the default sort is slower than the merge and the heap sorts&hellip;It’s very unusual. If you’ve ever tried to beat the default sort in Java or STL&hellip;well it’s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible.
-If we increase the array to more than 300k elements mergesort’s performance becomes very bad (more than 10 minutes) so I’ll just exclude the mergesort from the next tests.</p>
+<p>From the chart it&#x2019;s easy to see that the default sort is slower than the merge and the heap sorts&#x2026;It&#x2019;s very unusual. If you&#x2019;ve ever tried to beat the default sort in Java or STL&#x2026;well it&#x2019;s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible.
+If we increase the array to more than 300k elements mergesort&#x2019;s performance becomes&#xA0;very bad (more than 10 minutes) so I&#x2019;ll just exclude the mergesort from the next tests.</p>
 
-<p>Let me include one more algorithm implementation. It will be quicksort. Its’ implementation is like taken from a book, nothing special:</p>
+<p>Let me include one more algorithm implementation. It will be quicksort. Its&#x2019; implementation is like taken from a book, nothing special:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">quickSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">quickSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
     <span class="kd">function</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">cmp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
@@ -484,193 +447,101 @@ If we increase the array to more than 300k elements mergesort’s performance be
 <span class="p">}());</span>
 </code></pre></div>
 
+<p>I&#x2019;ll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:</p>
 
-<p>I&rsquo;ll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:</p>
-
-<div id="attachment_243" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/500k-quick-heap-default.png"><amp-img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-quick-heap-default.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_243" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/500k-quick-heap-default.png"><amp-img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-quick-heap-default.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 500k elements
   </p>
 </div>
 
-<p>Here is something logical. Quicksort beats heapsort, but the custom (not optimized) quicksort implementation is almost 5 times faster than the default. I guess there&rsquo;s something wrong and maybe the V8 profiler will tell us. I tried to start the native sorting algorithm multiple times with different generated arrays, in a single JavaScript file, because of possible optimizations by the interpreter. The result quicksort vs native with 2 arrays, 1 million elements each, was the same as 2 million elements arrays. So there&rsquo;s not any noticeable optimization.</p>
+<p>Here is something logical. Quicksort beats heapsort, but the custom (not optimized) quicksort implementation is almost 5 times faster than the default. I guess there&#x2019;s something wrong and maybe the V8 profiler will tell us. I tried to start the native sorting algorithm multiple times with different generated arrays, in a single JavaScript file, because of possible optimizations by the interpreter. The result quicksort vs native with 2 arrays, 1 million elements each, was the same as 2 million elements arrays. So there&#x2019;s not any noticeable optimization.</p>
 
 <p>Here is the last statistic with V8 v3.10.8. The array size this time will be 2 million.</p>
 
-<div id="attachment_244" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default.png"><amp-img class="size-full wp-image-244" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)" src="/images/legacy/uploads2012/11/2m-quick-heap-default.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_244" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default.png"><amp-img class="size-full wp-image-244" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)" src="/images/legacy/uploads2012/11/2m-quick-heap-default.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)
   </p>
 </div>
 
-<p>The default sort is more than 5 times slower&hellip;
-In the next chart there&rsquo;s statistics with the V8 engine used by node v0.8.12.</p>
+<p>The default sort is more than 5 times slower&#x2026;
+In the next chart there&#x2019;s statistics with the V8 engine used by node v0.8.12.</p>
 
-<div id="attachment_245" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png"><amp-img class="size-full wp-image-245" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)" src="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png" alt="" width="673" height="385" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_245" style="width: 683px" class="wp-caption alignnone">
+  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png"><amp-img class="size-full wp-image-245" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)" src="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png" alt="" width="673" height="385"></amp-img></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)
   </p>
 </div>
 
-<p>In the chart above the quicksort custom implementation is again the fastest. The difference is less because of poor performance of the custom implementation of quicksort and faster default sort&hellip;
-If you&rsquo;re interested about the tests with other CPU types please send me a message and I&rsquo;ll post them. The difference is not impressive. With Core2Duo Heapsort&rsquo;s performance is poor than the default sort but quicksort is again almost 1.5 seconds faster, when sorting array with 2 million items (node v0.8.14, under Windows 7).</p>
+<p>In the chart above the quicksort custom implementation is again the fastest. The difference is less because of poor performance of the custom implementation of quicksort and faster default sort&#x2026;
+If you&#x2019;re interested about the tests with other CPU types please send me a message and I&#x2019;ll post them. The difference is not impressive. With Core2Duo Heapsort&#x2019;s performance is poor than the default sort but quicksort is again almost 1.5 seconds faster, when sorting array with 2 million items (node v0.8.14, under Windows 7).</p>
 
-<p>Lesson learned is that you should not use the default sort in the Google&rsquo;s V8 engine for large arrays of data and multiples sorts. What will be an eventual drawback. Imagine you have a high traffic website. There&rsquo;s large amount of data which you receive each 10 seconds. You need to sort it and process it in any way. Let&rsquo;s say that the data is with 2m records. If you use the default sort you&rsquo;ll loose 5 seconds on each sort, so for two minutes you&rsquo;ll lose 1 minute only for sorting. If you use your custom quicksort implementation each sort will lose about 1 second. For two minutes you&rsquo;re going to lose 12 seconds. For small amount of data it&rsquo;s not a big deal what kind of sorting algorithm you&rsquo;re going to use&hellip;Even, I think that the default will be more readable and error resistant.</p>
+<p>Lesson learned is that you should not use the default sort in the Google&#x2019;s V8 engine for large arrays of data and multiples sorts. What will be an eventual drawback. Imagine you have a high traffic website. There&#x2019;s large amount of data which you receive each 10 seconds. You need to sort it and process it in any way. Let&#x2019;s say that the data is with 2m records. If you use the default sort you&#x2019;ll loose 5 seconds on each sort, so for two minutes you&#x2019;ll lose 1 minute only for sorting. If you use your custom quicksort implementation each sort will lose about 1 second. For two minutes you&#x2019;re going to lose 12 seconds. For small amount of data it&#x2019;s not a big deal what kind of sorting algorithm you&#x2019;re going to use&#x2026;Even, I think that the default will be more readable and error&#xA0;resistant.</p>
 
 <p>All files used for the test (except the generated ones) can be found <a href="https://github.com/mgechev/v8-sorting-test" target="_blank">here</a>.</p>
-</div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f&t=Looking%20for%20performance%3f%20Probably%20you%20should%20NOT%20use%20%5b%5d.sort%20%28V8%29" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f&text=Looking%20for%20performance%3f%20Probably%20you%20should%20NOT%20use%20%5b%5d.sort%20%28V8%29&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f24%2fjavascript-sorting-performance-quicksort-v8%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Looking for performance? Probably you should NOT use [].sort (V8)</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Algorithms/">Algorithms</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Browsers/">Browsers</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Development/">Development</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Linux/">Linux</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/OpenSource/">OpenSource</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Performance/">Performance</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Sorting/">Sorting</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Webkit/">Webkit</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/Algorithms/">Algorithms</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Development/">Development</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Heapsort/">Heapsort</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Mergesort/">Mergesort</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/performance/">performance</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Quicksort/">Quicksort</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Sorting/">Sorting</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

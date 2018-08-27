@@ -1,141 +1,106 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>JavaScript image scaling &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2012/11/02/javascript-html5-scale-image/">
+		
 
+		<meta property="og:title" content="JavaScript image scaling">
+		<meta property="og:description" content="I haven&#x2019;t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in stackoverflow. The post is connected with pure client side image scaling. While you&#x2019;re reading the example I hope that you&#x2019;ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2012/11/02/javascript-html5-scale-image/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2012/11/02/javascript-html5-scale-image/">
-
-
-    
-    
-    
-    <title>JavaScript image scaling - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in stackoverflow. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.">
-
-<meta property="og:title" content="JavaScript image scaling - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2012/11/02/javascript-html5-scale-image/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in stackoverflow. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2012/11/02/javascript-html5-scale-image/">
-<meta name="twitter:title" content="JavaScript image scaling - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in stackoverflow. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "JavaScript image scaling - Minko Gechev&#39;s blog",
-    "datePublished": "2012-11-02T00:00:00JST",
-    "dateModified": "2012-11-02T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in stackoverflow. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-2e665b7390a3bd91b521a781f617844c">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2012/11/02/javascript-html5-scale-image/" class="thumbnail" title="JavaScript image scaling"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">JavaScript image scaling</h1>
-        <ul class="p-facts">
-          <li><time datetime="2012-11-02T00:00:00JST">Nov 2, 2012</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f&t=JavaScript%20image%20scaling" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f&text=JavaScript%20image%20scaling&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body"><p>I haven’t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in <a title="StackOverflow" href="http://stackoverflow.com/questions/13177698/select-an-image-and-manipulate-it-in-javascript-no-form-submission/13178084#13178084" target="_blank">stackoverflow</a>. The post is connected with pure client side image scaling. While you’re reading the example I hope that you’ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.<br>
-So firstly I’ll post the source code with the example in JSFiddle, after that I’m going to explain everything step by step.</p>
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        JavaScript image scaling
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2012-11-02-javascript-html5-scale-image.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Nov 2, 2012
+                    &#xB7; 4 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/development">Development</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/filereader">FileReader</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/html5">HTML5</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/internet">Internet</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/programming">Programming</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/webkit">webkit</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>I haven&#x2019;t wrote here for a while so I decided to write about something more practical. Actually the idea for the post come from one my response in <a title="StackOverflow" href="http://stackoverflow.com/questions/13177698/select-an-image-and-manipulate-it-in-javascript-no-form-submission/13178084#13178084" target="_blank">stackoverflow</a>. The post is connected with pure client side image scaling. While you&#x2019;re reading the example I hope that you&#x2019;ll see how powerful is the HTML5 API and how with few lines of code you can do something which in other technologies is much more complex.<br>
+So firstly I&#x2019;ll post the source code with the example in JSFiddle, after that I&#x2019;m going to explain everything step by step.</p>
 
 <p><strong>The HTML form</strong></p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;picture&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;picture&quot;</span> <span class="p">/&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;picture&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;file&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;picture&quot;</span> <span class="p">/&gt;</span>
 <span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
   
   <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
@@ -168,23 +133,21 @@ So firstly I’ll post the source code with the example in JSFiddle, after that 
 <span class="p">&lt;</span><span class="nt">canvas</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;200&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;200&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;border: 1px solid black;&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;canvas&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">canvas</span><span class="p">&gt;</span>
 
 
-<span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;saveButton&quot;</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;saveButton&quot;</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span></code></pre></div>
 
 <p><strong>JavaScript (the actual code)</strong></p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
     <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;picture&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="nx">handleFileSelect</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;keyup&#39;</span><span class="p">,</span> <span class="nx">handleSizeChanged</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;keyup&#39;</span><span class="p">,</span> <span class="nx">handleSizeChanged</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;saveButton&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">saveImage</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;picture&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;change&apos;</span><span class="p">,</span> <span class="nx">handleFileSelect</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;width&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;keyup&apos;</span><span class="p">,</span> <span class="nx">handleSizeChanged</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;height&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;keyup&apos;</span><span class="p">,</span> <span class="nx">handleSizeChanged</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;saveButton&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;click&apos;</span><span class="p">,</span> <span class="nx">saveImage</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
     <span class="p">}());</span>
 
     <span class="kd">var</span> <span class="nx">currentImage</span><span class="p">,</span>
-        <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;canvas&#39;</span><span class="p">);</span>
+        <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;canvas&apos;</span><span class="p">);</span>
 
     <span class="kd">function</span> <span class="nx">saveImage</span><span class="p">()</span> <span class="p">{</span>
         <span class="nb">document</span><span class="p">.</span><span class="nx">location</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">();</span>
@@ -204,8 +167,8 @@ So firstly I’ll post the source code with the example in JSFiddle, after that 
 
     <span class="kd">function</span> <span class="nx">handleFileSelect</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">file</span><span class="p">.</span><span class="nx">type</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="s1">&#39;image.*&#39;</span><span class="p">))</span> <span class="p">{</span>
-                <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;Unknown format!&#39;</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">file</span><span class="p">.</span><span class="nx">type</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="s1">&apos;image.*&apos;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&apos;Unknown format!&apos;</span><span class="p">);</span>
             <span class="p">}</span>
         <span class="kd">var</span> <span class="nx">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
 
@@ -219,198 +182,110 @@ So firstly I’ll post the source code with the example in JSFiddle, after that 
 
     <span class="kd">function</span> <span class="nx">renderImage</span><span class="p">()</span> <span class="p">{</span>
         <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">currentImage</span><span class="p">,</span>
-            <span class="nx">img</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">);</span>
+            <span class="nx">img</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&apos;img&apos;</span><span class="p">);</span>
         <span class="nx">img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
         <span class="nx">img</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
             <span class="kd">var</span> <span class="nx">can</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">,</span>
-                <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">can</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+                <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">can</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&apos;2d&apos;</span><span class="p">);</span>
                 <span class="nx">ctx</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">can</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">can</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
         <span class="p">};</span>
     <span class="p">}</span>
 <span class="p">}());</span>
 </code></pre></div>
 
+<p>So let&#x2019;s begin with the HTML. I&#x2019;ve created a simple form with a file input, a table which contains two fields required for setting the size of the image, a canvas used for the image scaling and a save button. I don&#x2019;t think that there&#x2019;s something more to explain here&#x2026;</p>
 
-<p>So let&rsquo;s begin with the HTML. I&rsquo;ve created a simple form with a file input, a table which contains two fields required for setting the size of the image, a canvas used for the image scaling and a save button. I don&rsquo;t think that there&rsquo;s something more to explain here&hellip;</p>
+<p>Now let&#x2019;s look at the JavaScript. The script is relatively simple and actually we don&#x2019;t need any framework for it. We don&#x2019;t even need to create any globals (cool, ah?). I&#x2019;ve wrapped the whole stuff into a self-invoking function. In the function we have one more self-invoking function which sets the event handlers. I decided to make it <a href="https://blog.mgechev.com/2012/08/29/self-invoking-functions-in-javascript/" target="_blank">self-invoking</a> anonymous because in that way I&#x2019;ll be sure that it&#x2019;ll be called just once. In the initialization I simply add an event listener on the file input, which waits for value change. On keyup there&#x2019;re two event listeners - listening for width/height change of the text inputs. And the last event listener will be executed when an event is triggered by click on the &#x201C;Save&#x201D; button. Nothing so special&#x2026;(actually the whole idea is to show you how simple is that :-)).<br>
+Let&#x2019;s first look at the <em>handleFileSelect</em>. When a file is selected I get the file (</p>
 
-<p>Now let&rsquo;s look at the JavaScript. The script is relatively simple and actually we don&rsquo;t need any framework for it. We don&rsquo;t even need to create any globals (cool, ah?). I&rsquo;ve wrapped the whole stuff into a self-invoking function. In the function we have one more self-invoking function which sets the event handlers. I decided to make it <a href="https://blog.mgechev.com/2012/08/29/self-invoking-functions-in-javascript/" target="_blank">self-invoking</a> anonymous because in that way I&rsquo;ll be sure that it&rsquo;ll be called just once. In the initialization I simply add an event listener on the file input, which waits for value change. On keyup there&rsquo;re two event listeners - listening for width/height change of the text inputs. And the last event listener will be executed when an event is triggered by click on the &ldquo;Save&rdquo; button. Nothing so special&hellip;(actually the whole idea is to show you how simple is that :-)).<br>
-Let&rsquo;s first look at the <em>handleFileSelect</em>. When a file is selected I get the file (</p>
-
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</code></pre></div>
-</p>
-
-<p>) and check for it&rsquo;s type (actually I check it&rsquo;s mime type). If the file is not an image I simply log an error and stop the function execution. Otherwise (if the file is an image) I create <em>new FileReader</em>. As you might guess from it&rsquo;s name it&rsquo;s responsible for reading the file. With the line:</p>
-
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">reader</span><span class="p">.</span><span class="nx">readAsDataURL</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
 </code></pre></div>
 
+<p>) and check for it&#x2019;s type (actually I check it&#x2019;s mime type). If the file is not an image I simply log an error and stop the function execution. Otherwise (if the file is an image) I create <em>new FileReader</em>. As you might guess from it&#x2019;s name it&#x2019;s responsible for reading the file. With the line:</p>
 
-<p>I read the file. Here the file won&rsquo;t be read in binary but in base64 encoding instead. Because the file loading is asynchronous (imagine we want to load 1 GB file and the loading was synchronous, our application would block until the file is completely loaded&hellip;) that&rsquo;s why I&rsquo;ve added callback which will be invoked when the file is being read. In this callback I set the <em>currentImage</em> to the loaded image and call the <em>renderImage</em> method.<br>
-Now let&rsquo;s look into the <em>renderImage</em>. The <em>renderImage</em> method already has access to the <em>currentImage</em> so it just creates new <em>img</em> element (that&rsquo;s because the <em>drawImage</em> method accepts as first argument <em>img</em> element) with <em>src</em> the base64 encoded image. On load of the created <em>img</em> element I render it on the canvas, using it&rsquo;s 2d context.</p>
-
-<p>Now let&rsquo;s look at the <em>handleSizeChanged</em>. This method changes the size of the canvas on change of any of the text inputs. On <em>keyup</em> of a text input <em>handleSizeChanged</em> is being fired. In <em>handleSizeChanged</em> I first get the input id (because I&rsquo;m lazy aand I don&rsquo;t want to look at two cases - width/height). After that I validate the input id - it&rsquo;s valid only if it&rsquo;s value is width or height (who knows may be someone has changed the element&rsquo;s id). After that if the value of the field is a text (with the regex</p>
-
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="sr">/^\d+$/</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">reader</span><span class="p">.</span><span class="nx">readAsDataURL</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
 </code></pre></div>
 
+<p>I read the file. Here the file won&#x2019;t be read in binary but in base64 encoding instead. Because the file loading is asynchronous (imagine we want to load 1 GB file and the loading was synchronous, our application would block until the file is completely loaded&#x2026;) that&#x2019;s why I&#x2019;ve added callback which will be invoked when the file is being read. In this callback I set the <em>currentImage</em> to the loaded image and call the <em>renderImage</em> method.<br>
+Now let&#x2019;s look into the <em>renderImage</em>. The <em>renderImage</em> method already has access to the <em>currentImage</em> so it just creates new <em>img</em> element (that&#x2019;s because the <em>drawImage</em> method accepts as first argument <em>img</em> element) with <em>src</em> the base64 encoded image. On load of the created <em>img</em> element I render it on the canvas, using it&#x2019;s 2d context.</p>
+
+<p>Now let&#x2019;s look at the <em>handleSizeChanged</em>. This method changes the size of the canvas on change of any of the text inputs. On <em>keyup</em> of a text input <em>handleSizeChanged</em> is being fired. In <em>handleSizeChanged</em> I first get the input id (because I&#x2019;m lazy aand I don&#x2019;t want to look at two cases - width/height). After that I validate the input id - it&#x2019;s valid only if it&#x2019;s value is width or height (who knows may be someone has changed the element&#x2019;s id). After that if the value of the field is a text (with the regex</p>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="sr">/^\d+$/</span>
+</code></pre></div>
 
 <p>I check that) I set the size of the canvas.</p>
 
 <p>The save of the image is that simple:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nb">document</span><span class="p">.</span><span class="nx">location</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">();</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">location</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">toDataURL</span><span class="p">();</span>
 </code></pre></div>
 
+<p>And that&#x2019;s all. Simple isn&#x2019;t it?</p>
 
-<p>And that&rsquo;s all. Simple isn&rsquo;t it?</p>
+<p>I hope that this post was funny and useful. The next post I plan is going to be much more exited and cool&#x2026;just wait for it&#x2026;</p>
 
-<p>I hope that this post was funny and useful. The next post I plan is going to be much more exited and cool&hellip;just wait for it&hellip;</p>
-</div>
+                </section>
+            </article>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f&t=JavaScript%20image%20scaling" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f&text=JavaScript%20image%20scaling&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2012%2f11%2f02%2fjavascript-html5-scale-image%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+            
 
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>JavaScript image scaling</li>
-      </ol>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Browsers/">Browsers</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/FileReader/">FileReader</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/HTML5/">HTML5</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Image-processing/">Image processing</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Webkit/">Webkit</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/Development/">Development</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/FileReader/">FileReader</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/HTML5/">HTML5</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Internet/">Internet</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/webkit/">webkit</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

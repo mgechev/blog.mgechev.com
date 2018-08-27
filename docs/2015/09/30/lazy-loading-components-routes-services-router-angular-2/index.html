@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Lazy Loading of Route Components in Angular 2 &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -109,7 +109,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <h3 id="sample-application">Sample Application</h3>
 
 <p>Lets take a look at this sample application:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">RouteConfig</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">,</span> <span class="nx">ROUTER_PROVIDERS</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/router&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">Home</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/home/home&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">About</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/about/about&#39;</span><span class="p">;</span>
@@ -128,9 +128,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <span class="p">})</span>
 <span class="kr">class</span> <span class="nx">App</span> <span class="p">{}</span>
 
-<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span>
-</code></pre></div>
-
+<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span></code></pre></div>
 <p>This is the root component of <a href="https://github.com/mgechev/angular2-seed/blob/c5c7f8ffc3be1d75040ee11d9220c22dadf59c57/app/app.ts">angular2-seed</a>.</p>
 
 <p>In the snippet above we create a new component with controller the <code>App</code> class. We also register two routes:</p>
@@ -141,7 +139,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 </ul>
 
 <p>Here&rsquo;s the implementation of the <code>About</code> component:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">CORE_DIRECTIVES</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">CORE_DIRECTIVES</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
 
 <span class="kr">import</span> <span class="p">{</span><span class="nx">NameList</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;../../services/NameList&#39;</span><span class="p">;</span>
 
@@ -158,9 +156,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
     <span class="nx">newname</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
     <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>The <code>About</code> component uses the service <code>NameList</code>, which is located under <code>../../services/NameList</code>. So far so good, now lets take a look at how our application looks like:</p>
 
 <p><img src="/images/lazy-loading-angular-2/sample-app.gif" alt="Sample app" /></p>
@@ -184,16 +180,14 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <h3 id="asyncroute">AsyncRoute</h3>
 
 <p>The <em>obvious</em> Angular solution to the problem us using <code>AsyncRoute</code>. This is class, which implements <code>RouteDefinition</code> and allows asynchronous loading of the component associated with given route. This allows on demand loading of the component&rsquo;s dependencies as well. Here&rsquo;s now our definition will look like with <code>AsyncRoute</code>:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kd">@RouteConfig</span><span class="p">([</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@RouteConfig</span><span class="p">([</span>
   <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span> <span class="p">},</span>
   <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
     <span class="nx">loader</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./components/about/about&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span><span class="p">),</span>
     <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
   <span class="p">})</span>
-<span class="p">])</span>
-</code></pre></div>
-
+<span class="p">])</span></code></pre></div>
 <p>Basically we register two routes:
 - A regular route
 - Async route. The async route accepts as argument a <code>loader</code>. The <code>loader</code> is a function that must return a promise, which needs to be resolved with the component that needs to be rendered.</p>
@@ -205,7 +199,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <p>The Angular router accepts a component for value of the <code>component</code> property of all of its routes definitions. However, instead of providing the concrete component, which needs to be rendered we can provide a component proxy. This is the <a href="https://en.wikipedia.org/wiki/Proxy_pattern#Possible_Usage_Scenarios">Virtual Proxy pattern</a>. Inside the component proxy we can load the target component and later, when it is loaded, using the <code>DynamicComponentLoader</code> we can render it onto the screen.</p>
 
 <p>Lets define a <code>componentProxyFactory</code>, which will be responsible for creating component proxies:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">ComponentProvider</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">ComponentProvider</span> <span class="p">{</span>
   <span class="nx">path</span>:<span class="kt">string</span><span class="p">;</span>
   <span class="nx">provide</span><span class="o">:</span><span class="p">{(</span><span class="nx">module</span>:<span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="nx">any</span><span class="p">};</span>
 <span class="p">}</span>
@@ -234,9 +228,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
       <span class="p">}</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">VirtualComponent</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Now lets take a look at the code step by step:</p>
 
 <ol>
@@ -258,7 +250,7 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <p>And thats all!</p>
 
 <p>Now lets take a look how we can refactor our root component in order to take advantage of the lazy loading:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">bootstrap</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">RouteConfig</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">,</span> <span class="nx">ROUTER_PROVIDERS</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/router&#39;</span><span class="p">;</span>
 <span class="kr">import</span> <span class="p">{</span><span class="nx">Home</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/home/home&#39;</span><span class="p">;</span>
 
@@ -285,20 +277,16 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 <span class="p">})</span>
 <span class="kr">class</span> <span class="nx">App</span> <span class="p">{}</span>
 
-<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span>
-</code></pre></div>
-
+<span class="nx">bootstrap</span><span class="p">(</span><span class="nx">App</span><span class="p">,</span> <span class="p">[</span><span class="nx">ROUTER_PROVIDERS</span><span class="p">]);</span></code></pre></div>
 <p>Now the file doesn&rsquo;t contain any reference to the <code>About</code> component. Instead it registers in the route definition for the <code>About</code> component using:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">{</span>
   <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/about&#39;</span><span class="p">,</span>
   <span class="nx">component</span>: <span class="kt">componentProxyFactory</span><span class="p">({</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;./components/about/about&#39;</span><span class="p">,</span>
     <span class="nx">provide</span>: <span class="kt">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span>
   <span class="p">}),</span>
   <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <h2 id="results">Results</h2>
 
 <p>Lets take a look at how the page load will look this time:</p>
@@ -358,14 +346,17 @@ This blog post is mostly about performance and more accurately - lazy loading. B
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

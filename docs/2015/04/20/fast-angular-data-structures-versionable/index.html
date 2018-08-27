@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Even Faster AngularJS Data Structures &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -127,20 +127,18 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 <p><img src="/images/papi-lego.jpg" alt="" /></p>
 
 <p>The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">let</span> <span class="nx">primitive</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">primitive</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ListWrapper</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span>
 <span class="kd">let</span> <span class="nx">changedList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span> <span class="o">===</span> <span class="nx">changedList</span><span class="p">);</span> <span class="c1">// false</span>
-<span class="c1">// The primitive collection is changed</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span> <span class="o">===</span> <span class="nx">changedList</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1">// The primitive collection is changed
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
+</span><span class="c1"></span></code></pre></div>
 <p>But this will also have one important side effect:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changedList</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changedList</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
+</span><span class="c1"></span></code></pre></div>
 
 <p>Keeping the same reference to the primitive list in both collections will cause change inside the underlaying data in both collections, once we perform a mutation operation. This solution looks like a dirty hack.</p>
 
@@ -152,11 +150,10 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <p>But how we can limit AngularJS to watch <strong>only</strong> the control flag? We can do something like:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$watch</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$watch</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">isChanged</span><span class="p">;</span>
 <span class="p">},</span> <span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
 </code></pre></div>
-
 
 <p>There are three drawbacks of this approach:</p>
 
@@ -168,8 +165,8 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <p>Lets take a look at AngularJS&rsquo; <code>$watchCollection</code> implementation:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// ...</span>
-<span class="k">for</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span><span class="c1"></span><span class="k">for</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">newValue</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
     <span class="nx">newLength</span><span class="o">++</span><span class="p">;</span>
     <span class="nx">newItem</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
@@ -188,15 +185,14 @@ Introduction Before about a month ago, I decided to experiment using immutable d
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-<span class="c1">// ...</span>
-</code></pre></div>
-
+<span class="c1">// ...
+</span><span class="c1"></span></code></pre></div>
 
 <p>This part of the implementation is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using <code>for-in</code>. In order to achieve complexity around <code>O(1)</code>, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag as only key of the collection&rsquo; instances.</p>
 
 <p>Here is how we achieve behavior result:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">function</span> <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">)</span> <span class="p">{</span>
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
   <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">);</span>
 <span class="p">}</span>
@@ -232,7 +228,6 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 <span class="p">});</span>
 </code></pre></div>
 
-
 <p>There are three main parts of the snippet above:</p>
 
 <ul>
@@ -245,23 +240,21 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <p>Here is sample usage of <code>VersionableList</code>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VersionableList</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VersionableList</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 0</span>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 0
+</span><span class="c1"></span>
 <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2, 3]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 1</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2, 3]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 1
+</span><span class="c1"></span></code></pre></div>
 
 <p>And here are the keys over which AngularJS will iterate:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [&#39;_version&#39;]</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [&#39;_version&#39;]
+</span><span class="c1"></span></code></pre></div>
 
 <h2 id="benchmark-results">Benchmark Results</h2>
 
@@ -377,14 +370,17 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

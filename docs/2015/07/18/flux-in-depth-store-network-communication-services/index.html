@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Flux in Depth. Store and Network Communication. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -116,14 +116,11 @@
 <h3 id="chain-of-responsibility">Chain of Responsibility</h3>
 
 <p>This is a design pattern, which is exclusively used in the event-driven programming. Lets change the context and talk about DOM for a while. I bet you know that you can listen for any event on the document, for example once a user clicks on a button the event will propagate to the root of the DOM tree (eventually, if nothing stop it) and be caught by your listener:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="sb">`You actually clicked on element with #</span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">, not on document`</span><span class="p">);</span>
   <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span> <span class="o">===</span> <span class="nb">document</span><span class="p">)</span>
 <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-</code></pre></div>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;awesome-button&quot;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</code></pre></div>
-
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;awesome-button&#34;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span></code></pre></div>
 <p><a class="jsbin-embed" href="http://jsbin.com/hezizi/embed?output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.34.0"></script></p>
 
 <p>If you click on the <code>awesome-button</code>, you&rsquo;ll see two alert boxes: &ldquo;You actually clicked on element with #awesome-button, not directly on document&rdquo; and &ldquo;true&rdquo;. If you change the third parameter of <code>addEventListener</code> to <code>true</code>, the event will propagate in the opposite direction (i.e. from top to bottom, capturing mode).</p>
@@ -147,24 +144,22 @@
 <p><a href="/images/store-services/initial-setup.png"><img src="/images/store-services/initial-setup.png" alt="Initial Setup" /></a></p>
 
 <p>The tree on the left-hand side is the store, which serialized into JSON looks the following way:</p>
-<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
-  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;foo&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
   <span class="p">],</span>
-  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span> <span class="p">}</span>
+  <span class="nt">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;Hey foo&#34;</span><span class="p">,</span> <span class="nt">&#34;by&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&#34;timestamp&#34;</span><span class="p">:</span> <span class="mi">1437147880686</span> <span class="p">}</span>
   <span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>The tree on the right-hand side is the component tree. We already described the component trees in the <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">previous part</a>. Here is a snippet, which shows the relation between the <code>Chat</code> store and the <code>ChatBox</code> component:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&#39;../store/Chat&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&#39;../store/Chat&#39;</span><span class="p">;</span>
 
-<span class="kr">class</span> <span class="nx">ChatBox</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">ChatBox</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+    <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
     <span class="nx">Chat</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span>
     <span class="p">});</span>
@@ -172,14 +167,13 @@
   <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span>
       <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">messages</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">}</span><span class="o">/&gt;</span>
-        <span class="o">&lt;</span><span class="nx">MessageInput</span><span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">messages</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">}</span><span class="err">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">MessageInput</span><span class="err">/&gt;</span>
       <span class="o">&lt;</span><span class="err">/div&gt;</span>
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>Basically, the root component (<code>ChatBox</code>) is subscribed to the <code>change</code> event of the <code>Chat</code>. When the <code>Chat</code> emits a <code>change</code> event, the <code>ChatBox</code> sets its state to be the current store and passes the store&rsquo;s content down the component tree. That&rsquo;s it.</p>
 
 <p>What happens if something change our store?</p>
@@ -206,21 +200,19 @@
 </ul>
 
 <p>However, in most cases, this is not enough. Your application also has a UI state. For example, whether given dialog is opened or no, what is the dialog&rsquo;s position, etc. The data, which defines now your components will be rendered, depends on both - your UI state and the model. This is the reason I create a combined store, which presents both. For example, if we add a few dialogs to our chat application, the JSON representation of the store may look like:</p>
-<div class="highlight"><pre><code class="language-json" data-lang="json"><span></span><span class="p">{</span>
-  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;foo&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
   <span class="p">],</span>
-  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span><span class="p">}</span>
+  <span class="nt">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;Hey foo&#34;</span><span class="p">,</span> <span class="nt">&#34;by&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&#34;timestamp&#34;</span><span class="p">:</span> <span class="mi">1437147880686</span><span class="p">}</span>
   <span class="p">],</span>
-  <span class="nt">&quot;dialogsOpenStatus&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;nicknameInput&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="nt">&quot;editMessage&quot;</span><span class="p">:</span> <span class="kc">false</span>
+  <span class="nt">&#34;dialogsOpenStatus&#34;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&#34;nicknameInput&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nt">&#34;editMessage&#34;</span><span class="p">:</span> <span class="kc">false</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
 
 <h3 id="quick-faq">Quick FAQ:</h3>
@@ -365,14 +357,17 @@ Most likely you have collision in the action types. I&rsquo;d suggest to use the
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

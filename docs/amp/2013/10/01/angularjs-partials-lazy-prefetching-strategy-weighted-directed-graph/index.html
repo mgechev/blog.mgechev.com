@@ -1,139 +1,100 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Lazy prefetching of AngularJS partials &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">
+		
 
+		<meta property="og:title" content="Lazy prefetching of AngularJS partials">
+		<meta property="og:description" content="This blog post is concentrated about web performance. I&#x2019;ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I&#x2019;ve read are these by Mobify, Web Performance Daybook Volume, High Performance Web Sites and Critical rendering path &#x2013; Crash course on web performance and many others.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">
-
-
-    
-    
-    
-    <title>Lazy prefetching of AngularJS partials - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="This blog post is concentrated about web performance. I’ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I’ve read are these by Mobify, Web Performance Daybook Volume, High Performance Web Sites and Critical rendering path – Crash course on web performance and many others.">
-
-<meta property="og:title" content="Lazy prefetching of AngularJS partials - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="This blog post is concentrated about web performance. I’ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I’ve read are these by Mobify, Web Performance Daybook Volume, High Performance Web Sites and Critical rendering path – Crash course on web performance and many others.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/">
-<meta name="twitter:title" content="Lazy prefetching of AngularJS partials - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="This blog post is concentrated about web performance. I’ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I’ve read are these by Mobify, Web Performance Daybook Volume, High Performance Web Sites and Critical rendering path – Crash course on web performance and many others.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Lazy prefetching of AngularJS partials - Minko Gechev&#39;s blog",
-    "datePublished": "2013-10-01T00:00:00JST",
-    "dateModified": "2013-10-01T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "This blog post is concentrated about web performance. I’ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I’ve read are these by Mobify, Web Performance Daybook Volume, High Performance Web Sites and Critical rendering path – Crash course on web performance and many others."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-ac808c3be14910e72724ec368d6835d0">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/" class="thumbnail" title="Lazy prefetching of AngularJS partials"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Lazy prefetching of AngularJS partials</h1>
-        <ul class="p-facts">
-          <li><time datetime="2013-10-01T00:00:00JST">Oct 1, 2013</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f&t=Lazy%20prefetching%20of%20AngularJS%20partials" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f&text=Lazy%20prefetching%20of%20AngularJS%20partials&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body"><p>This blog post is concentrated about web performance. I’ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I’ve read are these by <a href="https://www.mobify.com/" target="_blank">Mobify</a>, <a href="http://shop.oreilly.com/product/0636920025955.do" target="_blank">Web Performance Daybook Volume</a>, <a href="http://shop.oreilly.com/product/9780596529307.do" target="_blank">High Performance Web Sites</a> and <a href="https://www.youtube.com/watch?v=PkOBnYxqj3k&list=PLjqQYuhKAW8Bg-HpGPDlbcecgyAVRPiYM" target="_blank">Critical rendering path – Crash course on web performance</a> and many others. I hope HTTP 2.0 will eliminate few of the dirty hacks we all make&hellip;<br>
-I’ll focus on the performance in the Single-Page Applications and especially template prefetching strategy we use in the web application of Brownie Points. I’ll give code samples with AngularJS but these methods can be also applied with Ember.js, Backbone.js (with little more pain) and other MV* frameworks, I guess.<br>
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Lazy prefetching of AngularJS partials
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2013-10-01-angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Oct 1, 2013
+                    &#xB7; 6 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/angularjs">AngularJS</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/javascript">JavaScript</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/lazy-loading">Lazy loading</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/performance">performance</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/pre-fetching">Pre-fetching</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>This blog post is concentrated about web performance. I&#x2019;ll skip the well known stuff about combining images into sprites, inlining images, DNS pre-fetching, combining and minifying script files, gzipping and so on. There are plenty of articles and tools which will help you about these things. There are also excellent researches on these topics, few of the best I&#x2019;ve read are these by <a href="https://www.mobify.com/" target="_blank">Mobify</a>, <a href="http://shop.oreilly.com/product/0636920025955.do" target="_blank">Web Performance Daybook Volume</a>, <a href="http://shop.oreilly.com/product/9780596529307.do" target="_blank">High Performance Web Sites</a> and <a href="https://www.youtube.com/watch?v=PkOBnYxqj3k&amp;list=PLjqQYuhKAW8Bg-HpGPDlbcecgyAVRPiYM" target="_blank">Critical rendering path &#x2013; Crash course on web performance</a> and many others. I hope HTTP 2.0 will eliminate few of the dirty hacks we all make&#x2026;<br>
+I&#x2019;ll focus on the performance in the Single-Page Applications and especially template prefetching strategy we use in the web application of Brownie Points. I&#x2019;ll give code samples with AngularJS but these methods can be also applied with Ember.js, Backbone.js (with little more pain) and other MV* frameworks, I guess.<br>
 To find the best approach for your app you should understand it very well and know all the relations between the different pages. One way to do this is by visualising all the relations using UML state machine diagram. It will show you how your pages are connected, triggering of which event will lead to page change (events), based on which conditions the pages will change (guards) and what is done during the transition (actions).<br>
-For illustrating the way this partials pre-fetching strategy works, I’ll use example with a web application which is web interface for revision control system.<br>
+For illustrating the way this partials pre-fetching strategy works, I&#x2019;ll use example with a web application which is web interface for revision control system.<br>
 So, we have the following pages:</p>
 
 <ul>
@@ -145,93 +106,92 @@ So, we have the following pages:</p>
 <li>Project wiki</li>
 </ul>
 
-<p>From the home screen the user will be able to view the profile of chosen user or navigate to his own projects. From the user’s profile view the user will be able to navigate to projects list or go back to the home screen. In case the user view the projects list (his own or projects of another user) he can navigate to a project details or go back to the home screen. From the project view the user can go to the wiki or issues pages (if the page exists).</p>
+<p>From the home screen the user will be able to view the profile of chosen user or navigate to his own projects. From the user&#x2019;s profile view the user will be able to navigate to projects list or go back to the home screen. In case the user view the projects list (his own or projects of another user) he can navigate to a project details or go back to the home screen. From the project view the user can go to the wiki or issues pages (if the page exists).</p>
 
 <p>This brief description is illustrated by the following state diagram (some events, actions and guards are not very descriptive because the diagram would become messy with verbose explanations).</p>
 
-<div id="attachment_537" class="wp-caption aligncenter">
-  <a href="/images/legacy/uploads2013/10/revision-control-state-machine.png"><amp-img class="size-full wp-image-537 " title="SPA state machine diagram" alt="revision-control-state-machine" src="/images/legacy/uploads/2013/10/revision-control-state-machine.png" width="385" height="486" layout="responsive"></amp-img></a><p class="wp-caption-text">
+<div id="attachment_537" style="width: 395px" class="wp-caption aligncenter">
+  <a href="/images/legacy/uploads2013/10/revision-control-state-machine.png"><amp-img class="size-full wp-image-537 " title="SPA state machine diagram" alt="revision-control-state-machine" src="/images/legacy/uploads/2013/10/revision-control-state-machine.png" width="385" height="486"></amp-img></a><p class="wp-caption-text">
     UML state machine diagram of SPA
   </p>
 </div>
 
 <p>It is not exactly state machine diagram because the beginning and end pseudo states are missing, but it illustrates our idea pretty well.</p>
 
-<p>If the user is in the home page he may go to the projects page or the user’s profile page, lets suppose that the same template is used for his own projects and for other users’ projects. Something we can do is to prefetch the templates for the projects list and user’s profile, these are only 2 pages which are neighbours of the home page so the browser will create two threads (eventually), using XHR we will fetch the templates and put them in the $templateCache using the template url as key and it’s content as content.</p>
+<p>If the user is in the home page he may go to the projects page or the user&#x2019;s profile page, lets suppose that the same template is used for his own projects and for other users&#x2019; projects. Something we can do is to prefetch the templates for the projects list and user&#x2019;s profile, these are only 2 pages which are neighbours of the home page so the browser will create two threads (eventually), using XHR we will fetch the templates and put them in the $templateCache using the template url as key and it&#x2019;s content as content.</p>
 
 <p>We can define our routes relations like:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">pageRelations</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s1">&#39;home&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;user-profile&#39;</span><span class="p">,</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">],</span>
-  <span class="s1">&#39;user-project&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="s1">&#39;project&#39;</span><span class="p">],</span>
-  <span class="s1">&#39;user-profile&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">,</span> <span class="s1">&#39;project&#39;</span><span class="p">],</span>
-  <span class="s1">&#39;project&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;user-projects&#39;</span><span class="p">,</span> <span class="s1">&#39;project-issues&#39;</span><span class="p">,</span> <span class="s1">&#39;project-wiki&#39;</span><span class="p">],</span>
-  <span class="s1">&#39;project-wiki&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">],</span>
-  <span class="s1">&#39;project-issues&#39;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pageRelations</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;home&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;user-profile&apos;</span><span class="p">,</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;user-project&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;home&apos;</span><span class="p">,</span> <span class="s1">&apos;project&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;user-profile&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;home&apos;</span><span class="p">,</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">,</span> <span class="s1">&apos;project&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;project&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;user-projects&apos;</span><span class="p">,</span> <span class="s1">&apos;project-issues&apos;</span><span class="p">,</span> <span class="s1">&apos;project-wiki&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;project-wiki&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;project&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;project-issues&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;project&apos;</span><span class="p">]</span>
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p>With routing definition like this:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">routes</span> <span class="o">=</span> <span class="p">[</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">routes</span> <span class="o">=</span> <span class="p">[</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/home&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/home.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;HomeCtrl&#39;</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;home&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/home&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/home.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;HomeCtrl&apos;</span>
   <span class="p">},</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/projects-list/:userid&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/user-projects.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;ProjectsListCtrl&#39;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/projects-list/:userid&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/user-projects.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;ProjectsListCtrl&apos;</span><span class="p">,</span>
     <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s1">&#39;ProjectsList&#39;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
+      <span class="s1">&apos;ProjectsList&apos;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
          <span class="k">return</span> <span class="nx">ProjectsService</span><span class="p">.</span><span class="nx">getList</span><span class="p">(</span><span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">},</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;user-profile&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/user-profile/:userid&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/user-profile.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;UserProfileCtrl&#39;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;user-profile&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/user-profile/:userid&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/user-profile.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;UserProfileCtrl&apos;</span><span class="p">,</span>
     <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s1">&#39;UserProfile&#39;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">UserService</span><span class="p">)</span> <span class="p">{</span>
+      <span class="s1">&apos;UserProfile&apos;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">UserService</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">UserService</span><span class="p">.</span><span class="nx">getProfile</span><span class="p">(</span><span class="nx">$routeParams</span><span class="p">.</span><span class="nx">userid</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">},</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/project/:projectid&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/project.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;ProjectCtrl&#39;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;project&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/project/:projectid&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/project.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;ProjectCtrl&apos;</span><span class="p">,</span>
     <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s1">&#39;Project&#39;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
+      <span class="s1">&apos;Project&apos;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">ProjectsService</span><span class="p">.</span><span class="nx">getDetails</span><span class="p">(</span><span class="nx">$routeParams</span><span class="p">.</span><span class="nx">projectid</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">},</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;project-wiki&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/project-wiki/:projectid&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/project-wiki.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;WikiCtrl&#39;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;project-wiki&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/project-wiki/:projectid&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/project-wiki.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;WikiCtrl&apos;</span><span class="p">,</span>
     <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s1">&#39;Project&#39;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
+      <span class="s1">&apos;Project&apos;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">ProjectsService</span><span class="p">.</span><span class="nx">getWiki</span><span class="p">(</span><span class="nx">$routeParams</span><span class="p">.</span><span class="nx">projectid</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">},</span>
   <span class="p">{</span>
-    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;project-issues&#39;</span><span class="p">,</span>
-    <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;/project-issues/:projectid&#39;</span><span class="p">,</span>
-    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;partials/project-issues.html&#39;</span><span class="p">,</span>
-    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&#39;ProjectCtrl&#39;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;project-issues&apos;</span><span class="p">,</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">&apos;/project-issues/:projectid&apos;</span><span class="p">,</span>
+    <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;partials/project-issues.html&apos;</span><span class="p">,</span>
+    <span class="nx">controller</span><span class="o">:</span> <span class="s1">&apos;ProjectCtrl&apos;</span><span class="p">,</span>
     <span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s1">&#39;Project&#39;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
+      <span class="s1">&apos;Project&apos;</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">ProjectsService</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">ProjectsService</span><span class="p">.</span><span class="nx">getIssues</span><span class="p">(</span><span class="nx">$routeParams</span><span class="p">.</span><span class="nx">projectid</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">}</span>
@@ -243,203 +203,116 @@ So, we have the following pages:</p>
 <span class="p">});</span>
 </code></pre></div>
 
+<p>And to prefetch the neighbour views&#x2019; templates when we are at specific state:</p>
 
-<p>And to prefetch the neighbour views’ templates when we are at specific state:</p>
-
-<p><div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">prefetched</span> <span class="o">=</span> <span class="p">{};</span>
-<span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;$routeStateChange&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evnt</span><span class="p">,</span> <span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">prefetched</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;$routeStateChange&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evnt</span><span class="p">,</span> <span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">pageRelations</span><span class="p">[</span><span class="nx">state</span><span class="p">.</span><span class="nx">id</span><span class="p">].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">routes</span><span class="p">[</span><span class="nx">c</span><span class="p">];</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">$templateCache</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span> <span class="c1">//prevent the prefetching if the template is already in the cache</span>
-    <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">).</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">$templateCache</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span> <span class="c1">//prevent the prefetching if the template is already in the cache
+</span><span class="c1"></span>    <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">).</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">$templateCache</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">,</span> <span class="nx">t</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">});</span>
 <span class="p">});</span>
 </code></pre></div>
-</p>
 
-<p>The pre-fetching control can be put at directive or top-level controller. I prefer the directive option, because if there are more things to be prefetched, not only the templates, you can configure it using markup and you won’t have to change your JavaScript code when you decide to change your pre-fetching options.</p>
+<p>The pre-fetching control can be put at directive or top-level controller. I prefer the directive option, because if there are more things to be prefetched, not only the templates, you can configure it using markup and you won&#x2019;t have to change your JavaScript code when you decide to change your pre-fetching options.</p>
 
-<p>If we look more abstract of the thing we did – we actually created a <a href="https://en.wikipedia.org/wiki/Graph_theory" target="_blank">graph</a> presented with list of neighbours and in each page change we pre-fetch the templates of all its neighbours.</p>
+<p>If we look more abstract of the thing we did &#x2013; we actually created a <a href="https://en.wikipedia.org/wiki/Graph_theory" target="_blank">graph</a> presented with list of neighbours and in each page change we pre-fetch the templates of all its neighbours.</p>
 
-<p>With not so complex web application everything is cool, the browser can run up to 6 different threads, one for each XHR. But when from a single page the user can go to 30 others and your server response time is not that fast the things may become not very efficient. If the order of the neighbours in the array is not the most appropriate one the user may have to wait because the first few threads won’t fetch the template required by him.<br>
-To do it better you should review each connection between the pages and sort the neighbours arrays by some kind of weight. It can be statistical data gained from the user, your suggestion, six sense, you can even roll dice if you think you’ll be more accurate. To keep the array ordered by hand is error-prone so you can do something like:</p>
+<p>With not so complex web application everything is cool, the browser can run up to 6 different threads, one for each XHR. But when from a single page the user can go to 30 others and your server response time is not that fast the things may become not very efficient. If the order of the neighbours in the array is not the most appropriate one the user may have to wait because the first few threads won&#x2019;t fetch the template required by him.<br>
+To do it better you should review each connection between the pages and sort the neighbours arrays by some kind of weight. It can be statistical data gained from the user, your suggestion, six sense, you can even roll dice if you think you&#x2019;ll be more accurate. To keep the array ordered by hand is error-prone so you can do something like:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">pageRelations</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s1">&#39;home&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;user-profile&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">}],</span>
-  <span class="s1">&#39;user-projects&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">7</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
-  <span class="s1">&#39;user-profile&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">4</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
-  <span class="s1">&#39;project&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;user-projects&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project-issues&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project-wiki&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">6</span> <span class="p">}],</span>
-  <span class="s1">&#39;project-wiki&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
-  <span class="s1">&#39;project-issues&#39;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}]</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">pageRelations</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;home&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;user-profile&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">}],</span>
+  <span class="s1">&apos;user-projects&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;home&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">7</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
+  <span class="s1">&apos;user-profile&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;home&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">4</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
+  <span class="s1">&apos;project&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;user-projects&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">8</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project-issues&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project-wiki&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">6</span> <span class="p">}],</span>
+  <span class="s1">&apos;project-wiki&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}],</span>
+  <span class="s1">&apos;project-issues&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;project&apos;</span><span class="p">,</span> <span class="nx">weight</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}]</span>
 <span class="p">};</span>
 </code></pre></div>
 
-
-<p>Now the pageRelations is a hash table with keys – the web app’s pages, values – all neighbour views for the current one, and rating associated to each neighbour.<br>
+<p>Now the pageRelations is a hash table with keys &#x2013; the web app&#x2019;s pages, values &#x2013; all neighbour views for the current one, and rating associated to each neighbour.<br>
 In that way you actually use a directed <a href="https://en.wikipedia.org/wiki/Graph_theory" target="_blank">graph</a> with weighted edges, all you have to do is to walk the neighbours of the current node (current page) by their priority and prefetch the template for each node:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;$routeStateChange&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evnt</span><span class="p">,</span> <span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;$routeStateChange&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evnt</span><span class="p">,</span> <span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">pageRelations</span><span class="p">[</span><span class="nx">state</span><span class="p">.</span><span class="nx">id</span><span class="p">].</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">b</span><span class="p">.</span><span class="nx">weight</span> <span class="o">-</span> <span class="nx">a</span><span class="p">.</span><span class="nx">weight</span><span class="p">;</span>
   <span class="p">}).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">routes</span><span class="p">[</span><span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="p">];</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">$templateCache</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span> <span class="c1">//prevent the prefetching if the template is already in the cache</span>
-    <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">).</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">$templateCache</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span> <span class="c1">//prevent the prefetching if the template is already in the cache
+</span><span class="c1"></span>    <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">).</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">$templateCache</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">templateUrl</span><span class="p">,</span> <span class="nx">t</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">});</span>
 <span class="p">});</span>
 </code></pre></div>
 
+<p>And that&#x2019;s all. Possible issue which should be taken under attention is the loading of the images used by the prefetched templates, it&#x2019;s not enough to load only the html, usually the images takes more bandwidth. Here you can use different approaches &#x2013; parse the template, take all &#x201C;img&#x201D; elements and pre-fetch their source. Anyway, this doesn&#x2019;t work with the CSS &#x201C;background-image&#x201D; property. When there are elements with &#x201C;background-image&#x201D; property you can get it&#x2019;s value only after the element is added to the DOM tree but adding each template and walking its elements may have performance impact when you have large, complex templates.</p>
 
-<p>And that’s all. Possible issue which should be taken under attention is the loading of the images used by the prefetched templates, it’s not enough to load only the html, usually the images takes more bandwidth. Here you can use different approaches – parse the template, take all “img” elements and pre-fetch their source. Anyway, this doesn’t work with the CSS “background-image” property. When there are elements with “background-image” property you can get it’s value only after the element is added to the DOM tree but adding each template and walking its elements may have performance impact when you have large, complex templates.</p>
-</div>
+                </section>
+            </article>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f&t=Lazy%20prefetching%20of%20AngularJS%20partials" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f&text=Lazy%20prefetching%20of%20AngularJS%20partials&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2013%2f10%2f01%2fangularjs-partials-lazy-prefetching-strategy-weighted-directed-graph%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+            
 
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Lazy prefetching of AngularJS partials</li>
-      </ol>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Algorithms/">Algorithms</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/AngularJS/">AngularJS</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Computer-science/">Computer science</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Development/">Development</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Internet/">Internet</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Performance/">Performance</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Programming/">Programming</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Web-development/">Web development</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/AngularJS/">AngularJS</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/JavaScript/">JavaScript</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Lazy-loading/">Lazy loading</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/performance/">performance</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Pre-fetching/">Pre-fetching</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-

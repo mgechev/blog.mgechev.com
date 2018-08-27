@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Processing Binary Protocols with Client-Side JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -155,7 +155,7 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 
 <p>In the last case our proxy will look something like:</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
 
 <span class="kd">var</span> <span class="nx">WebSocketServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;ws&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">wss</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocketServer</span><span class="p">({</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">8081</span> <span class="p">});</span>
@@ -200,7 +200,6 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on&#39;</span><span class="p">,</span> <span class="mi">8081</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>And our high-level architecture will look like:</p>
 
 <p><img src="/images/binary-protocol-processing/client-proxy-server.png" alt="" /></p>
@@ -217,23 +216,20 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 
 <p>The <code>TypedArray</code>s allow us to process words (with length 8, 16, 32 bits) in order to handle the binary messages received by the proxy. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s1">&#39;ws://127.0.0.1:8081&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s1">&#39;ws://127.0.0.1:8081&#39;</span><span class="p">);</span>
 <span class="nx">socket</span><span class="p">.</span><span class="nx">binaryType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span>
 </code></pre></div>
-
 
 <p>The two possible values for <code>binaryType</code>, of the WebSocket, are <code>arraybuffer</code> and <code>blob</code>. In most cases <code>arraybuffer</code> will be the one, which allows faster processing since it can be used with the synchronous API of the <code>DataView</code>. In case of large pieces of binary data preferable is the <code>blob</code> binary type.</p>
 
 <p>So how would we process the following example, using <code>DataView</code> and <code>arraybuffer</code>:</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text"><span></span>2      U16      framebuffer-width
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">2      U16      framebuffer-width
 2      U16      framebuffer-height
 16 PIXEL_FORMAT server-pixel-format
-4      U32      name-length
-</code></pre></div>
+4      U32      name-length</code></pre></div>
 
-
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="nx">connection</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">connection</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">dv</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
@@ -246,7 +242,6 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <span class="p">};</span>
 </code></pre></div>
 
-
 <p><code>DataView</code> provides interface, which allows us to read specific data type by providing given offset. For example <code>dv.getUint32(2)</code> will return unsigned 32 bit integer with offset 2 bytes from the beginning of the buffer.</p>
 
 <h3 id="handling-endianness">Handling endianness</h3>
@@ -255,7 +250,7 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 
 <p>The <code>TypedArray</code>&rsquo;s standard doesn&rsquo;t refer to specific endianness used in them, everything depends on the underlaying machine. The usual byte ordering is little endian, but in order to prevent hard-coded values we can use the function <code>getEndianness</code>:</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">function</span> <span class="nx">getEndianness</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">getEndianness</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayBuffer</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
   <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
@@ -273,7 +268,6 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-
 
 <p>Let&rsquo;s take a look at the function&rsquo;s implementation:</p>
 
@@ -296,7 +290,7 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 
 <p><code>Blob</code> has method in it&rsquo;s prototype called <code>slice</code>. It accepts interval, as two integers, and returns &ldquo;sub-blob&rdquo; composed by the bytes in the interval:</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])]);</span>
 <span class="kd">var</span> <span class="nx">subBlob</span> <span class="o">=</span> <span class="nx">blob</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">fr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
 <span class="nx">fr</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
@@ -305,22 +299,21 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <span class="nx">fr</span><span class="p">.</span><span class="nx">readAsArrayBuffer</span><span class="p">(</span><span class="nx">subBlob</span><span class="p">);</span>
 </code></pre></div>
 
-
 <p>Each time you want to read specific part of the blob you need to create <code>FileReader</code> instance and eventually slice it. This requires a lot of additional, repetitive work. Also, when you read the code above it is not very semantically clear that you want to read the third element of the array, since there&rsquo;s a lot of additional code around the construction of the <code>FileReader</code> and handling the <code>onload</code> event.</p>
 
 <p>In order to simplify the process of reading <code>Blob</code>s I created <a href="https://github.com/mgechev/blobreader"><code>BlobReader</code></a>, which provides simple interface for reading binary large objects.</p>
 
 <p><code>BlobReader</code> allows you to read blobs in the following fashion:</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="c1">// Blob definition</span>
-<span class="kd">var</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="c1">// Blob definition
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
 <span class="kd">var</span> <span class="nx">uint16</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint16Array</span><span class="p">([</span><span class="mi">3</span><span class="p">]);</span>
 <span class="kd">var</span> <span class="nx">uint82</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">var</span> <span class="nx">uint32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">([</span><span class="mi">8</span><span class="p">]);</span>
 <span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="nx">uint8</span><span class="p">,</span> <span class="nx">uint16</span><span class="p">,</span> <span class="nx">uint82</span><span class="p">,</span> <span class="nx">uint32</span><span class="p">]);</span>
 
-<span class="c1">// Reading the blob</span>
-<span class="nx">BlobReader</span><span class="p">(</span><span class="nx">blob</span><span class="p">)</span>
+<span class="c1">// Reading the blob
+</span><span class="c1"></span><span class="nx">BlobReader</span><span class="p">(</span><span class="nx">blob</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">readUint16</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
 <span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint82&#39;</span><span class="p">)</span>
@@ -335,7 +328,6 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
   <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint32</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre></div>
-
 
 <p>There are shortcut methods for reading the main data types, each of the methods accept name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the <code>commit</code> callback. <code>skip</code> allows you to skip bytes (like padding).</p>
 
@@ -414,14 +406,17 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

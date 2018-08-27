@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Boost the Performance of an AngularJS Application Using Immutable Data - Part 2 &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -118,56 +118,53 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
 
 <p>We can read given collection in JavaScript or render it inside a template. If we get a new collection each time we change (update) the current one, we have an immutable collection. This means that if we want to check if the collection have changed compared to the last time we&rsquo;ve seen it we simply need to compare the current reference of the collection with the previous one (before the change was made):</p>
 
-<div class="highlight"><pre><code class="language-JavaScript" data-lang="JavaScript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">changed</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span><span class="p">);</span> <span class="c1">// false</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1"></span></code></pre></div>
 
 <h3 id="side-note">Side note</h3>
 
 <p>*But what if:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="kd">function</span> <span class="nx">changeA</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="p">}</span>
 <span class="kd">var</span> <span class="nx">oldA</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span>
 <span class="nx">changeA</span><span class="p">();</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="nx">oldA</span><span class="p">);</span> <span class="c1">// false</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">angular</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">oldA</span><span class="p">));</span> <span class="c1">// true</span>
-</code></pre></div>
-
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="nx">oldA</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">angular</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">oldA</span><span class="p">));</span> <span class="c1">// true
+</span><span class="c1"></span></code></pre></div>
 
 <p>So, if we strictly want to perform given action <strong>only</strong> when the structure of the collection or the data inside it have changed (not only the reference) we will need to loop over both collections (old one and new one) and check whether they contains the same data.*</p>
 
 <p>If we delete, update or create additional entries in the collection, this is considered as update. If we use immutable data, a new collection will be returned on each such manipulation:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 
-<span class="c1">// update</span>
-<span class="kd">let</span> <span class="nx">list1</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list1</span><span class="p">);</span> <span class="c1">// false</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list1</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 42, 3 ]</span>
-
-<span class="c1">// remove</span>
-<span class="kd">let</span> <span class="nx">list2</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list2</span><span class="p">);</span> <span class="c1">// false</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list2</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 2, 3 ]</span>
-
-<span class="c1">// insert (create entry)</span>
-<span class="kd">let</span> <span class="nx">list3</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list3</span><span class="p">);</span> <span class="c1">// false</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list3</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4 ]</span>
-</code></pre></div>
-
+<span class="c1">// update
+</span><span class="c1"></span><span class="kd">let</span> <span class="nx">list1</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list1</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list1</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 42, 3 ]
+</span><span class="c1"></span>
+<span class="c1">// remove
+</span><span class="c1"></span><span class="kd">let</span> <span class="nx">list2</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list2</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list2</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 2, 3 ]
+</span><span class="c1"></span>
+<span class="c1">// insert (create entry)
+</span><span class="c1"></span><span class="kd">let</span> <span class="nx">list3</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list3</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list3</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4 ]
+</span><span class="c1"></span></code></pre></div>
 
 <p>That said, we can build a sample script, which will be used for profiling. Initially we will create a single collection and attach watchers to it. Once this is done, <code>protractor</code> will start clicking a button, which will update a random element of the collection. Here is our <code>SampleCtrl</code>, which is responsible for initialization and handling the update requests:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kd">var</span> <span class="nx">benchmarks</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;benchmarks&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;immutable&#39;</span><span class="p">]);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">benchmarks</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;benchmarks&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;immutable&#39;</span><span class="p">]);</span>
 
 <span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">)</span> <span class="p">{</span>
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
@@ -201,13 +198,13 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
     <span class="p">});</span>
   <span class="p">}</span>
 
-  <span class="c1">// Math.random() returns element in the interval [0, 1)</span>
-  <span class="kd">function</span> <span class="nx">generateRandomIndx</span><span class="p">(</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Math.random() returns element in the interval [0, 1)
+</span><span class="c1"></span>  <span class="kd">function</span> <span class="nx">generateRandomIndx</span><span class="p">(</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">length</span><span class="p">);</span>
   <span class="p">}</span>
 
-  <span class="c1">// Updates the current value of the `standard` collection</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">updateStandard</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Updates the current value of the `standard` collection
+</span><span class="c1"></span>  <span class="nx">$scope</span><span class="p">.</span><span class="nx">updateStandard</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">standard</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">$scope</span><span class="p">.</span><span class="nx">standard</span> <span class="o">=</span> <span class="nx">generateData</span><span class="p">(</span><span class="nx">dataSize</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -216,19 +213,19 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
     <span class="p">}</span>
   <span class="p">};</span>
 
-  <span class="c1">// Updates the current value of the `immutable` collection</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">updateImmutable</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Updates the current value of the `immutable` collection
+</span><span class="c1"></span>  <span class="nx">$scope</span><span class="p">.</span><span class="nx">updateImmutable</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">immutable</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">$scope</span><span class="p">.</span><span class="nx">immutable</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">(</span><span class="nx">generateData</span><span class="p">(</span><span class="nx">dataSize</span><span class="p">));</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="c1">// We can cache the plain collection here</span>
-      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nx">generateRandomIndx</span><span class="p">(</span><span class="nx">dataSize</span><span class="p">);</span>
+      <span class="c1">// We can cache the plain collection here
+</span><span class="c1"></span>      <span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="nx">generateRandomIndx</span><span class="p">(</span><span class="nx">dataSize</span><span class="p">);</span>
       <span class="nx">$scope</span><span class="p">.</span><span class="nx">immutable</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">immutable</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">());</span>
     <span class="p">}</span>
   <span class="p">};</span>
 
-  <span class="c1">// In case we are running benchmark, which changes the array</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">$location</span><span class="p">.</span><span class="nx">search</span><span class="p">().</span><span class="nx">testType</span> <span class="o">===</span> <span class="s1">&#39;update&#39;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// In case we are running benchmark, which changes the array
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="nx">$location</span><span class="p">.</span><span class="nx">search</span><span class="p">().</span><span class="nx">testType</span> <span class="o">===</span> <span class="s1">&#39;update&#39;</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">dataType</span> <span class="o">=</span> <span class="nx">$location</span><span class="p">.</span><span class="nx">search</span><span class="p">().</span><span class="nx">dataType</span><span class="p">;</span>
     <span class="k">switch</span> <span class="p">(</span><span class="nx">dataType</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">case</span> <span class="s1">&#39;immutable&#39;</span><span class="o">:</span>
@@ -239,24 +236,24 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
     <span class="p">}</span>
   <span class="p">}</span>
 
-  <span class="c1">// Clears the `immutable` collection and removes all</span>
-  <span class="c1">// listeners attached to it (except ng-repeat in the template).</span>
-  <span class="kd">function</span> <span class="nx">clearImmutable</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Clears the `immutable` collection and removes all
+</span><span class="c1"></span>  <span class="c1">// listeners attached to it (except ng-repeat in the template).
+</span><span class="c1"></span>  <span class="kd">function</span> <span class="nx">clearImmutable</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">$scope</span><span class="p">.</span><span class="nx">immutable</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
     <span class="nx">clearWatchers</span><span class="p">(</span><span class="nx">watchers</span><span class="p">.</span><span class="nx">immutable</span><span class="p">);</span>
     <span class="nx">watchers</span><span class="p">.</span><span class="nx">immutable</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="p">}</span>
 
-  <span class="c1">// Clears the `standard` collection and removes all</span>
-  <span class="c1">// listeners attached to it (except ng-repeat in the template).</span>
-  <span class="kd">function</span> <span class="nx">clearStandard</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Clears the `standard` collection and removes all
+</span><span class="c1"></span>  <span class="c1">// listeners attached to it (except ng-repeat in the template).
+</span><span class="c1"></span>  <span class="kd">function</span> <span class="nx">clearStandard</span><span class="p">()</span> <span class="p">{</span>
     <span class="nx">$scope</span><span class="p">.</span><span class="nx">standard</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
     <span class="nx">clearWatchers</span><span class="p">(</span><span class="nx">watchers</span><span class="p">.</span><span class="nx">standard</span><span class="p">);</span>
     <span class="nx">watchers</span><span class="p">.</span><span class="nx">standard</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="p">}</span>
 
-  <span class="c1">// Clears the both collections and all attached listeners to them.</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">clear</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// Clears the both collections and all attached listeners to them.
+</span><span class="c1"></span>  <span class="nx">$scope</span><span class="p">.</span><span class="nx">clear</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">clearStandard</span><span class="p">();</span>
     <span class="nx">clearImmutable</span><span class="p">();</span>
   <span class="p">};</span>
@@ -266,43 +263,40 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
   <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;SampleCtrl&#39;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>And the template&hellip;</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&#34;UTF-8&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">data-ng-app</span><span class="o">=</span><span class="s">&quot;benchmarks&quot;</span> <span class="na">data-ng-controller</span><span class="o">=</span><span class="s">&quot;SampleCtrl&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">data-ng-app</span><span class="o">=</span><span class="s">&#34;benchmarks&#34;</span> <span class="na">data-ng-controller</span><span class="o">=</span><span class="s">&#34;SampleCtrl&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;clear-btn&quot;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&quot;clear()&quot;</span><span class="p">&gt;</span>Clear<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;update-immutable-btn&quot;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&quot;updateImmutable()&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;clear-btn&#34;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&#34;clear()&#34;</span><span class="p">&gt;</span>Clear<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;update-immutable-btn&#34;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&#34;updateImmutable()&#34;</span><span class="p">&gt;</span>
     Update Immutable
   <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;update-standard-btn&quot;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&quot;updateStandard()&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;update-standard-btn&#34;</span> <span class="na">data-ng-click</span><span class="o">=</span><span class="s">&#34;updateStandard()&#34;</span><span class="p">&gt;</span>
     Update Standard
   <span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">data-ng-repeat</span><span class="o">=</span><span class="s">&quot;item in immutable | immutable track by $index&quot;</span> <span class="na">data-ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">data-ng-repeat</span><span class="o">=</span><span class="s">&#34;item in immutable | immutable track by $index&#34;</span> <span class="na">data-ng-bind</span><span class="o">=</span><span class="s">&#34;item&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">data-ng-repeat</span><span class="o">=</span><span class="s">&quot;item in standard track by $index&quot;</span> <span class="na">data-ng-bind</span><span class="o">=</span><span class="s">&quot;item&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">data-ng-repeat</span><span class="o">=</span><span class="s">&#34;item in standard track by $index&#34;</span> <span class="na">data-ng-bind</span><span class="o">=</span><span class="s">&#34;item&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/node_modules/angular/angular.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/node_modules/immutable/dist/immutable.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/node_modules/angular-immutable/dist/immutable.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/js/app.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/node_modules/angular/angular.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/node_modules/immutable/dist/immutable.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/node_modules/angular-immutable/dist/immutable.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/js/app.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
-</code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
 
 <p>There are three main variables, which has the strongest impact over such benchmark in AngularJS:</p>
 
@@ -459,14 +453,17 @@ It is interesting that the information we got from the benchmarks doesn&rsquo;t 
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

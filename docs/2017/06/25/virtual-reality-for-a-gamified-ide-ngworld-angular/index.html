@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>WebVR for a Gamified IDE &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -165,7 +165,7 @@
 <p>The initial part of the implementation of every compiler is its frontend. We get the phases of lexical analysis and syntax analysis for free from <a href="https://github.com/mgechev/ngast">ngast</a>, which delegates some of the work to <a href="https://github.com/angular/angular">ngc</a> and the <a href="https://github.com/Microsoft/TypeScript">tsc</a>.</p>
 
 <p>Parsing the entire project with <a href="https://github.com/mgechev/ngast">ngast</a> is as simple as this:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">projectPath</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">projectPath</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">project</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ProjectSymbols</span><span class="p">(</span><span class="nx">createProgramFromTsConfig</span><span class="p">(</span><span class="nx">projectPath</span><span class="p">),</span> <span class="p">{</span>
     <span class="nx">getSync</span><span class="o">:</span> <span class="p">(</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">path</span><span class="p">).</span><span class="nx">toString</span><span class="p">(),</span>
     <span class="nx">get</span><span class="o">:</span> <span class="p">(</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span>
@@ -173,9 +173,7 @@
         <span class="nx">readFile</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">content</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">error</span> <span class="o">?</span> <span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="o">:</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">content</span><span class="p">.</span><span class="nx">toString</span><span class="p">())))</span>
   <span class="p">},</span> <span class="p">(</span><span class="nx">error</span>: <span class="kt">string</span><span class="p">,</span> <span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">path</span><span class="p">));</span>
   <span class="k">return</span> <span class="nx">formatContext</span><span class="p">(</span><span class="nx">project</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>All we need to do is to create a new instance of the <code>ProjectSymbols</code> class by providing a TypeScript program, a host (<code>ResourceResolver</code>) and a logger to its constructor.</p>
 
 <p>In the end of the <code>parse</code> method we transform the project with the function <code>formatContext</code>.</p>
@@ -185,7 +183,7 @@
 <p>After we have the symbols of the project, we need to extract the ASTs of the templates of the components and transform it to a form convenient for code generation.</p>
 
 <p>Here are the signatures of the methods used for the phase of AST transformation, and the interfaces of their output:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Module</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Module</span> <span class="p">{</span>
   <span class="nx">name</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">components</span>: <span class="kt">Component</span><span class="p">[];</span>
 <span class="p">}</span>
@@ -215,9 +213,7 @@
 
 <span class="kr">const</span> <span class="nx">transformTemplateAst</span> <span class="o">=</span> <span class="p">(</span><span class="nx">template</span>: <span class="kt">TemplateAst</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
 
-<span class="kr">const</span> <span class="nx">formatComponents</span> <span class="o">=</span> <span class="p">(</span><span class="nx">directives</span>: <span class="kt">DirectiveSymbol</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
-</code></pre></div>
-
+<span class="kr">const</span> <span class="nx">formatComponents</span> <span class="o">=</span> <span class="p">(</span><span class="nx">directives</span>: <span class="kt">DirectiveSymbol</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span></code></pre></div>
 <ul>
 <li><code>formatModules</code> is responsible for transforming the internal <a href="https://github.com/mgechev/ngast">ngast</a> module representation to a structure which can be used for generation of a &ldquo;garden&rdquo;.</li>
 <li><code>formatComponents</code> will transform the internal <code>DirectiveSymbol</code>s to object suitable for generation of &ldquo;trees&rdquo;.</li>
@@ -231,7 +227,7 @@
 <p>For our compiler, we need to implement one more AST transformation phase, which put into the context of ngworld is just computation of the layout of the virtual world. For simplicity in our VR everything will be known ahead of time and nothing will be generated lazily.</p>
 
 <p>Here are the methods declarations and the interfaces of their outputs:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 
 <span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Size</span> <span class="p">{</span>
   <span class="nx">width</span>: <span class="kt">number</span><span class="p">;</span>
@@ -281,16 +277,14 @@
 
 <span class="kr">const</span> <span class="nx">getLeaves</span> <span class="o">=</span> <span class="p">(</span><span class="nx">template</span>: <span class="kt">Node</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
 
-<span class="c1">// We have less trees compared to previous layer</span>
-<span class="kr">const</span> <span class="nx">getTreesLayout</span> <span class="o">=</span> <span class="p">(</span><span class="nx">components</span>: <span class="kt">Component</span><span class="p">[],</span> <span class="nx">prevSize</span>: <span class="kt">Size</span><span class="p">,</span> <span class="nx">prevPosition</span>: <span class="kt">Position</span><span class="p">)</span><span class="o">:</span> <span class="nx">TreeLayout</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
+<span class="c1">// We have less trees compared to previous layer
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">getTreesLayout</span> <span class="o">=</span> <span class="p">(</span><span class="nx">components</span>: <span class="kt">Component</span><span class="p">[],</span> <span class="nx">prevSize</span>: <span class="kt">Size</span><span class="p">,</span> <span class="nx">prevPosition</span>: <span class="kt">Position</span><span class="p">)</span><span class="o">:</span> <span class="nx">TreeLayout</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
 
 <span class="kr">const</span> <span class="nx">getGardenLayout</span> <span class="o">=</span> <span class="p">(</span><span class="nx">module</span>: <span class="kt">Module</span><span class="p">,</span> <span class="nx">prevGarden</span>: <span class="kt">GardenLayout</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
 
 <span class="kr">const</span> <span class="nx">getGardensLayout</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">Module</span><span class="p">[])</span><span class="o">:</span> <span class="nx">GardenLayout</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
 
-<span class="kr">export</span> <span class="kr">const</span> <span class="nx">createWorldLayout</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">Module</span><span class="p">[])</span><span class="o">:</span> <span class="nx">WorldLayout</span> <span class="o">=&gt;</span> <span class="p">{...};</span>
-</code></pre></div>
-
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">createWorldLayout</span> <span class="o">=</span> <span class="p">(</span><span class="kr">module</span><span class="nx">s</span><span class="o">:</span> <span class="nx">Module</span><span class="p">[])</span><span class="o">:</span> <span class="nx">WorldLayout</span> <span class="o">=&gt;</span> <span class="p">{...};</span></code></pre></div>
 <p>In the snippet above we calculate the layout for the first tree of the first module, after that the second one, etc, until we calculate the layout for all the trees for the garden (module). Since at this point we already know the location of all the trees in given garden, we can just surround them with a fence which is the garden&rsquo;s layout.</p>
 
 <p>When we&rsquo;ve calculated the layout of each individual garden, we can calculate the layout of the entire world.</p>
@@ -300,37 +294,35 @@
 <p>The last step is the code generation. Given that we&rsquo;ll use <a href="https://aframe.io/">aframe</a>, this is going to be a straightforward process. We can represent the leaves, trees and gardens as a mustache templates. Later, based on our calculations in the layout phase, we can render the templates and fill the placeholders corresponding to colors, positioning, labeling, etc.</p>
 
 <p>Let&rsquo;s take a look at the tree template, to get a better idea:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">const</span> <span class="nx">TreeTemplate</span> <span class="o">=</span> <span class="sb">`</span>
-<span class="sb">&lt;a-entity id=&quot;{{id}}&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;{{x}} {{y}} {{z}}&quot; rotation=&quot;0 30 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot; data-template-url=&quot;{{{templateUrl}}}&quot;&gt;</span>
-<span class="sb">  &lt;a-entity static-body=&quot;&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;-0.1 0 0&quot; rotation=&quot;2 60 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot;&gt;&lt;/a-entity&gt;</span>
-<span class="sb">  &lt;a-entity static-body=&quot;&quot; geometry=&quot;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&quot; position=&quot;0 0 0.1&quot; rotation=&quot;2 -90 0&quot; material=&quot;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&quot;&gt;&lt;/a-entity&gt;</span>
-<span class="sb">  &lt;a-entity position=&quot;0 0 0.4&quot; rotation=&quot;-35 -30 0&quot; text=&quot;side: double; width: 5; color: white; align: center; value: {{label}};&quot;&gt;</span>
-<span class="sb">  &lt;/a-entity&gt;</span>
-<span class="sb">  {{{leaves}}}</span>
-<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
-<span class="sb">               dur=&quot;150&quot;¬</span>
-<span class="sb">               to=&quot;5 30 0&quot;¬</span>
-<span class="sb">               begin=&quot;shake-front-{{id}}&quot;</span>
-<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
-<span class="sb">  &lt;/a-animation&gt;¬</span>
-<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
-<span class="sb">               dur=&quot;150&quot;¬</span>
-<span class="sb">               to=&quot;-3 30 0&quot;¬</span>
-<span class="sb">               begin=&quot;shake-back-{{id}}&quot;</span>
-<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
-<span class="sb">  &lt;/a-animation&gt;¬</span>
-<span class="sb">  &lt;a-animation attribute=&quot;rotation&quot;¬</span>
-<span class="sb">               dur=&quot;150&quot;¬</span>
-<span class="sb">               to=&quot;0 30 0&quot;¬</span>
-<span class="sb">               begin=&quot;shake-ready-{{id}}&quot;</span>
-<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
-<span class="sb">  &lt;/a-animation&gt;¬</span>
-<span class="sb">&lt;/a-entity&gt;</span>
-<span class="sb">`</span><span class="p">;</span>
-</code></pre></div>
-
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">TreeTemplate</span> <span class="o">=</span> <span class="sb">`
+</span><span class="sb">&lt;a-entity id=&#34;{{id}}&#34; geometry=&#34;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&#34; position=&#34;{{x}} {{y}} {{z}}&#34; rotation=&#34;0 30 0&#34; material=&#34;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&#34; data-template-url=&#34;{{{templateUrl}}}&#34;&gt;
+</span><span class="sb">  &lt;a-entity static-body=&#34;&#34; geometry=&#34;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&#34; position=&#34;-0.1 0 0&#34; rotation=&#34;2 60 0&#34; material=&#34;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&#34;&gt;&lt;/a-entity&gt;
+</span><span class="sb">  &lt;a-entity static-body=&#34;&#34; geometry=&#34;primitive: box; depth: 0.1; height: {{height}}; width: 0.2&#34; position=&#34;0 0 0.1&#34; rotation=&#34;2 -90 0&#34; material=&#34;shader: standard; metalness: 0.6; src: url(images/dirt.jpg); repeat: 1 4&#34;&gt;&lt;/a-entity&gt;
+</span><span class="sb">  &lt;a-entity position=&#34;0 0 0.4&#34; rotation=&#34;-35 -30 0&#34; text=&#34;side: double; width: 5; color: white; align: center; value: {{label}};&#34;&gt;
+</span><span class="sb">  &lt;/a-entity&gt;
+</span><span class="sb">  {{{leaves}}}
+</span><span class="sb">  &lt;a-animation attribute=&#34;rotation&#34;¬
+</span><span class="sb">               dur=&#34;150&#34;¬
+</span><span class="sb">               to=&#34;5 30 0&#34;¬
+</span><span class="sb">               begin=&#34;shake-front-{{id}}&#34;
+</span><span class="sb">               repeat=&#34;0&#34;&gt;¬
+</span><span class="sb">  &lt;/a-animation&gt;¬
+</span><span class="sb">  &lt;a-animation attribute=&#34;rotation&#34;¬
+</span><span class="sb">               dur=&#34;150&#34;¬
+</span><span class="sb">               to=&#34;-3 30 0&#34;¬
+</span><span class="sb">               begin=&#34;shake-back-{{id}}&#34;
+</span><span class="sb">               repeat=&#34;0&#34;&gt;¬
+</span><span class="sb">  &lt;/a-animation&gt;¬
+</span><span class="sb">  &lt;a-animation attribute=&#34;rotation&#34;¬
+</span><span class="sb">               dur=&#34;150&#34;¬
+</span><span class="sb">               to=&#34;0 30 0&#34;¬
+</span><span class="sb">               begin=&#34;shake-ready-{{id}}&#34;
+</span><span class="sb">               repeat=&#34;0&#34;&gt;¬
+</span><span class="sb">  &lt;/a-animation&gt;¬
+</span><span class="sb">&lt;/a-entity&gt;
+</span><span class="sb">`</span><span class="p">;</span></code></pre></div>
 <p>This is a standard <a href="https://aframe.io">aframe</a> template where we have an entity with identifier. Inside of it we have declaration of three animations and also placeholder for the leaves. The animations are related to the tree-shaking simulation. The properties of the object that this template accepts, can be represented by the following interface:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">TreeProperties</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">TreeProperties</span> <span class="p">{</span>
   <span class="nx">x</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">y</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">z</span>: <span class="kt">number</span><span class="p">;</span>
@@ -339,11 +331,9 @@
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">leaves</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">templateUrl</span>: <span class="kt">string</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Notice that inside of the <code>TreeProperties</code> interface we have declaration of <code>templateUrl</code>. Now lets take a look at the leaf template and properties interface:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="kr">interface</span> <span class="nx">LeafProperties</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">LeafProperties</span> <span class="p">{</span>
   <span class="nx">color</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">x</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">y</span>: <span class="kt">number</span><span class="p">;</span>
@@ -359,27 +349,25 @@
   <span class="nx">startOffset</span>: <span class="kt">number</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">const</span> <span class="nx">LeafTemplate</span> <span class="o">=</span> <span class="sb">`</span>
-<span class="sb">&lt;a-entity</span>
-<span class="sb">  id=&quot;{{id}}&quot;</span>
-<span class="sb">  data-start-offset=&quot;{{startOffset}}&quot;</span>
-<span class="sb">  data-end-offset=&quot;{{endOffset}}&quot;</span>
-<span class="sb">  data-tree-id=&quot;{{treeId}}&quot;</span>
-<span class="sb">  geometry=&quot;primitive: box; depth: {{depth}}; height: {{height}}; width: {{width}}&quot;</span>
-<span class="sb">  position=&quot;{{x}} {{y}} {{z}}&quot;</span>
-<span class="sb">  material=&quot;shader: standard; metalness: 0.6; color: {{color}}; repeat: 1 1&quot;&gt;</span>
-<span class="sb">  ...</span>
-<span class="sb">  &lt;a-animation attribute=&quot;position&quot;¬</span>
-<span class="sb">               dur=&quot;1000&quot;¬</span>
-<span class="sb">               begin=&quot;shake-{{id}}&quot;</span>
-<span class="sb">               fill=&quot;forwards&quot;¬</span>
-<span class="sb">               to=&quot;{{x}} 0 {{z}}&quot;¬</span>
-<span class="sb">               repeat=&quot;0&quot;&gt;¬</span>
-<span class="sb">  &lt;/a-animation&gt;¬</span>
-<span class="sb">&lt;/a-entity&gt;</span>
-<span class="sb">`</span><span class="p">;</span>
-</code></pre></div>
-
+<span class="kr">const</span> <span class="nx">LeafTemplate</span> <span class="o">=</span> <span class="sb">`
+</span><span class="sb">&lt;a-entity
+</span><span class="sb">  id=&#34;{{id}}&#34;
+</span><span class="sb">  data-start-offset=&#34;{{startOffset}}&#34;
+</span><span class="sb">  data-end-offset=&#34;{{endOffset}}&#34;
+</span><span class="sb">  data-tree-id=&#34;{{treeId}}&#34;
+</span><span class="sb">  geometry=&#34;primitive: box; depth: {{depth}}; height: {{height}}; width: {{width}}&#34;
+</span><span class="sb">  position=&#34;{{x}} {{y}} {{z}}&#34;
+</span><span class="sb">  material=&#34;shader: standard; metalness: 0.6; color: {{color}}; repeat: 1 1&#34;&gt;
+</span><span class="sb">  ...
+</span><span class="sb">  &lt;a-animation attribute=&#34;position&#34;¬
+</span><span class="sb">               dur=&#34;1000&#34;¬
+</span><span class="sb">               begin=&#34;shake-{{id}}&#34;
+</span><span class="sb">               fill=&#34;forwards&#34;¬
+</span><span class="sb">               to=&#34;{{x}} 0 {{z}}&#34;¬
+</span><span class="sb">               repeat=&#34;0&#34;&gt;¬
+</span><span class="sb">  &lt;/a-animation&gt;¬
+</span><span class="sb">&lt;/a-entity&gt;
+</span><span class="sb">`</span><span class="p">;</span></code></pre></div>
 <p>There are three interesting properties that we need to consider:</p>
 
 <ul>
@@ -393,7 +381,7 @@
 <h2 id="tree-shaking">Tree-Shaking</h2>
 
 <p>When we shake the tree, we activate the following invocation:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;http://localhost:8081&#39;</span><span class="p">,</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;http://localhost:8081&#39;</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span>
   <span class="nx">headers</span><span class="o">:</span> <span class="p">{</span>
     <span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
@@ -403,9 +391,7 @@
     <span class="nx">start</span>: <span class="kt">leaf.getAttribute</span><span class="p">(</span><span class="s1">&#39;data-start-offset&#39;</span><span class="p">),</span>
     <span class="nx">end</span>: <span class="kt">leaf.getAttribute</span><span class="p">(</span><span class="s1">&#39;data-end-offset&#39;</span><span class="p">)</span>
   <span class="p">})</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>All it does is to send a post request to an HTTP application server listening on port <code>8081</code>. All the server needs to do, is to remove the element corresponding to the given offset.</p>
 
 <p>However, notice that if we remove an element, the offsets of all the elements following it in the template, will require an update. This will involve more complex communication protocol between the VR UI and the application server. Because of that, the demo simply replaces all the different characters from the element with whitespace.</p>
@@ -413,7 +399,7 @@
 <h3 id="server">Server</h3>
 
 <p>Here&rsquo;s the server implementation, with the mentioned hack:</p>
-<div class="highlight"><pre><code class="language-typescript" data-lang="typescript"><span></span><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">)</span> <span class="p">{</span>
@@ -424,9 +410,7 @@
     <span class="nx">writeFileSync</span><span class="p">(</span><span class="nx">p</span><span class="p">.</span><span class="nx">file</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <h2 id="further-improvements">Further improvements</h2>
 
 <p>Of course, we can start planting trees and creating gardens in order to turn this demo into a more complete &ldquo;IDE&rdquo;. Another place for improvement is to drop all child leaves once a parent leaf has been shaken.</p>
@@ -485,14 +469,17 @@
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.22-DEV" />
+		<meta name="generator" content="Hugo 0.47.1" />
 		<title>Implementing a Simple Compiler on 25 Lines of JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -130,9 +130,7 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 <h1 id="introducing-a-simple-prefix-language">Introducing a Simple Prefix Language</h1>
 
 <p>Here&rsquo;s how a sample expression in our language is going to look like:</p>
-<div class="highlight"><pre><span></span>mul 3 sub 2 sum 1 3 4
-</pre></div>
-
+<div class="highlight"><pre class="chroma">mul 3 sub 2 sum 1 3 4</pre></div>
 <p>By the end of this article we&rsquo;ll be able to transpile these expressions to JavaScript by going through phases typical for any compiler!</p>
 
 <p>For simplicity, there are a few rules we need to follow:</p>
@@ -144,21 +142,16 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 </ul>
 
 <p>In order to explore the semantics behind the expression above lets define a few JavaScript functions:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">mul</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">sub</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">c</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">mul</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">sub</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">c</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 </code></pre></div>
-
 <p><code>mul</code> accepts multiple operands, passed with the spread operator. The function just multiplies all of them, so for instance <code>mul(2, 3, 4) === 24</code>. <code>sub</code> respectively subtracts the passed arguments and <code>sum</code> sums them.</p>
 
 <p>The expression above can be translated to the following JavaScript expression:</p>
-<div class="highlight"><pre><span></span>mul(3, sub(2, sum(1, 3, 4)))
-</pre></div>
-
+<div class="highlight"><pre class="chroma">mul(3, sub(2, sum(1, 3, 4)))</pre></div>
 <p>or&hellip;</p>
-<div class="highlight"><pre><span></span>3 * (2 - (1 + 3 + 4))
-</pre></div>
-
+<div class="highlight"><pre class="chroma">3 * (2 - (1 + 3 + 4))</pre></div>
 <p>Now, after we have understanding of the semantics, lets start with the front end of the compiler!</p>
 
 <p><em><strong>Note</strong>: Similar prefix expressions can be simply evaluated with a stack-based algorithm, however, in this case we&rsquo;ll focus on concepts rather than implementation.</em></p>
@@ -172,13 +165,12 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 <p>The phase of lexical analysis is responsible for dividing the input string (or stream of characters) of the program into smaller pieces called <strong>tokens</strong>. The tokens usually carries information about their type (if they are numbers, operators, keywords, identifiers, etc), the substring of the program they represent and their position in the program. The position is usually used for reporting user friendly errors in case of invalid syntactical constructs.</p>
 
 <p>For instance, if we have the JavaScript program:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">if</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">bar</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>A sample lexical analyzer for JavaScript will produce the output:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">[</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">[</span>
   <span class="p">{</span>
     <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;if&#39;</span><span class="p">,</span>
     <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;keyword&#39;</span><span class="p">,</span>
@@ -206,19 +198,16 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
   <span class="p">...</span>
 <span class="p">]</span>
 </code></pre></div>
-
 <p>We&rsquo;ll keep our lexical analyzer as simple as possible. In fact, we&rsquo;ll implement it on a single line of JavaScript:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">lex</span> <span class="o">=</span> <span class="nx">str</span> <span class="p">=&gt;</span> <span class="nx">str</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span> <span class="p">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">trim</span><span class="p">()).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">s</span> <span class="p">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">lex</span> <span class="o">=</span> <span class="nx">str</span> <span class="p">=&gt;</span> <span class="nx">str</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span> <span class="p">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">trim</span><span class="p">()).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">s</span> <span class="p">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
 </code></pre></div>
-
 <p>Here we split the string by a single space, we map the produced substrings to their trimmed version and filter the empty strings.</p>
 
 <p>Invoking the lexer with an expression will produce an array of strings:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">lex</span><span class="p">(</span><span class="s1">&#39;mul 3 sub 2 sum 1 3 4&#39;</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">lex</span><span class="p">(</span><span class="s1">&#39;mul 3 sub 2 sum 1 3 4&#39;</span><span class="p">)</span>
 
-<span class="c1">// [&quot;mul&quot;, &quot;3&quot;, &quot;sub&quot;, &quot;2&quot;, &quot;sum&quot;, &quot;1&quot;, &quot;3&quot;, &quot;4&quot;]</span>
-</code></pre></div>
-
+<span class="c1">// [&#34;mul&#34;, &#34;3&#34;, &#34;sub&#34;, &#34;2&#34;, &#34;sum&#34;, &#34;1&#34;, &#34;3&#34;, &#34;4&#34;]
+</span><span class="c1"></span></code></pre></div>
 <p>This is completely enough for our purpose!</p>
 
 <p>Now lets go to the phase of syntax analysis!</p>
@@ -230,12 +219,10 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 <p><img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;"></p>
 
 <p>Usually, the parser is implemented based on a <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">grammar</a><sup>[7]</sup>. Here&rsquo;s the grammar of our language:</p>
-<div class="highlight"><pre><span></span>digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<div class="highlight"><pre class="chroma">digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
-expr = num | op expr+
-</pre></div>
-
+expr = num | op expr+</pre></div>
 <p>This basically means that we have digits which composed together can form numbers (<code>num</code>). We have 4 operations and an expression can be either a <code>num</code>ber, or <code>op</code>eration, followed by one or more <code>expr</code>essions. We&rsquo;ll refer to the individual definitions in the grammar (for instance to <code>num</code> and <code>op</code>) as rules.</p>
 
 <p>This is the so called <a href="https://en.wikipedia.org/wiki/Extended_Backus–Naur_form">EBNF grammar</a><sup>[6]</sup>. Look at the grammar for a bit, try to understand it, and after that completely forget about it! We&rsquo;ll come back to the grammar after we explain the parser and you&rsquo;ll see how everything connects together!</p>
@@ -243,9 +230,7 @@ expr = num | op expr+
 <p>As we mentioned, a parser is a tool which turns a list of tokens to an AST.</p>
 
 <p>For instance, for our expression:</p>
-<div class="highlight"><pre><span></span>mul 3 sub 2 sum 1 3 4
-</pre></div>
-
+<div class="highlight"><pre class="chroma">mul 3 sub 2 sum 1 3 4</pre></div>
 <p>The parser will produce the following AST, based on the grammar above:</p>
 
 <div style="width: 300px; height: 300px; display: block; margin: auto;">
@@ -253,48 +238,45 @@ expr = num | op expr+
 </div>
 
 <p>Lets explore the algorithm for this!</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">Num</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">Num</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">);</span>
 
-<span class="kr">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="nx">tokens</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<span class="k">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="nx">tokens</span> <span class="p">=&gt;</span> <span class="p">{</span>
 
   <span class="kd">let</span> <span class="nx">c</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="kr">const</span> <span class="nx">peek</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">c</span><span class="p">];</span>
-  <span class="kr">const</span> <span class="nx">consume</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">c</span><span class="o">++</span><span class="p">];</span>
+  <span class="k">const</span> <span class="nx">peek</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">c</span><span class="p">];</span>
+  <span class="k">const</span> <span class="nx">consume</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">c</span><span class="o">++</span><span class="p">];</span>
 
-  <span class="kr">const</span> <span class="nx">parseNum</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">({</span> <span class="nx">val</span><span class="o">:</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">consume</span><span class="p">()),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span> <span class="p">});</span>
+  <span class="k">const</span> <span class="nx">parseNum</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">({</span> <span class="nx">val</span><span class="o">:</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">consume</span><span class="p">()),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span> <span class="p">});</span>
 
-  <span class="kr">const</span> <span class="nx">parseOp</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">val</span><span class="o">:</span> <span class="nx">consume</span><span class="p">(),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span> <span class="nx">expr</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
+  <span class="k">const</span> <span class="nx">parseOp</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">val</span><span class="o">:</span> <span class="nx">consume</span><span class="p">(),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span> <span class="nx">expr</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
     <span class="k">while</span> <span class="p">(</span><span class="nx">peek</span><span class="p">())</span> <span class="nx">node</span><span class="p">.</span><span class="nx">expr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">parseExpr</span><span class="p">());</span>
     <span class="k">return</span> <span class="nx">node</span><span class="p">;</span>
   <span class="p">};</span>
 
-  <span class="kr">const</span> <span class="nx">parseExpr</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="o">/</span><span class="err">\</span><span class="nx">d</span><span class="o">/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">peek</span><span class="p">())</span> <span class="o">?</span> <span class="nx">parseNum</span><span class="p">()</span> <span class="o">:</span> <span class="nx">parseOp</span><span class="p">();</span>
+  <span class="k">const</span> <span class="nx">parseExpr</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="sr">/\d/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">peek</span><span class="p">())</span> <span class="o">?</span> <span class="nx">parseNum</span><span class="p">()</span> <span class="o">:</span> <span class="nx">parseOp</span><span class="p">();</span>
 
   <span class="k">return</span> <span class="nx">parseExpr</span><span class="p">();</span>
 <span class="p">};</span>
 </code></pre></div>
-
 <p>The bad news is that there are a lot of things going on. The good news is that this is the most complicated part of the compiler!</p>
 
 <p>Lets divide the code into parts and look into each one step by step.</p>
 
 <h2 id="node-types">Node Types</h2>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">Num</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">Num</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">);</span>
 </code></pre></div>
-
 <p>First we define the different node types that we are going to have in the AST. We&rsquo;ll have only numbers and operations. For example, the number node <code>42</code> will look like this:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
   <span class="nx">val</span><span class="o">:</span> <span class="mi">42</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>The operator <code>sum</code>, applied to <code>2</code>, <code>3</code>, <code>4</code> will look like this:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span>
   <span class="nx">val</span><span class="o">:</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span>
   <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
@@ -309,7 +291,6 @@ expr = num | op expr+
   <span class="p">}]</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>That&rsquo;s how simple is that!</p>
 
 <h2 id="the-parser">The Parser</h2>
@@ -327,21 +308,18 @@ expr = num | op expr+
 <h3 id="parsing-operations">Parsing Operations</h3>
 
 <p>The <code>parseOp</code> is maybe the most complicated function from the parser above. That&rsquo;s the case because of the loop and the indirect recursion that we have. Here&rsquo;s its definition one more time in order to explain it line by line:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">parseOp</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="kr">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">val</span><span class="o">:</span> <span class="nx">consume</span><span class="p">(),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span> <span class="nx">expr</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">parseOp</span> <span class="o">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="nx">node</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">val</span><span class="o">:</span> <span class="nx">consume</span><span class="p">(),</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span> <span class="nx">expr</span><span class="o">:</span> <span class="p">[]</span> <span class="p">};</span>
   <span class="k">while</span> <span class="p">(</span><span class="nx">peek</span><span class="p">())</span> <span class="nx">node</span><span class="p">.</span><span class="nx">expr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">parseExpr</span><span class="p">());</span>
   <span class="k">return</span> <span class="nx">node</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
-
 <p>Since <code>parseOp</code> has been invoked by <code>parseExpr</code> when the value of <code>peek()</code> is not a number we know that it is an operator so we create a new operation node. Note that we don&rsquo;t perform any further validation, however, in a real-world programming language we&rsquo;d want to do that and eventually throw a syntax error in case of unexpected token.</p>
 
 <p>Anyhow, in the node declaration we set the list of &ldquo;sub-expressions&rdquo; to be the empty list (i.e. <code>[]</code>), the operation name to the value of <code>consume()</code> and the type of the node to <code>Op</code>. Later, while we don&rsquo;t reach the end of the program, we loop over all tokens by pushing the currently parsed expression to the list of &ldquo;sub-expressions` of the given node. Finally, we return the node.</p>
 
 <p>Keep in mind that <code>while (peek()) node.expr.push(parseExpr());</code> performs an indirect recursion. In case we have the expression:</p>
-<div class="highlight"><pre><span></span>sum sum 2
-</pre></div>
-
+<div class="highlight"><pre class="chroma">sum sum 2</pre></div>
 <p>This will</p>
 
 <ul>
@@ -359,12 +337,12 @@ expr = num | op expr+
 </ul>
 
 <p>The produced AST will look like:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span>
-  <span class="nx">val</span><span class="o">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+  <span class="nx">val</span><span class="o">:</span> <span class="s2">&#34;sum&#34;</span><span class="p">,</span>
   <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
     <span class="nx">type</span><span class="o">:</span> <span class="nx">Op</span><span class="p">,</span>
-    <span class="nx">val</span><span class="o">:</span> <span class="s2">&quot;sum&quot;</span><span class="p">,</span>
+    <span class="nx">val</span><span class="o">:</span> <span class="s2">&#34;sum&#34;</span><span class="p">,</span>
     <span class="nx">expr</span><span class="o">:</span> <span class="p">[{</span>
       <span class="nx">type</span><span class="o">:</span> <span class="nx">Num</span><span class="p">,</span>
       <span class="nx">val</span><span class="o">:</span> <span class="mi">2</span>
@@ -372,18 +350,15 @@ expr = num | op expr+
   <span class="p">}]</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <p>&hellip;and that&rsquo;s it! The final step is to traverse this tree and produce JavaScript!</p>
 
 <h2 id="recursive-descent-parsing">Recursive Descent Parsing</h2>
 
 <p>Now lets see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:</p>
-<div class="highlight"><pre><span></span>digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<div class="highlight"><pre class="chroma">digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
-expr = num | op expr+
-</pre></div>
-
+expr = num | op expr+</pre></div>
 <p>Do they now may make a bit more sense? <code>expr</code> looks very much like <code>parseExpr</code>, where we parse either a <code>num</code>ber or an <code>op</code>eration. Similarly, <code>op expr+</code> looks very much like <code>parseOp</code> and <code>num</code> like <code>parseNum</code>. In fact, very often parsers are generated directly from the grammars since there&rsquo;s a direct connection between both with the <a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">recursive descent parsing algorithm</a><sup>[8]</sup>.</p>
 
 <p>And in fact, we just developed a simple recursive descent parser! Our parser was quite simple (well, we have only 4 <strong>production rules</strong> in the grammar) but you can imagine how complex the parser of a real-life programming language is.</p>
@@ -393,15 +368,14 @@ expr = num | op expr+
 <h1 id="developing-the-transpiler">Developing the Transpiler</h1>
 
 <p>In this part of the post we&rsquo;ll traverse the AST of the language and produce JavaScript. The entire transpiler is on 7 lines of JavaScript (literally!):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">transpile</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="kr">const</span> <span class="nx">opMap</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">sum</span><span class="o">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="nx">mul</span><span class="o">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nx">sub</span><span class="o">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nx">div</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span> <span class="p">};</span>
-  <span class="kr">const</span> <span class="nx">transpileNode</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">Num</span> <span class="o">?</span> <span class="nx">transpileNum</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="o">:</span> <span class="nx">transpileOp</span><span class="p">(</span><span class="nx">ast</span><span class="p">);</span>
-  <span class="kr">const</span> <span class="nx">transpileNum</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">val</span><span class="p">;</span>
-  <span class="kr">const</span> <span class="nx">transpileOp</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="sb">`(</span><span class="si">${</span><span class="nx">ast</span><span class="p">.</span><span class="nx">expr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">transpileNode</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nx">opMap</span><span class="p">[</span><span class="nx">ast</span><span class="p">.</span><span class="nx">val</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">)`</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">transpile</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="nx">opMap</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">sum</span><span class="o">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="nx">mul</span><span class="o">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nx">sub</span><span class="o">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nx">div</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span> <span class="p">};</span>
+  <span class="k">const</span> <span class="nx">transpileNode</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">Num</span> <span class="o">?</span> <span class="nx">transpileNum</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="o">:</span> <span class="nx">transpileOp</span><span class="p">(</span><span class="nx">ast</span><span class="p">);</span>
+  <span class="k">const</span> <span class="nx">transpileNum</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">val</span><span class="p">;</span>
+  <span class="k">const</span> <span class="nx">transpileOp</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="sb">`(</span><span class="si">${</span><span class="nx">ast</span><span class="p">.</span><span class="nx">expr</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">transpileNode</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nx">opMap</span><span class="p">[</span><span class="nx">ast</span><span class="p">.</span><span class="nx">val</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">)`</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">transpileNode</span><span class="p">(</span><span class="nx">ast</span><span class="p">);</span>
 <span class="p">};</span>
 </code></pre></div>
-
 <p>Lets explore the implementation line by line.</p>
 
 <p>First we define a function called <code>transpile</code>. It accepts as argument the AST produced by the parser. After that in the <code>opMap</code> we define the mapping between arithmetic operations and the operators in the language. Basically, <code>sum</code> maps to <code>+</code>, <code>mul</code> to <code>*</code>, etc.</p>
@@ -420,12 +394,11 @@ expr = num | op expr+
 <h1 id="wiring-everything-together">Wiring Everything Together</h1>
 
 <p>Here&rsquo;s how we can wire everything together:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="s1">&#39;mul 3 sub 2 sum 1 3 4&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="s1">&#39;mul 3 sub 2 sum 1 3 4&#39;</span><span class="p">;</span>
 
 <span class="nx">transpile</span><span class="p">(</span><span class="nx">parse</span><span class="p">(</span><span class="nx">lex</span><span class="p">(</span><span class="nx">program</span><span class="p">)));</span>
-<span class="c1">// (3 * (2 - (1 + 3 + 4)))</span>
-</code></pre></div>
-
+<span class="c1">// (3 * (2 - (1 + 3 + 4)))
+</span><span class="c1"></span></code></pre></div>
 <p>We invoke <code>lex(program)</code>, which produces the list of tokens, after that we pass the tokens to the <code>parse</code> function, which produces the AST and finally, we <code>transpile</code> the AST to JavaScript!</p>
 
 <p><img src="/images/simple-compiler/wire.jpg" alt="Connecting"  style="display: block; margin: auto;"></p>
@@ -502,14 +475,17 @@ expr = num | op expr+
 
 
   
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-18060688-3', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 

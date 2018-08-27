@@ -1,141 +1,100 @@
-<!DOCTYPE html>
-<html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
-    
-<meta name="pinterest" content="nopin">
-<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<meta name="theme-color" content="#263238">
+    <!DOCTYPE html>
+<html lang="en-us" amp="">
+	<head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.47.1">
+		<title>Developing Statically Typed Programming Language &#xB7; Minko Gechev&apos;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		<style amp-custom=""></style>
+		
 
-<meta name="generator" content="Hugo 0.22-DEV">
+		
+		<style amp-custom=""></style>
+		
 
-<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&apos;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">
+		
 
+		<meta property="og:title" content="Developing Statically Typed Programming Language">
+		<meta property="og:description" content="In this blog post we&#x2019;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. We will do a &#x201C;full-stack&#x201D; programming language development by going through formal definition of the language&#x2019;s syntax, semantics and type system. After that we&#x2019;ll demonstrate how we can &#x201C;translate&#x201D; these definitions to JavaScript.
+Although the article doesn&#x2019;t require any mathematical background, it&#x2019;ll be useful to have high-level understanding of how compilers work.">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/myself.jpg">
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/myself.jpg">
+		
+	<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"><style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript></head>
 
-<link rel="canonical" href="https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">
-
-
-    
-    
-    
-    <title>Developing Statically Typed Programming Language - Minko Gechev&#39;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    
-    
-<meta name="description" content="In this blog post we&amp;rsquo;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. We will do a &amp;ldquo;full-stack&amp;rdquo; programming language development by going through formal definition of the language&amp;rsquo;s syntax, semantics and type system. After that we&amp;rsquo;ll demonstrate how we can &amp;ldquo;translate&amp;rdquo; these definitions to JavaScript.Although the article doesn&amp;rsquo;t require any mathematical background, it&amp;rsquo;ll be useful to have high-level understanding of how compilers work.">
-
-<meta property="og:title" content="Developing Statically Typed Programming Language - Minko Gechev&#39;s blog">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">
-<meta property="og:site_name" content="Minko Gechev&#39;s blog">
-<meta property="og:description" content="In this blog post we&amp;rsquo;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. We will do a &amp;ldquo;full-stack&amp;rdquo; programming language development by going through formal definition of the language&amp;rsquo;s syntax, semantics and type system. After that we&amp;rsquo;ll demonstrate how we can &amp;ldquo;translate&amp;rdquo; these definitions to JavaScript.Although the article doesn&amp;rsquo;t require any mathematical background, it&amp;rsquo;ll be useful to have high-level understanding of how compilers work.">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="Minko Gechev&#39;s blog">
-<meta name="twitter:url" content="https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/">
-<meta name="twitter:title" content="Developing Statically Typed Programming Language - Minko Gechev&#39;s blog">
-<meta name="twitter:description" content="In this blog post we&amp;rsquo;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. We will do a &amp;ldquo;full-stack&amp;rdquo; programming language development by going through formal definition of the language&amp;rsquo;s syntax, semantics and type system. After that we&amp;rsquo;ll demonstrate how we can &amp;ldquo;translate&amp;rdquo; these definitions to JavaScript.Although the article doesn&amp;rsquo;t require any mathematical background, it&amp;rsquo;ll be useful to have high-level understanding of how compilers work.">
-
-
-<script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "NewsArticle",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id":"https://blog.mgechev.com/"
-    },
-    "headline": "Developing Statically Typed Programming Language - Minko Gechev&#39;s blog",
-    "datePublished": "2017-08-05T00:00:00JST",
-    "dateModified": "2017-08-05T00:00:00JST",
-    "author": {
-      "@type": "Person",
-      "name": "Minko Gechev&#39;s blog"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Minko Gechev&#39;s blog",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://blog.mgechev.com/images/logo.png",
-        "width": 600,
-        "height": 60
-      }
-    },
-    "description": "In this blog post we&rsquo;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the lambda calculus. We will do a &ldquo;full-stack&rdquo; programming language development by going through formal definition of the language&rsquo;s syntax, semantics and type system. After that we&rsquo;ll demonstrate how we can &ldquo;translate&rdquo; these definitions to JavaScript.
-Although the article doesn&rsquo;t require any mathematical background, it&rsquo;ll be useful to have high-level understanding of how compilers work."
-  }
-</script>
-
-
-    <style amp-custom="">
-      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
-
-      
-    </style>
-  </head>
-
-  <body>
-    
-    
-    <amp-analytics type="googleanalytics" id="analytics1">
-      <script type="application/json">
-        {
-          "vars": {
-            "account": "UA-18060688-3"
-          },
-          "triggers": {
-            "trackPageview": {
-              "on": "visible",
-              "request": "pageview"
-            }
-          }
-        }
-      </script>
-    </amp-analytics>
-    
-    
-
-    <header class="l-header">
-      <div class="l-container">
-        <div class="h-logo p-logo">
-          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&#39;s blog</a>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      
-<div class="l-container">
-  <article class="single article-7ace91aa7f4ecff4a4ccbc96a6b487c6">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2017/08/05/typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript/" class="thumbnail" title="Developing Statically Typed Programming Language"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h1 class="title">Developing Statically Typed Programming Language</h1>
-        <ul class="p-facts">
-          <li><time datetime="2017-08-05T00:00:00JST">Aug 5, 2017</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href="https://blog.mgechev.com/"> <span class="arrow">&#x2190;</span>Home</a>
+	
+	<a href="https://blog.mgechev.com/post">Posts</a>
+	<a href="https://blog.mgechev.com/about">About</a>
+	<a href="https://blog.mgechev.com/talks">Speaking</a>
   </div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f&t=Developing%20Statically%20Typed%20Programming%20Language" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f&text=Developing%20Statically%20Typed%20Programming%20Language&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewbox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 
-  <div class="article-body">
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Developing Statically Typed Programming Language
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2017-08-05-typed-lambda-calculus-create-type-checker-transpiler-compiler-javascript.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    &#xB7; Aug 5, 2017
+                    &#xB7; 22 minutes read
+                    &#xB7; <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/programming-languages">Programming languages</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/lambda-calculus">Lambda calculus</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/type-theory">Type theory</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/compilers">Compilers</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
 
-<p>In this blog post we&rsquo;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">lambda calculus</a>. We will do a &ldquo;full-stack&rdquo; programming language development by going through formal definition of the language&rsquo;s syntax, semantics and type system. After that we&rsquo;ll demonstrate how we can &ldquo;translate&rdquo; these definitions to JavaScript.</p>
+<p>In this blog post we&#x2019;ll go through a sample implementation of a type checker, interpreter and a transpiler for a basic purely functional programming language, which is based on the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">lambda calculus</a>. We will do a &#x201C;full-stack&#x201D; programming language development by going through formal definition of the language&#x2019;s syntax, semantics and type system. After that we&#x2019;ll demonstrate how we can &#x201C;translate&#x201D; these definitions to JavaScript.</p>
 
-<p>Although the article doesn&rsquo;t require any mathematical background, it&rsquo;ll be useful to have high-level understanding of how compilers work. The article is inspired by the book &ldquo;<a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages</a>&rdquo;.</p>
+<p>Although the article doesn&#x2019;t require any mathematical background, it&#x2019;ll be useful to have high-level understanding of how compilers work. The article is inspired by the book &#x201C;<a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages</a>&#x201D;.</p>
 
 <p>The source code of the implementation can be found at my <a href="https://github.com/mgechev/typed-calc">GitHub profile</a>.</p>
 
@@ -143,12 +102,12 @@ Although the article doesn&rsquo;t require any mathematical background, it&rsquo
 
 <p>The syntax of the language is going to be quite simple.</p>
 
-<p><amp-img src="/images/typed-lambda/syntax.jpg" alt="Syntax" layout="responsive" width="1500" height="1000"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/syntax.jpg" alt="Syntax" style="display: block; margin: auto;"></amp-img></p>
 
 <p>Our programs will belong to the language defined by the following grammar:</p>
-<div class="highlight"><pre><span></span>t ::=
+<div class="highlight"><pre class="chroma">t ::=
   x   # variable
-  λ x: T → t   # called an abstraction by lambda calculus. In JavaScript we call it a function.
+  &#x3BB; x: T &#x2192; t   # called an abstraction by lambda calculus. In JavaScript we call it a function.
   t t   # application
   true   # true literal
   false   # false literal
@@ -156,100 +115,88 @@ Although the article doesn&rsquo;t require any mathematical background, it&rsquo
   succ t   # returns the next natural number when applied to `t`
   prev t   # returns the previous natural number when applied to `t`
   iszero t # returns `true` if the argument after evaluation equals `0`, otherwise `false`
-  0   # symbol representing the natural number zero
-</pre></div>
+  0   # symbol representing the natural number zero</pre></div>
+<p>The abstraction nonterminal allows us to declare functions with only one argument of type <code>T</code> and an expression <code>t</code> as a body. The syntax of the abstractions involves the unicode symbols <code>&#x2192;</code> and <code>&#x3BB;</code> . In case you have a Greek keyboard layout <code>&#x3BB;</code> will be easy to type, however, in order to quickly type <code>&#x2192;</code> you will need some kind of a keyboard shortcut. In other words, the syntax of our language is not very ergonomic.</p>
 
-<p>The abstraction nonterminal allows us to declare functions with only one argument of type <code>T</code> and an expression <code>t</code> as a body. The syntax of the abstractions involves the unicode symbols <code>→</code> and <code>λ</code> . In case you have a Greek keyboard layout <code>λ</code> will be easy to type, however, in order to quickly type <code>→</code> you will need some kind of a keyboard shortcut. In other words, the syntax of our language is not very ergonomic.</p>
-
-<p>Note that there&rsquo;s no syntax construct for expressing negative numbers and on top of that <code>succ</code> and <code>pred</code> produce natural numbers. In order to be consistent with the grammar the result of <code>pred 0</code> will be <code>0</code>.</p>
+<p>Note that there&#x2019;s no syntax construct for expressing negative numbers and on top of that <code>succ</code> and <code>pred</code> produce natural numbers. In order to be consistent with the grammar the result of <code>pred 0</code> will be <code>0</code>.</p>
 
 <p>Regarding the type system, we will have two primitive types:</p>
-<div class="highlight"><pre><span></span>T ::= Nat | Bool
-</pre></div>
-
-<p>Notice that in contrast to other statically typed programming languages, such as Haskell or Elm, we do not have a syntactical construct for declaring the type of a function. In Haskell the semantics of the annotation <code>T1 → T2</code> is a function which accepts one argument of type <code>T1</code> and returns result of type <code>T2</code>. In our grammar, we do not have this explicit type annotation because we&rsquo;re going to apply type inference in order to guess a function&rsquo;s type based on the type of its argument and body.</p>
+<div class="highlight"><pre class="chroma">T ::= Nat | Bool</pre></div>
+<p>Notice that in contrast to other statically typed programming languages, such as Haskell or Elm, we do not have a syntactical construct for declaring the type of a function. In Haskell the semantics of the annotation <code>T1 &#x2192; T2</code> is a function which accepts one argument of type <code>T1</code> and returns result of type <code>T2</code>. In our grammar, we do not have this explicit type annotation because we&#x2019;re going to apply type inference in order to guess a function&#x2019;s type based on the type of its argument and body.</p>
 
 <h1 id="playground">Playground</h1>
 
-<p>Now after we&rsquo;re familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button &ldquo;Evaluate&rdquo; to see the result:</p>
+<p>Now after we&#x2019;re familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button &#x201C;Evaluate&#x201D; to see the result:</p>
 
 <p><div>
-  <textarea id="code">
-(λ a: Nat → a)
+  <textarea id="code" style="width: 100%; height: 140px; padding: 5px; font-size: 13px;">
+(&#x3BB; a: Nat &#x2192; a)
   (if
-    (λ a: Nat → iszero a) pred 0
+    (&#x3BB; a: Nat &#x2192; iszero a) pred 0
   then
-    (λ a: Nat → succ a)
+    (&#x3BB; a: Nat &#x2192; succ a)
   else
-    (λ a: Nat → pred a))
+    (&#x3BB; a: Nat &#x2192; pred a))
   0</textarea>
 </div>
-<div>
-  <button id="add-lambda-btn">λ</button>
-  <button id="add-arrow-btn">→</button>
+<div style="padding-top: 10px;">
+  <button id="add-lambda-btn">&#x3BB;</button>
+  <button id="add-arrow-btn">&#x2192;</button>
   <button id="eval-btn">Evaluate</button>
 </div>
-<div>Result: <span id="result"></span></div>
+<div style="padding-top: 10px;">Result: <span id="result"></span></div>
 <script src="/assets/js/typed-calc/run.js"></script></p>
 
 <h1 id="semantics">Semantics</h1>
 
-<p>Before going any further, lets show a few sample programs belonging to the programming language that we&rsquo;re going to develop.</p>
+<p>Before going any further, lets show a few sample programs belonging to the programming language that we&#x2019;re going to develop.</p>
 
-<p><amp-img src="/images/typed-lambda/semantics.jpg" alt="Semantics" layout="responsive" width="1500" height="948"></amp-img></p>
-<div class="highlight"><pre><span></span>(λ a: Nat → succ succ a) 0
-</pre></div>
-
+<p><amp-img src="/images/typed-lambda/semantics.jpg" alt="Semantics" style="display: block; margin: auto;"></amp-img></p>
+<div class="highlight"><pre class="chroma">(&#x3BB; a: Nat &#x2192; succ succ a) 0</pre></div>
 <p>In the example above we declare an anonymous function which accepts a single argument called <code>a</code> of type <code>Nat</code>. In the body of the function we apply twice the predefined function <code>succ</code> to <code>a</code>. The anonymous function we apply to <code>0</code>. This is going to produce <code>2</code> as final result.</p>
 
 <p>The equivalent of this program in JavaScript will be:</p>
-<div class="highlight"><pre><span></span>(a =&gt; succ(succ(a)))(0)
-</pre></div>
-
+<div class="highlight"><pre class="chroma">(a =&gt; succ(succ(a)))(0)</pre></div>
 <p>Where <code>succ</code> is defined as:</p>
-<div class="highlight"><pre><span></span>const succ = a =&gt; a + 1
-</pre></div>
-
+<div class="highlight"><pre class="chroma">const succ = a =&gt; a + 1</pre></div>
 <p>A more complicated program in our programming language will look like this:</p>
-<div class="highlight"><pre><span></span>(
-  λ f: Nat →
-    (λ g: Nat → f) 0
-) (succ 0)
-</pre></div>
-
+<div class="highlight"><pre class="chroma">(
+  &#x3BB; f: Nat &#x2192;
+    (&#x3BB; g: Nat &#x2192; f) 0
+) (succ 0)</pre></div>
 <p>Lets explain the evaluation step by step:</p>
 
 <ol>
   <li>
-Reduce the expression with left side <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
+Reduce the expression with left side <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; (&#x3BB; g: Nat &#x2192; f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
 
 <div class="highlight">
 <pre>
 <code>(
-  λ f: Nat →
-    (λ g: Nat → f) 0
+  &#x3BB; f: Nat &#x2192;
+    (&#x3BB; g: Nat &#x2192; f) 0
 ) (succ 0)</code>
 </pre>
 </div>
   </li>
   <li>
-Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply <a href="https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction">beta reduction</a>) in the expression <code class="highlighter-rouge">(λ f: Nat → (λ g: Nat → f) 0)</code> and get <code class="highlighter-rouge">(λ f: Nat → f)</code>.
+Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply <a href="https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction">beta reduction</a>) in the expression <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; (&#x3BB; g: Nat &#x2192; f) 0)</code> and get <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; f)</code>.
 
 <div class="highlight">
 <pre>
 <code>(
-  λ f: Nat → f
+  &#x3BB; f: Nat &#x2192; f
 ) (succ 0)</code>
 </pre>
 </div>
   </li>
   <li>
-Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(λ f: Nat → f)</code>.
+Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; f)</code>.
 
 <div class="highlight">
 <pre>
 <code>(
-  λ f: Nat → f
+  &#x3BB; f: Nat &#x2192; f
 ) 1</code>
 </pre>
 </div>
@@ -269,94 +216,82 @@ Return result.
 
 <h2 id="small-step-semantics">Small-step semantics</h2>
 
-<p>In this section we&rsquo;ll take a look at the <a href="https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics">small-step semantics</a> of the language.</p>
+<p>In this section we&#x2019;ll take a look at the <a href="https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics">small-step semantics</a> of the language.</p>
 
-<p>Lets suppose <code>σ</code> is the current state of our program, which keeps what value each individual variable has.</p>
+<p>Lets suppose <code>&#x3C3;</code> is the current state of our program, which keeps what value each individual variable has.</p>
 
 <h3 id="variables">Variables</h3>
-<div class="highlight"><pre><span></span>1)
-    ─────────────
-    (x, σ) → σ(x)
-</pre></div>
-
-<p><code>1)</code> simply means that for variable <code>x</code> we return its value kept in the state <code>σ</code>.</p>
+<div class="highlight"><pre class="chroma">1)
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    (x, &#x3C3;) &#x2192; &#x3C3;(x)</pre></div>
+<p><code>1)</code> simply means that for variable <code>x</code> we return its value kept in the state <code>&#x3C3;</code>.</p>
 
 <h3 id="built-in-functions">Built-in functions</h3>
 
-<p>The built-in functions in our language are <code>succ</code>, <code>pred</code> and <code>iszero</code>. Here&rsquo;s the small-step semantics of <code>succ</code> and <code>pred</code>:</p>
-<div class="highlight"><pre><span></span>1)
-         t1 → t2
-    ─────────────────
-    succ t1 → succ t2
+<p>The built-in functions in our language are <code>succ</code>, <code>pred</code> and <code>iszero</code>. Here&#x2019;s the small-step semantics of <code>succ</code> and <code>pred</code>:</p>
+<div class="highlight"><pre class="chroma">1)
+         t1 &#x2192; t2
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    succ t1 &#x2192; succ t2
 
 2)
-    pred 0 → 0
+    pred 0 &#x2192; 0
 
 3)
-    pred succ v → v
+    pred succ v &#x2192; v
 
 4)
-        t1 → t2
-    ─────────────────
-    pred t1 → pred t2
-</pre></div>
-
+        t1 &#x2192; t2
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    pred t1 &#x2192; pred t2</pre></div>
 <p><code>1)</code> simply means that if expression <code>t1</code>, passed to <code>succ</code> evaluates to <code>t2</code>, <code>succ</code> evaluates to <code>succ t2</code>.</p>
 
 <p><code>2)</code> we define that the result of <code>pred 0</code> equals <code>0</code> in order to keep the language consistent and disallow negative numbers not only syntactically but also as result of evaluation.</p>
 
-<p>We&rsquo;re going to define <code>iszero</code> the following way:</p>
-<div class="highlight"><pre><span></span>1)
+<p>We&#x2019;re going to define <code>iszero</code> the following way:</p>
+<div class="highlight"><pre class="chroma">1)
 
-    iszero 0 → true
+    iszero 0 &#x2192; true
 
 2)
 
-    iszero succ v → false
+    iszero succ v &#x2192; false
 
 3)
-        t1 → t2
-    ────────────────────
-    iszero t1 → iszero t2
-</pre></div>
-
+        t1 &#x2192; t2
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    iszero t1 &#x2192; iszero t2</pre></div>
 <p>This means that <code>iszero</code> applied to <code>0</code> returns <code>true</code> (by <code>1)</code>). The result of the evaluation of <code>iszero</code> applied to any other number greater than <code>0</code> will equal <code>false</code> (by <code>2)</code>). If <code>t1</code> evaluates to <code>t2</code>, then <code>iszero t1</code> equals the result of the evaluation <code>iszero t2</code> (by <code>3)</code>).</p>
 
 <h3 id="conditional-expressions">Conditional expressions</h3>
 
 <p>Lets take a look at the small-step semantics for the conditional expressions:</p>
-<div class="highlight"><pre><span></span>1)
-    if true then t2 else t3 → t2
-    if false then t2 else t3 → t3
-</pre></div>
-
+<div class="highlight"><pre class="chroma">1)
+    if true then t2 else t3 &#x2192; t2
+    if false then t2 else t3 &#x2192; t3</pre></div>
 <p>If the condition of the conditional expression is <code>true</code> then we return the expression from the <code>then</code> part, otherwise, we return the one from the <code>else</code> part.</p>
-<div class="highlight"><pre><span></span>2)
-                       t1 → v
-    ─────────────────────────────────────────────
-    if t1 then t2 else t3 → if v then t2 else t3
-</pre></div>
-
+<div class="highlight"><pre class="chroma">2)
+                       t1 &#x2192; v
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    if t1 then t2 else t3 &#x2192; if v then t2 else t3</pre></div>
 <p>If given expression <code>t1</code> evaluates to <code>v</code> and this expression is passed as condition of the conditional expression, the evaluation of the conditional expression is equivalent to the evaluation of the conditional expression with <code>v</code> passed as condition.</p>
 
 <h3 id="abstraction-application">Abstraction &amp; Application</h3>
 
-<p>In this section we&rsquo;ll explain the function evaluation.</p>
-<div class="highlight"><pre><span></span>1)
-    (λ x: T → t) v → { x → v } t
+<p>In this section we&#x2019;ll explain the function evaluation.</p>
+<div class="highlight"><pre class="chroma">1)
+    (&#x3BB; x: T &#x2192; t) v &#x2192; { x &#x2192; v } t
 
 2)
-       t1 → v
-    ────────────
-    t1 t2 → v t2
+       t1 &#x2192; v
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    t1 t2 &#x2192; v t2
 
 3)
-       t2 → v
-    ────────────
-    v1 t2 → t1 v
-</pre></div>
-
-<p><code>1)</code> means that if we have the abstraction <code>(λ x: T → t)</code>, where <code>T</code> is the type of <code>x</code>, and apply it to <code>v</code>, we need to substitute all the occurrences of <code>x</code> in <code>t</code> with <code>v</code>.</p>
+       t2 &#x2192; v
+    &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+    v1 t2 &#x2192; t1 v</pre></div>
+<p><code>1)</code> means that if we have the abstraction <code>(&#x3BB; x: T &#x2192; t)</code>, where <code>T</code> is the type of <code>x</code>, and apply it to <code>v</code>, we need to substitute all the occurrences of <code>x</code> in <code>t</code> with <code>v</code>.</p>
 
 <p>In <code>2)</code> if <code>t1</code> evaluates to <code>v</code>, <code>t1 t2</code> evaluates to <code>v</code> applied to <code>t2</code>.</p>
 
@@ -364,15 +299,13 @@ Return result.
 
 <h1 id="type-system">Type System</h1>
 
-<p><amp-img src="/images/typed-lambda/type.jpg" alt="Type System" layout="responsive" width="1500" height="1138"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/type.jpg" alt="Type System" style="display: block; margin: auto;"></amp-img></p>
 
-<p>Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following program is a valid according to the grammar from the &ldquo;<a href="#syntax">Syntax</a>&rdquo; section above but is semantically incorrect:</p>
-<div class="highlight"><pre><span></span>if 1 then true else 2
-</pre></div>
-
+<p>Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following program is a valid according to the grammar from the &#x201C;<a href="#syntax">Syntax</a>&#x201D; section above but is semantically incorrect:</p>
+<div class="highlight"><pre class="chroma">if 1 then true else 2</pre></div>
 <p>The condition of the conditional expression is expected to be of type boolean, however, we pass a natural number. Another problem with the snippet is that the result of both branches of the expression should return result with the same type but this is not the case in our example.</p>
 
-<p>In order to handle such invalid programs we can introduce a mechanism of program verification through <strong>type checking</strong>. This way, we will assign types to the individual constructs and <strong>as part of the compilation process</strong>, verify if the program is valid according to the &ldquo;contract signed&rdquo; with the type annotations.</p>
+<p>In order to handle such invalid programs we can introduce a mechanism of program verification through <strong>type checking</strong>. This way, we will assign types to the individual constructs and <strong>as part of the compilation process</strong>, verify if the program is valid according to the &#x201C;contract signed&#x201D; with the type annotations.</p>
 
 <p>Notice that the <strong>type checking will be performed compile-time</strong>. The alternative is to perform runtime type checking, which will not prevent us from distributing invalid programs.</p>
 
@@ -381,64 +314,60 @@ Return result.
 <h2 id="type-rules">Type Rules</h2>
 
 <p>Lets define that:</p>
-<div class="highlight"><pre><span></span><span class="kc">true</span> <span class="o">:</span> <span class="n">Bool</span>
-<span class="kc">false</span> <span class="o">:</span> <span class="n">Bool</span>
-<span class="n">n</span> <span class="o">:</span> <span class="n">Nat</span><span class="o">,</span> <span class="n">n</span> <span class="err">∈</span> <span class="err">ℕ</span>
-</pre></div>
-
+<div class="highlight"><pre class="chroma">true : Bool
+false : Bool
+n : Nat, n &#x2208; &#x2115;</pre></div>
 <p>Based on the types of our terminals, lets declare the type rules for <code>succ</code>, <code>pred</code>, <code>iszero</code> and the conditional expression:</p>
-<div class="highlight"><pre><span></span>1)
+<div class="highlight"><pre class="chroma">1)
         t : Nat
-     ─────────────
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
      succ t : Nat
 
 2)
         t : Nat
-     ─────────────
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
      pred t : Nat
 
 3)
          t : Nat
-     ───────────────
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
      iszero t : Bool
 
 4)
        t1 : Bool, t2: T, t3: T
-     ───────────────────────────
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
       if t1 then t2 else t3 : T
 
 5)
-      (λ x: T → y): T → Y, u: T, y: Y
-     ────────────────────────────────
-            (λ x: T → y) u: Y
+      (&#x3BB; x: T &#x2192; y): T &#x2192; Y, u: T, y: Y
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+            (&#x3BB; x: T &#x2192; y) u: Y
 
 6)
-      t1: T → Y, t2: T
-     ──────────────────
-         t1 t2: Y
-</pre></div>
-
+      t1: T &#x2192; Y, t2: T
+     &#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;
+         t1 t2: Y</pre></div>
 <p><code>1)</code>, <code>2)</code> and <code>3)</code> are quite similar. In <code>1)</code> and <code>2)</code> we declare that if we have an expression <code>t</code> of type <code>Nat</code>, then both <code>pred t</code> and <code>succ t</code> will be of type <code>Nat</code>. On the other hand, <code>iszero</code> accepts an argument of type <code>Nat</code> and results of type <code>Bool</code>.</p>
 
-<p><code>4)</code> states that the condition of the conditional expression should be of type <code>Bool</code> and the expressions in the <code>then</code> and <code>else</code> branches should be the of the same type <code>T</code>, where we can think of <code>T</code> as a generic type (placeholder which can be filled with any type, for instance <code>Bool</code> or <code>Nat</code>, even <code>Nat → Bool</code>).</p>
+<p><code>4)</code> states that the condition of the conditional expression should be of type <code>Bool</code> and the expressions in the <code>then</code> and <code>else</code> branches should be the of the same type <code>T</code>, where we can think of <code>T</code> as a generic type (placeholder which can be filled with any type, for instance <code>Bool</code> or <code>Nat</code>, even <code>Nat &#x2192; Bool</code>).</p>
 
-<p>Rule <code>5)</code> states that if a function has type <code>T → Y</code> and is applied to argument <code>u</code> of type <code>T</code> then the result of the evaluation will be of type <code>Y</code>.</p>
+<p>Rule <code>5)</code> states that if a function has type <code>T &#x2192; Y</code> and is applied to argument <code>u</code> of type <code>T</code> then the result of the evaluation will be of type <code>Y</code>.</p>
 
-<p>Finally, <code>6)</code> states that if we have <code>t1</code> of type <code>T → Y</code> and <code>t2</code> of type <code>T</code> then <code>t1 t2</code> will be of type <code>Y</code>.</p>
+<p>Finally, <code>6)</code> states that if we have <code>t1</code> of type <code>T &#x2192; Y</code> and <code>t2</code> of type <code>T</code> then <code>t1 t2</code> will be of type <code>Y</code>.</p>
 
-<p>It&rsquo;s interesting to see how the <a href="#type-rules">type rules</a> does not explain how to evaluate the individual expressions but only define a set of rules which the expressions should hold.</p>
+<p>It&#x2019;s interesting to see how the <a href="#type-rules">type rules</a> does not explain how to evaluate the individual expressions but only define a set of rules which the expressions should hold.</p>
 
 <h1 id="developing-the-compiler">Developing the Compiler</h1>
 
-<p><amp-img src="/images/typed-lambda/develop.jpg" alt="Develop" layout="responsive" width="1500" height="1000"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/develop.jpg" alt="Develop" style="display: block; margin: auto;"></amp-img></p>
 
-<p>Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler&rsquo;s implementation works. Here are the high-level steps of execution:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">fileName</span><span class="p">,</span> <span class="p">{</span> <span class="nx">encoding</span><span class="o">:</span> <span class="s1">&#39;utf-8&#39;</span> <span class="p">});</span>
-<span class="kr">const</span> <span class="nx">ast</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">program</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">).</span><span class="nx">diagnostics</span><span class="p">;</span>
+<p>Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler&#x2019;s implementation works. Here are the high-level steps of execution:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">fileName</span><span class="p">,</span> <span class="p">{</span> <span class="nx">encoding</span><span class="o">:</span> <span class="s1">&apos;utf-8&apos;</span> <span class="p">});</span>
+<span class="k">const</span> <span class="nx">ast</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">program</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">).</span><span class="nx">diagnostics</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">red</span><span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">)));</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">red</span><span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&apos;\n&apos;</span><span class="p">)));</span>
   <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 <span class="p">}</span>
 
@@ -449,8 +378,7 @@ Return result.
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">));</span>
 <span class="p">}</span>
 </code></pre></div>
-
-<p>In the pseudo code above, we can notice that the program&rsquo;s compilation &amp; interpretation happen the following way:</p>
+<p>In the pseudo code above, we can notice that the program&#x2019;s compilation &amp; interpretation happen the following way:</p>
 
 <ol>
 <li>Read the file containing our program.</li>
@@ -460,7 +388,7 @@ Return result.
 <li>Either compile to JavaScript or evaluate the program.</li>
 </ol>
 
-<p>It&rsquo;s lovely to see a functional level of cohesion of the individual components! In the last next four sections we&rsquo;ll explain steps 2-5.</p>
+<p>It&#x2019;s lovely to see a functional level of cohesion of the individual components! In the last next four sections we&#x2019;ll explain steps 2-5.</p>
 
 <h2 id="lexer-parser">Lexer &amp; Parser</h2>
 
@@ -468,8 +396,8 @@ Return result.
 
 <p>For diversity, lets generate the modules for lexical and syntax analysis by using <a href="https://pegjs.org/">Peg.js</a> grammar.</p>
 
-<p>Here&rsquo;s the grammar itself:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">Program</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&#39;(&#39;</span><span class="o">*</span><span class="nx">_</span> <span class="nx">a</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span><span class="s1">&#39;)&#39;</span><span class="o">?</span><span class="nx">_</span> <span class="p">{</span>
+<p>Here&#x2019;s the grammar itself:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Program</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&apos;(&apos;</span><span class="o">*</span><span class="nx">_</span> <span class="nx">a</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span><span class="s1">&apos;)&apos;</span><span class="o">?</span><span class="nx">_</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">a</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -478,114 +406,108 @@ Return result.
     <span class="k">return</span> <span class="nx">l</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="nx">r</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
-    <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="nx">r</span><span class="p">};</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;application&apos;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="nx">r</span><span class="p">};</span>
   <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="nx">Abstraction</span> <span class="o">=</span> <span class="nx">_</span> <span class="s1">&#39;(&#39;</span><span class="o">*</span> <span class="nx">_</span> <span class="s1">&#39;λ&#39;</span> <span class="nx">_</span> <span class="nx">id</span><span class="o">:</span><span class="nx">Identifier</span> <span class="s1">&#39;:&#39;</span> <span class="nx">t</span><span class="o">:</span><span class="nx">Type</span> <span class="s1">&#39;→&#39;</span> <span class="nx">f</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span> <span class="s1">&#39;)&#39;</span><span class="o">?</span> <span class="nx">_</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;abstraction&#39;</span><span class="p">,</span> <span class="nx">arg</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span> <span class="p">},</span> <span class="nx">body</span><span class="o">:</span> <span class="nx">f</span> <span class="p">};</span>
+<span class="nx">Abstraction</span> <span class="o">=</span> <span class="nx">_</span> <span class="s1">&apos;(&apos;</span><span class="o">*</span> <span class="nx">_</span> <span class="s1">&apos;&#x3BB;&apos;</span> <span class="nx">_</span> <span class="nx">id</span><span class="o">:</span><span class="nx">Identifier</span> <span class="s1">&apos;:&apos;</span> <span class="nx">t</span><span class="o">:</span><span class="nx">Type</span> <span class="s1">&apos;&#x2192;&apos;</span> <span class="nx">f</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span> <span class="s1">&apos;)&apos;</span><span class="o">?</span> <span class="nx">_</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;abstraction&apos;</span><span class="p">,</span> <span class="nx">arg</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span> <span class="p">},</span> <span class="nx">body</span><span class="o">:</span> <span class="nx">f</span> <span class="p">};</span>
 <span class="p">}</span>
 
-<span class="nx">Expr</span> <span class="o">=</span> <span class="nx">IfThen</span> <span class="o">/</span> <span class="nx">IsZeroCheck</span> <span class="o">/</span> <span class="nx">ArithmeticOperation</span> <span class="o">/</span> <span class="nx">Zero</span> <span class="o">/</span> <span class="nx">True</span> <span class="o">/</span> <span class="nx">False</span> <span class="o">/</span> <span class="nx">Identifier</span> <span class="o">/</span> <span class="nx">ParanExpression</span>
+<span class="nx">Expr</span> <span class="o">=</span> <span class="nx">IfThen</span> <span class="sr">/ IsZeroCheck /</span> <span class="nx">ArithmeticOperation</span> <span class="sr">/ Zero /</span> <span class="nx">True</span> <span class="sr">/ False /</span> <span class="nx">Identifier</span> <span class="err">/ ParanExpression</span>
 
 <span class="nx">ArithmeticOperation</span> <span class="o">=</span> <span class="nx">o</span><span class="o">:</span><span class="nx">Operator</span> <span class="nx">e</span><span class="o">:</span><span class="nx">Application</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;arithmetic&#39;</span><span class="p">,</span> <span class="nx">operator</span><span class="o">:</span> <span class="nx">o</span><span class="p">,</span> <span class="nx">expression</span><span class="o">:</span> <span class="nx">e</span> <span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;arithmetic&apos;</span><span class="p">,</span> <span class="nx">operator</span><span class="o">:</span> <span class="nx">o</span><span class="p">,</span> <span class="nx">expression</span><span class="o">:</span> <span class="nx">e</span> <span class="p">};</span>
 <span class="p">};</span>
 
-<span class="nx">Operator</span> <span class="o">=</span> <span class="nx">Succ</span> <span class="o">/</span> <span class="nx">Pred</span>
+<span class="nx">Operator</span> <span class="o">=</span> <span class="nx">Succ</span> <span class="err">/ Pred</span>
 
 <span class="nx">IfThen</span> <span class="o">=</span> <span class="nx">If</span> <span class="nx">expr</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">Then</span> <span class="nx">then</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">Else</span> <span class="nx">el</span><span class="o">:</span><span class="nx">Application</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;conditional_expression&#39;</span><span class="p">,</span> <span class="nx">condition</span><span class="o">:</span> <span class="nx">expr</span><span class="p">,</span> <span class="nx">then</span><span class="o">:</span> <span class="nx">then</span><span class="p">,</span> <span class="nx">el</span><span class="o">:</span> <span class="nx">el</span> <span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;conditional_expression&apos;</span><span class="p">,</span> <span class="nx">condition</span><span class="o">:</span> <span class="nx">expr</span><span class="p">,</span> <span class="nx">then</span><span class="o">:</span> <span class="nx">then</span><span class="p">,</span> <span class="nx">el</span><span class="o">:</span> <span class="nx">el</span> <span class="p">};</span>
 <span class="p">}</span>
 
-<span class="nx">Type</span> <span class="o">=</span>  <span class="nx">Nat</span> <span class="o">/</span> <span class="nx">Bool</span>
+<span class="nx">Type</span> <span class="o">=</span>  <span class="nx">Nat</span> <span class="err">/ Bool</span>
 
 <span class="nx">_</span>  <span class="o">=</span> <span class="p">[</span> <span class="err">\</span><span class="nx">t</span><span class="err">\</span><span class="nx">r</span><span class="err">\</span><span class="nx">n</span><span class="p">]</span><span class="o">*</span>
 
 <span class="nx">__</span> <span class="o">=</span> <span class="p">[</span> <span class="err">\</span><span class="nx">t</span><span class="err">\</span><span class="nx">r</span><span class="err">\</span><span class="nx">n</span><span class="p">]</span><span class="o">+</span>
 
 <span class="nx">Identifier</span> <span class="o">=</span> <span class="o">!</span><span class="nx">ReservedWord</span> <span class="nx">_</span> <span class="nx">id</span><span class="o">:</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">z</span><span class="p">]</span><span class="o">+</span> <span class="nx">_</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">id</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;identifier&#39;</span> <span class="p">};</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">id</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&apos;&apos;</span><span class="p">),</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;identifier&apos;</span> <span class="p">};</span>
 <span class="p">}</span>
 
-<span class="nx">ParanExpression</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&#39;(&#39;</span><span class="nx">_</span> <span class="nx">expr</span><span class="o">:</span><span class="nx">Expr</span> <span class="nx">_</span><span class="s1">&#39;)&#39;</span><span class="nx">_</span> <span class="p">{</span>
+<span class="nx">ParanExpression</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&apos;(&apos;</span><span class="nx">_</span> <span class="nx">expr</span><span class="o">:</span><span class="nx">Expr</span> <span class="nx">_</span><span class="s1">&apos;)&apos;</span><span class="nx">_</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">expr</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="nx">ReservedWord</span> <span class="o">=</span> <span class="nx">If</span> <span class="o">/</span> <span class="nx">Then</span> <span class="o">/</span> <span class="nx">Else</span> <span class="o">/</span> <span class="nx">Pred</span> <span class="o">/</span> <span class="nx">Succ</span> <span class="o">/</span> <span class="nx">Nat</span> <span class="o">/</span> <span class="nx">Bool</span> <span class="o">/</span> <span class="nx">IsZero</span> <span class="o">/</span> <span class="nx">False</span>
+<span class="nx">ReservedWord</span> <span class="o">=</span> <span class="nx">If</span> <span class="sr">/ Then /</span> <span class="nx">Else</span> <span class="sr">/ Pred /</span> <span class="nx">Succ</span> <span class="sr">/ Nat /</span> <span class="nx">Bool</span> <span class="sr">/ IsZero /</span> <span class="nx">False</span>
 
-<span class="nx">Succ</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&#39;succ&#39;</span><span class="nx">_</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="s1">&#39;succ&#39;</span><span class="p">;</span>
+<span class="nx">Succ</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&apos;succ&apos;</span><span class="nx">_</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="s1">&apos;succ&apos;</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="nx">Nat</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&#39;Nat&#39;</span><span class="nx">_</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="s1">&#39;Nat&#39;</span><span class="p">;</span>
+<span class="nx">Nat</span> <span class="o">=</span> <span class="nx">_</span><span class="s1">&apos;Nat&apos;</span><span class="nx">_</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="s1">&apos;Nat&apos;</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="p">...</span>
 </code></pre></div>
+<p>For simplicity I&#x2019;ve omitted some implementation details. The entire grammar can be found <a href="https://github.com/mgechev/typed-calc/blob/master/simply-typed.peg">here</a>.</p>
 
-<p>For simplicity I&rsquo;ve omitted some implementation details. The entire grammar can be found <a href="https://github.com/mgechev/typed-calc/blob/master/simply-typed.peg">here</a>.</p>
-
-<p>We&rsquo;ll take a look at only few grammar rules. If you&rsquo;re interested in the entire syntax of Peg.js, you can take a look at the official <a href="https://pegjs.org/documentation">documentation</a> and experiment on the <a href="https://pegjs.org/online">online playground</a>. If you&rsquo;re interested into some theoretical background, I&rsquo;d recommend you to find a read for <a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">BNF form</a>.</p>
+<p>We&#x2019;ll take a look at only few grammar rules. If you&#x2019;re interested in the entire syntax of Peg.js, you can take a look at the official <a href="https://pegjs.org/documentation">documentation</a> and experiment on the <a href="https://pegjs.org/online">online playground</a>. If you&#x2019;re interested into some theoretical background, I&#x2019;d recommend you to find a read for <a href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">BNF form</a>.</p>
 
 <p>Lets take a look at two interesting nonterminals from the grammar:</p>
 
 <h3 id="application-nonterminal">Application Nonterminal</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">Application</span> <span class="o">=</span> <span class="nx">l</span><span class="o">:</span><span class="nx">ExprAbs</span> <span class="nx">r</span><span class="o">:</span><span class="nx">Application</span><span class="o">*</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Application</span> <span class="o">=</span> <span class="nx">l</span><span class="o">:</span><span class="nx">ExprAbs</span> <span class="nx">r</span><span class="o">:</span><span class="nx">Application</span><span class="o">*</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">r</span> <span class="o">||</span> <span class="o">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">l</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="nx">r</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
-    <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="nx">r</span><span class="p">};</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;application&apos;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="nx">l</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="nx">r</span><span class="p">};</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre></div>
-
-<p>The application nonterminal (<code>t t</code>) from the <a href="#syntax">&ldquo;Syntax&rdquo;</a> section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by <code>0</code> or more other applications.</p>
+<p>The application nonterminal (<code>t t</code>) from the <a href="#syntax">&#x201C;Syntax&#x201D;</a> section above can be expressed with this Peg rule. The semantics behind the rule is that, we can have one expression or abstraction followed by <code>0</code> or more other applications.</p>
 
 <p>We name the left nonterminal <code>l</code> (<code>l:ExprAbs</code>) and the right one <code>r</code> (<code>r:Application</code>), after that, in case of a match, we return an object, which will be used as an AST node, with type <code>abstraction</code>, <code>left</code> and <code>right</code> branches.</p>
 
 <p>Another interesting nonterminal is the abstraction:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">Abstraction</span> <span class="o">=</span> <span class="nx">_</span> <span class="s1">&#39;(&#39;</span><span class="o">?</span> <span class="nx">_</span> <span class="s1">&#39;λ&#39;</span> <span class="nx">_</span> <span class="nx">id</span><span class="o">:</span><span class="nx">Identifier</span> <span class="s1">&#39;:&#39;</span> <span class="nx">t</span><span class="o">:</span><span class="nx">Type</span> <span class="s1">&#39;→&#39;</span> <span class="nx">f</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span> <span class="s1">&#39;)&#39;</span><span class="o">?</span> <span class="nx">_</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;abstraction&#39;</span><span class="p">,</span> <span class="nx">arg</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span> <span class="p">},</span> <span class="nx">body</span><span class="o">:</span> <span class="nx">f</span> <span class="p">};</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Abstraction</span> <span class="o">=</span> <span class="nx">_</span> <span class="s1">&apos;(&apos;</span><span class="o">?</span> <span class="nx">_</span> <span class="s1">&apos;&#x3BB;&apos;</span> <span class="nx">_</span> <span class="nx">id</span><span class="o">:</span><span class="nx">Identifier</span> <span class="s1">&apos;:&apos;</span> <span class="nx">t</span><span class="o">:</span><span class="nx">Type</span> <span class="s1">&apos;&#x2192;&apos;</span> <span class="nx">f</span><span class="o">:</span><span class="nx">Application</span> <span class="nx">_</span> <span class="s1">&apos;)&apos;</span><span class="o">?</span> <span class="nx">_</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&apos;abstraction&apos;</span><span class="p">,</span> <span class="nx">arg</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="nx">t</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span> <span class="p">},</span> <span class="nx">body</span><span class="o">:</span> <span class="nx">f</span> <span class="p">};</span>
 <span class="p">}</span>
 </code></pre></div>
+<p>We can see that it starts with an optional opening parenthesis, after that we have the lambda (<code>&#x3BB;</code>) symbol, followed by the parameter declaration and its type. After that, we have the hard to type arrow (<code>&#x2192;</code>) and the abstraction&#x2019;s body, which we try to match against the <code>Application</code> rule from above.</p>
 
-<p>We can see that it starts with an optional opening parenthesis, after that we have the lambda (<code>λ</code>) symbol, followed by the parameter declaration and its type. After that, we have the hard to type arrow (<code>→</code>) and the abstraction&rsquo;s body, which we try to match against the <code>Application</code> rule from above.</p>
+<p>For instance, the AST of the program: <code>(&#x3BB; a: Bool &#x2192; succ 0) iszero 0</code>, after parsing, will look like:</p>
 
-<p>For instance, the AST of the program: <code>(λ a: Bool → succ 0) iszero 0</code>, after parsing, will look like:</p>
+<p><amp-img src="/images/typed-lambda/ast.png" alt="AST" style="display: block; margin: auto;"></amp-img></p>
 
-<p><amp-img src="/images/typed-lambda/ast.png" alt="AST" layout="responsive" width="307" height="447"></amp-img></p>
-
-<p>The root node is the application nonterminal (<code>t1 t2</code>), where <code>t1</code> equals the abstraction (i.e. <code>λ a: Bool → succ 0</code>) and <code>t2</code> the expression <code>iszero 0</code>.</p>
+<p>The root node is the application nonterminal (<code>t1 t2</code>), where <code>t1</code> equals the abstraction (i.e. <code>&#x3BB; a: Bool &#x2192; succ 0</code>) and <code>t2</code> the expression <code>iszero 0</code>.</p>
 
 <h2 id="developing-the-type-checker">Developing the Type Checker</h2>
 
 <p>Now lets take a look at the type checker. First, lets declare the set of primitive types:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">Types</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">Natural</span><span class="o">:</span> <span class="s1">&#39;Nat&#39;</span><span class="p">,</span>
-  <span class="nb">Boolean</span><span class="o">:</span> <span class="s1">&#39;Bool&#39;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Types</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">Natural</span><span class="o">:</span> <span class="s1">&apos;Nat&apos;</span><span class="p">,</span>
+  <span class="nb">Boolean</span><span class="o">:</span> <span class="s1">&apos;Bool&apos;</span>
 <span class="p">};</span>
 </code></pre></div>
-
-<p><amp-img src="/images/typed-lambda/guard.jpg" alt="Guard" layout="responsive" width="1500" height="988"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/guard.jpg" alt="Guard" style="display: block; margin: auto;"></amp-img></p>
 
 <h3 id="function-type">Function Type</h3>
 
-<p>We&rsquo;ll express the function type using an array of types, for instance <code>['Bool', 'Nat']</code> is a function which accepts an argument of type <code>Bool</code> and returns <code>Num</code>. From the following example, we can see that our language supports high-order functions:</p>
-<div class="highlight"><pre><span></span>(
-  (λ a: Nat →
-    λ b: Nat → succ a)
+<p>We&#x2019;ll express the function type using an array of types, for instance <code>[&apos;Bool&apos;, &apos;Nat&apos;]</code> is a function which accepts an argument of type <code>Bool</code> and returns <code>Num</code>. From the following example, we can see that our language supports high-order functions:</p>
+<div class="highlight"><pre class="chroma">(
+  (&#x3BB; a: Nat &#x2192;
+    &#x3BB; b: Nat &#x2192; succ a)
   0
-) succ 0
-</pre></div>
-
-<p>The outermost function has type <code>Nat → (Nat → Nat)</code>, which means that it accepts an argument of type <code>Nat</code> and returns a function of type <code>Nat → Nat</code>.</p>
+) succ 0</pre></div>
+<p>The outermost function has type <code>Nat &#x2192; (Nat &#x2192; Nat)</code>, which means that it accepts an argument of type <code>Nat</code> and returns a function of type <code>Nat &#x2192; Nat</code>.</p>
 
 <h3 id="type-checking-algorithm-and-type-inference">Type Checking Algorithm and Type Inference</h3>
 
-<p>The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type according to the type rules from section <a href="#type-system">&ldquo;Type System&rdquo;</a>. Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the <a href="#type-rules">&ldquo;Type Rules&rdquo;</a> section from above.</p>
+<p>The algorithm for performing type checking will traverse the AST and verify if each individual node has correct type according to the type rules from section <a href="#type-system">&#x201C;Type System&#x201D;</a>. Generally speaking, the algorithm will be just a JavaScript translation of the definitions in the <a href="#type-rules">&#x201C;Type Rules&#x201D;</a> section from above.</p>
 
 <p>Here are the basic rules that we will implement:</p>
 
@@ -594,15 +516,15 @@ Return result.
 <li>Check if both the branches of conditional expression have the same type. Here we need to recursively find the types of both sub-expressions and compare them <em>(rule <code>4)</code>)</em>.</li>
 <li>Check if argument passed to a function is of the correct type. In this case we need to find the type of the expression passed as argument to the function and check if it matches with the declaration of the function <em>(rule <code>5)</code>)</em>. In order to find the type of the function we need to find the type of its body. This is called <strong>type inference</strong>.</li>
 <li>Check if the arguments of the built-in functions are of the correct type. The procedure is quite similar to 3. <em>(rules <code>1)</code>, <code>2)</code> and <code>3)</code>)</em>.</li>
-<li>Check if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type <code>Nat → Bool</code>, we can only apply it to an argument of type <code>Nat</code> <em>(rule <code>6)</code>)</em>.</li>
+<li>Check if the types of the left and right side of an application match. We need to find the types of both terms recursively, just like for all other cases above. For instance, if we have function of type <code>Nat &#x2192; Bool</code>, we can only apply it to an argument of type <code>Nat</code> <em>(rule <code>6)</code>)</em>.</li>
 </ol>
 
-<p>From above we can see that each point includes the word &ldquo;check&rdquo;, so it looks like, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:</p>
+<p>From above we can see that each point includes the word &#x201C;check&#x201D;, so it looks like, an important part of the type checking algorithm is the type comparison. Lets peek at its implementation:</p>
 
 <h3 id="comparing-types">Comparing Types</h3>
 
 <p>In order to compare two types and see if they are equivalent, we can use the following function:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">typeEq</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">typeEq</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">a</span> <span class="k">instanceof</span> <span class="nb">Array</span> <span class="o">&amp;&amp;</span> <span class="nx">b</span> <span class="k">instanceof</span> <span class="nb">Array</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span> <span class="o">!==</span> <span class="nx">b</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
@@ -615,24 +537,23 @@ Return result.
       <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">a</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">b</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">a</span> <span class="o">===</span> <span class="s1">&apos;string&apos;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="nx">b</span> <span class="o">===</span> <span class="s1">&apos;string&apos;</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">a</span> <span class="o">===</span> <span class="nx">b</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
-
-<p>The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that&rsquo;s the case, we compare the types they are composed of one by one by invoking the <code>typeEq</code> function recursively. Otherwise, in case <code>a</code> and <code>b</code> are primitive types, we just compare them by their value (<code>a === b</code>).</p>
+<p>The function first checks if both types are types of a function (i.e. have more than one type they are composed of). If that&#x2019;s the case, we compare the types they are composed of one by one by invoking the <code>typeEq</code> function recursively. Otherwise, in case <code>a</code> and <code>b</code> are primitive types, we just compare them by their value (<code>a === b</code>).</p>
 
 <h3 id="type-checking-implementation">Type Checking Implementation</h3>
 
-<p>Now we&rsquo;re ready to take a look at the actual implementation of our type checker:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">Check</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ast</span><span class="p">,</span> <span class="nx">diagnostics</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<p>Now we&#x2019;re ready to take a look at the actual implementation of our type checker:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Check</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ast</span><span class="p">,</span> <span class="nx">diagnostics</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span> <span class="o">||</span> <span class="p">[];</span>
 
-  <span class="c1">// By definition empty AST is correct</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// By definition empty AST is correct
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">diagnostics</span>
     <span class="p">};</span>
@@ -640,55 +561,55 @@ Return result.
 
   <span class="p">...</span>
 
-  <span class="c1">// We get the type of identifier from the symbol table</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// We get the type of identifier from the symbol table
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">diagnostics</span><span class="p">,</span>
       <span class="nx">type</span><span class="o">:</span> <span class="nx">SymbolTable</span><span class="p">.</span><span class="nx">lookup</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">name</span><span class="p">)</span>
     <span class="p">};</span>
 
-  <span class="c1">// if-then-else block is correct if:</span>
-  <span class="c1">// - The condition is of type Boolean.</span>
-  <span class="c1">// - Then and else are of the same type.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// if-then-else block is correct if:
+</span><span class="c1"></span>  <span class="c1">// - The condition is of type Boolean.
+</span><span class="c1"></span>  <span class="c1">// - Then and else are of the same type.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span> <span class="o">||</span> <span class="o">!</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span> <span class="o">||</span> <span class="o">!</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;No condition of a conditional expression&#39;</span><span class="p">);</span>
+      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&apos;No condition of a conditional expression&apos;</span><span class="p">);</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="nx">diagnostics</span>
       <span class="p">};</span>
     <span class="p">}</span>
-    <span class="kr">const</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">);</span>
     <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">conditionType</span> <span class="o">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+    <span class="k">const</span> <span class="nx">conditionType</span> <span class="o">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">typeEq</span><span class="p">(</span><span class="nx">conditionType</span><span class="p">,</span> <span class="nx">Types</span><span class="p">.</span><span class="nb">Boolean</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;Incorrect type of the condition of a conditional expression&#39;</span><span class="p">);</span>
+      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&apos;Incorrect type of the condition of a conditional expression&apos;</span><span class="p">);</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="nx">diagnostics</span>
       <span class="p">};</span>
     <span class="p">}</span>
-    <span class="kr">const</span> <span class="nx">thenBranch</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">thenBranch</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
     <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">thenBranch</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">thenBranchType</span> <span class="o">=</span> <span class="nx">thenBranch</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
-    <span class="kr">const</span> <span class="nx">elseBranch</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">thenBranchType</span> <span class="o">=</span> <span class="nx">thenBranch</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+    <span class="k">const</span> <span class="nx">elseBranch</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
     <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">elseBranch</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">elseBranchType</span> <span class="o">=</span> <span class="nx">elseBranch</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+    <span class="k">const</span> <span class="nx">elseBranchType</span> <span class="o">=</span> <span class="nx">elseBranch</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">typeEq</span><span class="p">(</span><span class="nx">thenBranchType</span><span class="p">,</span> <span class="nx">elseBranchType</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">thenBranch</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;Incorrect type of then/else branches&#39;</span><span class="p">);</span>
+      <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&apos;Incorrect type of then/else branches&apos;</span><span class="p">);</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="nx">diagnostics</span>
       <span class="p">};</span>
     <span class="p">}</span>
 
-  <span class="c1">// The type of:</span>
-  <span class="c1">// e1: T1, e2: T2, e1 e2: T1</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">leftType</span> <span class="o">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">type</span> <span class="o">||</span> <span class="p">[];</span>
+  <span class="c1">// The type of:
+</span><span class="c1"></span>  <span class="c1">// e1: T1, e2: T2, e1 e2: T1
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">leftType</span> <span class="o">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">type</span> <span class="o">||</span> <span class="p">[];</span>
     <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">l</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">rightType</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">type</span> <span class="o">||</span> <span class="p">[];</span>
+    <span class="k">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">rightType</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">type</span> <span class="o">||</span> <span class="p">[];</span>
     <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">leftType</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span> <span class="o">||</span> <span class="nx">leftType</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="nx">rightType</span><span class="p">)</span> <span class="p">{</span>
@@ -697,7 +618,7 @@ Return result.
           <span class="nx">type</span><span class="o">:</span> <span class="nx">leftType</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="p">};</span>
       <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;Incorrect type of application&#39;</span><span class="p">);</span>
+        <span class="nx">diagnostics</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&apos;Incorrect type of application&apos;</span><span class="p">);</span>
         <span class="k">return</span> <span class="p">{</span>
           <span class="nx">diagnostics</span>
         <span class="p">};</span>
@@ -709,35 +630,31 @@ Return result.
   <span class="k">return</span> <span class="p">{</span> <span class="nx">diagnostics</span> <span class="p">};</span>
 <span class="p">};</span>
 </code></pre></div>
-
-<p>I have stripped some of the code since it&rsquo;s not crucial for our purpose. If you&rsquo;re interested in the complete implementation, you can find it <a href="https://github.com/mgechev/typed-calc/blob/master/check.js">here</a>.</p>
+<p>I have stripped some of the code since it&#x2019;s not crucial for our purpose. If you&#x2019;re interested in the complete implementation, you can find it <a href="https://github.com/mgechev/typed-calc/blob/master/check.js">here</a>.</p>
 
 <p>An interesting thing to notice is the <a href="https://en.wikipedia.org/wiki/Continuation">continuation</a>. We pass the <code>diagnostics</code> array to each invocation of the <code>Check</code> function. When we find a type error, we push a string representing a human readable message corresponding to the error in the array. This way, in the end of the invocation we have the list of all type errors found by the type checking algrithm.</p>
 
-<p>If we go back to the entire compiler&rsquo;s implementation:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">...</span>
-<span class="kr">const</span> <span class="nx">ast</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">program</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">).</span><span class="nx">diagnostics</span><span class="p">;</span>
+<p>If we go back to the entire compiler&#x2019;s implementation:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
+<span class="k">const</span> <span class="nx">ast</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">program</span><span class="p">);</span>
+<span class="k">const</span> <span class="nx">diagnostics</span> <span class="o">=</span> <span class="nx">Check</span><span class="p">(</span><span class="nx">ast</span><span class="p">).</span><span class="nx">diagnostics</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">red</span><span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;\n&#39;</span><span class="p">)));</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">red</span><span class="p">(</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&apos;\n&apos;</span><span class="p">)));</span>
   <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">(</span><span class="sb">`1)`</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="p">...</span>
 </code></pre></div>
-
 <p>In case the program that we want to type check is the following:</p>
-<div class="highlight"><pre><span></span>(λ a: Nat → succ succ 0) iszero true
-</pre></div>
-
+<div class="highlight"><pre class="chroma">(&#x3BB; a: Nat &#x2192; succ succ 0) iszero true</pre></div>
 <p>The diagnostics that the compiler will produce will be as follows:</p>
 
-<pre>
-~/Projects/typed-calc <span>master</span> <span>❯</span> <span>node index.js demo/incorrect1.lambda</span>
-<span>Evaluating "demo/incorrect1.lambda".</span>
+<pre style="font-family: Fira Code, monospace; font-size: 13px; padding: 10px; overflow: auto; background-color: #292929;">
+~/Projects/typed-calc <span style="color: #F22A2F">master</span> <span style="color: #FED669">&#x276F;</span> <span style="color: #C0C3C0">node index.js demo/incorrect1.lambda</span>
+<span style="color: #96A651">Evaluating &quot;demo/incorrect1.lambda&quot;.</span>
 
-<span>Incorrect type of IsZero</span>
-<span>Incorrect type of application</span>
+<span style="color: #BA4E50">Incorrect type of IsZero</span>
+<span style="color: #BA4E50">Incorrect type of application</span>
 </pre>
 
 <h2 id="developing-the-interpreter">Developing the Interpreter</h2>
@@ -745,152 +662,147 @@ Return result.
 <p>Once the compiler goes through the phase of type checking there are a few options:</p>
 
 <ul>
-<li>Perform AST transformations in order to produce equivalent but more efficient AST for the purposes of the compiler&rsquo;s <a href="https://en.wikipedia.org/wiki/Compiler#Back_end">back end</a>.</li>
+<li>Perform AST transformations in order to produce equivalent but more efficient AST for the purposes of the compiler&#x2019;s <a href="https://en.wikipedia.org/wiki/Compiler#Back_end">back end</a>.</li>
 <li>Skip the transformation phase and directly perform either code generation or evaluation.</li>
 </ul>
 
-<p>In this section we&rsquo;ll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the parser (syntax analyzer).</p>
+<p>In this section we&#x2019;ll take a look at the interpreter which is going to evaluate our programs based on the AST produced by the parser (syntax analyzer).</p>
 
-<p>Here&rsquo;s its entire implementation:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">Eval</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="c1">// The empty program evaluates to null.</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
+<p>Here&#x2019;s its entire implementation:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Eval</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// The empty program evaluates to null.
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="c1">// The literals evaluate to their values.</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Literal</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// The literals evaluate to their values.
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Literal</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
 
-  <span class="c1">// The variables evaluate to the values</span>
-  <span class="c1">// that are bound to them in the SymbolTable.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// The variables evaluate to the values
+</span><span class="c1"></span>  <span class="c1">// that are bound to them in the SymbolTable.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">SymbolTable</span><span class="p">.</span><span class="nx">lookup</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
 
-  <span class="c1">// if-then-else evaluates to the expression of the</span>
-  <span class="c1">// then clause if the condition is true, otherwise</span>
-  <span class="c1">// to the value of the else clause.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// if-then-else evaluates to the expression of the
+</span><span class="c1"></span>  <span class="c1">// then clause if the condition is true, otherwise
+</span><span class="c1"></span>  <span class="c1">// to the value of the else clause.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">))</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
     <span class="p">}</span>
 
-  <span class="c1">// The abstraction creates a new context of execution</span>
-  <span class="c1">// and registers it&#39;s argument in the SymbolTable.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Abstraction</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">scope</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">();</span>
+  <span class="c1">// The abstraction creates a new context of execution
+</span><span class="c1"></span>  <span class="c1">// and registers it&apos;s argument in the SymbolTable.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Abstraction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">scope</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">();</span>
     <span class="k">return</span> <span class="nx">x</span> <span class="p">=&gt;</span> <span class="p">{</span>
       <span class="nx">scope</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">x</span><span class="p">);</span>
       <span class="nx">SymbolTable</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">scope</span><span class="p">);</span>
       <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
     <span class="p">};</span>
 
-  <span class="c1">// IsZero checks if the evaluated value of its</span>
-  <span class="c1">// expression equals `0`.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">IsZero</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// IsZero checks if the evaluated value of its
+</span><span class="c1"></span>  <span class="c1">// expression equals `0`.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">IsZero</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">expression</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="c1">// The arithmetic operations manipulate the value</span>
-  <span class="c1">// of their corresponding expressions:</span>
-  <span class="c1">// - `succ` adds 1.</span>
-  <span class="c1">// - `pred` subtracts 1.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Arithmetic</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">op</span> <span class="o">=</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">operator</span><span class="p">;</span>
-    <span class="kr">const</span> <span class="nx">val</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">expression</span><span class="p">);</span>
+  <span class="c1">// The arithmetic operations manipulate the value
+</span><span class="c1"></span>  <span class="c1">// of their corresponding expressions:
+</span><span class="c1"></span>  <span class="c1">// - `succ` adds 1.
+</span><span class="c1"></span>  <span class="c1">// - `pred` subtracts 1.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Arithmetic</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">op</span> <span class="o">=</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">operator</span><span class="p">;</span>
+    <span class="k">const</span> <span class="nx">val</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">expression</span><span class="p">);</span>
     <span class="k">switch</span> <span class="p">(</span><span class="nx">op</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">case</span> <span class="s1">&#39;succ&#39;</span><span class="o">:</span>
+      <span class="k">case</span> <span class="s1">&apos;succ&apos;</span><span class="o">:</span>
         <span class="k">return</span> <span class="nx">val</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-      <span class="k">case</span> <span class="s1">&#39;pred&#39;</span><span class="o">:</span>
+      <span class="k">case</span> <span class="s1">&apos;pred&apos;</span><span class="o">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="nx">val</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">val</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">val</span><span class="p">;</span>
     <span class="p">}</span>
 
-  <span class="c1">// The application evaluates to:</span>
-  <span class="c1">// - Evaluation of the left expression.</span>
-  <span class="c1">// - Evaluation of the right expression.</span>
-  <span class="c1">// Application of the evaluation of the left expression over</span>
-  <span class="c1">// the evaluated right expression.</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
+  <span class="c1">// The application evaluates to:
+</span><span class="c1"></span>  <span class="c1">// - Evaluation of the left expression.
+</span><span class="c1"></span>  <span class="c1">// - Evaluation of the right expression.
+</span><span class="c1"></span>  <span class="c1">// Application of the evaluation of the left expression over
+</span><span class="c1"></span>  <span class="c1">// the evaluated right expression.
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">l</span><span class="p">(</span><span class="nx">r</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div>
-
-<p>The code is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check its condition and return the result we get from the evaluation of its <code>then</code> or <code>else</code> branches, depending on the condition&rsquo;s value:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="k">if</span> <span class="p">(</span><span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">))</span> <span class="p">{</span>
+<p>The code is quite straightforward. It involves pre-order traversal of the produced AST and interpretation of the individual nodes. For instance, in case given node in the tree represents a conditional expression all we need to do is check its condition and return the result we get from the evaluation of its <code>then</code> or <code>else</code> branches, depending on the condition&#x2019;s value:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">))</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">Eval</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
-
 <h2 id="developing-a-code-generator">Developing a Code Generator</h2>
 
-<p>Here&rsquo;s a <a href="https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js">list of the languages</a> which compile to JavaScript. Why not create another language?</p>
+<p>Here&#x2019;s a <a href="https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js">list of the languages</a> which compile to JavaScript. Why not create another language?</p>
 
-<p><amp-img src="/images/typed-lambda/generation.jpg" alt="Generation" layout="responsive" width="1500" height="1000"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/generation.jpg" alt="Generation" style="display: block; margin: auto;"></amp-img></p>
 
-<p>In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our &ldquo;to JavaScript compiler&rdquo; is on less than 40 lines of code. The entire transpiler can be found <a href="https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1">here</a>`.</p>
+<p>In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our &#x201C;to JavaScript compiler&#x201D; is on less than 40 lines of code. The entire transpiler can be found <a href="https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7`1">here</a>`.</p>
 
-<p>Let&rsquo;s take a look at how we are going to translate application, abstraction and conditional expressions to JavaScript:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">const</span> <span class="nx">CompileJS</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<p>Let&#x2019;s take a look at how we are going to translate application, abstraction and conditional expressions to JavaScript:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">CompileJS</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="p">...</span>
 
-  <span class="c1">// Transpile a literal</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Literal</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Transpile a literal
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Literal</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
 
-  <span class="c1">// Transpile identifier</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Transpile identifier
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Identifier</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">ast</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
 
-  <span class="c1">// Transpile a conditional expression</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">targetCondition</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">targetThen</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">targetElse</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+  <span class="c1">// Transpile a conditional expression
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Condition</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">targetCondition</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">condition</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">targetThen</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">then</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">targetElse</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
     <span class="k">return</span> <span class="sb">`</span><span class="si">${</span><span class="nx">targetCondition</span><span class="si">}</span><span class="sb"> ? </span><span class="si">${</span><span class="nx">targetThen</span><span class="si">}</span><span class="sb"> : </span><span class="si">${</span><span class="nx">targetElse</span><span class="si">}</span><span class="err">\</span><span class="sb">n`</span><span class="p">;</span>
 
-  <span class="c1">// Transpile an abstraction</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Abstraction</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="sb">`(</span><span class="si">${</span><span class="nx">ast</span><span class="p">.</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> =&gt; {</span>
-<span class="sb">      return </span><span class="si">${</span><span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span><span class="si">}</span><span class="sb"></span>
-<span class="sb">    })`</span><span class="p">;</span>
+  <span class="c1">// Transpile an abstraction
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Abstraction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="sb">`(</span><span class="si">${</span><span class="nx">ast</span><span class="p">.</span><span class="nx">arg</span><span class="p">.</span><span class="nx">id</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> =&gt; {
+</span><span class="sb">      return </span><span class="si">${</span><span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span><span class="si">}</span><span class="sb">
+</span><span class="sb">    })`</span><span class="p">;</span>
 
-  <span class="c1">// Transpile an application</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
+  <span class="c1">// Transpile an application
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">ASTNodes</span><span class="p">.</span><span class="nx">Application</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">left</span><span class="p">);</span>
+    <span class="k">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">CompileJS</span><span class="p">(</span><span class="nx">ast</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
     <span class="k">return</span> <span class="sb">`</span><span class="si">${</span><span class="nx">l</span><span class="si">}</span><span class="sb">(</span><span class="si">${</span><span class="nx">r</span><span class="si">}</span><span class="sb">)</span><span class="err">\</span><span class="sb">n`</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">&apos;&apos;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre></div>
-
 <p>Notice that when the current node is a literal (i.e. <code>0</code>, <code>true</code> or <code>false</code>) we return its value. In case we transpile a conditional expression, we first transpile its condition, then its <code>then</code> expression, right after that its <code>else</code> expression and finally, the entire conditional expression itself. The result will be a JavaScript ternary operator.</p>
 
-<p>Right after that is the source code for transpilation of a function (or abstraction, the way we call a function in our definitions above). The source code is quite straightforward, we declare the function&rsquo;s argument based on the argument of our lambda and after that compile function&rsquo;s body and place it as the return statement.</p>
+<p>Right after that is the source code for transpilation of a function (or abstraction, the way we call a function in our definitions above). The source code is quite straightforward, we declare the function&#x2019;s argument based on the argument of our lambda and after that compile function&#x2019;s body and place it as the return statement.</p>
 
 <p>Finally, we transpile the application. For this purpose, we transpile the left sub-expression of the application which is supposed to be a function and apply it to the right hand side of the application.</p>
 
 <p>Now if we transpile the following program to JavaScript:</p>
-<div class="highlight"><pre><span></span>(
-  λ x: Nat →
-    (λ y: Nat → x) 0
+<div class="highlight"><pre class="chroma">(
+  &#x3BB; x: Nat &#x2192;
+    (&#x3BB; y: Nat &#x2192; x) 0
 )
 succ (
-  λ f: Nat →
-    (λ g: Nat → g) 0
-) 0
-</pre></div>
-
+  &#x3BB; f: Nat &#x2192;
+    (&#x3BB; g: Nat &#x2192; g) 0
+) 0</pre></div>
 <p>We will get:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="p">(</span><span class="nx">x</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="nx">x</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">(</span><span class="nx">y</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
   <span class="p">})(</span><span class="mi">0</span><span class="p">);</span>
@@ -902,157 +814,85 @@ succ (
   <span class="p">})(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 <span class="p">);</span>
 </code></pre></div>
-
 <h1 id="conclusion">Conclusion</h1>
 
-<p>The purpose of this article was to explain a &ldquo;full-stack&rdquo; process of design and development of a programming language. The explained language is an extension of the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">lambda calculus</a>. On top of the primitives provided by the lambda calculus we added three built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.</p>
+<p>The purpose of this article was to explain a &#x201C;full-stack&#x201D; process of design and development of a programming language. The explained language is an extension of the <a href="https://en.wikipedia.org/wiki/Lambda_calculus">lambda calculus</a>. On top of the primitives provided by the lambda calculus we added three built-in functions, natural numbers, boolean values, a syntax for conditional expressions and a type system. We provided a formal definition of these primitives in terms of small-step semantics and also defined a type system by using a series of type rules.</p>
 
-<p>It&rsquo;s interesting how <strong>straightforward</strong> is the <strong>JavaScript implementation which we directly derived from the mathematical definitions</strong>. We just &ldquo;translated the math&rdquo; into source code. Of course, the process of designing the source code has it&rsquo;s own portion of creativity involved but the general algorithm is equivalent.</p>
+<p>It&#x2019;s interesting how <strong>straightforward</strong> is the <strong>JavaScript implementation which we directly derived from the mathematical definitions</strong>. We just &#x201C;translated the math&#x201D; into source code. Of course, the process of designing the source code has it&#x2019;s own portion of creativity involved but the general algorithm is equivalent.</p>
 
 <p>Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of <a href="https://en.wikipedia.org/wiki/Dependent_type">dependent types</a> the boundary between evaluation and type checking becomes even blurrier.</p>
 
 <h2 id="where-to-go-from-here">Where to go from here?</h2>
 
-<p><amp-img src="/images/typed-lambda/next.jpg" alt="Next" layout="responsive" width="1500" height="844"></amp-img></p>
+<p><amp-img src="/images/typed-lambda/next.jpg" alt="Next" style="display: block; margin: auto;"></amp-img></p>
 
-<p>A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language&rsquo;s ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main &ldquo;syntactic camps&rdquo; that they are in. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.</p>
+<p>A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language&#x2019;s ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main &#x201C;syntactic camps&#x201D; that they are in. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.</p>
 
 <p>Another direction for improvement is a better error reporting. With the grammar produced by Peg.js we can easy get the exact position in the program of the individual symbols. This will allow us to throw errors at specific locations which will make debugging much easier.</p>
 
 <p>Will be happy to get your thoughts and observations from the article in the comments section below.</p>
-</div>
 
-  <aside class="p-share">
-  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f&t=Developing%20Statically%20Typed%20Programming%20Language" title="Facebookでシェア" class="fb" target="_blank" rel="nofollow"></a>
-  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f&text=Developing%20Statically%20Typed%20Programming%20Language&tw_p=tweetbutton" title="Twitterでシェア" class="tw" target="_blank" rel="nofollow"></a>
-  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2017%2f08%2f05%2ftyped-lambda-calculus-create-type-checker-transpiler-compiler-javascript%2f" title="Google Plusでシェア" class="gp" target="_blank" rel="nofollow"></a>
-</aside>
+                </section>
+            </article>
 
+            
 
-  <footer class="article-footer">
-    <section>
-      <ol class="p-crumb">
-        <li><a href="https://blog.mgechev.com/">Minko Gechev&#39;s blog</a></li>
-        
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
-        
-        <li>Developing Statically Typed Programming Language</li>
-      </ol>
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
 
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
-          <ul>
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Programming-languages/">Programming languages</a></li>
+
             
-            <li><a href="https://blog.mgechev.com/categories/Lambda-calculus/">Lambda calculus</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Type-theory/">Type theory</a></li>
-            
-            <li><a href="https://blog.mgechev.com/categories/Compilers/">Compilers</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-      
-      <ul class="p-facts">
-        <li>
-          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
-          <ul>
-            
-            <li><a href="https://blog.mgechev.com/tags/Programming-languages/">Programming languages</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Lambda-calculus/">Lambda calculus</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Type-theory/">Type theory</a></li>
-            
-            <li><a href="https://blog.mgechev.com/tags/Compilers/">Compilers</a></li>
-            
-          </ul>
-        </li>
-      </ul>
-      
-      
-    </section>
-  </footer>
-</article>
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         &#xA9; Copyright 2018  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
 
 
 
   
-  
-  <section>
-    <header><span>Latests</span></header>
-    <ul class="p-articles thin">
-      <li><article class="li sm article-a82370942d7e1aeff2b293afaa046093">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/" class="thumbnail" title="Fast, extensible, configurable, and beautiful linter for Go"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">Fast, extensible, configurable, and beautiful linter for Go</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-28T00:00:00JST">May 28, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-5c68733b87f8b000068b3ec24de50f2d">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/" class="thumbnail" title="Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web"></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-05-09T00:00:00JST">May 9, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li><li><article class="li sm article-65b7794818635a71066d583c1d19dfcf">
-  <div class="header-wrapper">
-    <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/" class="thumbnail" title="Machine Learning-Driven Bundling. The Future of JavaScript Tooling."></a>
-    <header class="article-header">
-      <div class="clearfix">
-        <h2 class="title"><a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling.</a></h2>
-        <ul class="p-facts">
-          <li><time datetime="2018-03-18T00:00:00JST">Mar 18, 2018</time></li>
-          <li><a href="https://blog.mgechev.com/post/">post</a></li>
-          
-        </ul>
-      </div>
-    </header>
-  </div>
-</article>
-</li>
-    </ul>
-  </section>
-  
-</div>
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
 
 
-    </main>
 
-    
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
 
-    <footer class="l-footer">
-      <div class="l-container">
-        <p><span class="h-logo">&copy; Minko Gechev&#39;s blog</span></p>
-      </div>
-    </footer>
 
-    <a href="#" class="p-movetop" title="ページ上部へ戻る" rel="nofollow"></a>
-  </body>
+
+    </body>
 </html>
-
