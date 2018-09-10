@@ -31,6 +31,10 @@ In this article, I'll introduce the early implementation of a few tools which ba
 <section style="background: #eee; padding: 15px;">
 If you're only interested in the practical applications of the described packages, you can read the "Introduction" and the "Tooling Introduction" sections. In case you want to know more about the implementation details, you can focus on the sections "Definitions" and "Technical Details".
 </section>
+<br>
+<section style="background: #ddefff; padding: 15px;">
+Based on the research shown in this article, in collaboration with the Google Chrome team, we published <a href="https://github.com/guess-js/guess">🔮 Guess.js</a>. The implementation of Guess.js follows closely the <code>@mlx/*</code> tools described here. More about Guess.js you can read <a href="/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">here</a>
+</section>
 
 # Introduction
 
@@ -679,7 +683,7 @@ Keep in mind that we're ignoring the page leaves.
   .diagram-wrapper section {
     width: 30%;
   }
-  @media (max-width: 660px) { 
+  @media (max-width: 660px) {
     .diagram-wrapper {
       display: block;
     }
@@ -698,7 +702,7 @@ Keep in mind that we're ignoring the page leaves.
   <feComponentTransfer>
     <feFuncA type="linear" slope="0.9"/>
   </feComponentTransfer>
-  <feMerge> 
+  <feMerge>
     <feMergeNode/>
     <feMergeNode in="SourceGraphic"/>
   </feMerge>
