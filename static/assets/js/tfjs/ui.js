@@ -206,15 +206,18 @@
   }
 
   var videoStream = null;
+  var camTabs = 0;
 
-  function activateCamera(tab, content) {
+  function onTabChange(tab, content) {
     if (tab.innerText !== 'Camera') {
-      if (videoStream) {
+      camTabs--;
+      if (videoStream && camTabs === 0) {
         videoStream.getTracks()[0].stop();
         videoStream = null;
       }
       return;
     }
+    camTabs++;
     var video = content.querySelector('video');
     var promise = null;
     if (videoStream) {
@@ -224,7 +227,7 @@
         video: true
       });
     }
-    promise.then(function(stream) {
+    return promise.then(function(stream) {
       videoStream = stream;
       video.srcObject = stream;
     });
@@ -256,15 +259,15 @@
     });
   }
 
-  tab(document.getElementById('mobile-net-tab'), activateCamera);
+  tab(document.getElementById('mobile-net-tab'), onTabChange);
   dropArea(document.querySelector('#mobile-net-tab .upload'), mobileNetPredict);
   cameraArea(document.querySelector('#mobile-net-tab .cam'), mobileNetPredict);
 
-  tab(document.getElementById('binary-class-tab'), activateCamera);
+  tab(document.getElementById('binary-class-tab'), onTabChange);
   dropArea(document.querySelector('#binary-class-tab .upload'), punchPredict);
   cameraArea(document.querySelector('#binary-class-tab .cam'), punchPredict);
 
-  tab(document.getElementById('n-ary-class-tab'), activateCamera);
+  tab(document.getElementById('n-ary-class-tab'), onTabChange);
   dropArea(document.querySelector('#n-ary-class-tab .upload'), punchKickPredict);
   cameraArea(document.querySelector('#n-ary-class-tab .cam'), punchKickPredict);
 
