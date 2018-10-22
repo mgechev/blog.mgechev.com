@@ -5,7 +5,7 @@ categories:
 - TensorFlow
 - CNN
 date: 2018-10-20T00:00:00Z
-draft: true
+draft: false
 tags:
 - Machine learning
 - TensorFlow
@@ -316,3 +316,203 @@ await model.fit(xs, ys, {
 The code above, invokes `fit` with three arguments - `xs`, `ys`, and a configuration object. In the configuration object we've set for how many epochs we want to train the model, we've provided a batch size, and a callback which will be invoked after each batch.
 
 The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from our `sigmoid` layer and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
+
+<div class="image-widget" id="binary-class">
+  <div class="tab" id="binary-class-tab">
+    <ul>
+      <li>Upload</li>
+      <li>Camera</li>
+    </ul>
+    <div class="content">
+      <div class="upload">
+        <h1>Drag & Drop file here</h1>
+        <img class="image-preview">
+      </div>
+      <div class="cam">
+        video
+        <video autoplay></video>
+      </div>
+    </div>
+  </div>
+  <div class="prediction">
+  </div>
+</div>
+
+<style>
+.tab li {
+  display: inline-block;
+  padding: 9px;
+  cursor: pointer;
+  margin: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.tab li.selected {
+  background-color: #eee;
+}
+
+.upload {
+  height: 200px;
+  border: 5px dashed #eee;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload.highlight {
+  border: 5px dashed #ccc;
+}
+
+.upload h1 {
+  position: absolute;
+  top: 52px;
+  font-family: Verdana;
+  left: calc(50% - 160px);
+  color: #eee;
+}
+
+.upload.highlight h1 {
+  color: #ccc;
+}
+
+.upload.filled {
+  border: 5px dashed transparent;
+}
+
+.upload.filled h1 {
+  display: none;
+}
+</style>
+
+<canvas id="crop" width="100" height="56" style="display: none"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1"></script>
+<script>
+  var crop = document.getElementById('crop');
+  var tab = function (el) {
+    var nav = el.getElementsByTagName('ul')[0];
+    var panel = el.getElementsByClassName('content')[0];
+    var tabs = [].slice.call(nav.getElementsByTagName('li'));
+    var panels = [].slice.call(el.querySelectorAll('.content > div'));
+    panels.forEach(function (p) {
+      p.style.display = 'none';
+    });
+    tabs.forEach(function (el, idx) {
+      el.addEventListener('click', function (e) {
+        panels.forEach(function (e) {
+          e.style.display = 'none';
+        });
+        panels[idx].style.display = 'block';
+        tabs.forEach(function (e) {
+          e.className = '';
+        });
+        el.className = 'selected';
+      });
+    });
+    tabs[0].className = 'selected';
+    panels[0].style.display = 'block';
+  };
+
+  var dropArea = function (el, onDrop) {
+    var dropArea = el;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ;['dragenter', 'dragover'].forEach(function (eventName) {
+      dropArea.addEventListener(eventName, highlight, false);
+    })
+
+    ;['dragleave', 'drop'].forEach(function (eventName) {
+      dropArea.addEventListener(eventName, unhighlight, false)
+    })
+
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false)
+
+    function preventDefaults (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    function highlight(e) {
+      dropArea.classList.add('highlight')
+    }
+
+    function unhighlight(e) {
+      dropArea.classList.remove('highlight')
+    }
+
+    function fill(e) {
+      dropArea.classList.add('filled')
+    }
+
+    function handleDrop(e) {
+      previewFile(e.dataTransfer.files[0]);
+    }
+
+    function previewFile(file) {
+      var reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onloadend = function() {
+        var img = dropArea.querySelector('.image-preview');
+        img.src = reader.result;
+        fill(dropArea);
+        img.onload = function () {
+          crop
+            .getContext('2d')
+            .drawImage(
+              img,
+              0,
+              0,
+              img.width,
+              img.width / (100 / 56),
+              0,
+              0,
+              100,
+              56
+            );
+          grayscale(crop)
+          onDrop(crop);
+        };
+      };
+    }
+  }
+
+  var grayscale = function (canvas) {
+    var imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    var data = imageData.data;
+    for (var i = 0; i < data.length; i += 4) {
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i] = avg;
+      data[i + 1] = avg;
+      data[i + 2] = avg;
+    }
+    canvas.getContext('2d').putImageData(imageData, 0, 0);
+  };
+
+  var mobileNet = null;
+  var punchModel = null;
+
+  function predict(img) {
+    var result = document.querySelector('#binary-class > .prediction')
+    result.innerHTML = 'Loading...';
+    Promise.all([
+      mobileNet ? Promise.resolve(mobileNet) : mobilenet.load(),
+      punchModel ? Promise.resolve(punchModel) : tf.loadModel('/assets/js/tfjs/punch/model.json')
+    ])
+    .then(function (models) {
+      mobileNet = models[0];
+      punchModel = models[1];
+      var output = punchModel.predict(mobileNet.infer(img, 'global_average_pooling2d_1')).dataSync();
+      result.innerHTML = 'Prediction <span class="prediction">'+ output +'</span>';
+      console.log(output);
+    });
+  }
+
+  tab(document.getElementById('binary-class-tab'))
+  dropArea(document.querySelectorAll('.upload')[0], predict);
+</script>
