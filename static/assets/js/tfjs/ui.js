@@ -1,5 +1,8 @@
 (function() {
-  var crop = document.getElementById('crop');
+  var crop = document.createElement('canvas');
+  crop.width = 100;
+  crop.height = 56;
+
   var tab = function(el, onChange) {
     var nav = el.getElementsByTagName('ul')[0];
     var tabs = [].slice.call(nav.getElementsByTagName('li'));
@@ -141,7 +144,7 @@
   var mobileNet = null;
   var punchModel = null;
 
-  function predict(img) {
+  function punchPredict(img) {
     img = scale(img);
     grayscale(img);
     var result = document.querySelector('#binary-class > .prediction');
@@ -157,7 +160,28 @@
         headers: ['Action', 'Probability'],
         rows: [['Punch', parseFloat(output).toFixed(5)]]
       });
-      result.innerHTML = 'Prediction <span class="prediction">' + output + '</span>';
+      result.innerHTML = '';
+      result.appendChild(table);
+    });
+  }
+
+  var punchKickModel = null;
+  function punchKickPredict(img) {
+    img = scale(img);
+    grayscale(img);
+    var result = document.querySelector('#n-ary-class > .prediction');
+    result.innerHTML = renderSpinner();
+    Promise.all([
+      mobileNet ? Promise.resolve(mobileNet) : mobilenet.load(),
+      punchKickModel ? Promise.resolve(punchKickModel) : tf.loadModel('/assets/js/tfjs/punch-kick/model.json')
+    ]).then(function(models) {
+      mobileNet = models[0];
+      punchKickModel = models[1];
+      var output = Array.from(punchKickModel.predict(mobileNet.infer(img, 'global_average_pooling2d_1')).dataSync());
+      var table = renderTable({
+        headers: ['Action', 'Probability'],
+        rows: [['Punch', parseFloat(output[0]).toFixed(5)], ['Kick', parseFloat(output[1]).toFixed(5)]]
+      });
       result.innerHTML = '';
       result.appendChild(table);
     });
@@ -237,6 +261,10 @@
   cameraArea(document.querySelector('#mobile-net-tab .cam'), mobileNetPredict);
 
   tab(document.getElementById('binary-class-tab'), activateCamera);
-  dropArea(document.querySelector('#binary-class-tab .upload'), predict);
-  cameraArea(document.querySelector('#binary-class-tab .cam'), predict);
+  dropArea(document.querySelector('#binary-class-tab .upload'), punchPredict);
+  cameraArea(document.querySelector('#binary-class-tab .cam'), punchPredict);
+
+  tab(document.getElementById('n-ary-class-tab'), activateCamera);
+  dropArea(document.querySelector('#n-ary-class-tab .upload'), punchKickPredict);
+  cameraArea(document.querySelector('#n-ary-class-tab .cam'), punchKickPredict);
 })();

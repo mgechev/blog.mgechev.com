@@ -366,12 +366,31 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
   </div>
 </div>
 
-<style>
+More text
 
-
-</style>
-
-<canvas id="crop" width="100" height="56" style="display: none"></canvas>
+<div class="image-widget" id="n-ary-class">
+  <div class="prediction">
+  </div>
+  <div class="tab" id="n-ary-class-tab">
+    <ul>
+      <li>Upload</li>
+      <li>Camera</li>
+    </ul>
+    <div class="content">
+      <div class="upload">
+        <input type="file">
+        <h1>Drag & Drop file here</h1>
+        <img class="image-preview">
+      </div>
+      <div class="cam">
+        <div class="btn">
+          <i class="fa fa-camera"></i>
+        </div>
+        <video autoplay></video>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1"></script>
