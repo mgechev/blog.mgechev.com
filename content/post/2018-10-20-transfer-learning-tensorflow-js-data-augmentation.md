@@ -357,7 +357,9 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
         <img class="image-preview">
       </div>
       <div class="cam">
-        <div class="btn"></div>
+        <div class="btn">
+          <i class="fa fa-camera"></i>
+        </div>
         <video autoplay></video>
       </div>
     </div>
