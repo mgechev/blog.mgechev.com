@@ -318,6 +318,8 @@ The code above, invokes `fit` with three arguments - `xs`, `ys`, and a configura
 The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from our `sigmoid` layer and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
 
 <div class="image-widget" id="binary-class">
+  <div class="prediction">
+  </div>
   <div class="tab" id="binary-class-tab">
     <ul>
       <li>Upload</li>
@@ -325,6 +327,7 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
     </ul>
     <div class="content">
       <div class="upload">
+        <input type="file">
         <h1>Drag & Drop file here</h1>
         <img class="image-preview">
       </div>
@@ -334,18 +337,22 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
       </div>
     </div>
   </div>
-  <div class="prediction">
-  </div>
 </div>
 
 <style>
+.image-widget {
+  border-radius: 5px;
+}
+
 .tab li {
   display: inline-block;
   padding: 9px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   cursor: pointer;
   margin: 0;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  border-radius: 25px;
+  font-size: 0.9em;
 }
 
 .tab li.selected {
@@ -359,16 +366,30 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
   overflow: hidden;
 }
 
+.upload input[type="file"] {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  z-index: 3;
+  cursor: pointer;
+}
+
 .upload.highlight {
   border: 5px dashed #ccc;
 }
 
 .upload h1 {
   position: absolute;
-  top: 52px;
+  top: 50px;
   font-family: Verdana;
-  left: calc(50% - 160px);
+  left: calc(50% - 181px);
   color: #eee;
+  font-weight: 600;
+  font-size: 32px !important;
+  text-align: center;
 }
 
 .upload.highlight h1 {
@@ -377,6 +398,7 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
 
 .upload.filled {
   border: 5px dashed transparent;
+  height: auto;
 }
 
 .upload.filled h1 {
@@ -416,6 +438,12 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
 
   var dropArea = function (el, onDrop) {
     var dropArea = el;
+
+    dropArea.querySelector('input[type="file"]').onchange = function (event) {
+      if (this.files && this.files[0]) {
+        previewFile(this.files[0]);
+      }
+    };
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
       dropArea.addEventListener(eventName, preventDefaults, false);
