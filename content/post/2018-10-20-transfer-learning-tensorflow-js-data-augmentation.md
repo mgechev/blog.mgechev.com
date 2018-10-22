@@ -224,6 +224,29 @@ Transfer learning allows us to reuse an already existing and trained network. We
 
 For our purposes, we'll use the MobileNet neural network, from the [@tensorflow-models/mobilenet](https://www.npmjs.com/package/@tensorflow-models/mobilenet) package. MobileNet is as powerful as VGG-16 but it's also much smaller which makes its forward propagation much faster. MobileNet has been trained on the [ILSVRC-2012-CLS](http://www.image-net.org/challenges/LSVRC/2012/) image classification dataset.
 
+You can give MobileNet a try in the widget below. Feel free to select an image from your file system or use the camera as an input:
+
+<div class="image-widget" id="mobile-net">
+  <div class="prediction"></div>
+  <div class="tab" id="mobile-net-tab">
+    <ul>
+      <li>Upload</li>
+      <li>Camera</li>
+    </ul>
+    <div class="content">
+      <div class="upload">
+        <input type="file">
+        <h1>Drag & Drop file here</h1>
+        <img class="image-preview">
+      </div>
+      <div class="cam">
+        video
+        <video autoplay></video>
+      </div>
+    </div>
+  </div>
+</div>
+
 Few of the choices that we have when we develop a model with transfer learning are:
 
 - The output from which layer of the source model are we going to use as an input for the target model
@@ -344,6 +367,23 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
   border-radius: 5px;
 }
 
+.prediction {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.prediction table {
+  margin-bottom: 0px;
+  margin-top: 5px;
+}
+
+.tab ul {
+  width: 140px;
+  display: block;
+  margin: auto;
+  margin-bottom: 10px !important;
+}
+
 .tab li {
   display: inline-block;
   padding: 9px;
@@ -364,6 +404,11 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
   border: 5px dashed #eee;
   position: relative;
   overflow: hidden;
+}
+
+.upload img {
+  margin: auto;
+  display: block;
 }
 
 .upload input[type="file"] {
@@ -404,6 +449,62 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
 .upload.filled h1 {
   display: none;
 }
+
+
+/************** Spinner *************/
+
+.spinner {
+  margin: auto;
+  margin-right: 11px;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  text-align: center;
+
+  -webkit-animation: sk-rotate 2.0s infinite linear;
+  animation: sk-rotate 2.0s infinite linear;
+}
+
+.dot1, .dot2 {
+  width: 60%;
+  height: 60%;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  background-color: #EE9D27;
+  border-radius: 100%;
+
+  -webkit-animation: sk-bounce 1.0s infinite ease-in-out;
+  animation: sk-bounce 1.0s infinite ease-in-out;
+}
+
+.dot2 {
+  top: auto;
+  bottom: 0;
+  -webkit-animation-delay: -0.5s;
+  animation-delay: -0.5s;
+  background-color: #CD2E28;
+}
+
+@-webkit-keyframes sk-rotate { 100% { -webkit-transform: rotate(360deg) }}
+@keyframes sk-rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+
 </style>
 
 <canvas id="crop" width="100" height="56" style="display: none"></canvas>
@@ -490,25 +591,32 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
         img.src = reader.result;
         fill(dropArea);
         img.onload = function () {
-          crop
-            .getContext('2d')
-            .drawImage(
-              img,
-              0,
-              0,
-              img.width,
-              img.width / (100 / 56),
-              0,
-              0,
-              100,
-              56
-            );
-          grayscale(crop)
-          onDrop(crop);
+          var canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+          onDrop(canvas);
         };
       };
     }
   }
+
+  var scale = function (canvas) {
+    crop
+      .getContext('2d')
+      .drawImage(
+        canvas,
+        0,
+        0,
+        canvas.width,
+        canvas.width / (100 / 56),
+        0,
+        0,
+        100,
+        56
+      );
+    return crop;
+  };
 
   var grayscale = function (canvas) {
     var imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
@@ -522,12 +630,43 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
     canvas.getContext('2d').putImageData(imageData, 0, 0);
   };
 
+  var renderTable = function (conf) {
+    var headers = conf.headers;
+    var rows = conf.rows;
+    var table = document.createElement('table');
+    var header = document.createElement('thead');
+    var headerTr = document.createElement('tr');
+    headers.forEach(function (h) {
+      var th = document.createElement('th');
+      th.innerText = h;
+      headerTr.appendChild(th);
+    })
+    header.appendChild(headerTr);
+    table.appendChild(header);
+    rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+      row.forEach(function (cell) {
+        var td = document.createElement('td');
+        td.innerText = cell;
+        tr.appendChild(td);
+      })
+      table.appendChild(tr);
+    })
+    return table;
+  }
+
+  var renderSpinner = function () {
+    return '<div class="spinner"><div class="dot1"></div><div class="dot2"></div></div>';
+  };
+
   var mobileNet = null;
   var punchModel = null;
 
   function predict(img) {
+    img = scale(img)
+    grayscale(img);
     var result = document.querySelector('#binary-class > .prediction')
-    result.innerHTML = 'Loading...';
+    result.innerHTML = renderSpinner();
     Promise.all([
       mobileNet ? Promise.resolve(mobileNet) : mobilenet.load(),
       punchModel ? Promise.resolve(punchModel) : tf.loadModel('/assets/js/tfjs/punch/model.json')
@@ -536,11 +675,39 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
       mobileNet = models[0];
       punchModel = models[1];
       var output = punchModel.predict(mobileNet.infer(img, 'global_average_pooling2d_1')).dataSync();
+      var table = renderTable({
+        headers: ['Action', 'Probability'],
+        rows: [['Punch', parseFloat(output).toFixed(5)]]
+      })
       result.innerHTML = 'Prediction <span class="prediction">'+ output +'</span>';
-      console.log(output);
+      result.innerHTML = '';
+      result.appendChild(table);
     });
   }
 
+  function mobileNetPredict(img) {
+    var result = document.querySelector('#mobile-net > .prediction')
+    result.innerHTML = renderSpinner();
+    (mobileNet ? Promise.resolve(mobileNet) : mobilenet.load())
+    .then(function (model) {
+      mobileNet = model;
+      var output = mobileNet.classify(img)
+      .then(function (predictions) {
+        result.innerHTML = '';
+        var table = renderTable({
+          headers: ['Object', 'Probability'],
+          rows: predictions.map(function (p) {
+            return [p.className, p.probability.toFixed(5)];
+          })
+        })
+        result.appendChild(table);
+      })
+    });
+  }
+
+  tab(document.getElementById('mobile-net-tab'))
+  dropArea(document.querySelectorAll('.upload')[0], mobileNetPredict);
+
   tab(document.getElementById('binary-class-tab'))
-  dropArea(document.querySelectorAll('.upload')[0], predict);
+  dropArea(document.querySelectorAll('.upload')[1], predict);
 </script>
