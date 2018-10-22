@@ -18,13 +18,18 @@ og_image: /images/tf-mk/cover.png
 url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation
 ---
 
-While experimenting with enhancements of the prediction model of [Guess.js](https://guessjs.com), I started looking at deep learning. I've been mostly focused on recurrent neural networks (RNNs), specifically LSTM because of their ["unreasonable effectiveness"](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) in the domain of Guess.js. In the same time, I started looking at convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are often used for image classification, recognition, and detection.
-Then I remembered an [experiment I did](https://www.youtube.com/watch?v=0_yfU_iNUYo) a few years ago, when the browser vendors introduced the `getUserMedia` API. In this experiment, I used the user's camera as a controller for playing a JavaScript clone of Mortal Kombat 3. You can find the game at my [GitHub account](https://github.com/mgechev/mk.js). As part of the experiment, I implemented a very basic posture detection algorithm which recognizes:
+While experimenting with enhancements of the prediction model of [Guess.js](https://guessjs.com), I started looking at deep learning. I've been mostly focused on recurrent neural networks (RNNs), specifically LSTM because of their ["unreasonable effectiveness"](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) in the domain of Guess.js. In the same time, I started looking at convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.
+
+<img src="/images/tfjs-cnn/rnn.svg" alt="Recurrent Neural Network" style="display: block; margin: auto; margin-top: 20px;">
+<div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">Recurrent neural network</div>
+
+After playing around with CNNs, I remembered an [experiment I did](https://www.youtube.com/watch?v=0_yfU_iNUYo) a few years ago, when the browser vendors introduced the `getUserMedia` API. In this experiment, I used the user's camera as a controller for playing a small JavaScript clone of Mortal Kombat 3. You can find the game at my [GitHub account](https://github.com/mgechev/mk.js). As part of the experiment, I implemented a very basic posture detection algorithm which classifies an image into the following classes:
 
 - Upper punch with the left and right hands
 - Kick with the left and right legs
 - Walking left and right
 - Squatting
+- None of the above
 
 The algorithm is so simple, that I'd be able to explain it in a few sentences:
 
@@ -32,9 +37,9 @@ The algorithm is so simple, that I'd be able to explain it in a few sentences:
 
 You can find demo of the implementation in the video below. The source code is at my [GitHub account](https://github.com/mgechev/movement.js).
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/0_yfU_iNUYo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<iframe style="width: 100%; height: 400px;" src="https://www.youtube.com/embed/0_yfU_iNUYo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-Although I had success with controlling my tiny MK clone, the algorithm was far from perfect. It requires a background frame, without the user inside of it. The background frame needs to be with the same color over the course of execution of the program so that the detection procedure to work properly. This means that changes in the light, shadows, etc., would introduce disturbance and inaccurate results. Finally, the algorithm does not recognize actions - based on a background frame, it classifies another frame as a posture from a predefined set.
+Although I had success with controlling my tiny MK clone, the algorithm was far from perfect. It requires a frame with the background behind the user. For the detection procedure to work properly, the background frame needs to be with the same color over the course of execution of the program. This means that changes in the light, shadows, etc., would introduce disturbance and inaccurate results. Finally, the algorithm does not recognize actions - based on a background frame, it classifies another frame as a posture from a predefined set.
 
 Now, given the advancements in the Web platform APIs, and more specifically WebGL, I decided to give the problem another shot by using TensorFlow.js.
 
@@ -43,39 +48,40 @@ Now, given the advancements in the Web platform APIs, and more specifically WebG
 In this blog post, I'll share my experience on building a posture classification algorithm using TensorFlow.js and MobileNet. In the process, we'll look at the following topics:
 
 - Collecting training data for image classification
-- Performing data augmentation by using [imgaug](https://github.com/aleju/imgaug)
+- Performing data augmentation using [imgaug](https://github.com/aleju/imgaug)
 - Transfer learning with MobileNet
 - Binary classification and n-ary classification
 - Training an image classification TensorFlow.js model in Node.js and using it in the browser
-- Improving the model
 - Action classification with LSTM
 
-For the purposes of this article, we'll relax the problem to posture detection based on a single frame, in contrast to recognizing an action from a sequence of frames.
+For the purposes of this article, we'll relax the problem to posture detection based on a single frame, in contrast to recognizing an action from a sequence of frames. We'll develop a **supervised deep learning model**, which based on an image from the user's laptop camera, indicates if on this image the user is punching, kicking, or not doing the first two.
 
-In this blog post, we'll develop a **supervised deep learning model**, which based on an image from the user's laptop camera, indicates if on this image the user is punching, kicking, or not doing the first two.
+By the end of the article, we'd be able to use our model for playing [MK.js](https://github.com/mgechev/mk.js):
 
-**As a prerequirement, the reader should have a familiarity with software engineering and JavaScript. No background in deep learning is required.**
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
 
-In the next section, we'll make a brief introduction to deep learning and neural networks. Feel free to skip this section if you're already familiar with the concepts model, test data, backpropagation, optimization algorithm.
+**As a prerequirement, the reader should have a familiarity with fundamental concepts from the software engineering and JavaScript. No background in deep learning is required.**
 
-<div class="zippy">
-  <div>Header</div>
+In the next section, we'll make a brief, informal introduction to deep learning and neural networks. Feel free to skip this section if you're already familiar with the concepts model, test data, backpropagation, and optimization algorithms.
 
-## Deep Learning for Software Engineers
+<div class="zippy" data-title="Introduction to Deep Learning">
+
+<h2>Deep Learning for Software Engineers</h2>
 
 To give an intuition on how neural networks work, I'd want to make an analogy with the test-driven development (or TDD).
 
 In TDD, we start by writing tests for a function, even before we've implemented it. With the tests, we encapsulate our knowledge for the function's specification. Later, when we run the tests and they fail, we can adjust/alter the function's implementation so that we can estimate the expected result with higher precision. We repeat this process until we reach the desired function behavior. In TDD there's also heavily involved process of constant refactoring, which we can ignore for simplicity.
 
-Believe me or not, but this is a very accurate high-level, abstract analogy of how we can solve a problem using deep learning. In deep learning, instead of developing a function, we're working on a **model** which estimates a function. Instead of specifying the function's behavior with test cases, we use pairs - an input and an expected output. We will call these pairs **test data**. Initially, using our intuition for the problem that we're solving, we start by implementing a generic model which *may show good results* for the problem that we want to solve. After that, we pass our training data through the model, we get the calculated output and compare it with the expected result. Given the difference between them, we propagate it backwards, so that we can adjust the model to give a more precise result next time, which better approximates our ideal solution. This process is known as **backpropagation** and is quite similar to the TDD phase in which we're tuning our function by adding different statements.
+Believe me or not, but this is a very accurate high-level, abstract analogy of how we can solve a problem using deep learning. In deep learning, instead of developing a function, we're working on a <strong>model</strong> which estimates a function. Instead of specifying the function's behavior with test cases, we use pairs - an input and an expected output. We will call these pairs <strong>test data</strong>. Initially, using our intuition for the problem that we're solving, we start by implementing a generic model which *may show good results* for the problem that we want to solve. After that, we pass our training data through the model, we get the calculated output and compare it with the expected result. Given the difference between them, we propagate it backwards, so that we can adjust the model to give a more precise result next time, which better approximates our ideal solution. This process is known as <strong>backpropagation</strong> and is quite similar to the TDD phase in which we're tuning our function by adding different statements.
 
 As software engineers we often write functions with a very well defined specification. For example, there are very well defined rules on how to produce the monthly bank statement for given client. There are well defined algorithms for this which can be easily translate to code. These problems usually depend on some small number of variables (1, 100, or 100,000) which have finite domain of values. It's easy to hardcode rules which transform them into the actual solution.
 
-In contrast, deep learning can work with many more variables which have much larger domain. Using neural networks, we take a huge leap - we know what the algorithm should produce when we pass a given input but we have no idea how. Since coming up with an algorithm could be extremely hard, we build a model and let it figure out the algorithm itself. The model figures the algorithm out by finding patterns in our data called **features**. Since we give to the model the expected result that it needs to produce, it can adjust itself internally so that it can produce a closer approximation of the function which solves the general problem. This process is known as **training** and is achieved through many back propagations using an **optimization algorithm**.
+In contrast, deep learning can work with many more variables which have much larger domain. Using neural networks, we take a huge leap - we know what the algorithm should produce when we pass a given input but we have no idea how. Since coming up with an algorithm could be extremely hard, we build a model and let it figure out the algorithm itself. The model figures the algorithm out by finding patterns in our data called <strong>features</strong>. Since we give to the model the expected result that it needs to produce, it can adjust itself internally so that it can produce a closer approximation of the function which solves the general problem. This process is known as <strong>training</strong> and is achieved through many back propagations using an <strong>optimization algorithm</strong>.
 
-### Feed-forward architecture
+<h3>Feed-forward architecture</h3>
 
   Feed forward
+
 </div>
 
 ## Collecting data
@@ -203,8 +209,7 @@ Since we're dealing with images, we're going to use a convolutional neural netwo
 
 If you're interested in reading more about CNNs, you can expand the section below. Otherwise, feel free to skip the theory and get directly to practice!
 
-<div class="zippy">
-  <div>Header</div>
+<div class="zippy" data-title="Convolutional Neural Networks">
   CNNs
 </div>
 
