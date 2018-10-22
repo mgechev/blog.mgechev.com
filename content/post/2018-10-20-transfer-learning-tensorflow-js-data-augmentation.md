@@ -224,4 +224,95 @@ Transfer learning allows us to reuse an already existing and trained network. We
 
 For our purposes, we'll use the MobileNet neural network, from the [@tensorflow-models/mobilenet](https://www.npmjs.com/package/@tensorflow-models/mobilenet) package. MobileNet is as powerful as VGG-16 but it's also much smaller which makes its forward propagation much faster. MobileNet has been trained on the [ILSVRC-2012-CLS](http://www.image-net.org/challenges/LSVRC/2012/) image classification dataset.
 
+Few of the choices that we have when we develop a model with transfer learning are:
 
+- The output from which layer of the source model are we going to use as an input for the target model
+- How many layers from the target model do we want to train, if any
+
+For our purposes, we're not going to train any layers from MobileNet. We're directly going to pick the output from `global_average_pooling2d_1` and pass it to our tiny neural network.
+
+### Defining the Model
+
+Let us first solve a smaller problem - detect if the user is punching on a frame or not. This is a typical binary classification problem. For the purpose, we can define the following model:
+
+```typescript
+import * as tf from '@tensorflow/tfjs';
+
+const model = tf.sequential();
+model.add(tf.layers.inputLayer({ inputShape: [1024] }));
+model.add(tf.layers.dense({ units: 1024, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+model.compile({
+  optimizer: tf.train.adam(10e-5),
+  loss: tf.losses.sigmoidCrossEntropy,
+  metrics: ['accuracy']
+});
+```
+
+This snippet defines a simple model with a layer with 1024 units with ReLU activation and one output unit which goes through a sigmoid function. The sigmoid will produce a number between 0 and 1, depending on the probability the user to be punching at the given frame.
+
+The `compile` method, compiles the layers together, preparing the model for training and evaluation. Here we declare that we want to use `adam` for optimization. We also declare that we want to compute the loss with sigmoid cross entropy and we specify that we want to evaluate the model in terms of accuracy.
+
+If we want to apply transfer learning, we need to first load MobileNet. Because it wouldn't be practical to train our model with over 3k images in the browser, we'll load it in Node.js, from a file:
+
+```typescript
+export const loadModel = async () => {
+  const mn = new mobilenet.MobileNet(1, 1);
+  mn.path = `file://${ModelPath}`;
+  await mn.load();
+  return (input): tf.Tensor1D =>
+      mn.infer(input, 'global_average_pooling2d_1')
+        .reshape([1024]);
+};
+```
+
+Notice that in the `loadModel` method we return a function, which accepts a single dimensional tensor as an input and returns `mn.infer(input, Layer)`. The `infer` method of MobileNet accepts as argument an input and a layer. The layer specifies the output from which hidden layer we'd want to get the output from.
+
+Now, in order to train this model, we'll have to create our training set. For the purpose, we'll have to pass each one of our images through the `infer` method of MobileNet and associate a label with it - 1 for images which contain a punch, and 0 for images without a punch:
+
+```javascript
+const punches = require('fs')
+  .readdirSync(Punches)
+  .filter(f => f.endsWith('.jpg'))
+  .map(f => `${Punches}/${f}`);
+
+const others = require('fs')
+  .readdirSync(Others)
+  .filter(f => f.endsWith('.jpg'))
+  .map(f => `${Others}/${f}`);
+
+const ys = tf.tensor1d(
+  new Array(punches.length).fill(1)
+    .concat(new Array(others.length).fill(0)));
+
+const xs: tf.Tensor2D = tf.stack(
+  punches
+    .map((path: string) => mobileNet(readInput(path)))
+    .concat(others.map((path: string) => mobileNet(readInput(path))))
+) as tf.Tensor2D;
+```
+
+In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other samples. After that, we define a one dimensional tensor with shape `[TotalImages]`. The tensor will start with `1` which count equals to the numbers of images with a punch followed with `0` with count equals to the number of other images.
+
+In `xs` we stack the results from the invocation of the `infer` method of MobileNet for the individual images. Finally, for each `i` from `0` to `TotalImages`, we should have `ys[i]` is `1` if `xs[i]` corresponds to an image with a punch, and `0` otherwise.
+
+## Training the Model
+
+Now, the only thing left is to train the model! For the purpose, invoke the method `fit` of the model's instance:
+
+```typescript
+await model.fit(xs, ys, {
+  epochs: Epochs,
+  batchSize: parseInt(((punches.length + others.length) * BatchSize).toFixed(0)),
+  callbacks: {
+    onBatchEnd: async (_, logs) => {
+      console.log('Cost: %s, accuracy: %s', logs.loss.toFixed(5), logs.acc.toFixed(5));
+      await tf.nextFrame();
+    }
+  }
+});
+```
+
+The code above, invokes `fit` with three arguments - `xs`, `ys`, and a configuration object. In the configuration object we've set for how many epochs we want to train the model, we've provided a batch size, and a callback which will be invoked after each batch.
+
+The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from our `sigmoid` layer and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
