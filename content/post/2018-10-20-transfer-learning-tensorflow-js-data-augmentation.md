@@ -277,7 +277,9 @@ Notice how over time the accuracy increases, and the loss decreases. As a rule o
 
 ### Other Model Architectures
 
-The multilayer perceptron is just
+The multilayer perceptron is just one example for a neural network architecture. There are more advanced models, which are more appropriate for solving some problems.
+
+For example, for performing image recognition, detection, or classifications, the convolutional neural networks are known to perform well. For natural language processing, on the other hand, researchers are using recurrent neural networks. We'll stop on convolutional neural networks in a later section of this article.
 
 </section>
 
