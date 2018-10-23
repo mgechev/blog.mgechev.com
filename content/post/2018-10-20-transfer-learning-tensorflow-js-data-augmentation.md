@@ -99,7 +99,7 @@ Each introduction to deep learning starts with an explanation of the <strong>fee
 
 When we pass an input to our neural network, it'll perform a <strong>sequential</strong> computation - it'll pass the input to the first layer, the model will perform a bunch of calculations, pass the output to the second layer, etc. Since we perform a sequential computation, this type of model is called sequential. In TensorFlow.js we can define it as shown below:
 
-```javascript
+```typescript
 import * as tf from '@tensorflow/tfjs';
 
 const model = tf.sequential();
@@ -121,9 +121,9 @@ Notice that with each layer we also introduce an `activation` property. In this 
 
 Once we've defined the TensorFlow.js model, we have to "compile" it. We can compile a model by using the `compile` method:
 
-```javascript
+```typescript
 model.compile({
-  optimizer: tf.train.adam(10e-6),
+  optimizer: tf.train.adam(1e-6),
   loss: tf.losses.sigmoidCrossEntropy,
   metrics: ['accuracy']
 })
@@ -143,7 +143,7 @@ We'll first generate a dataset. For each season, we'll generate *`n`* days and a
 
 Here's the algorithm which generates the dataset:
 
-```javascript
+```typescript
 const data = [
   {
     start: summerStart,
@@ -186,7 +186,7 @@ const generateData = () => {
 
 Now, after we have the dataset, we can define the model:
 
-```javascript
+```typescript
 const createModel = async () => {
   const model = tf.sequential();
   model.add(tf.layers.dense({ inputShape: [1], units: 7, activation: 'relu' }));
@@ -223,7 +223,7 @@ Now let's train the model! In the previous sections we explained that we train a
 
 TensorFlow.js allows us to train given model using only a few lines of code!
 
-```javascript
+```typescript
 const train = async (model, data) => {
   const xs = tf.tensor1d(data.map(d => d[0] / 365));
   const ys = tf.stack(data.map(d => d[1]));
@@ -315,7 +315,7 @@ Based on the metrics that we've passed to the `compile` method, `evaluate` outpu
 
 Here's how we can evaluate the model that we just developed:
 
-```javascript
+```typescript
 const evaluate = async (model, data) => {
   const xs = tf.tensor2d(data.map(d => [d[0] / 365]));
   const ys = tf.stack(data.map(d => d[1]));
@@ -554,13 +554,15 @@ model.add(tf.layers.inputLayer({ inputShape: [1024] }));
 model.add(tf.layers.dense({ units: 1024, activation: 'relu' }));
 model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
 model.compile({
-  optimizer: tf.train.adam(10e-5),
+  optimizer: tf.train.adam(1e-6),
   loss: tf.losses.sigmoidCrossEntropy,
   metrics: ['accuracy']
 });
 ```
 
 This snippet defines a simple model with a layer with 1024 units and ReLU activation, and one output unit which goes through a sigmoid activation function. The sigmoid will produce a number between 0 and 1, depending on the probability the user to be punching at the given frame.
+
+Why did I pick `1024` units for the second layer and `1e-6` learning rate? Well, I tried a couple of different options and saw that `1024` and `1e-6` work best. Try and see what happens may doesn't sound like the best approach but that's pretty much how the tunning of hyperparameters in deep learning works - based on our understanding of the model we use our intuition to update orthogonal parameters and empirically check if the model performs well.
 
 The `compile` method, compiles the layers together, preparing the model for training and evaluation. Here we declare that we want to use `adam` as an optimization algorithm. We also declare that we want to compute the loss with sigmoid cross entropy and we specify that we want to evaluate the model in terms of accuracy. TensorFlow.js calculates the accuracy with the formula:
 
@@ -587,7 +589,7 @@ Notice that in the `loadModel` method we return a function, which accepts a sing
 
 Now, in order to train this model, we'll have to create our training set. For the purpose, we'll have to pass each one of our images through the `infer` method of MobileNet and associate a label with it - `1` for images which contain a punch, and `0` for images without a punch:
 
-```javascript
+```typescript
 const punches = require('fs')
   .readdirSync(Punches)
   .filter(f => f.endsWith('.jpg'))
@@ -720,7 +722,180 @@ Keep in mind that the accuracy might not be too high because of the limited trai
   </div>
 </div>
 
+## Running the Model in the Browser
+
+In the last section we trained the model for binary classification. Now let us run it in the browser and wire it up together with [MK.js](https://github.com/mgechev/mk.js)!
+
+```typescript
+const video = document.getElementById('cam');
+const Layer = 'global_average_pooling2d_1';
+const mobilenetInfer = m => (p): tf.Tensor<tf.Rank> => m.infer(p, Layer);
+const canvas = document.getElementById('canvas');
+const scale = document.getElementById('crop');
+
+const ImageSize = {
+  Width: 100,
+  Height: 56
+};
+
+navigator.mediaDevices
+  .getUserMedia({
+    video: true,
+    audio: false
+  })
+  .then(stream => {
+    video.srcObject = stream;
+  });
+```
+
+In the snippet above, we have few declarations:
+
+- `video` - contains a reference to the HTML5 video element on the page
+- `Layer` - contains the name of the layer from MobileNet that we want to get the output from and pass it as an input to our model
+- `mobilenetInfer` - is a function which accepts an instance of MobileNet and returns another function. The returned function accepts an input and returns the output from the specified layer of MobileNet for the corresponding input
+- `canvas` - points to an HTML5 canvas element that we'll use to extract frames from the video
+- `scale` - is another canvas that we'll use to scale the individual frames
+
+After that, we get video stream from the user's camera and set it as source of the video element.
+
+As next step, we'll implement a grayscale filter which accepts a canvas and transforms its content:
+
+```typescript
+const grayscale = (canvas: HTMLCanvasElement) => {
+  const imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    data[i] = avg;
+    data[i + 1] = avg;
+    data[i + 2] = avg;
+  }
+  canvas.getContext('2d').putImageData(imageData, 0, 0);
+};
+```
+
+As next step, let us wire the model together with MK.js:
+
+```typescript
+let mobilenet: (p: any) => tf.Tensor<tf.Rank>;
+tf.loadModel('http://localhost:5000/model.json').then(model => {
+  mobileNet
+    .load()
+    .then((mn: any) => mobilenet = mobilenetInfer(mn))
+    .then(startInterval(mobilenet, model));
+});
+```
+
+In the code above, first we load the model that we trained above and after that load MobileNet. MobileNet we pass to the `mobilenetInfer` method so that we can get a shortcut for getting the output from the hidden layer of the network. After that we invoke the `startInterval` method with the two networks as arguments.
+
+```typescript
+const startInterval = (mobilenet, model) => () => {
+  setInterval(() => {
+    canvas.getContext('2d').drawImage(video, 0, 0);
+
+    grayscale(scale
+      .getContext('2d')
+      .drawImage(
+        canvas, 0, 0, canvas.width,
+        canvas.width / (ImageSize.Width / ImageSize.Height),
+        0, 0, ImageSize.Width, ImageSize.Height
+      ));
+
+    const [punching] = Array.from((
+      model.predict(mobilenet(tf.fromPixels(scale))) as tf.Tensor1D)
+    .dataSync() as Float32Array);
+
+    const detect = (window as any).Detect;
+    if (punching >= 0.4) detect && detect.onPunch();
+
+  }, 100);
+};
+```
+
+`startInterval` is where the fun happens! First, we start an interval, where every `100ms` we're going to invoke an anonymous function. In this function, we first render the video on top of the canvas which contains our current frame. After that, we scale the frame to `100x56` and apply grayscale filter to it.
+
+As next step, we pass the scaled frame to MobileNet, we get the output from the desired hidden layer and pass it as an input to the `predict` method of our model. The `predict` method of our model returns a tensor with a single element. By using `dataSync` we get the value from the tensor and set assign it to `punching`.
+
+Finally, we check if the probability for the user to be punching on this frame is over `0.4` and depending on this, we invoke the `onPunch` method of the global object `Detect`. MK.js exposes a global object with three methods: `onKick`, `onPunch`, and `onStand`.
+
+That's it! 🎉 Here's the result!
+
+<img src="/images/tfjs-cnn/punching.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
+
 ## Recognizing Kicks and Punches with N-ary Classification
+
+In the final part of this blog post, we'll make a smarter model - we'll develop a neural network which recognizes punches, kicks, and other images. Let us this time start with the process of preparing the training set:
+
+```typescript
+const punches = require('fs')
+  .readdirSync(Punches)
+  .filter(f => f.endsWith('.jpg'))
+  .map(f => `${Punches}/${f}`);
+
+const kicks = require('fs')
+  .readdirSync(Kicks)
+  .filter(f => f.endsWith('.jpg'))
+  .map(f => `${Kicks}/${f}`);
+
+const others = require('fs')
+  .readdirSync(Others)
+  .filter(f => f.endsWith('.jpg'))
+  .map(f => `${Others}/${f}`);
+
+const ys = tf.tensor2d(
+  new Array(punches.length)
+    .fill([1, 0, 0])
+    .concat(new Array(kicks.length).fill([0, 1, 0]))
+    .concat(new Array(others.length).fill([0, 0, 1])),
+  [punches.length + kicks.length + others.length, 3]
+);
+
+const xs: tf.Tensor2D = tf.stack(
+  punches
+    .map((path: string) => mobileNet(readInput(path)))
+    .concat(kicks.map((path: string) => mobileNet(readInput(path))))
+    .concat(others.map((path: string) => mobileNet(readInput(path))))
+) as tf.Tensor2D;
+```
+
+Just like before, first we read the directories for punches, kicks, and others. After that, however, we form the expected output as a two-dimensional tensor, instead of one-dimensional. If we have *`n`* images of punches, *`m`* images of kicks, and *`k`* other images, the `ys` tensor will have *`n`* elements with value `[1, 0, 0]`, *`m`* elements with value `[0, 1, 0]`, and *`k`* elements with value `[0, 0, 1]`. With the images corresponding to a punch we associate the vector `[1, 0, 0]`, with the images corresponding to a kick we associate the vector `[0, 1, 0]`, and finally, with the other images we associate the vector `[0, 0, 1]`.
+
+A vector with `n` elements, which has `n - 1` elements with value `0` and `1` element with value `1`, we call one-hot vector.
+
+After that, we form the input tensor `xs` by stacking the outputs for each individual image from MobileNet.
+
+For the purpose, we'll have to update the model definition:
+
+```typescript
+const model = tf.sequential();
+model.add(tf.layers.inputLayer({ inputShape: [1024] }));
+model.add(tf.layers.dense({ units: 1024, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 3, activation: 'softmax' }));
+await model.compile({
+  optimizer: tf.train.adam(1e-6),
+  loss: tf.losses.sigmoidCrossEntropy,
+  metrics: ['accuracy']
+});
+```
+
+The only two differences from the previous model are:
+
+- Number of units in the output layer
+- Activation in the output layer
+
+The reason why we have `3` units in the output layer is because we have three different categories of images:
+
+- Punching
+- Kicking
+- Others
+
+The softmax activation, invoked on top of these `3` units will transform their parameters to a tensor with `3` values. Why do we have `3` units in the output layer? We know that we can represent `3` values (one for each of our `3` classes) with 2 bits - `00`, `01`, `10`. The sum of the values of the tensor produced by `softmax` will equal `1`, which means that we'll never get `00`, so we'll never be able to classify images from one of the classes.
+
+After I trained the model for `500` epochs, I achieved about `92%` accuracy. After running the model in the browser and wiring it up with MK.js I got the following result:
+
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
+
+Below, you can find a widget which runs the pre-trained model over an input from a file you selected, or a snapshot from your camera.
 
 <div class="image-widget" id="n-ary-class">
   <div class="prediction">
@@ -745,6 +920,8 @@ Keep in mind that the accuracy might not be too high because of the limited trai
     </div>
   </div>
 </div>
+
+<img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block; margin: auto; margin-top: 20px;">
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1"></script>
