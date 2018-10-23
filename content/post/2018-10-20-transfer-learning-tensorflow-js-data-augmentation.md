@@ -62,27 +62,224 @@ By the end of the article, we'd be able to use our model for playing [MK.js](htt
 
 **As a prerequirement, the reader should have a familiarity with fundamental concepts from the software engineering and JavaScript. No background in deep learning is required.**
 
-In the next section, we'll make a brief, informal introduction to deep learning and neural networks. Feel free to skip this section if you're already familiar with the concepts model, test data, backpropagation, and optimization algorithms.
+In the next section, we'll make a brief, informal introduction to deep learning and neural networks. Feel free to skip this section if you're already familiar with the concepts model, test data, backpropagation, and optimization algorithms. The introduction below would be high-level, practical focused, without going into the theoretical foundations of the topic.
 
-<div class="zippy" data-title="Introduction to Deep Learning">
+</div>
+<section class="zippy" data-title="Introduction to Deep Learning & TensorFlow.js">
 
-<h2>Deep Learning for Software Engineers</h2>
+## Deep Learning For Software Engineers
 
 To give an intuition on how neural networks work, I'd want to make an analogy with the test-driven development (or TDD).
 
-In TDD, we start by writing tests for a function, even before we've implemented it. With the tests, we encapsulate our knowledge for the function's specification. Later, when we run the tests and they fail, we can adjust/alter the function's implementation so that we can estimate the expected result with higher precision. We repeat this process until we reach the desired function behavior. In TDD there's also heavily involved process of constant refactoring, which we can ignore for simplicity.
+In TDD, we start by writing tests for a function, even before we've implemented it. With the tests, we encapsulate our knowledge for the function's specification. Later, when we run the tests and they fail, we can adjust/alter the function's implementation so that we can estimate the expected result with higher precision. We repeat this process until we reach the function's desired behavior. In TDD there's also heavily involved process of constant refactoring, which we can ignore for simplicity.
 
-Believe me or not, but this is a very accurate high-level, abstract analogy of how we can solve a problem using deep learning. In deep learning, instead of developing a function, we're working on a <strong>model</strong> which estimates a function. Instead of specifying the function's behavior with test cases, we use pairs - an input and an expected output. We will call these pairs <strong>test data</strong>. Initially, using our intuition for the problem that we're solving, we start by implementing a generic model which *may show good results* for the problem that we want to solve. After that, we pass our training data through the model, we get the calculated output and compare it with the expected result. Given the difference between them, we propagate it backwards, so that we can adjust the model to give a more precise result next time, which better approximates our ideal solution. This process is known as <strong>backpropagation</strong> and is quite similar to the TDD phase in which we're tuning our function by adding different statements.
+Initially we have a dummy function implementation. Over time it evolves, approximating the specification of the desired functionality with higher precision, until we reach satisfactory precision. Notice that writing tests doesn't necessary guarantee that our function does what we expect it to do for all the possible arguments, even if we have <a href="https://www.stickyminds.com/article/100-percent-unit-test-coverage-not-enough">100% test coverage</a>.
 
-As software engineers we often write functions with a very well defined specification. For example, there are very well defined rules on how to produce the monthly bank statement for given client. There are well defined algorithms for this which can be easily translate to code. These problems usually depend on some small number of variables (1, 100, or 100,000) which have finite domain of values. It's easy to hardcode rules which transform them into the actual solution.
+Believe me or not, but this is a close high-level, abstract analogy of how we can solve a problem using deep learning. In deep learning, instead of developing a function, we're working on a <strong>model</strong> which approximates a function. Instead of specifying the function's behavior with test cases, in supervised learning, we use pairs - an input and an expected output. We will call these pairs <strong>test data</strong>.
 
-In contrast, deep learning can work with many more variables which have much larger domain. Using neural networks, we take a huge leap - we know what the algorithm should produce when we pass a given input but we have no idea how. Since coming up with an algorithm could be extremely hard, we build a model and let it figure out the algorithm itself. The model figures the algorithm out by finding patterns in our data called <strong>features</strong>. Since we give to the model the expected result that it needs to produce, it can adjust itself internally so that it can produce a closer approximation of the function which solves the general problem. This process is known as <strong>training</strong> and is achieved through many back propagations using an <strong>optimization algorithm</strong>.
+The implementation of the model starts by using our intuition for the problem in order to implement a generic model that <i>may show good results</i> for this specific problem's domain. After that, we pass our training data through the model, we get the calculated output and compare it with the expected result. Given the difference between them, the model calculates a <strong>gradient</strong> and propagates it backwards. This way the model adjusts itself to produce more precise results next time and approximate the ideal solution with closer proximity.
 
-<h3>Feed-forward architecture</h3>
+### Why Do We Need Deep Learning?
 
-  Feed forward
+As software engineers we often write functions with a very well defined specification. For example, there are very well defined rules on how to produce the monthly bank statement for a given client. The problem's specification can be easily translated to code. Such problems usually depend on a small number of variables (1, 100, or 100,000); it's easy to hardcode rules which transform them into the actual solution.
 
-</div>
+In contrast, deep learning can work with many more variables which have much larger domain. Using neural networks, we take a huge leap - we know what the algorithm should produce when we pass a given input but we have no idea how. Since coming up with an algorithm could be extremely hard, we build a model and let it figure out the algorithm itself.
+
+The model figures the algorithm out by finding patterns in our data called <strong>features</strong>. Since we give to the model the expected result that it needs to produce, it can adjust itself internally so that it can produce a closer approximation of the function which solves given problem. This process is known as <strong>training</strong> and is achieved using an <strong>optimization algorithm</strong>.
+
+### Feed-Forward Architecture
+
+Each introduction to deep learning starts with an explanation of <strong>feed-forward neural networks</strong>, also known as <strong>multilayer perceptron</strong>. The neural network below accepts a single input, has two hidden layers, and produces a single output. The hidden and the output layers have <strong>parameters</strong> associated with them, which are <strong>tensors</strong> with different ranks. We can think of the tensors as data structures which contain a bunch of numbers and we can perform a set of operations over them.
+
+<img src="/images/tfjs-cnn/feed-forward.svg" alt="Feed-Forward Network" style="display: block; margin: auto; margin-top: 20px;">
+
+When we pass an input to our neural network, it'll perform a <strong>sequential</strong> computation - it'll pass the input to the first layer, the model will perform a bunch of calculations, pass the output to the second layer, etc. Since the computation is sequential, this is a sequence model which we can define with TensorFlow.js as shown below:
+
+```javascript
+import * as tf from '@tensorflow/tfjs';
+
+const model = tf.sequential();
+model.add(tf.layers.inputLayer({ inputShape: [1] }));
+model.add(tf.layers.dense({ units: 3, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 2, activation: 'relu' }));
+model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+```
+
+The snippet above shows how we can apply the [builder design pattern](https://en.wikipedia.org/wiki/Builder_pattern#Overview) for creating a deep learning model. We create sequential model and after that we add a bunch of layers to it.
+
+The first layer has an input shape `1`. This means that we'll pass a single value. If we were going to pass an `64x64` image, the input would have been `[64, 64, 3]`, 64 rows, 64 columns and three channels for [RGB](https://en.wikipedia.org/wiki/RGB_color_model). After that we add a <strong>dense</strong> layer. Adding a dense layer with 3 units simply means that we want to add 3 nodes and connect each one of them with the input. This way, the calculation that the model performs would be propagated from the input neuron to the 3 neurons from the next layer.
+
+As next step we define one more hidden dense layer with 2 neurons. Finally, we add one more layer with a single neuron. This is going to be our output layer.
+
+Notice that with each layer we also introduce an `activation` property. In this case, it's either [`relu`](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)) or [`sigmoid`](https://en.wikipedia.org/wiki/Sigmoid_function). These activations are functions which perform an operation over the layers' parameters. `relu` is usually [preferred over `sigmoid`](https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Advantages) because it has much better performance and other characteristics which contribute to bigger efficiency during training.
+
+### Training a Deep Neural Network
+
+Once we've defined the TensorFlow.js model, we have to "compile" it. We can compile a model by using the `compile` method:
+
+```javascript
+model.compile({
+  optimizer: tf.train.adam(10e-6),
+  loss: tf.losses.sigmoidCrossEntropy,
+  metrics: ['accuracy']
+})
+```
+
+The `compile` accepts a configuration object where we can specify a bunch of properties, important of which are:
+
+- `optimizer` - the algorithm to be used for training the neural network. The algorithm we specify may have an enormous impact on how long it takes to train a model. The `adam` and `adamax` are known to perform well in most cases
+- `loss` - the `loss` property specifies the function which should be used for calculating the "difference" between the expected output and the one produced by the neural network. Difference is not an accurate term but it gives a good intuition what `loss` is used for. It's important to pick a `loss` function which will not make the [gradient stuck in a local minima](https://en.wikipedia.org/wiki/Gradient_descent#Description)
+- `metrics` - here we list the metrics based on which we want to judge how well our model performs
+
+### Developing a Simple Model
+
+Now let's develop a simple multilayer perceptron for guessing which is the current season based on the data of the year as an input.
+
+For the purpose, we'll first generate dataset. For each season, we'll generate *`n`* days and associate a vector corresponding to the given month. For the summer we'll use the vector `[1, 0, 0, 0]`, for the spring `[0, 1, 0, 0]`, for the fall `[0, 0, 1, 0]`, and for the winter `[0, 0, 0, 1]`. The days will be relative to 1st of January, so for example, the winter day 2st of January we can represent with the tuple: `[1, [0, 0, 0, 1]]`. Vectors with *`n`* elements which have all zeroes and a single `1` are called <strong>one hot vectors</strong>.
+
+Here's the algorithm which will generate the dataset:
+
+```javascript
+const data = [
+  { start: summerStart,
+    end: summerEnd,
+    value: [1, 0, 0, 0] },
+  { start: springStart,
+    end: springEnd,
+    value: [0, 1, 0, 0] },
+  { start: fallStart,
+    end: fallEnd,
+    value: [0, 0, 1, 0] },
+  { start: winterStart,
+    end: winterEnd,
+    value: [0, 0, 0, 1] }
+];
+
+const generateData = () => {
+  for (let s = 0; s < data.length; s++) {
+    const firstDate = new Date(`1/1/${data[s].start.getFullYear()}`).getTime();
+    const picked = {};
+    for (let i = 0; i < TotalItems; i++) {
+      const { start, end, value } = data[s];
+      const startDay = toDay(start.getTime() - firstDate);
+      const endDay = toDay(end.getTime() - firstDate);
+      let day = Math.ceil(Math.random() * (endDay - startDay) + startDay);
+      while (picked[day]) {
+        day = Math.ceil(Math.random() * (endDay - startDay) + startDay);
+      }
+      picked[day] = true;
+      result.push([day, value]);
+    }
+  }
+  return result;
+};
+```
+
+Later, once we have our dataset, we can define our model:
+
+```javascript
+const createModel = async () => {
+  const model = tf.sequential();
+  model.add(tf.layers.dense({ inputShape: [1], units: 7, activation: 'relu' }));
+  model.add(tf.layers.dense({ units: 10, activation: 'relu' }));
+  model.add(tf.layers.dense({ units: 4, activation: 'softmax' }));
+  await model.compile({
+    optimizer: tf.train.adam(0.2),
+    loss: tf.losses.softmaxCrossEntropy,
+    metrics: ['accuracy']
+  });
+  return model;
+};
+```
+
+We create a sequential model and add a few layers. Notice the differences from the last time:
+
+- In the output layer we use a `softmax` activation
+- The optimizer uses `softmaxCrossEntropy` loss function
+
+### `softmax` vs `sigmoid`/`relu`
+
+The main difference between these two groups of activation functions is in the number of results they produce. For example, for binary classification (i.e., when we have only two choices), we'd want to use a `sigmoid` or a `relu`. On the other hand, when we have `n` classes of objects (i.e., we're performing n-ary classification), we should use a `softmax`. The `softmax` activation function has one interesting property, the sum of the elements of the vector that it'll produces will equal to `1`.
+
+### Training the Model
+
+Now let's train the model! From the previous sections you may remember that we train the model by showing it input and output tuples. Later, the model calculates an output based on the input we've passed, compares it with the correct answer and adjust its parameters using the optimization algorithm that we've provided.
+
+TensorFlow.js allows us to train given model using only a few lines of code!
+
+```javascript
+const train = async (model, data) => {
+  const xs = tf.tensor1d(data.map(d => d[0] / 365));
+  const ys = tf.stack(data.map(d => d[1]));
+  await model.fit(xs, ys, {
+    batchSize: Math.floor(0.4 * data.length),
+    epochs: 200,
+    callbacks: {
+      onEpochEnd: async (_, logs) => {
+        console.log('Cost: %s, accuracy: %s', logs.loss.toFixed(5), logs.acc.toFixed(5));
+        await tf.nextFrame();
+      }
+    }
+  });
+};
+```
+
+The `train` function accepts the model that we created in `createModel` above, and part of the dataset that we generated with `generateData`. Let us remember the shape of the array produced by `generateData`:
+
+```json
+[
+  [1, [0, 0, 0, 1]],
+  [200, [1, 0, 0, 0]],
+]
+```
+
+The array above contains two training examples, one for the 2nd day of the year, and one for the 201st. The second day of the year is winter and the 201st is summer.
+
+As next step, we create two tensors:
+
+- `xs` - an one dimensional tensor which contains the dates for each training example. We're going to use `xs` as input of the model
+- `ys` - contains the one-hot vectors corresponding to the days. These are going to be the outputs that we're going to pass to the model, so that it can adjust it parameters with the optimization algorithm
+
+Finally, we invoke the `fit` method, passing the inputs (`xs`), outputs `ys`, and a configuration object.
+
+Let's take a look at the `batchSize` and `epochs` properties of the configuration object. The value of `batchSize` is 40% of the number of elements in our training set. This means that TensorFlow.js will train our model on steps, where on each step it'll take 40% of the elements from the training set. For example, in the first step TensorFlow.js will invoke the model with the first 40% of the elements, on the second step, with the second 40% of the elements, and on the third step, with the remaining 20%. After each step, the model will adjust its parameters by using the optimization algorithm.
+
+This triple of steps (i.e., invoking the model for the first 40%, second 40%, and last 20%), we'll call an epoch. In the example, we've set the number of epochs to 200.
+
+In the end of each epoch we log the current accuracy (i.e., the ratio of the number of times our model has returned the expected input over the total invocations) and the loss. Remember that the loss indicates the "difference" between the produced output and the expected output.
+
+Now after we invoke the script, we'll get output similar to:
+
+```
+Epoch 1 / 200
+eta=0.0 ==>- acc=0.57 loss=1.20
+91ms 337us/step - acc=0.39 loss=1.31
+Cost: 1.31161, accuracy: 0.39259
+Epoch 2 / 200
+eta=0.0 ==>- acc=0.59 loss=1.17
+48ms 177us/step - acc=0.53 loss=1.20
+Cost: 1.20253, accuracy: 0.52963
+Epoch 3 / 200
+eta=0.0 ==>- acc=0.74 loss=1.02
+39ms 145us/step - acc=0.70 loss=1.12
+Cost: 1.12104, accuracy: 0.69630
+Epoch 4 / 200
+eta=0.0 ==>- acc=0.74 loss=1.01
+39ms 146us/step - acc=0.75 loss=1.02
+Cost: 1.01902, accuracy: 0.74815
+Epoch 5 / 200
+eta=0.0 =>-- acc=0.87 loss=0.91
+44ms 162us/step - acc=0.81 loss=0.95
+Cost: 0.95307, accuracy: 0.81111
+```
+
+Notice how over time the accuracy increases, and the loss decreases. As a rule of thumb, if the loss stops decreasing for a few epochs, the model would probably not achieve higher accuracy so we should stop training and tune our parameters.
+
+### Other Model Architectures
+
+The multilayer perceptron is just
+
+</section>
 
 ## Collecting data
 
