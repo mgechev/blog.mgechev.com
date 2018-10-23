@@ -611,7 +611,33 @@ const xs: tf.Tensor2D = tf.stack(
 
 In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other images. After that, we define a one dimensional tensor which will contain the output labels. If we have *`n`* images with a punch and *`m`* other images, the tensor will have *`n`* elements with value `1` and *`m`* elements with value `0`.
 
-In `xs` we stack the results from the invocation of the `infer` method of MobileNet for the individual images. In the end, for each `i` from `0` to `TotalImages`, we should have `ys[i]` is `1` if `xs[i]` corresponds to an image with a punch, and `0` otherwise.
+In `xs` we stack the results from the invocation of the `infer` method of MobileNet for the individual images. Notice that for each image we invoke the `readInput` method. Let us take a look at its implementation:
+
+```typescript
+export const readInput = img => imageToInput(readImage(img), TotalChannels);
+
+const readImage = path => jpeg.decode(fs.readFileSync(path), true);
+
+const imageToInput = image => {
+  const values = serializeImage(image);
+  return tf.tensor3d(values, [image.height, image.width, 3], 'int32');
+};
+
+const serializeImage = image => {
+  const totalPixels = image.width * image.height;
+  const result = new Int32Array(totalPixels * 3);
+  for (let i = 0; i < totalPixels; i++) {
+    result[i * 3 + 0] = image.data[i * 4 + 0];
+    result[i * 3 + 1] = image.data[i * 4 + 1];
+    result[i * 3 + 2] = image.data[i * 4 + 2];
+  }
+  return result;
+};
+```
+
+`readInput` first invokes the function `readImage` and after that delegates the invocation to `imageToInput`. `readImage` reads the image from the disk and after that decodes the buffer as an jpg image using the [`jpeg-js`](https://www.npmjs.com/package/jpeg-js) module. In `imageToInput` we transform the image to a three dimensional tensor.
+
+In the end, for each `i` from `0` to `TotalImages`, we should have `ys[i]` is `1` if `xs[i]` corresponds to an image with a punch, and `0` otherwise.
 
 ## Training The Model
 
@@ -633,6 +659,42 @@ await model.fit(xs, ys, {
 The code above, invokes `fit` with three arguments - `xs`, `ys`, and a configuration object. In the configuration object we've set for how many epochs we want to train the model, we've provided a batch size, and a callback which will be invoked after each batch.
 
 The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from the layer with `sigmoid` activation and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
+
+Once you run the training script, you should see output similar to the one below:
+
+```text
+Cost: 0.84212, accuracy: 1.00000
+eta=0.3 >---------- acc=1.00 loss=0.84 Cost: 0.79740, accuracy: 1.00000
+eta=0.2 =>--------- acc=1.00 loss=0.80 Cost: 0.81533, accuracy: 1.00000
+eta=0.2 ==>-------- acc=1.00 loss=0.82 Cost: 0.64303, accuracy: 0.50000
+eta=0.2 ===>------- acc=0.50 loss=0.64 Cost: 0.51377, accuracy: 0.00000
+eta=0.2 ====>------ acc=0.00 loss=0.51 Cost: 0.46473, accuracy: 0.50000
+eta=0.1 =====>----- acc=0.50 loss=0.46 Cost: 0.50872, accuracy: 0.00000
+eta=0.1 ======>---- acc=0.00 loss=0.51 Cost: 0.62556, accuracy: 1.00000
+eta=0.1 =======>--- acc=1.00 loss=0.63 Cost: 0.65133, accuracy: 0.50000
+eta=0.1 ========>-- acc=0.50 loss=0.65 Cost: 0.63824, accuracy: 0.50000
+eta=0.0 ==========>
+293ms 14675us/step - acc=0.60 loss=0.65
+Epoch 3 / 50
+Cost: 0.44661, accuracy: 1.00000
+eta=0.3 >---------- acc=1.00 loss=0.45 Cost: 0.78060, accuracy: 1.00000
+eta=0.3 =>--------- acc=1.00 loss=0.78 Cost: 0.79208, accuracy: 1.00000
+eta=0.3 ==>-------- acc=1.00 loss=0.79 Cost: 0.49072, accuracy: 0.50000
+eta=0.2 ===>------- acc=0.50 loss=0.49 Cost: 0.62232, accuracy: 1.00000
+eta=0.2 ====>------ acc=1.00 loss=0.62 Cost: 0.82899, accuracy: 1.00000
+eta=0.2 =====>----- acc=1.00 loss=0.83 Cost: 0.67629, accuracy: 0.50000
+eta=0.1 ======>---- acc=0.50 loss=0.68 Cost: 0.62621, accuracy: 0.50000
+eta=0.1 =======>--- acc=0.50 loss=0.63 Cost: 0.46077, accuracy: 1.00000
+eta=0.1 ========>-- acc=1.00 loss=0.46 Cost: 0.62076, accuracy: 1.00000
+eta=0.0 ==========>
+304ms 15221us/step - acc=0.85 loss=0.63
+```
+
+Notice how over time the accuracy increases and the loss decreases.
+
+With my dataset, after the model's training completed I reached 92% accuracy. Below, you can find a widget where you can play with the pre-trained model. You can select an image from your computer, or take one with your camera and classify it as a punch or not.
+
+Keep in mind that the accuracy might not be too high because of the limited training set that we trained the model with.
 
 <div class="image-widget" id="binary-class">
   <div class="prediction">
@@ -658,7 +720,7 @@ The batch size determines how large subset of `xs` and `ys` we'll train our mode
   </div>
 </div>
 
-More text
+## Recognizing Kicks and Punches with N-ary Classification
 
 <div class="image-widget" id="n-ary-class">
   <div class="prediction">
