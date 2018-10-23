@@ -143,16 +143,19 @@ Here's the algorithm which will generate the dataset:
 const data = [
   { start: summerStart,
     end: summerEnd,
-    value: [1, 0, 0, 0] },
-  { start: springStart,
+    value: [1, 0, 0, 0]
+  }, { start: springStart,
     end: springEnd,
-    value: [0, 1, 0, 0] },
-  { start: fallStart,
+    value: [0, 1, 0, 0]
+  }, {
+    start: fallStart,
     end: fallEnd,
-    value: [0, 0, 1, 0] },
-  { start: winterStart,
+    value: [0, 0, 1, 0]
+  }, {
+    start: winterStart,
     end: winterEnd,
-    value: [0, 0, 0, 1] }
+    value: [0, 0, 0, 1]
+  }
 ];
 
 const generateData = () => {
