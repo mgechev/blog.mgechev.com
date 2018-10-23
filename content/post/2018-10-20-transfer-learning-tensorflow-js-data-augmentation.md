@@ -52,7 +52,7 @@ In this blog post, I'll share my experience on building a posture classification
 - Transfer learning with MobileNet
 - Binary classification and n-ary classification
 - Training an image classification TensorFlow.js model in Node.js and using it in the browser
-- Action classification with LSTM
+- Few words on using action classification with LSTM
 
 For the purposes of this article, we'll relax the problem to posture detection based on a single frame, in contrast to recognizing an action from a sequence of frames. We'll develop a **supervised deep learning model**, which based on an image from the user's laptop camera, indicates if on this image the user is punching, kicking, or not doing the first two.
 
@@ -145,10 +145,12 @@ Here's the algorithm which generates the dataset:
 
 ```javascript
 const data = [
-  { start: summerStart,
+  {
+    start: summerStart,
     end: summerEnd,
     value: [1, 0, 0, 0]
-  }, { start: springStart,
+  }, {
+    start: springStart,
     end: springEnd,
     value: [0, 1, 0, 0]
   }, {
@@ -323,7 +325,7 @@ const evaluate = async (model, data) => {
 
 ...and that's pretty much all of it! Now let us put everything together in the next section!
 
-## Putting Everything Together
+### Putting Everything Together
 
 In the snippet below, we read the generated data from a file called `data.json`. After that we shuffle it and take 80% of the items as part of the training set. The remaining 20% go to the test set that we're going to use for evaluating our model.
 
@@ -361,7 +363,7 @@ For example, for performing image recognition, detection, or classifications, th
 
 ## Collecting data
 
-The accuracy of our algorithm depends to a very high extent on the quality of the training data. The bigger the variety of our training data is, the higher the accuracy of the model will be.
+The accuracy of a deep learning model depends to a very high extent on the quality of the training data. The closer the training set reflects the real-life data that we'll use our model on, the higher its accuracy will be.
 
 Our model should be able to recognize punches and kicks. This means that we should collect images from three different categories:
 
@@ -369,42 +371,46 @@ Our model should be able to recognize punches and kicks. This means that we shou
 - Kicks
 - Others
 
-For the purpose of this experiment, I collected these samples with two other volunteers ([@lili_vs](https://twitter.com/lili_vs) and [@gsamokovarov](https://twitter.com/gsamokovarov)). We recorded 5 videos with QuickTime on my MacBook Pro, each of which contained 2-4 punches and 2-4 kicks.
+For the purpose of this experiment, I collected photos with the help of two volunteers ([@lili_vs](https://twitter.com/lili_vs) and [@gsamokovarov](https://twitter.com/gsamokovarov)). We recorded 5 videos with QuickTime on my MacBook Pro, each of which contains 2-4 punches and 2-4 kicks.
 
-Now, since we have `mov` videos, we can use `ffmpeg`, to extract the individual frames and stored them as jpg images:
+Now, since we need images but instead we have `mov` videos, we can use `ffmpeg`, to extract the individual frames and store them as `jpg` pictures:
 
 ```shell
 ffmpeg -i video.mov $filename%03d.jpg
 ```
 
-At this step we have a bunch of images of three people performing actions. If we want to be able to train our model, we have to provide inputs and their corresponding outputs. This means that we have to categorize the frames from the videos that we extracted in the three categories above - punches, kicks, others. For each category we can create a separate directory and move all the corresponding images there.
+To run the above command, you may first have to [install](https://www.ffmpeg.org/download.html) `ffmpeg` on your computer.
+
+At this step we have a bunch of images of three people taking different poses. If we want to train the model, we have to provide inputs and their corresponding outputs. This means that we have to categorize the frames from the videos that we extracted in the three categories above - punches, kicks, others. For each category we can create a separate directory and move all the corresponding images there.
 
 This way, in each directory we should have roughly about 200 images, similar to the ones below:
 
 ![Image samples](/images/tfjs-cnn/all.jpg)
 
-Notice that in directory "Others" we may have many more images. It'd be best if we reduce the number of other images to about 200 as well, otherwise, we risk to make our model biased towards the "Others" images.
+Note that in the directory "Others" we may have many more images because there are less photos of punches and kick then ones of people walking, turning around, or managing the video recording. If we have too many images from one class and we train the model on all of them, we risk to make it biased towards this specific class. So, even if we try to classify an image of a person punching, the neural network will likely output the class "Others". To reduce this bias, we can simply delete some of the photos from the "Others" directory and train the model with equal number of images from each category.
 
-As you can imagine, 600 photos taken in the same environment, with the same people, having the same movements would not make our algorithm very accurate and it may not perform great in the general case. To extract as much value as possible from our data, we can generate some extra samples by using **data augmentation**.
+For convenience, we'll name the images in the individual directories after the numbers from `1` to `190`, so the first image would be `1.jpg`, the second `2.jpg`, etc.
 
-## Data Augmentation
+Training the model with only 600 photos taken in the same environment, with the same people, we'll not be able to achieve very high of accuracy. To extract as much value as possible from our data, we can generate some extra samples by using **data augmentation**.
 
-Data augmentation means, increasing the number of data points by synthesizing new ones from the existing dataset. Usually, we use data augmentation for increasing the size and variety of our training set. In our case, we'd want to pass the original images to a set of transformations which produce new images. The new images should be categorized the same way by the neural network as the original ones, to make sure our training data contains only valid data points.
+### Data Augmentation
 
-For example, valid transformations over our images would be rotation under 180 degrees, inverting the colors, blurring the images, etc. There are amazing open source tools for image data augmentation available online. For generating more data, I used [imgaug](https://github.com/aleju/imgaug). It contains a set of augmenters that can be applied probabilistically. The tool is written in Python. Currently, there's not rich enough alternative for JavaScript.
+Data augmentation is a technique which allows us to increase the number of data points by synthesizing new ones from the existing dataset. Usually, we use data augmentation for increasing the size and the variety of our training set. We'd pass the original images to a pipeline of transformations which produce new images. We should not be too aggressive with the transformations - applying them on an image classified as a punch, should produce other images classifiable as punches.
 
-Here's the data augmentation logic that I applied:
+Valid transformations over our images would be rotation, inverting the colors, blurring the images, etc. There are great open source tools for image data augmentation available online. At the moment of writing, there are no rich alternatives in JavaScript, so I used a library implemented in Python - [imgaug](https://github.com/aleju/imgaug). It contains a set of augmenters that can be applied probabilistically.
+
+Here's the data augmentation logic that I applied in this experiment:
 
 ```python3
 np.random.seed(44)
 ia.seed(44)
 
 def main():
-    for i in range(1, 190):
+    for i in range(1, 191):
         draw_single_sequential_images(str(i), "others", "others-aug")
-    for i in range(1, 190):
+    for i in range(1, 191):
         draw_single_sequential_images(str(i), "hits", "hits-aug")
-    for i in range(1, 190):
+    for i in range(1, 191):
         draw_single_sequential_images(str(i), "kicks", "kicks-aug")
 
 def draw_single_sequential_images(filename, path, aug_path):
@@ -470,23 +476,21 @@ def draw_single_sequential_images(filename, path, aug_path):
         misc.imsave(aug_path + "/" + filename + "_" + str(im) + ".jpg", grid[im])
 ```
 
-For each image above, the images will produce 16 other images with applied different transforms on top. Here's an example for how the augmented images would look like:
+The script above has a method `main` which has three `for` loops - one for each image category. In each iteration, in each of the loops we invoke the method `draw_single_sequential_images` with first argument the image name, second argument the path to the image, and third argument the directory where the function should store the augmented images.
+
+After that we read the image from the disk and apply a set of transformations to it. Most of the transformations are documented in the snippet above, so we'll not stop on them here.
+
+For each image in the existing data set, the transformations will produce 16 other images. Here's an example for how the augmented images would look like:
 
 [![Grid with augmented images](/images/tfjs-cnn/aug.jpg)](/images/tfjs-cnn/aug.jpg)
 
-Notice that in the script above, we also scale the images to `100x56` pixel. We do this to reduce the amount of pixels, and respectively the amount of computations which our model would have to perform.
+Notice that in the script above, we scale the images to `100x56` pixel. We do this to reduce the amount of data, and respectively the amount of computations which our model would have to perform.
 
 ## Building the Model
 
-Now let's build the model that we're going to use for classification!
+Now let's build the classification model!
 
-Since we're dealing with images, we're going to use a convolutional neural network (CNN). This network architecture is known to be good for image recognition, detection, and classification.
-
-If you're interested in reading more about CNNs, you can expand the section below. Otherwise, feel free to skip the theory and get directly to practice!
-
-<div class="zippy" data-title="Convolutional Neural Networks">
-  CNNs
-</div>
+Since we're dealing with images, we're going to use a convolutional neural network (CNN). This network architecture is known to be good for image recognition, object detection, and classification.
 
 ### Transfer Learning
 
@@ -496,15 +500,15 @@ The figure below shows VGG-16, a popular CNN which is used for classification of
 
 The VGG-16 network recognizes 1000 classes of images. It has 16 layers (we don't count the output and the pooling layers). Such a large network will be very hard to train in practice. It'll require a large dataset and many hours of training.
 
-As we mentioned in the CNN section above, the hidden layers in a CNN recognize different features of an image, starting from edges, going to more advanced features, such as shapes and so on.
+The hidden layers in a trained CNN recognize different features of the images from its training set starting from edges, going to more advanced features, such as shapes, individual objects, and so on. A trained CNN, similar to VGG-16, which recognizes a large set of images will have hidden layers that have discovered a lot of features from its training set. Such features would be in common between most images, and respectively, reusable across different tasks.
 
-Transfer learning allows us to reuse an already existing and trained network. We can take the output from any of the layers of the existing network and feed it as an input to a new neural network. This way, by using backpropagation, over time we can train the newly created neural network to recognize new higher level features and properly classify our images.
+**Transfer learning** allows us to reuse an already existing and trained network. We can take the output from any of the layers of the existing network and feed it as an input to a new neural network. This way, by training the newly created neural network, over time it can be taught to recognize new higher level features and properly classify images that the source model has never seen before.
 
 <img src="/images/tfjs-cnn/transfer.svg" style="display: block; margin: auto; margin-top: 20px; margin-bottom: 20px;">
 
-For our purposes, we'll use the MobileNet neural network, from the [@tensorflow-models/mobilenet](https://www.npmjs.com/package/@tensorflow-models/mobilenet) package. MobileNet is as powerful as VGG-16 but it's also much smaller which makes its forward propagation much faster. MobileNet has been trained on the [ILSVRC-2012-CLS](http://www.image-net.org/challenges/LSVRC/2012/) image classification dataset.
+For our purposes, we'll use the **MobileNet neural network**, from the [@tensorflow-models/mobilenet](https://www.npmjs.com/package/@tensorflow-models/mobilenet) package. MobileNet is as powerful as VGG-16 but it's also much smaller which makes its forward propagation much faster. MobileNet has been trained on the [ILSVRC-2012-CLS](http://www.image-net.org/challenges/LSVRC/2012/) image classification dataset.
 
-You can give MobileNet a try in the widget below. Feel free to select an image from your file system or use the camera as an input:
+You can give MobileNet a try in the widget below. Feel free to select an image from your file system or use your camera as an input:
 
 <div class="image-widget" id="mobile-net">
   <div class="prediction"></div>
@@ -529,16 +533,18 @@ You can give MobileNet a try in the widget below. Feel free to select an image f
   </div>
 </div>
 
-Few of the choices that we have when we develop a model with transfer learning are:
+Two of the choices that we have when we develop a model using transfer learning are:
 
-- The output from which layer of the source model are we going to use as an input for the target model
-- How many layers from the target model do we want to train, if any
+1. The output from which layer of the source model are we going to use as an input for the target model
+2. How many layers from the target model do we want to train, if any
 
-For our purposes, we're not going to train any layers from MobileNet. We're directly going to pick the output from `global_average_pooling2d_1` and pass it to our tiny neural network.
+The first point is quite important. Depending on the layer we choose, we're going to get features on lower or higher level of abstraction, as input to our neural network.
+
+For our purposes, we're not going to train any layers from MobileNet. We're directly going to pick the output from `global_average_pooling2d_1` and pass it as an input to our tiny model.
 
 ### Defining the Model
 
-Let us first solve a smaller problem - detect if the user is punching on a frame or not. This is a typical binary classification problem. For the purpose, we can define the following model:
+The original problem was to categorize an image in three classes - punch, kick, and other. Let us first solve a smaller problem - detect if the user is punching on a frame or not. This is a typical binary classification problem. For the purpose, we can define the following model:
 
 ```typescript
 import * as tf from '@tensorflow/tfjs';
@@ -554,16 +560,22 @@ model.compile({
 });
 ```
 
-This snippet defines a simple model with a layer with 1024 units with ReLU activation and one output unit which goes through a sigmoid function. The sigmoid will produce a number between 0 and 1, depending on the probability the user to be punching at the given frame.
+This snippet defines a simple model with a layer with 1024 units and ReLU activation, and one output unit which goes through a sigmoid activation function. The sigmoid will produce a number between 0 and 1, depending on the probability the user to be punching at the given frame.
 
-The `compile` method, compiles the layers together, preparing the model for training and evaluation. Here we declare that we want to use `adam` for optimization. We also declare that we want to compute the loss with sigmoid cross entropy and we specify that we want to evaluate the model in terms of accuracy.
+The `compile` method, compiles the layers together, preparing the model for training and evaluation. Here we declare that we want to use `adam` as an optimization algorithm. We also declare that we want to compute the loss with sigmoid cross entropy and we specify that we want to evaluate the model in terms of accuracy. TensorFlow.js calculates the accuracy with the formula:
 
-If we want to apply transfer learning, we need to first load MobileNet. Because it wouldn't be practical to train our model with over 3k images in the browser, we'll load it in Node.js, from a file:
+```text
+Accuracy = (True Positives + True Negatives) / (Positives + Negatives)
+```
+
+If we want to apply transfer learning with MobileNet as a source model, we'll first need to load it. Because it wouldn't be practical to train our model with over 3k images in the browser, we'll use Node.js and load the network from a file.
+
+You can download MobileNet from [here](https://github.com/mgechev/mk-tfjs/tree/master/mobile-net). In the directory you can find `model.json`, which contains the architecture of the model - layers, activations, etc. The rest of the files contain the model's parameters. You can load the model from the file using:
 
 ```typescript
 export const loadModel = async () => {
   const mn = new mobilenet.MobileNet(1, 1);
-  mn.path = `file://${ModelPath}`;
+  mn.path = `file://PATH/TO/model.json`;
   await mn.load();
   return (input): tf.Tensor1D =>
       mn.infer(input, 'global_average_pooling2d_1')
@@ -571,9 +583,9 @@ export const loadModel = async () => {
 };
 ```
 
-Notice that in the `loadModel` method we return a function, which accepts a single dimensional tensor as an input and returns `mn.infer(input, Layer)`. The `infer` method of MobileNet accepts as argument an input and a layer. The layer specifies the output from which hidden layer we'd want to get the output from.
+Notice that in the `loadModel` method we return a function, which accepts a single dimensional tensor as an input and returns `mn.infer(input, Layer)`. The `infer` method of MobileNet accepts as argument an input and a layer. The layer specifies from which hidden layer we'd want to get the output from. If you open [`model.json`](https://github.com/mgechev/mk-tfjs/blob/master/mobile-net/model.json) and search for `global_average_pooling2d_1` you'll find it as the name of one of the layers.
 
-Now, in order to train this model, we'll have to create our training set. For the purpose, we'll have to pass each one of our images through the `infer` method of MobileNet and associate a label with it - 1 for images which contain a punch, and 0 for images without a punch:
+Now, in order to train this model, we'll have to create our training set. For the purpose, we'll have to pass each one of our images through the `infer` method of MobileNet and associate a label with it - `1` for images which contain a punch, and `0` for images without a punch:
 
 ```javascript
 const punches = require('fs')
@@ -597,13 +609,13 @@ const xs: tf.Tensor2D = tf.stack(
 ) as tf.Tensor2D;
 ```
 
-In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other samples. After that, we define a one dimensional tensor with shape `[TotalImages]`. The tensor will start with `1` which count equals to the numbers of images with a punch followed with `0` with count equals to the number of other images.
+In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other images. After that, we define a one dimensional tensor which will contain the output labels. If we have *`n`* images with a punch and *`m`* other images, the tensor will have *`n`* elements with value `1` and *`m`* elements with value `0`.
 
-In `xs` we stack the results from the invocation of the `infer` method of MobileNet for the individual images. Finally, for each `i` from `0` to `TotalImages`, we should have `ys[i]` is `1` if `xs[i]` corresponds to an image with a punch, and `0` otherwise.
+In `xs` we stack the results from the invocation of the `infer` method of MobileNet for the individual images. In the end, for each `i` from `0` to `TotalImages`, we should have `ys[i]` is `1` if `xs[i]` corresponds to an image with a punch, and `0` otherwise.
 
-## Training the Model
+## Training The Model
 
-Now, the only thing left is to train the model! For the purpose, invoke the method `fit` of the model's instance:
+Now we are ready to train the model! For the purpose, invoke the method `fit` of the model's instance:
 
 ```typescript
 await model.fit(xs, ys, {
@@ -620,7 +632,7 @@ await model.fit(xs, ys, {
 
 The code above, invokes `fit` with three arguments - `xs`, `ys`, and a configuration object. In the configuration object we've set for how many epochs we want to train the model, we've provided a batch size, and a callback which will be invoked after each batch.
 
-The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from our `sigmoid` layer and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
+The batch size determines how large subset of `xs` and `ys` we'll train our model with in one epoch. For each epoch, TensorFlow.js will pick a subset of `xs` and the corresponding elements from `ys`, it'll perform forward propagation, get the output from the layer with `sigmoid` activation and after that, based on the loss, it'll perform optimization using the `adam` algorithm.
 
 <div class="image-widget" id="binary-class">
   <div class="prediction">
