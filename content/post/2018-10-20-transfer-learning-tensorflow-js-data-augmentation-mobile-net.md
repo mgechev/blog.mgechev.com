@@ -229,7 +229,7 @@ You can give MobileNet a try in the widget below. Feel free to select an image f
     <div class="content">
       <div class="upload">
         <input type="file">
-        <h1>Drag & Drop file here</h1>
+        <h1>Drop a file here</h1>
         <img class="image-preview">
       </div>
       <div class="cam">
@@ -418,7 +418,7 @@ Keep in mind that the accuracy might not be very high because of the small train
     <div class="content">
       <div class="upload">
         <input type="file">
-        <h1>Drag & Drop file here</h1>
+        <h1>Drop a file here</h1>
         <img class="image-preview">
       </div>
       <div class="cam">
@@ -640,7 +640,7 @@ Now you can play with the subsequent widget which uses the trained model over in
     <div class="content">
       <div class="upload">
         <input type="file">
-        <h1>Drag & Drop file here</h1>
+        <h1>Drop a file here</h1>
         <img class="image-preview">
       </div>
       <div class="cam">
