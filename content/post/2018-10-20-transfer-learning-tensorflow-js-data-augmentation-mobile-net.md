@@ -659,7 +659,7 @@ If we collect a large and diverse dataset of people punching and kicking, we'll 
 
 As we can see from the snapshots below, both kicks would look similar at given point in time, from a certain angle:
 
-<div style="margin-top: -10px; display: flex;">
+<div class="image-wrapper">
 <img src="/images/tfjs-cnn/roundhouse.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
 <img src="/images/tfjs-cnn/back.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
 </div>
