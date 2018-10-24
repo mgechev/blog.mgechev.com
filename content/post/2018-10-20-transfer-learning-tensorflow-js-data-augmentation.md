@@ -23,6 +23,10 @@ While experimenting with enhancements of the prediction model of [Guess.js](http
 <img src="/images/tfjs-cnn/rnn.svg" alt="Recurrent Neural Network" style="display: block; margin: auto; margin-top: 20px;">
 <div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">Recurrent neural network</div>
 
+<section style="background: #ddefff; padding: 15px;">
+You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">this article</a> and <a href="https://github.com/mgechev/mk.js">MK.js</a> in my <a href="https://github.com/mgechev">GitHub account</a>. I haven't shared the dataset that I used for training for privacy reasons but feel free to collect your own and train the model as described below! Also, to get an idea how everything works together, feel free to play around with the widgets below.
+</section>
+
 After playing around with CNNs, I remembered an [experiment I did](https://www.youtube.com/watch?v=0_yfU_iNUYo) a few years ago, when the browser vendors introduced the `getUserMedia` API. In this experiment, I used the user's camera as a controller for playing a small JavaScript clone of Mortal Kombat 3. You can find the game at my [GitHub account](https://github.com/mgechev/mk.js). As part of the experiment, I implemented a very basic posture detection algorithm which classifies an image into the following classes:
 
 - Upper punch with the left and right hands
