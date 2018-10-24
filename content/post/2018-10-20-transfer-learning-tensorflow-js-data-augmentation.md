@@ -22,7 +22,7 @@ url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation
 
 While experimenting with enhancements of the prediction model of [Guess.js](https://github.com/guess-js/guess), I started looking at deep learning. I've focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their ["unreasonable effectiveness"](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.
 
-<img src="/images/tfjs-cnn/cover.png" alt="MK.js with TensorFlow.js" style="display: block; max-width: 450px; margin-bottom: 0;">
+<img src="/images/tfjs-cnn/cover.png" alt="MK.js with TensorFlow.js" style="display: block; width: 100%; max-width: 450px; margin-bottom: 0;">
 <div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">
 Controlling <a href="https://github.com/mgechev/mk.js">MK.js</a> with TensorFlow.js
 </div>
