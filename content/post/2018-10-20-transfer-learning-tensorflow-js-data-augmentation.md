@@ -20,10 +20,10 @@ url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation
 
 While experimenting with enhancements of the prediction model of [Guess.js](https://github.com/guess-js/guess), I started looking at deep learning. I've focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their ["unreasonable effectiveness"](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.
 
-<img src="/images/tfjs-cnn/rnn.svg" alt="Recurrent Neural Network" style="display: block;">
-<div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">Recurrent neural network</div>
+<img src="/images/tfjs-cnn/cover.png" alt="MK.js with TensorFlow.js" style="display: block; max-width: 450px; margin-bottom: 0;">
+<div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">Controlling MK.js with TensorFlow.js</div>
 
-<section style="background: #ddefff; padding: 15px;">
+<section style="background: #eff7ff; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
 You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">this article</a> and <a href="https://github.com/mgechev/mk.js">MK.js</a> in my <a href="https://github.com/mgechev">GitHub account</a>. I haven't shared the dataset that I used for training but feel free to collect your own and train the model as described below! Also, to get an idea of how everything works together, feel free to play around with the widgets below.
 </section>
 
@@ -692,7 +692,7 @@ To use the model we developed in the browser, we loaded it together with MobileN
 
 Finally, we looked at how we can improve our model even further by combining it with a recurrent neural network for action recognition.
 
-I hope you enjoyed this tiny project as much as I did! 🙇🏼‍♂️
+I hope you enjoyed this tiny project as much as I did! 🙇🏼‍
 
 <script src="/assets/js/tfjs/ui.js" async></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
