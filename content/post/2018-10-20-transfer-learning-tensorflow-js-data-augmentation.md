@@ -895,7 +895,7 @@ After I trained the model for `500` epochs, I achieved about `92%` accuracy. Aft
 
 <img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
 
-Below, you can find a widget which runs the pre-trained model over an input from a file you selected, or a snapshot from your camera.
+Below, you can find a widget which runs the pre-trained model over an input from a file you selected, or a snapshot from your camera. Try it out with an image of you punching or kicking!
 
 <div class="image-widget" id="n-ary-class">
   <div class="prediction">
@@ -921,9 +921,52 @@ Below, you can find a widget which runs the pre-trained model over an input from
   </div>
 </div>
 
+## Action Recognition
+
+If we collect a large and diverse dataset of people punching and kicking, we'll be able to build a model which performs excellent on individual frames. But is this enough? What if we want to go one step further and recognize two different types of kicks - roundhouse and back kicks.
+
+As we can see from the snapshots below, both kicks would look similar at given point in time, from a certain angle:
+
+<div style="margin-top: -10px; display: flex;">
+<img src="/images/tfjs-cnn/roundhouse.png" alt="Roundhouse kick" style="width: 48%; display: inline-block; margin: auto;">
+<img src="/images/tfjs-cnn/back.png" alt="Roundhouse kick" style="width: 48%; display: inline-block; margin: auto;">
+</div>
+
+But if we look at the execution, the movements are quite different:
+
 <img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block; margin: auto; margin-top: 20px;">
 
+So how do we teach our neural network to look into a sequence of frames, instead of a single one?
+
+For the purpose, we can look at different types of neural networks called recurrent neural networks (RNNs). RNNs are excellent for dealing with time series, for example:
+
+- Natural language processing (NLP) where one word depends on the ones before and after itself
+- Predicting which page the user will visit next if we know their history
+- Recognizing an action from a sequence of frames
+
+Implementing such model is out of the scope of this article but let us take a look at a sample architecture so we can get an intuition for how everything would work together!
+
+### The Power of RNNs
+
+On the image below, you can find a sample implementation of a model for action recognition:
+
+<a href="/images/tfjs-cnn/cnn-rnn.svg"><img src="/images/tfjs-cnn/cnn-rnn.svg" alt="RNN & CNN" style="display: block; margin: auto;"></a>
+
+We take the last *`n`* frames from a video and pass them to a CNN. The output of the CNN for each individual frame, we pass as input to the RNN. The recurrent neural network would figure out the dependencies between the individual frames and recognize what action is encoded by them.
+
+## Conclusion
+
+In this article we developed a model for image classification. For the purpose, we collected a dataset by extracting video frames and by hand, dividing them among three separate categories. As next step, we generated additional data using image augmentation with [imgaug](https://github.com/aleju/imgaug).
+
+After that we explained what's transfer learning and how we can take advantage of it by reusing the pretrained model MobileNet from the package `@tensorflow-models/mobilenet`. We loaded MobileNet from a file in a Node.js process and trained an additional dense layer which we fed with the output from a hidden layer of MobileNet. After going through the training process, we achieved over 90% accuracy.
+
+To use the model we developed in the browser, we loaded it together with MobileNet and started categorizing frames from the user's camera every `100ms`. We connected the model with the game MK.js and based on the output of the model, started controlling one of the characters.
+
+Finally, we looked at how we can improve our model even further by combining it with a recurrent neural network for action recognition.
+
+I hope you enjoyed this tiny project as much as I did! 🙇🏼‍♂️
+
+<script src="/assets/js/tfjs/ui.js" async></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1"></script>
-<script src="/assets/js/tfjs/ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1" async></script>
 <link rel="stylesheet" href="/assets/css/tfjs/ui.css">
