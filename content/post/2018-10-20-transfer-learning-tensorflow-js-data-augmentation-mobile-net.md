@@ -13,9 +13,9 @@ tags:
 - Transfer learning
 - Data augmentation
 - ML
-title: Playing Mortal Kombat with TensorFlow.js. Transfer learning and data augmentation
+title: Controlling Mortal Kombat with TensorFlow.js. Transfer learning and data augmentation
 og_image: /images/tfjs-cnn/cover.png
-url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation
+url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation-mobile-net
 ---
 
 <link rel="stylesheet" href="/assets/css/tfjs/ui.css">
