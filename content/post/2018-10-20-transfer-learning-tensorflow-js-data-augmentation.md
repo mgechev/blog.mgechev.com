@@ -594,7 +594,28 @@ The reason why we have `3` units in the output layer is because we have three di
 
 The softmax activation, invoked on top of these `3` units will transform their parameters to a tensor with `3` values. Why do we have `3` units in the output layer? We know that we can represent `3` values (one for each of our `3` classes) with 2 bits - `00`, `01`, `10`. The sum of the values of the tensor produced by `softmax` will equal `1`, which means that we'll never get `00`, so we'll never be able to classify images from one of the classes.
 
-After I trained the model for `500` epochs, I achieved about `92%` accuracy. After running the model in the browser and wiring it up with MK.js I got the following result:
+After I trained the model for `500` epochs, I achieved about `92%` accuracy. The next step is to run the model in the browser! Since the source code for the purpose is quite similar to running the model for binary classifcation, let us just take a look at the last step, where we pick an action based on the model's output:
+
+```typescript
+const [punch, kick, nothing] = Array.from((model.predict(
+  mobilenet(tf.fromPixels(scaled))
+) as tf.Tensor1D).dataSync() as Float32Array);
+
+const detect = (window as any).Detect;
+if (nothing >= 0.4) return;
+
+if (kick > punch && kick >= 0.35) {
+  detect.onKick();
+  return;
+}
+if (punch > kick && punch >= 0.35) detect.onPunch();
+```
+
+Initially, we invoke MobileNet with the scaled, grayscaled canvas, after that we pass the output to our pretrained model. Our model returns a new one-dimensional tensor that we convert to `Float32Array` with `dataSync`. As next step, by using `Array.from` we cast the typed array to a JavaScript array and we extract the probabilities the given action to be a punch, kick, or non of these.
+
+If the probability the action to be neither a kick, nor a punch is greater than `0.4` we return. Otherwise, if we have higher probability for the action to be a kick, and this probability is higher than `0.32` we emit a kick command to MK.js. If the probability of punch is over `0.32` and is higher than the probability of kick, then we emit a punch action.
+
+That's pretty much all of it! You can now see the result below:
 
 <img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
 
