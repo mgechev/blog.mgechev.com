@@ -20,7 +20,7 @@ url: /2018/10/20/transfer-learning-tensorflow-js-data-augmentation
 
 While experimenting with enhancements of the prediction model of [Guess.js](https://github.com/guess-js/guess), I started looking at deep learning. I've focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their ["unreasonable effectiveness"](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.
 
-<img src="/images/tfjs-cnn/rnn.svg" alt="Recurrent Neural Network" style="display: block; margin: auto; margin-top: 20px;">
+<img src="/images/tfjs-cnn/rnn.svg" alt="Recurrent Neural Network" style="display: block;">
 <div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">Recurrent neural network</div>
 
 <section style="background: #ddefff; padding: 15px;">
@@ -62,7 +62,7 @@ For this article, we'll relax the problem to posture detection based on a single
 
 By the end of the article, we'd be able to build a model for playing [MK.js](https://github.com/mgechev/mk.js):
 
-<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 
 **To get most of this article, the reader should have a familiarity with fundamental concepts from software engineering and JavaScript. Basic understanding of deep learning would be helpful but not strictly required.**
 
@@ -201,7 +201,7 @@ Since we're dealing with images, we're going to use a convolutional neural netwo
 
 The figure below shows VGG-16, a popular CNN which is used for classification of images.
 
-<img src="/images/tfjs-cnn/vgg-16.svg" style="display: block; margin: auto;">
+<img src="/images/tfjs-cnn/vgg-16.svg" style="display: block;">
 
 The VGG-16 network recognizes 1000 classes of images. It has 16 layers (we don't count the output and the pooling layers). Such a multilayer network would be hard to train in practice. It'll require a large dataset and many hours of training.
 
@@ -209,7 +209,7 @@ The hidden layers in a trained CNN recognize different features of the images fr
 
 **Transfer learning** allows us to reuse an already existing and trained network. We can take the output from any of the layers of the existing network and feed it as an input to a new neural network. This way, by training the newly created neural network, over time it can be taught to recognize new higher level features and correctly classify images from classes that the source model has never seen before.
 
-<img src="/images/tfjs-cnn/transfer.svg" style="display: block; margin: auto; margin-top: 20px; margin-bottom: 20px;">
+<img src="/images/tfjs-cnn/transfer.svg" style="display: block">
 
 For our purposes, we'll use the **MobileNet neural network**, from the [@tensorflow-models/mobilenet](https://www.npmjs.com/package/@tensorflow-models/mobilenet) package. MobileNet is as powerful as VGG-16, but it's also much smaller which makes its forward propagation faster and reduces its load time in the browser. MobileNet has been trained on the [ILSVRC-2012-CLS](http://www.image-net.org/challenges/LSVRC/2012/) image classification dataset.
 
@@ -525,7 +525,7 @@ Finally, we check if the probability for the user to be punching on this frame i
 
 That's it! 🎉 Here's the result!
 
-<img src="/images/tfjs-cnn/punching.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
+<img src="/images/tfjs-cnn/punching.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 
 ## Recognizing Kicks and Punches with N-ary Classification
 
@@ -621,7 +621,7 @@ If the probability the pose of being neither a kick nor a punch is higher than `
 
 That's pretty much all of it! You can now see the result below:
 
-<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block; margin: auto; margin-top: 20px;">
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 
 Now you can play with the subsequent widget which uses the trained model over input from a file you selected, or a snapshot from your camera. Try it out with an image of you punching or kicking!
 
@@ -656,13 +656,13 @@ If we collect a large and diverse dataset of people punching and kicking, we'll 
 As we can see from the snapshots below, both kicks would look similar at given point in time, from a certain angle:
 
 <div style="margin-top: -10px; display: flex;">
-<img src="/images/tfjs-cnn/roundhouse.png" alt="Roundhouse kick" style="width: 48%; display: inline-block; margin: auto;">
-<img src="/images/tfjs-cnn/back.png" alt="Roundhouse kick" style="width: 48%; display: inline-block; margin: auto;">
+<img src="/images/tfjs-cnn/roundhouse.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
+<img src="/images/tfjs-cnn/back.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
 </div>
 
 But if we look at the execution, the movements are quite different:
 
-<img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block; margin: auto; margin-top: 20px;">
+<img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block;">
 
 So, how do we teach our neural network to look into a sequence of frames, instead of a single one?
 
@@ -678,7 +678,7 @@ Implementing such a model is out of the scope of this article but let us take a 
 
 On the image below, you can find a diagram which shows a model for action recognition:
 
-<a href="/images/tfjs-cnn/cnn-rnn.svg"><img src="/images/tfjs-cnn/cnn-rnn.svg" alt="RNN & CNN" style="display: block; margin: auto;"></a>
+<a href="/images/tfjs-cnn/cnn-rnn.svg"><img src="/images/tfjs-cnn/cnn-rnn.svg" alt="RNN & CNN" style="display: block"></a>
 
 We take the last *`n`* frames from a video and pass them to a CNN. The output of the CNN for each frame, we pass as input to the RNN. The recurrent neural network would figure out the dependencies between the individual frames and recognize what action they encode.
 
