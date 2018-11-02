@@ -3,14 +3,14 @@ author: minko_gechev
 categories:
 - Career
 - Google
-date: 2018-10-02T00:00:00Z
-draft: true
+date: 2018-11-02T00:00:00Z
+draft: false
 tags:
 - Career
 - Google
 title: Joining Google
 og_image: /images/google/logo.png
-url: /2018/10/02/joining-google
+url: /2018/11/02/joining-google
 ---
 
 The past five years I've been heavily involved in the startup space, both, here in the Silicon Valley and Bulgaria. My focus was EdTech, working on different educational products, starting with an app for kids, to a platform for online education, marketing, and sales demos which provides access to a virtual environment in the browser. In the second company called [Rhyme](https://rhyme.com), which is particularly exciting and technically challenging, I had the opportunity to join as a co-founder.
