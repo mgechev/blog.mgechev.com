@@ -23,7 +23,7 @@ In this blog post, we'll make a brief introduction to what Bazel is and how we c
 
 Google manages a massive amount of source code. There are dependencies between the individual projects, for example, the user interface of Google Cloud depends on Angular & Angular Material, Angular Material depends on Angular, which depends on TypeScript.
 
-The projects in Google use a single versions of all the libraries in the organization (including the third-party ones.) This simplifies the dependency management in the company dramatically. Another huge bonus of this convention is that an update of a library affects all the dependant projects. This way everyone can take advantage of the latest security fixes, performance improvements, and bug fixes. Following this process means that when Microsoft releases a new version of TypeScript, it gets synced inside of Google as soon as possible so that all the projects can take advantage of it. As you can imagine, changes in the type system of TypeScript may break a lot of code!
+The projects in Google use a single version for the individual libraries in the organization (including the third-party ones.) This simplifies the dependency management in the company dramatically. Another huge bonus of this convention is that an update of a library affects all the dependent projects. This way everyone can take advantage of the latest security fixes, performance improvements, and bug fixes. Following this process means that when Microsoft releases a new version of TypeScript, it gets synced inside of Google as soon as possible so that all the projects can take advantage of it. As you can imagine, changes in the type system of TypeScript may break a lot of code!
 
 To verify that nothing broke after a dependency update, **the internal CI rebuilds all the dependent projects and executes their tests**. Having millions of lines of TypeScript and hundreds of thousands of TypeScript files, this process may take a while if not done right!
 
@@ -143,7 +143,7 @@ Don't worry if it the snippet above doesn't look obvious. You can think of the `
 
 ## Configuring the Targets
 
-We're going to go on a very granular level. We can directly map the individual modules of the project to separate Bazel packages and in each package, we’ll define a target. As we mentioned above, we can think of the packages as directories and their corresponding files and the targets as build rules.
+We're going to go on a very granular level. We can directly map the individual modules of the project to separate Bazel packages, and in each package, we’ll define a target. As we mentioned above, we can think of the packages as directories and their corresponding files and the targets as build rules.
 
 Each directory has a `BUILD` file (or `BUILD.bzl` if you prefer). Let us take a look at the `BUILD` file in the root of the project:
 
@@ -271,4 +271,3 @@ In this blog post, we looked at Google's build system Bazel. We explained some o
 In the second part of the post, we looked at a sample build setup for a small TypeScript project, where we compile a bunch of files and bundle them with Rollup.js. In the process, we explained what a workspace, a build target, package, and how we can configure them.
 
 At this point, we saw one of the core strengths of Bazel - static dependency graph which allows neat optimizations such as caching and parallelism. Be tuned for the next post in which we'll take a closer look at the performance implications.
-
