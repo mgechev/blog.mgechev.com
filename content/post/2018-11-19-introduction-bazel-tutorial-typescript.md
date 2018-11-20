@@ -10,7 +10,7 @@ tags:
 - Bazel
 - Build
 - TypeScript
-title: Building TypeScript with Bazel
+title: Building TypeScript Projects with Bazel
 og_image: /images/bazel-intro/banner.png
 url: /2018/11/19/introduction-bazel-typescript-tutorial
 ---
