@@ -31,7 +31,7 @@ In this quick blog post I’ll show you how to create a simple VNC client in abo
 For our goal we’re going to use only HTML5 and JavaScript (client and server side).
 The end result will be something like this:
 
-[<img src="/images/legacy/uploads2013/08/js-vnc-1024x946.png" alt="js-vnc" width="600" height="554" class="alignnone size-large wp-image-500" />][1]
+[<img src="/images/legacy/uploads/2013/08/js-vnc-1024x946.png" alt="js-vnc" width="600" height="554" class="alignnone size-large wp-image-500" />][1]
 
 So, let’s begin!
 
