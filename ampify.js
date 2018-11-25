@@ -1,6 +1,6 @@
 const { readFileSync, writeFileSync, readdirSync, lstatSync } = require('fs');
 const { join } = require('path');
-const ampify = require('../ampify');
+const ampify = require('../amplify');
 
 const updateFiles = node => {
   const dir = lstatSync(node).isDirectory()
