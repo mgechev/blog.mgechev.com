@@ -17,23 +17,23 @@ og_image: /images/ngx-quicklink/logo.png
 url: /2018/12/24/quicklink-angular-prefetching-preloading-strategy
 ---
 
-A few months ago I posted an article about [Guess.js](https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/). Guess.js is a powerful library for predictive prefetching of JavaScript based on analytics data for a website. The library consumes reports from an analytics source (by default Google Analytics) and builds a basic machine learning model. When a user visits the website, based on the model Guess.js prefetches resources which are likely to be needed next. Thanks to the data-driven approach, Guess.js offers a number of benefits - reduces overfetching, does not perform aggressive prefetching on slow networks, etc.
+A few months ago I posted an article about [Guess.js](https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/). Guess.js is a powerful library for predictive prefetching of JavaScript based on analytics data for a website. The library consumes reports from an analytics source (by default Google Analytics) and builds a basic machine learning model. When a user visits the site, based on the model Guess.js prefetches resources which are likely to be needed next. Thanks to the data-driven approach, Guess.js offers many benefits - reduces over fetching, does not perform aggressive prefetching on slow networks, etc.
 
 In this blog post we're going to look at another prefetching approach, which takes advantage of two heuristics:
 - Users are likely to visit links which are visible on the page
-- We do not want to prefetch aggressively if the user is using poor data plan
+- We do not want to prefetch aggressively if the user is using a poor data plan
 
 ## Prefetching with quicklink
 
-GatsbyJS is a static site generator which is famous for producing very fast progressive web applications. In an effort to get even faster, Gatsby uses aggressive [link](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-link?sa=D&ust=1522637949841000) prefetching.
+GatsbyJS is a static site generator which is famous for producing high-speed progressive web applications. To get even faster, Gatsby uses aggressive [link](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-link?sa=D&ust=1522637949841000) prefetching.
 
 <img src="/images/ngx-quicklink/quicklink.png" style="display: block; margin: auto">
 
-When a link is visible on the screen, Gatsby prefetches the content associated with it. This is achieved with a combination of an `IntersectionObserver`, using the mapping between a link and the associated resource, that is available at build time.
+When a link is visible on the screen, Gatsby prefetches the content associated with it. This is achieved with a combination of an `IntersectionObserver`, using the mapping between a link and the related resource, that is available at build time.
 
-A potential drawback of this approach is overfetching which can cause extra bandwidth consumption. Another minor problem are direct navigation to pages which are not directly linked on the page. This scenario is possible when the user updates the URL in the address bar, for instance. Guess.js handles both problems quite well, and fortunately, there's a Guess.js plugin for Gatsby. To use Guess.js, however, one needs to have an analytics source. A good compromise which does not require any analytics is to prefetch resources only when the user uses fast data plan.
+A potential drawback of this approach is over fetching which can cause extra bandwidth consumption. Another minor problem is related to direct navigation to pages which are not directly linked on the page. This scenario is possible when the user updates the URL in the address bar, for instance. Guess.js handles both problems quite well, and fortunately, there's a Guess.js plugin for Gatsby. To use Guess.js, however, one needs to have an analytics source. A good compromise which does not require any analytics is to prefetch resources only when the user uses a fast data plan.
 
-`quicklink` is a project which implements this algorithm! The library prefetches the content associated with all links currently visible on the page, in case the user is on fast network. `quicklink` does not perform any prefetching if they are on 2G network or slower.
+`quicklink` is a project which implements this algorithm! The library prefetches the content associated with all links currently visible on the page, in case the user is on a fast network. `quicklink` does not perform any prefetching if they are on a 2G network or slower.
 
 ## quicklink in Angular
 
@@ -130,7 +130,7 @@ On [this link](https://github.com/mgechev/angular-realworld-example-app-qucklink
 
 There are three main differences between the original `quicklink` implementation and `ngx-quicklink`:
 
-1. `quicklink` prefetches resources with `link[rel="prefetch"]` if available and fallbacks to `XMLHttpRequest`. `ngx-quicklink` uses only `XMLHttpRequest` because of the current routing preloading mechanism of the Angular router. Although `link[rel="prefetch"]` is a better alternative, used also by Guess.js, most likely your users will not notice a significant difference.
+1. `quicklink` prefetches resources with `link[rel="prefetch"]` if available and fallbacks to `XMLHttpRequest`. `ngx-quicklink` uses only `XMLHttpRequest` because of the current routing preloading mechanism of the Angular router. Although `link[rel="prefetch"]` is a better alternative, also used by Guess.js, most likely your users will not notice a significant difference.
 1. `ngx-quicklink` not only downloads the associated JavaScript bundles but also parses and evaluates the content. This will allow even further performance boost when the user changes the page.
 1. `ngx-quicklink` will download all parent modules of the requested module for prefetch.
 
@@ -160,6 +160,6 @@ If on the page there's a `routerLink="/about/team"`, `ngx-quicklink` will first 
 
 ## Conclusion
 
-In this article we talked about prefetching in web applications. We discussed the `quicklink` prefetching strategy and where it originates from. After that we discussed what's the difference between predictive prefetching and `quicklink`.
+In this article, we talked about prefetching in web applications. We discussed the `quicklink` prefetching strategy and where it originates from. After that, we discussed what's the difference between predictive prefetching and `quicklink`.
 
-After that we put `quicklink` into the context of Angular and we discussed the limitations of the original implementation. Combining Angular's `routerLink` directive with the framework's `PreloadingStrategy` we introduced `ngx-quicklink` - `quicklink` implementation for Angular.
+After that, we put `quicklink` into the context of Angular, and we discussed the limitations of the original implementation. Combining Angular's `routerLink` directive with the framework's `PreloadingStrategy`, we introduced `ngx-quicklink` - `quicklink` implementation for Angular.
