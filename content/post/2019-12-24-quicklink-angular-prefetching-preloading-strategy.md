@@ -12,7 +12,7 @@ tags:
 - Performance
 - Router
 - Angular
-title: Angular Quicklink Preloading Strategy
+title: Angular quicklink Preloading Strategy
 og_image: /images/ngx-quicklink/logo.png
 url: /2018/12/24/quicklink-angular-prefetching-preloading-strategy
 ---
@@ -23,19 +23,21 @@ In this blog post we're going to look at another prefetching approach, which tak
 - Users are likely to visit links which are visible on the page
 - We do not want to prefetch aggressively if the user is using poor data plan
 
-## Prefetching with Quicklink
+## Prefetching with quicklink
 
 GatsbyJS is a static site generator which is famous for producing very fast progressive web applications. In an effort to get even faster, Gatsby uses aggressive [link](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-link?sa=D&ust=1522637949841000) prefetching.
+
+<img src="/images/ngx-quicklink/quicklink.png" style="display: block; margin: auto">
 
 When a link is visible on the screen, Gatsby prefetches the content associated with it. This is achieved with a combination of an `IntersectionObserver`, using the mapping between a link and the associated resource, that is available at build time.
 
 A potential drawback of this approach is overfetching which can cause extra bandwidth consumption. Another minor problem are direct navigation to pages which are not directly linked on the page. This scenario is possible when the user updates the URL in the address bar, for instance. Guess.js handles both problems quite well, and fortunately, there's a Guess.js plugin for Gatsby. To use Guess.js, however, one needs to have an analytics source. A good compromise which does not require any analytics is to prefetch resources only when the user uses fast data plan.
 
-Quicklink is a project which implements this algorithm! The library prefetches the content associated with all links currently visible on the page, in case the user is on fast network. Quicklink does not perform any prefetching if they are on 2G network or slower.
+`quicklink` is a project which implements this algorithm! The library prefetches the content associated with all links currently visible on the page, in case the user is on fast network. `quicklink` does not perform any prefetching if they are on 2G network or slower.
 
-## Quicklink in Angular
+## quicklink in Angular
 
-Quicklink is supposed to be a script which you drop on the page and it does its job. Unfortunately, that's not the case for frameworks which manage their own routing, creating indirection between a URL and content. Examples are Angular, React with React Router, etc.
+`quicklink` is supposed to be a script which you drop on the page and it does its job. Unfortunately, that's not the case for frameworks which manage their own routing, creating indirection between a URL and content. Examples are Angular, React with React Router, etc.
 
 Let's take a look at an example:
 
@@ -61,11 +63,13 @@ With the following routing definition, we can link to the page that the `AboutMo
 <a routerLink="/about">About</a>
 ```
 
-What quicklink will try to do is find all the `a` elements on the page at idle time and prefetch the page associated with their `href` attribute. Given the template above, this is not going to work.
+What `quicklink` will try to do is find all the `a` elements on the page at idle time and prefetch the page associated with their `href` attribute. Given the template above, this is not going to work.
 
 ## Introducing ngx-quicklink
 
-To let all Angular developers take advantage of the powerful prefetching strategy that quicklink provides, I developed [`ngx-quicklink`](https://github.com/mgechev/ngx-quicklink).
+To let all Angular developers take advantage of the powerful prefetching strategy that `quicklink` provides, I developed [`ngx-quicklink`](https://github.com/mgechev/ngx-quicklink).
+
+<img src="/images/ngx-quicklink/logo.png" style="display: block; margin: auto">
 
 ### How to use
 
@@ -124,7 +128,7 @@ On [this link](https://github.com/mgechev/angular-realworld-example-app-qucklink
 * **Checks if the user isn't on a slow connection** (using `navigator.connection.effectiveType`) or has data-saver enabled (using `navigator.connection.saveData`)
 * **Prefetches the lazy loaded modules** using Angular's prefetching strategy)
 
-There are three main differences between the original quicklink implementation and ngx-quicklink:
+There are three main differences between the original `quicklink` implementation and `ngx-quicklink`:
 
 1. `quicklink` prefetches resources with `link[rel="prefetch"]` if available and fallbacks to `XMLHttpRequest`. `ngx-quicklink` uses only `XMLHttpRequest` because of the current routing preloading mechanism of the Angular router. Although `link[rel="prefetch"]` is a better alternative, used also by Guess.js, most likely your users will not notice a significant difference.
 1. `ngx-quicklink` not only downloads the associated JavaScript bundles but also parses and evaluates the content. This will allow even further performance boost when the user changes the page.
@@ -156,6 +160,6 @@ If on the page there's a `routerLink="/about/team"`, `ngx-quicklink` will first 
 
 ## Conclusion
 
-In this article we talked about prefetching in web applications. We discussed the quicklink prefetching strategy and where it originates from. After that we discussed what's the difference between predictive prefetching and quicklink.
+In this article we talked about prefetching in web applications. We discussed the `quicklink` prefetching strategy and where it originates from. After that we discussed what's the difference between predictive prefetching and `quicklink`.
 
-After that we put quicklink into the context of Angular and we discussed the limitations of the original implementation. Combining Angular's `routerLink` directive with the framework's `PreloadingStrategy` we introduced `ngx-quicklink` - quicklink implementation for Angular.
+After that we put `quicklink` into the context of Angular and we discussed the limitations of the original implementation. Combining Angular's `routerLink` directive with the framework's `PreloadingStrategy` we introduced `ngx-quicklink` - `quicklink` implementation for Angular.
