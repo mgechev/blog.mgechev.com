@@ -20,6 +20,7 @@ url: /2018/12/24/quicklink-angular-prefetching-preloading-strategy
 A few months ago I posted an article about [Guess.js](https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/). [Guess.js](https://github.com/guess-js/guess) is a powerful library for predictive prefetching of JavaScript based on analytics data for a website. The library consumes reports from an analytics source (by default Google Analytics) and builds a basic machine learning model. When a user visits the site, based on the model Guess.js prefetches resources which are likely to be needed next. Thanks to the data-driven approach, Guess.js offers many benefits - reduces over fetching, does not perform aggressive prefetching on slow networks, etc.
 
 In this blog post we're going to look at another prefetching approach, which takes advantage of two heuristics:
+
 - Users are likely to visit links which are visible on the page
 - We do not want to prefetch aggressively if the user is using a poor data plan
 - We want to prefetch only when the browser is idle
