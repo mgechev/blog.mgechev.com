@@ -59,7 +59,7 @@ For simplicity, there are a few rules we need to follow:
 - Each individual string token is surrounded by whitespace.
 - We support only natural numbers.
 
-In order to explore the semantics behind the expression above lets define a few JavaScript functions:
+In order to explore the semantics behind the expression above let's define a few JavaScript functions:
 
 ```javascript
 const mul = (...operands) => operands.reduce((a, c) => a * c, 1);
@@ -81,7 +81,7 @@ or...
 3 * (2 - (1 + 3 + 4))
 ```
 
-Now, after we have understanding of the semantics, lets start with the front end of the compiler!
+Now, after we have understanding of the semantics, let's start with the front end of the compiler!
 
 
 _**Note**: Similar prefix expressions can be simply evaluated with a stack-based algorithm, however, in this case we'll focus on concepts rather than implementation._
@@ -92,7 +92,7 @@ The front end of any compiler usually has the modules for [Lexical Analysis](htt
 
 ## Developing a Lexical Analyzer
 
-The phase of lexical analysis is responsible for dividing the input string (or stream of characters) of the program into smaller pieces called **tokens**. The tokens usually carries information about their type (if they are numbers, operators, keywords, identifiers, etc), the substring of the program they represent and their position in the program. The position is usually used for reporting user friendly errors in case of invalid syntactical constructs.
+The phase of lexical analysis is responsible for dividing the input string (or stream of characters) of the program into smaller pieces called **tokens**. The tokens usually carry information about their type (if they are numbers, operators, keywords, identifiers, etc), the substring of the program they represent and their position in the program. The position is usually used for reporting user friendly errors in case of invalid syntactical constructs.
 
 For instance, if we have the JavaScript program:
 
@@ -152,13 +152,13 @@ lex('mul 3 sub 2 sum 1 3 4')
 
 This is completely enough for our purpose!
 
-Now lets go to the phase of syntax analysis!
+Now let's go to the phase of syntax analysis!
 
 # Developing a Parser
 
-The syntax analyzer (often know as parser) is the module of a compiler which out of a list (or stream) of tokens produces an [Abstract Syntax Tree](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)<sup>[6]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.
+The syntax analyzer (often known as parser) is the module of a compiler which out of a list (or stream) of tokens produces an [Abstract Syntax Tree](https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees)<sup>[6]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.
 
-<img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;">
+<img src="/images/simple-compiler/tree.jpg" alt="Nature Tree" style="display: block; margin: auto;">
 
 Usually, the parser is implemented based on a [grammar](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)<sup>[7]</sup>. Here's the grammar of our language:
 
@@ -169,7 +169,7 @@ op = sum | sub | mul | div
 expr = num | op expr+
 ```
 
-This basically means that we have digits which composed together can form numbers (`num`). We have 4 operations and an expression can be either a `num`ber, or `op`eration, followed by one or more `expr`essions. We'll refer to the individual definitions in the grammar (for instance to `num` and `op`) as rules.
+This basically means that we have digits which composed together can form numbers (`num`). We have 4 operations and an expression which can be either a `num`ber, or `op`eration, followed by one or more `expr`essions. We'll refer to the individual definitions in the grammar (for instance to `num` and `op`) as rules.
 
 This is the so called [EBNF grammar](https://en.wikipedia.org/wiki/Extended_Backus–Naur_form)<sup>[6]</sup>. Look at the grammar for a bit, try to understand it, and after that completely forget about it! We'll come back to the grammar after we explain the parser and you'll see how everything connects together!
 
@@ -187,7 +187,7 @@ The parser will produce the following AST, based on the grammar above:
   <img src="/images/simple-compiler/ast.svg">
 </div>
 
-Lets explore the algorithm for this!
+Let's explore the algorithm for this!
 
 ```javascript
 const Op = Symbol('op');
@@ -216,7 +216,7 @@ const parse = tokens => {
 
 The bad news is that there are a lot of things going on. The good news is that this is the most complicated part of the compiler!
 
-Lets divide the code into parts and look into each one step by step.
+Let's divide the code into parts and look into each one step by step.
 
 ## Node Types
 
@@ -322,7 +322,7 @@ The produced AST will look like:
 
 ## Recursive Descent Parsing
 
-Now lets see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:
+Now let's see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Let's take a look at the rules in the EBNF grammar:
 
 ```
 digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
@@ -351,7 +351,7 @@ const transpile = ast => {
 };
 ```
 
-Lets explore the implementation line by line.
+Let's explore the implementation line by line.
 
 First we define a function called `transpile`. It accepts as argument the AST produced by the parser. After that in the `opMap` we define the mapping between arithmetic operations and the operators in the language. Basically, `sum` maps to `+`, `mul` to `*`, etc.
 
