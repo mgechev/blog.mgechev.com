@@ -10,7 +10,7 @@ tags:
 - Angular
 - Angular CLI
 - Productivity
-title: 5 Angular CLI Pro Tips
+title: 5 Angular CLI Features You Didn't Know About
 og_image: /images/ngx-quicklink/logo.png
 url: /2019/02/06/5-angular-cli-features
 ---
@@ -85,6 +85,8 @@ The source map property is under `projects.[PROJECT_NAME].architect.build.config
 
 <img src="/images/5-cli-features/hidden-sourcemaps.gif" style="display: block; margin: auto">
 
+To use this feature, make sure you're using **Angular CLI ^7.2.0**.
+
 ## Looking up the Documentation
 
 While working on a project, I spend most of my time in the terminal. Often I want to look up something in the Angular's documentation quickly from the command line. Angular CLI provides `ng doc` which accepts a keyword. The `doc` command will open a browser with https://angular.io and it'll automatically search for the provided keyword.
@@ -105,3 +107,23 @@ The more the application grows, the slower the build gets. Angular CLI version 7
 Here's a [link](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) which explains how to get started with the trace event profiling tool.
 
 <img src="/images/5-cli-features/tracing.png" style="display: block; margin: auto">
+
+This feature was **part of the 7.0.0 release**.
+
+## Open the Browser
+
+This is an obvious one, but I've been really missing it. In [Angular Seed](https://github.com/mgechev/angular-seed), I was feeling strongly for opening the browser once the development server is ready. I used Angular CLI in the past and I noticed that this wasn't the case there, which I found a little disappointing.
+
+Oh well, I didn't look at the documentation back then...neither I looked today, but while reading through the source code I found the `--open=true` or `-o` command line option, which opens the browser for you. This tiny little feature saves me over a minute every day.
+
+# Conclusion
+
+In this blog post we looked at five not very popular CLI features:
+
+- Conditional polyfill serving
+- Hidden source maps, consumable by error reporting services
+- Searching in the Angular's documentation using `ng doc`
+- Profiling the build with Chrome's trace event profiling tool
+- Opening the browser when the development server starts
+
+Be tunned for Angular CLI v8.0.0 with more upcoming feature. Make sure you follow https://blog.angular.io for updates!
