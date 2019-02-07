@@ -57,8 +57,51 @@ On the snippet above, you can see how Angular CLI downloads the polyfills condit
 
 ## "Hidden" Source Maps
 
+Source maps are an amazing tool which help us to debug transformed code in its original form. For example, although the browser executes JavaScript, we can debug the original TypeScript that we developed. It's likely, however, that we would not want to ship source maps to our production servers. There are a couple of reasons:
 
+- They are usually large; source maps could be several hundreds of KBs even after compression
+- We may not want to share the original source code of our application with the users
+
+Angular CLI has a solution for this! In development all the source files have associated source maps. In production, however, you can chose between not generating source maps at all, or getting "hidden source maps". There's nothing that hidden or special - we generate the source maps but do not reference them in the JavaScript files.
+
+Why is this useful? If you're using an error reporting service such as Sentry, you can upload the produced source maps so you can get runtime errors mapped to their position in the original code that you've written. You can read more about how to upload source maps to Sentry [here](https://docs.sentry.io/platforms/javascript/sourcemaps/availability/#uploading-source-maps-to-sentry).
+
+How to enable hidden source maps? Open `angular.json` and make sure you set the `sourceMap` under the production builder:
+
+```json
+...
+"configurations": {
+  "production": {
+    "sourceMap": {
+      "scripts": true,
+      "hidden": true
+    }
+  }
+}
+...
+```
+
+The source map property is under `projects.[PROJECT_NAME].architect.build.configurations.production.sourceMap`.
+
+<img src="/images/5-cli-features/hidden-sourcemaps.gif" style="display: block; margin: auto">
 
 ## Looking up the Documentation
 
+While working on a project, I spend most of my time in the terminal. Often I want to look up something in the Angular's documentation quickly from the command line. Angular CLI provides `ng doc` which accepts a keyword. The `doc` command will open a browser with https://angular.io and it'll automatically search for the provided keyword.
+
+Here's how this works in practice:
+
+<img src="/images/5-cli-features/doc.gif" style="display: block; margin: auto">
+
 ## Profiling the Build
+
+The more the application grows, the slower the build gets. Angular CLI version 7.0.0 introduced a `--profile` flag that outputs the build events and lets you profile them in `chrome://tracing`. The process goes as follow:
+
+1. Build your project with `--profile` flag on (`ng build --prod --profile`), Angular CLI will produce a file called `chrome-profiler-events.json`
+1. Open [`chrome://tracing`](chrome://tracing) and click on "Load" in the top left corner
+1. Select `chrome-profiler-events.json`
+1. 🎉
+
+Here's a [link](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) which explains how to get started with the trace event profiling tool.
+
+<img src="/images/5-cli-features/tracing.png" style="display: block; margin: auto">
