@@ -83,7 +83,7 @@ How to enable hidden source maps? Open `angular.json` and make sure you set the 
 
 The source map property is under `projects.[PROJECT_NAME].architect.build.configurations.production.sourceMap`.
 
-<img src="/images/5-cli-features/hidden-sourcemaps.gif" style="display: block; margin: auto">
+<img src="/images/5-cli-features/hidden-sourcemaps.gif" style="display: block; margin: auto; width: 668px;">
 
 To use this feature, make sure you're using **Angular CLI ^7.2.0**.
 
@@ -93,7 +93,7 @@ While working on a project, I spend most of my time in the terminal. Often I wan
 
 Here's how this works in practice:
 
-<img src="/images/5-cli-features/doc.gif" style="display: block; margin: auto">
+<img src="/images/5-cli-features/doc.gif" style="display: block; margin: auto; width: 668px;">
 
 ## Profiling the Build
 
@@ -106,7 +106,7 @@ The more the application grows, the slower the build gets. Angular CLI version 7
 
 Here's a [link](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) which explains how to get started with the trace event profiling tool.
 
-<img src="/images/5-cli-features/tracing.png" style="display: block; margin: auto">
+<img src="/images/5-cli-features/tracing.png" style="display: block; margin: auto; width: 668px;">
 
 This feature was **part of the 7.0.0 release**.
 
