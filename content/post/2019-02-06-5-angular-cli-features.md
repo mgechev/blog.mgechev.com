@@ -17,6 +17,8 @@ url: /2019/02/06/5-angular-cli-features
 
 I've been using Angular for years, not only the framework itself but the entire development platform, including the CLI. Since I joined the Angular team and started digging into the source code, however, I started noticing features in the CLI that I've never used before. In this blog post I want to share some of them, which will make your work life easier and more productive!
 
+<img src="/images/5-cli-features/cli.png" style="display: block; margin: auto;">
+
 ## Conditional Polyfill Serving
 
 In the development of Angular we're using TypeScript with a lot of modern JavaScript features. Not all of them are supported by the users' browsers so that's why as part of the production build we ship a file called `polyfills.js`, which provides features such as `Map`, `Set`, zones.js, etc.
