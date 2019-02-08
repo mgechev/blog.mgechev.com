@@ -140,7 +140,7 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 <li>We support only natural numbers.</li>
 </ul>
 
-<p>In order to explore the semantics behind the expression above lets define a few JavaScript functions:</p>
+<p>In order to explore the semantics behind the expression above let&rsquo;s define a few JavaScript functions:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">mul</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="k">const</span> <span class="nx">sub</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">c</span><span class="p">);</span>
 <span class="k">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">operands</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">operands</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">c</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
@@ -151,7 +151,7 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 <div class="highlight"><pre class="chroma">mul(3, sub(2, sum(1, 3, 4)))</pre></div>
 <p>or&hellip;</p>
 <div class="highlight"><pre class="chroma">3 * (2 - (1 + 3 + 4))</pre></div>
-<p>Now, after we have understanding of the semantics, lets start with the front end of the compiler!</p>
+<p>Now, after we have understanding of the semantics, let&rsquo;s start with the front end of the compiler!</p>
 
 <p><em><strong>Note</strong>: Similar prefix expressions can be simply evaluated with a stack-based algorithm, however, in this case we&rsquo;ll focus on concepts rather than implementation.</em></p>
 
@@ -161,7 +161,7 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 
 <h2 id="developing-a-lexical-analyzer">Developing a Lexical Analyzer</h2>
 
-<p>The phase of lexical analysis is responsible for dividing the input string (or stream of characters) of the program into smaller pieces called <strong>tokens</strong>. The tokens usually carries information about their type (if they are numbers, operators, keywords, identifiers, etc), the substring of the program they represent and their position in the program. The position is usually used for reporting user friendly errors in case of invalid syntactical constructs.</p>
+<p>The phase of lexical analysis is responsible for dividing the input string (or stream of characters) of the program into smaller pieces called <strong>tokens</strong>. The tokens usually carry information about their type (if they are numbers, operators, keywords, identifiers, etc), the substring of the program they represent and their position in the program. The position is usually used for reporting user friendly errors in case of invalid syntactical constructs.</p>
 
 <p>For instance, if we have the JavaScript program:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
@@ -209,20 +209,20 @@ Recently I published &ldquo;Developing Statically Typed Programming Language&ldq
 </span><span class="c1"></span></code></pre></div>
 <p>This is completely enough for our purpose!</p>
 
-<p>Now lets go to the phase of syntax analysis!</p>
+<p>Now let&rsquo;s go to the phase of syntax analysis!</p>
 
 <h1 id="developing-a-parser">Developing a Parser</h1>
 
-<p>The syntax analyzer (often know as parser) is the module of a compiler which out of a list (or stream) of tokens produces an <a href="https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees">Abstract Syntax Tree</a><sup>[6]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.</p>
+<p>The syntax analyzer (often known as parser) is the module of a compiler which out of a list (or stream) of tokens produces an <a href="https://en.wikibooks.org/wiki/Compiler_Construction/Case_Study_1B#Abstract_Syntax_Trees">Abstract Syntax Tree</a><sup>[6]</sup> (or in short an AST). Along the process, the syntax analyzer may also produce syntax errors in case of invalid programs.</p>
 
-<p><img src="/images/simple-compiler/tree.jpg" alt="Nature Tree"  style="display: block; margin: auto;"></p>
+<p><img src="/images/simple-compiler/tree.jpg" alt="Nature Tree" style="display: block; margin: auto;"></p>
 
 <p>Usually, the parser is implemented based on a <a href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">grammar</a><sup>[7]</sup>. Here&rsquo;s the grammar of our language:</p>
 <div class="highlight"><pre class="chroma">digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
 expr = num | op expr+</pre></div>
-<p>This basically means that we have digits which composed together can form numbers (<code>num</code>). We have 4 operations and an expression can be either a <code>num</code>ber, or <code>op</code>eration, followed by one or more <code>expr</code>essions. We&rsquo;ll refer to the individual definitions in the grammar (for instance to <code>num</code> and <code>op</code>) as rules.</p>
+<p>This basically means that we have digits which composed together can form numbers (<code>num</code>). We have 4 operations and an expression which can be either a <code>num</code>ber, or <code>op</code>eration, followed by one or more <code>expr</code>essions. We&rsquo;ll refer to the individual definitions in the grammar (for instance to <code>num</code> and <code>op</code>) as rules.</p>
 
 <p>This is the so called <a href="https://en.wikipedia.org/wiki/Extended_Backus–Naur_form">EBNF grammar</a><sup>[6]</sup>. Look at the grammar for a bit, try to understand it, and after that completely forget about it! We&rsquo;ll come back to the grammar after we explain the parser and you&rsquo;ll see how everything connects together!</p>
 
@@ -236,7 +236,7 @@ expr = num | op expr+</pre></div>
   <img src="/images/simple-compiler/ast.svg">
 </div>
 
-<p>Lets explore the algorithm for this!</p>
+<p>Let&rsquo;s explore the algorithm for this!</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
 <span class="k">const</span> <span class="nx">Num</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">);</span>
 
@@ -262,7 +262,7 @@ expr = num | op expr+</pre></div>
 </code></pre></div>
 <p>The bad news is that there are a lot of things going on. The good news is that this is the most complicated part of the compiler!</p>
 
-<p>Lets divide the code into parts and look into each one step by step.</p>
+<p>Let&rsquo;s divide the code into parts and look into each one step by step.</p>
 
 <h2 id="node-types">Node Types</h2>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">Op</span> <span class="o">=</span> <span class="nx">Symbol</span><span class="p">(</span><span class="s1">&#39;op&#39;</span><span class="p">);</span>
@@ -353,7 +353,7 @@ expr = num | op expr+</pre></div>
 
 <h2 id="recursive-descent-parsing">Recursive Descent Parsing</h2>
 
-<p>Now lets see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Lets take a look at the rules in the EBNF grammar:</p>
+<p>Now let&rsquo;s see how are the individual functions related to the grammar we defined above and see why having a grammar makes sense in general. Let&rsquo;s take a look at the rules in the EBNF grammar:</p>
 <div class="highlight"><pre class="chroma">digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 num = digit+
 op = sum | sub | mul | div
@@ -375,7 +375,7 @@ expr = num | op expr+</pre></div>
   <span class="k">return</span> <span class="nx">transpileNode</span><span class="p">(</span><span class="nx">ast</span><span class="p">);</span>
 <span class="p">};</span>
 </code></pre></div>
-<p>Lets explore the implementation line by line.</p>
+<p>Let&rsquo;s explore the implementation line by line.</p>
 
 <p>First we define a function called <code>transpile</code>. It accepts as argument the AST produced by the parser. After that in the <code>opMap</code> we define the mapping between arithmetic operations and the operators in the language. Basically, <code>sum</code> maps to <code>+</code>, <code>mul</code> to <code>*</code>, etc.</p>
 
