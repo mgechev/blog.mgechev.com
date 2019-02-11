@@ -64,7 +64,7 @@ Source maps are an amazing tool which helps us with debugging transformed code i
 - Source maps are usually large; they could be several hundreds of KBs even after compression
 - We may not want to share the original source code of our application with the users
 
-Angular CLI has a solution for this! In development all the source files have associated source maps. In production, however, you can chose between not generating source maps at all, generating external, or "hidden" source maps. There's nothing that hidden or special in the latter kind - we generate the source maps but do not reference them in the JavaScript files.
+Angular CLI has a solution for this! In development all the source files have associated source maps. In production, however, you can choose between not generating source maps at all, generating external, or "hidden" source maps. There's nothing that hidden or special in the latter kind - we generate the source maps but do not reference them in the JavaScript files.
 
 Why is this useful? If you're using an error reporting service such as Sentry, you can upload the produced source maps so you can get runtime errors mapped to their original position in the code that you've written. You can read more about how to upload source maps to Sentry [here](https://docs.sentry.io/platforms/javascript/sourcemaps/availability/#uploading-source-maps-to-sentry).
 
