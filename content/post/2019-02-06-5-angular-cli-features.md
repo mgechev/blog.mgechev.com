@@ -11,7 +11,7 @@ tags:
 - Angular CLI
 - Productivity
 title: 5 Angular CLI Features You Didn't Know About
-og_image: /images/ngx-quicklink/logo.png
+og_image: /images/5-cli-features/cli.png
 url: /2019/02/06/5-angular-cli-features
 ---
 
