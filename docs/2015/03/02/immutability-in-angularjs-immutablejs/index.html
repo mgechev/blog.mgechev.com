@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.51" />
+		<meta name="generator" content="Hugo 0.54.0" />
 		<title>Boost the Performance of an AngularJS Application Using Immutable Data &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -105,12 +105,12 @@ Later, when my code was used in production, I started appreciating things like h
 <span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>    <span class="c1">// List [ 1, 2, 3 ]
 </span><span class="c1"></span><span class="nx">changed</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span> <span class="c1">// List [ 1, 2, 3, 4 ]
 </span><span class="c1"></span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span>    <span class="c1">// false
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>Compared to the mutable JavaScript lists:</p>
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <h2 id="angularjs-data-binding">AngularJS data-binding</h2>
 
 <p>There are a lot of posts about how the AngularJS data-binding and dirty checking works. I even created a light AngularJS implementation in order <a href="https://github.com/mgechev/light-angularjs/blob/master/src/Scope.js#L61-L80">to illustrate it</a> better. Basically it involves a lot of evaluations and comparisons of the watched expression and their results. For example:</p>
@@ -134,7 +134,7 @@ Later, when my code was used in production, I started appreciating things like h
 
 <p>Since each immutable data-structure creates a new instance of itself on change, we basically get different references when we add or remove elements. This drops the complexity of <code>$watch</code> to <code>O(1)</code>, since now we don&rsquo;t need to loop over the entire collection in order to find the difference with the previous value. We simple compare the reference of the current collection with the previous one:</p>
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">previous</span> <span class="o">===</span> <span class="nx">current</span> <span class="c1">// O(1)
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <h2 id="immutable-js-and-angularjs">Immutable.js and AngularJS</h2>
 
 <p>Lets create a simple example in which we bind with <code>ng-repeat</code> to immutable list and render it in our HTML page:</p>
@@ -176,7 +176,7 @@ Later, when my code was used in production, I started appreciating things like h
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">jsList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">();</span>
 <span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">()</span> <span class="o">===</span> <span class="nx">jsList</span> <span class="c1">// false
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>This mean that Immutable.js creates a new JavaScript object for each call of <code>toJS</code>. Another thing we can do is to watch the inner collection, which is inside the immutable wrapper:</p>
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watchCollection</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">list</span><span class="p">.</span><span class="nx">_tail</span><span class="p">.</span><span class="nx">array</span><span class="p">;</span>
