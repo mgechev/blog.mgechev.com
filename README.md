@@ -2,9 +2,11 @@
 
 The blog uses [Hugo](https://gohugo.io/). For installation instructions follow [this guide](https://gohugo.io/getting-started/quick-start/).
 
-After that clone the repository, enter `blog.mgechev.com` and run:
+## Setup
 
 ```
+$ git clone git@github.com:mgechev/blog.mgechev.com
+$ cd blog.mgechev.com
 $ hugo server
 ```
 
