@@ -1,10 +1,10 @@
-# Personal Blog
+# Personal blog
 
 The blog uses [Hugo](https://gohugo.io/). For installation instructions follow [this guide](https://gohugo.io/getting-started/quick-start/).
 
 ## Setup
 
-```
+```bash
 $ git clone git@github.com:mgechev/blog.mgechev.com
 $ cd blog.mgechev.com
 $ hugo server
