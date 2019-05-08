@@ -205,7 +205,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       </section>
     </section>
     <section class="timeline-event">
-      <h1>Moved to the Silicon Valley</h1>
+      <h1>Moved to Silicon Valley</h1>
       <section>
         <img src="/images/story/silicon-valley.png">
         <p>
@@ -220,7 +220,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Got H-1B Visa</h1>
       <section>
         <p>
-          Not long after I got my invitation to join the Angular team, I received my H-1B visa. This gave me work permission in the United States, so I headed up to the Silicon Valley!
+          Not long after I got my invitation to join the Angular team, I received my H-1B visa. This gave me work permission in the United States, so I headed up to Silicon Valley!
         </p>
         <p>
           Unfortunately, this blocked me from continuing my work with the Angular team because of administrative restrictions, however, it didn't stop me from supporting the Angular community as an external contributor.
