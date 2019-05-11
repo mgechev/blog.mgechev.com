@@ -13,6 +13,8 @@ og_image: /images/5-cli-features/cli.png
 url: /2019/05/10/dynamic-imports-javascript
 ---
 
+Since Angular version 8 we support dynamic imports in `loadChildren` in the route declaration. In this article I want to give more information about why dynamic imports could be tricky to handle from tooling perspective and why you should be careful with them.
+
 As engineers, we often have the perception that `dynamic == good`. With the statically typed languages, such as TypeScript, this has shifted over the years. Because to compile-time checking, more folks started appreciating what tooling can give us, if we provide more statically analyzable information at build time.
 
 In the past, I've heard a lot of complains around the static imports in JavaScript:
@@ -96,4 +98,103 @@ That's why I often discourage people to use wildcard imports, since they could b
 
 ## What about dynamic imports
 
-Originally, I started writing this blog post to explain why dynamic imports are not great from tooling perspective.
+Originally, I started writing this blog post to explain why dynamic imports could be tricky from tooling perspective. Let's suppose that we have a lazy-loaded module:
+
+```js
+// dynamic.js
+export const a = 42;
+
+// foo.js
+import('./dynamic.js').then(m => console.log(m.a));
+```
+
+If we try to bundle this with rollup by specifying `foo.js` as an entry point we'll get something like:
+
+```bash
+$ rollup foo.js --output.format esm
+
+foo.js → stdout...
+
+//→ foo.js:
+import('./chunk-75df839a.js').then(m => console.log(m.a));
+
+//→ chunk-75df839a.js:
+const a = 42;
+
+export { a };
+created stdout in 59ms
+```
+
+Perfect! Here's what rollup did:
+
+- Created a chunk from `foo.js` and all its static imports (none)
+- Statically analyzed `foo.js` and found out that it dynamically imports `dynamic.js`
+- Created another chunk called `chunk-75df839a.js` by bundling together `dynamic.js` and all its static imports (none)
+
+Now let's change something in `foo.js`:
+
+```js
+// foo.js
+import('./dynamic.js').then(m => console.log(m.a));
+```
+
+In this case we get:
+
+```bash
+$ rollup foo.js --output.format esm
+
+foo.js → stdout...
+import('./dynamic.js' + '').then(m => console.log(m.a));
+created stdout in 39ms
+```
+
+This means that rollup was not able to properly figure out the entry point of the dynamically loaded chunk. Why? Well, we changed the argument of the import from a string literal to an expression. Same, of course, is going to happen if we use an expression which could be only invoked at runtime. Webpack would handle this case though, webpack will look at the expression we've passed to the dynamic import and it'll try to evaluate it statically, at build time:
+
+```bash
+$ webpack foo.js
+
+Hash: 2a1d2bcb0c5277c3bf29
+Version: webpack 4.30.0
+Time: 396ms
+Built at: 05/11/2019 3:44:22 PM
+  Asset       Size  Chunks             Chunk Names
+   1.js  141 bytes       1  [emitted]
+main.js      2 KiB       0  [emitted]  main
+Entrypoint main = main.js
+[0] ./foo.js 58 bytes {0} [built]
+[1] ./dynamic.js 21 bytes {1} [built]
+```
+
+## Dynamic Imports and TypeScript
+
+Now, let's look at another example - TypeScript. Let's suppose we have the following snippet:
+
+```ts
+// foo.ts
+export const foo = 42;
+
+// bar.ts
+import('./foo').then(m => m.foo);
+```
+
+<img src="/images/dynamic-imports/foo-number.png" style="display: block; margin: auto;">
+
+If you open `bar.ts` in a text editor and you point over `m.foo`, you'll see that it's of type `number`. This means that TypeScript's type inference has tracked the reference and figured out its type. Now, change `bar.ts` to:
+
+```ts
+// bar.ts
+import('./foo' + '').then(m => m.foo);
+```
+
+<img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto;">
+
+If you point over `m.foo` again, you'll find out that it has type `any` (TypeScript version 3.1.3). Why's that? We'll, when TypeScript finds out that we've passed a string literal to the dynamic import it follows the module reference and performs type inference, if it finds an expression, it fallbacks to type `any`.
+
+Before making any conclusions, let's make a quick recap of our observations:
+
+- Dynamic imports cannot be tree-shaken because we can access the exported symbols with index signature with an expression that contains data only available at runtime (i.e. `import(...).then(m => m[localStorage.getItem('foo')])`)
+- Modern bundlers and TypeScript can resolve dynamic imports only when we have specified the module with a string literal (webpack tries to perform some extra partial evaluation statically)
+
+## Conclusions
+
+Dynamic imports are fantastic for code-splitting on granular level.
