@@ -192,9 +192,13 @@ If you point over `m.foo` again, you'll find out that it has type `any` (TypeScr
 
 Before making any conclusions, let's make a quick recap of our observations:
 
-- Dynamic imports cannot be tree-shaken because we can access the exported symbols with index signature with an expression that contains data only available at runtime (i.e. `import(...).then(m => m[localStorage.getItem('foo')])`)
-- Modern bundlers and TypeScript can resolve dynamic imports only when we have specified the module with a string literal (webpack tries to perform some extra partial evaluation statically)
+- In the general case, dynamic imports cannot be tree-shaken because we can access the exported symbols with index signature with an expression that contains data only available at runtime (i.e. `import(...).then(m => m[localStorage.getItem('foo')])`)
+- Modern bundlers and TypeScript can resolve dynamic imports only when we have specified the module with a string literal (an exception is webpack, which performs some extra partial evaluation statically)
+
+This is one of the reasons in the general case [Guess.js](https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/), cannot handle dynamic imports and map them directly to Google Analytics URLs so that it can reuse the predictive model at runtime.
 
 ## Conclusions
 
-Dynamic imports are fantastic for code-splitting on granular level.
+Dynamic imports are fantastic for code-splitting on a granular level. They allow us to provide lazy-loading boundaries in our application. In the same time, because of it's dynamical nature, often they allow us to sneak code that requires some runtime data for resolution of the imported module, or for accessing it's exports.
+
+In such cases, we should be extremely couscous because we limit the capabilities of the tools that we're using. We sacrifice automatic bundling of lazy-loaded chunks, type inference, and much more.
