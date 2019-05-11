@@ -13,11 +13,11 @@ og_image: /images/5-cli-features/cli.png
 url: /2019/05/10/dynamic-imports-javascript
 ---
 
-Since Angular version 8 we support dynamic imports in `loadChildren` in the route declaration. In this article I want to give more information about why dynamic imports could be tricky to handle from tooling perspective and why you should be careful with them.
+Since Angular version 8, we support dynamic imports in `loadChildren` in the route declaration. In this article, I want to give more information about why dynamic imports could be tricky to handle from tooling perspective and why you should be careful with them.
 
-As engineers, we often have the perception that `dynamic == good`. With the statically typed languages, such as TypeScript, this has shifted over the years. Because to compile-time checking, more folks started appreciating what tooling can give us, if we provide more statically analyzable information at build time.
+As engineers, we often have the perception that `dynamic == good`. With the statically typed languages, such as TypeScript, this has shifted over the years. Because to compile-time checking, more folks started appreciating what tooling can give us if we provide more statically analyzable information at build time.
 
-In the past, I've heard a lot of complains around the static imports in JavaScript:
+In the past, I've heard a lot of complaints around the static imports in JavaScript:
 
 >Why does JavaScript restricts us to use only string literals when specifying the module in ES2015 imports?
 
@@ -32,7 +32,7 @@ Above we have the `import` keyword, import specifier, `from` keyword, followed b
 - Statically we can determine what symbols we import
 - Statically we can determine from which module we import
 
-## Static vs Dynamic Analysis
+## Static vs. Dynamic Analysis
 
 It's essential to understand what I mean by saying *statically*. In practice, any correct program can be partially executed at build time (for example, by webpack, prepack, etc.) and potentially fully executed at runtime. Look at this example:
 
@@ -42,7 +42,7 @@ const fib = n => n === 1 || n === 2 ? 1 : fib(n - 1) + fib(n - 2);
 console.log(fib(5));
 ```
 
-If we add prepack plugin to our webpack build, the final bundle will look something like this:
+If we add a prepack plugin to our webpack build, the final bundle will look something like this:
 
 ```js
 console.log(5);
@@ -58,7 +58,7 @@ console.log(fib(window.num));
 
 The evaluation of the snippet above would be impossible at build time because we don't know what's the value of `window.num` (imagine if a Chrome extension has set this value and we rely on it).
 
-How does this related to ES2015 imports? It relates in at least two different ways. With ES2015 imports we can:
+How does this relate to ES2015 imports? It connects in at least two different ways. With ES2015 imports we can:
 
 - Statically analyze the import specifier when the imported symbols are explicitly listed
 - Statically analyze the path because it's a string literal
@@ -77,7 +77,7 @@ Now, let's look at another example:
 import * as foo from './foo';
 ```
 
-This is all good, right? We specify the path as a string literal. Well, this way, the bundler needs to do *magic* in order to understand what parts of `./foo` we are using in the current module. Imagine we have the following snippet:
+This is all good, right? We specify the path as a string literal. Well, this way, the bundler needs to do *magic* to understand what parts of `./foo` we are using in the current module. Imagine we have the following snippet:
 
 ```js
 // foo.js
@@ -92,13 +92,13 @@ console.log(foo.a);
 console.log(foo[localStorage.get('bar')]);
 ```
 
-If we invoke the bundler by specifying `bar.js` as an entry point, statically we can determine that `bar.js` uses `a` but we have no idea if `b` and `c` are going to be needed at runtime, we don't know what the value of `localStorage.get('bar')` is. This way we won't be able to get rid of the unused symbols, since we don't know what is unused.
+If we invoke the bundler by specifying `bar.js` as an entry point, statically we can determine that `bar.js` uses `a` but we have no idea if `b` and `c` are going to be needed at runtime, we don't know what the value of `localStorage.get('bar')` is. This way we won't be able to get rid of the unused symbols since we don't know what is unused.
 
-That's why I often discourage people to use wildcard imports, since they could block the bundler from tree-shaking effectively.
+That's why I often discourage people to use wildcard imports since they could block the bundler from tree-shaking effectively.
 
 ## What about dynamic imports
 
-Originally, I started writing this blog post to explain why dynamic imports could be tricky from tooling perspective. Let's suppose that we have a lazy-loaded module:
+Originally, I started writing this blog post to explain why dynamic imports could be tricky from a tooling perspective. Let's suppose that we have a lazy-loaded module:
 
 ```js
 // dynamic.js
@@ -138,7 +138,7 @@ Now let's change something in `foo.js`:
 import('./dynamic.js').then(m => console.log(m.a));
 ```
 
-In this case we get:
+In this case, we get:
 
 ```bash
 $ rollup foo.js --output.format esm
@@ -148,7 +148,7 @@ import('./dynamic.js' + '').then(m => console.log(m.a));
 created stdout in 39ms
 ```
 
-This means that rollup was not able to properly figure out the entry point of the dynamically loaded chunk. Why? Well, we changed the argument of the import from a string literal to an expression. Same, of course, is going to happen if we use an expression which could be only invoked at runtime. Webpack would handle this case though, webpack will look at the expression we've passed to the dynamic import and it'll try to evaluate it statically, at build time:
+This means that rollup was not able to correctly figure out the entry point of the dynamically loaded chunk. Why? Well, we changed the argument of the import from a string literal to an expression. Same, of course, is going to happen if we use an expression which could be only invoked at runtime. Webpack would handle this case though, webpack will look at the expression we've passed to the dynamic import, and it'll try to evaluate it statically, at build time:
 
 ```bash
 $ webpack foo.js
@@ -188,7 +188,7 @@ import('./foo' + '').then(m => m.foo);
 
 <img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto;">
 
-If you point over `m.foo` again, you'll find out that it has type `any` (TypeScript version 3.1.3). Why's that? We'll, when TypeScript finds out that we've passed a string literal to the dynamic import it follows the module reference and performs type inference, if it finds an expression, it fallbacks to type `any`.
+If you point over `m.foo` again, you'll find out that it has type `any` (TypeScript version 3.1.3). Why's that? Well, when TypeScript finds out that we've passed a string literal to the dynamic import it follows the module reference and performs type inference if it finds expression, it fallbacks to type `any`.
 
 Before making any conclusions, let's make a quick recap of our observations:
 
@@ -199,6 +199,6 @@ This is one of the reasons in the general case [Guess.js](https://blog.mgechev.c
 
 ## Conclusions
 
-Dynamic imports are fantastic for code-splitting on a granular level. They allow us to provide lazy-loading boundaries in our application. In the same time, because of it's dynamical nature, often they allow us to sneak code that requires some runtime data for resolution of the imported module, or for accessing it's exports.
+Dynamic imports are fantastic for code-splitting on a granular level. They allow us to provide lazy-loading boundaries in our application. In the same time, because of it's dynamical nature, often they will enable us to sneak code that requires some runtime data for resolution of the imported module, or for accessing its exports.
 
 In such cases, we should be extremely couscous because we limit the capabilities of the tools that we're using. We sacrifice automatic bundling of lazy-loaded chunks, type inference, and much more.
