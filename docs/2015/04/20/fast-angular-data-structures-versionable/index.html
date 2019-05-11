@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.51" />
+		<meta name="generator" content="Hugo 0.54.0" />
 		<title>Even Faster AngularJS Data Structures &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -132,12 +132,12 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span> <span class="o">===</span> <span class="nx">changedList</span><span class="p">);</span> <span class="c1">// false
 </span><span class="c1">// The primitive collection is changed
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>But this will also have one important side effect:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changedList</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 
 <p>Keeping the same reference to the primitive list in both collections will cause change inside the underlaying data in both collections, once we perform a mutation operation. This solution looks like a dirty hack.</p>
 
@@ -185,7 +185,7 @@ Introduction Before about a month ago, I decided to experiment using immutable d
   <span class="p">}</span>
 <span class="p">}</span>
 <span class="c1">// ...
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 
 <p>This part of the implementation is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using <code>for-in</code>. In order to achieve complexity around <code>O(1)</code>, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag as only key of the collection&rsquo; instances.</p>
 
@@ -248,12 +248,12 @@ Introduction Before about a month ago, I decided to experiment using immutable d
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2, 3]
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 1
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 
 <p>And here are the keys over which AngularJS will iterate:</p>
 
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [&#39;_version&#39;]
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 
 <h2 id="benchmark-results">Benchmark Results</h2>
 
