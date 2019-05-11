@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.54.0" />
+		<meta name="generator" content="Hugo 0.51" />
 		<title>Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -444,7 +444,7 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="kd">let</span> <span class="nx">newRule</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RouteRule</span><span class="p">(</span><span class="nx">routePath</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">);</span>
 <span class="c1">// ...
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 <p>The <code>RouteRule</code> class has a private <code>_getInstruction</code> method, which based on the state of the <code>RouteRule</code> instance and passed arguments returns an instruction. We need to update its implementation to:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">private</span> <span class="nx">_getInstruction</span><span class="p">(</span><span class="nx">urlPath</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">urlParams</span><span class="o">:</span> <span class="nx">string</span><span class="p">[],</span>
                         <span class="nx">params</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">any</span><span class="p">})</span><span class="o">:</span> <span class="nx">ComponentInstruction</span> <span class="p">{</span>
@@ -493,7 +493,7 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
   <span class="p">});</span>
 <span class="p">}</span>
 <span class="c1">// ...
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 <p>The <code>activate</code> method accepts an instruction and renders the component associated with it once it gets available (i.e. its template is loaded, etc.).</p>
 
 <p>Notice that inside of the method is created a custom set of <code>providers</code> which include the <code>RouteData</code> associated with the given route, as well as <code>RouteParams</code> and the <code>Router</code>. After that the <code>activate</code> method loads the target component next to the <code>router-outlet</code> directive. It does this with the <code>DynamicComponentLoader</code> by taking all the defined above providers plus all the providers which reside in the <code>_viewContainerRef</code> (for a reference take a look <a href="https://github.com/angular/angular/blob/bb8976608db93b9ff90a71187608a4390cbd7a07/modules/%40angular/core/src/linker/dynamic_component_loader.ts#L137-L139">here</a>).</p>
@@ -520,7 +520,7 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <span class="kd">var</span> <span class="nx">parentInjector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_viewContainerRef</span><span class="p">.</span><span class="nx">parentInjector</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">fromResolvedProviders</span><span class="p">(</span><span class="nx">providers</span><span class="p">,</span> <span class="nx">parentInjector</span><span class="p">);</span>
 <span class="c1">// ...
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 <p>This way we create an injector which has all providers from the <code>_viewContainerRef</code> (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated with the keys in the <code>defer</code> object we can:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">deferPromises</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span>
 </code></pre></div>
