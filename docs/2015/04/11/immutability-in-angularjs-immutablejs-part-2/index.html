@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.54.0" />
+		<meta name="generator" content="Hugo 0.51" />
 		<title>Boost the Performance of an AngularJS Application Using Immutable Data - Part 2 &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -120,7 +120,7 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
 <div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">changed</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span><span class="p">);</span> <span class="c1">// false
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 
 <h3 id="side-note">Side note</h3>
 
@@ -134,7 +134,7 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
 <span class="nx">changeA</span><span class="p">();</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="nx">oldA</span><span class="p">);</span> <span class="c1">// false
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">angular</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">oldA</span><span class="p">));</span> <span class="c1">// true
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 
 <p>So, if we strictly want to perform given action <strong>only</strong> when the structure of the collection or the data inside it have changed (not only the reference) we will need to loop over both collections (old one and new one) and check whether they contains the same data.*</p>
 
@@ -159,7 +159,7 @@ In the post I did simple profiling using the built-in Date but it didn&rsquo;t g
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">list3</span><span class="p">);</span> <span class="c1">// false
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list3</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4 ]
-</span></code></pre></div>
+</span><span class="c1"></span></code></pre></div>
 
 <p>That said, we can build a sample script, which will be used for profiling. Initially we will create a single collection and attach watchers to it. Once this is done, <code>protractor</code> will start clicking a button, which will update a random element of the collection. Here is our <code>SampleCtrl</code>, which is responsible for initialization and handling the update requests:</p>
 
