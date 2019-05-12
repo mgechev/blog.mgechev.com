@@ -203,4 +203,4 @@ This is one of the reasons why in the general case [Guess.js](https://blog.mgech
 
 Dynamic imports are fantastic for code-splitting on a granular level. They allow us to provide lazy-loading boundaries in our application. In the same time, because of their dynamical nature, they often will enable us to sneak in code that requires runtime data for resolution of the imported module, or for accessing its exports.
 
-In such cases, we should be extremely couscous because we limit the capabilities of the tools that we're using. We sacrifice automatic bundling of lazy-loaded chunks, type inference, and much more.
+In such cases, we should be extremely cautious because we limit the capabilities of the tools that we're using. We sacrifice automatic bundling of lazy-loaded chunks, type inference, and much more.
