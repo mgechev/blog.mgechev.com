@@ -15,7 +15,7 @@ url: /2019/05/11/dynamic-imports-javascript
 
 Since Angular version 8, we support dynamic imports in `loadChildren` in the route declaration. In this article, I want to give more information about why dynamic imports could be tricky to handle from tooling perspective and why you should be careful with them.
 
-<img src="/images/dynamic-imports/imports.png" style="display: block; margin: auto;">
+<img src="/images/dynamic-imports/imports.png" style="display: block; margin: auto; width: 100%;">
 
 As engineers, we often have the perception that `dynamic == good`. With statically typed languages, such as TypeScript, this has shifted over the years. Because of compile-time checking, more folks started appreciating what tooling can give us if we provide statically analyzable information at build time.
 
@@ -179,7 +179,7 @@ export const foo = 42;
 import('./foo').then(m => m.foo);
 ```
 
-<img src="/images/dynamic-imports/foo-num.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px;">
+<img src="/images/dynamic-imports/foo-num.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;">
 
 If we open `bar.ts` in a text editor and we point over `m.foo`, we'll see that it's of type `number`. This means that TypeScript's type inference has tracked the reference and figured out its type. Now, change `bar.ts` to:
 
@@ -188,7 +188,7 @@ If we open `bar.ts` in a text editor and we point over `m.foo`, we'll see that i
 import('./foo' + '').then(m => m.foo);
 ```
 
-<img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px;">
+<img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;">
 
 If we point over `m.foo` again, we'll find out that it has type `any` (TypeScript version 3.1.3). Why both differ? When TypeScript finds out that we've passed a string literal to the dynamic import it follows the module reference and performs type inference; if it finds an expression, it fallbacks to type `any`.
 
