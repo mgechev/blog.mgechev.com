@@ -137,7 +137,7 @@ Now let's change something in `foo.js`:
 
 ```js
 // foo.js
-import('./dynamic.js').then(m => console.log(m.a));
+import('./dynamic.js' + '').then(m => console.log(m.a));
 ```
 
 In this case, we get:
