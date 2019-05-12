@@ -8,7 +8,7 @@ draft: false
 tags:
 - Tooling
 - JavaScript
-title: Dynamic imports are good, right?
+title: Dynamic imports solve all the problems, right?
 og_image: /images/dynamic-imports/imports.png
 url: /2019/05/11/dynamic-imports-javascript
 ---
