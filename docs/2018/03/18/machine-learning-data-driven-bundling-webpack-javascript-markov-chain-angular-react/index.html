@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.51" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Machine Learning-Driven Bundling. The Future of JavaScript Tooling. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -603,10 +603,10 @@ collapse.onclick = function () {
 <ul>
 <li><code>debug</code> indicates if the plugin&rsquo;s verbose logging should be enabled.</li>
 <li><code>data</code> is the page graph gotten from Google Analytics.</li>
-<li><code>routeProvider</code> is a function which returns the mapping between routes and chunk entry points. If a <code>routeProvider</code> is not specified, <code>@mlx/webpack</code> will use the default route provider implementation from <code>@mlx/parser</code>. This is <strong>extremely powerful configuration property</strong>. If you have a React application and the default <code>routeProvider</code> doesn&rsquo;t work you can provide a custom function which returns the metadata:
-<code>ts
-new MLPlugin({ data, routeProvider: () =&gt; [{...}, {...}] })
-</code></li>
+
+<li><p><code>routeProvider</code> is a function which returns the mapping between routes and chunk entry points. If a <code>routeProvider</code> is not specified, <code>@mlx/webpack</code> will use the default route provider implementation from <code>@mlx/parser</code>. This is <strong>extremely powerful configuration property</strong>. If you have a React application and the default <code>routeProvider</code> doesn&rsquo;t work you can provide a custom function which returns the metadata:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">routeProvider</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[{...},</span> <span class="p">{...}]</span> <span class="p">})</span></code></pre></div>
+<ul>
 <li><code>runtime</code> configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional <code>basePath</code> and/or <code>prefetchConfig</code> or disable the pre-fetching completely.</li>
 <li><code>build</code> is the part of the <code>@mlx/webpack</code> plugin which by default groups the webpack chunks based on the clustering algorithm performed by <code>@mlx/cluster</code>. We can think of it as an algorithm which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.</li>
 </ul>
@@ -617,11 +617,13 @@ new MLPlugin({ data, routeProvider: () =&gt; [{...}, {...}] })
 
 <p>As I mentioned, if <code>routeProvider</code> is not passed to the plugin configuration object, the default one will be used. The default route provider will return an array of objects in the following format:</p>
 <div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">interface</span> <span class="nx">RoutingModule</span> <span class="p">{</span>
-  <span class="nx">path</span>: <span class="kt">string</span><span class="p">;</span>
-  <span class="nx">lazy</span>: <span class="kt">boolean</span><span class="p">;</span>
-  <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="kt">string</span><span class="p">;</span>
-  <span class="nx">parentModulePath</span>: <span class="kt">string</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
+<span class="nx">path</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="nx">lazy</span>: <span class="kt">boolean</span><span class="p">;</span>
+<span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="kt">string</span><span class="p">;</span>
+<span class="nx">parentModulePath</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div></li>
+</ul>
+
 <p>In case the default route provider doesn&rsquo;t work for you, you can implement a function which parses your application and returns the routes in the specified format. If an entire parser seems like an overhead for your application, you can even collect the metadata manually and return it as the result of a constant function:</p>
 <div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">routeProvider</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[</span>
   <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">lazy</span>: <span class="kt">true</span><span class="p">,</span> <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="s1">&#39;/foo&#39;</span><span class="p">,</span> <span class="nx">parentModulePath</span>: <span class="kt">null</span> <span class="p">},</span>

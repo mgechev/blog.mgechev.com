@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.51" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Ahead-of-Time Compilation in Angular &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -131,7 +131,7 @@
   <span class="p">}</span>
 <span class="p">};</span>
 <span class="c1">// ...
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>This snippet is copied from my <a href="https://github.com/mgechev/light-angularjs/blob/master/lib/Scope.js#L61-L79">lightweight AngularJS 1.x implementation</a>. Above we perform a Depth-First-Search over the entire scope tree, looking for changes in our bindings. This approach will work for any directive. However, it is obviously slower compared to code which is directive specific:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
@@ -145,7 +145,7 @@
 <span class="p">}</span>
 <span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
 <span class="c1">// ...
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>The snippet above contains a piece of the implementation of the generated <code>detectChangesInternal</code> method of a compiled component from the <a href="https://github.com/mgechev/angular-seed">angular-seed project</a>. It gets the values of the individual bindings by using a direct property access and compares them with the new values using the most efficient way. Once it finds that their values are different, it updates only the impacted DOM elements.</p>
 
 <p>By answering the question &ldquo;Why we need compilation?&rdquo; we answered the question &ldquo;What needs to be compiled?&rdquo; as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.</p>
@@ -289,7 +289,7 @@
 <span class="p">}</span>
 <span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
 <span class="c1">// ...
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>Let&rsquo;s suppose that <code>currVal_6</code> has value <code>3</code> and <code>this_expr_6</code> has value <code>1</code>, and now lets trace the method&rsquo;s execution:</p>
 
 <p>For call like: <code>import4.checkBinding(1, 3)</code>, in production mode, <code>checkBinding</code> perform the following check:</p>
@@ -363,7 +363,7 @@
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">})</span>
 <span class="c1">// ...
-</span><span class="c1"></span></code></pre></div>
+</span></code></pre></div>
 <p>Since in JiT mode, the Angular compiler generates JavaScript, this works perfect! Each time the value of the <code>name</code> expression changes and equals to truthy value, the <code>_initials</code> property will be recomputed. However, the implementation of <code>ThirdPartyComponent</code> is not AoT-friendly (to make sure you access only public/existing fields in your templates you can use <a href="https://github.com/mgechev/codelyzer">codelyzer</a>. If we want to do so we have to change it to:</p>
 <div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
 </span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
