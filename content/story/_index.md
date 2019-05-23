@@ -17,7 +17,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2019</header>
     <section class="timeline-event">
-      <h1>Presented on Google I/O</h1>
+      <h1>Speaker on Google I/O</h1>
       <section>
         <img src="/images/story/io.gif">
         <p>
