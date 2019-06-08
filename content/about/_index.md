@@ -96,4 +96,42 @@ A few of the open source projects that I've developed in my spare time:
 
 [And many, many others...](https://github.com/mgechev)
 
+## Appearances
+
+### Interviews
+
+- [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)
+- [theInitialCommit](https://theinitialcommit.com/2017/05/23/minko-gechev/)
+- [Angular’s Minko Gechev: I Still Experience a Rush of Dopamine When I Complete a Challenging Project](https://medium.com/@amsterdamjs/angulars-minko-gechev-i-still-experience-a-rush-of-dopamine-when-i-complete-a-challenging-project-b4aaa47a20c0)
+- [Visualize Your Code in Minko Gechev's 3D Ng-World and Learn About Angular's Compiler](https://www.youtube.com/watch?v=JJftfaNu2rU)
+- [ng-conf Interview with Minko Gechev](https://www.youtube.com/watch?v=4zUL2sY7bIM)
+- [NgATL Interview with Minko Gechev](https://www.youtube.com/watch?v=7yGTkoxtJJQ)
+- [Behind the Code](https://issuu.com/ngpoland/docs/behindthecodemagazine2)
+
+
+### Podcasts
+
+- [Modern Web Podcast - All About Compilers with Minko Gechev, Kristofer Baxter, Radoslav Kirov, Jake Dohm, and Rob Ocel](https://dev.to/modernweb/s06e3-modern-web-podcast-all-about-compilers-with-minko-gechev-kristofer-baxter-radoslav-kirov-jake-dohm-and-rob-ocel)
+- [Codelyzer and Static Analysis Tools for Angular with Minko Gechev](https://dev.to/adventuresinangular/aia-147-codelyzer-and-static-analysis-tools-for-angular-with-minko-gechev)
+- [Angular Tooling with Minko Gechev](https://www.youtube.com/watch?v=PZ0WoyLbrso)
+- [How Service Workers will change the way you think about web apps](https://www.youtube.com/watch?v=ZPuryHgluUk)
+- [Predictive Prefetching Using Machine Learning and Guess.js with Minko Gechev](https://www.youtube.com/watch?v=4nUaiCHVYYo)
+- [Angular and Bazel With Minko Gechev](https://www.youtube.com/watch?v=vlIhnYnMAX0)
+- [Minko Gechev: My Angular Story](https://dev.to/adventuresinangular/aia-mas-010-minko-gechev-my-angular-story)
+- [Angular Differs with Minko Gechev](https://www.youtube.com/watch?v=nLJqAAOn73c)
+- [Teaching Angular through Rhyme.com with Minko Gechev](https://www.youtube.com/watch?v=sq123GokC-c)
+- [Immutability & Angular with Minko Gechev](https://devchat.tv/adv-in-angular/054-aia-immutability-with-angular-with-minko-gechev/)
+- [Immutable.js with Angular](https://www.youtube.com/watch?v=gN1K1hE9v4g)
+- [Angular 2 and React](https://www.youtube.com/watch?v=BJbWR3xOgS4)
+
+### Others
+
+- [Angular Contributor Days 2018](https://www.youtube.com/watch?v=2u-dtwQhffk)
+- [RxJS Contributor Days](https://www.youtube.com/watch?v=2elgbSierX0)
+
+<br>
+<a href="/talks">You can find my talks here</a>
+
+
+
  [1]: https://github.com/mgechev
