@@ -101,6 +101,7 @@ A few of the open source projects that I've developed in my spare time:
 ### Interviews
 
 - [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)
+- [DevStyler interview with Minko Gechev (BG)](https://devstyler.io/blog/2019/06/10/kak-proticha-intervyu-za-rabota-v-ofisa-na-google/?fbclid=IwAR2PZ7yUkin45fB53owERt3rTvE4ZH-SUNQitR6IFpBX2r524YdhxqJHTdc)
 - [theInitialCommit](https://theinitialcommit.com/2017/05/23/minko-gechev/)
 - [Angular’s Minko Gechev: I Still Experience a Rush of Dopamine When I Complete a Challenging Project](https://medium.com/@amsterdamjs/angulars-minko-gechev-i-still-experience-a-rush-of-dopamine-when-i-complete-a-challenging-project-b4aaa47a20c0)
 - [Visualize Your Code in Minko Gechev's 3D Ng-World and Learn About Angular's Compiler](https://www.youtube.com/watch?v=JJftfaNu2rU)
