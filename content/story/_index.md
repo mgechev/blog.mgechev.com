@@ -24,7 +24,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           May 2019 I gave my first talk on Google I/O! The topic of my presentation was "Faster Web Navigation with Predictive Prefetching".
         </p>
         <p>
-          In my talk I explained how to use predictive prefetching of JavaScript using Guess.js. Together with my talk, I was also staffing at the "Performance Budgets" booth in the Web Sandbox. I had fantastic several days on the event, brainstorming on different challenging problems with hundreds of engineers from all around the world.
+          In <a href="https://www.youtube.com/watch?v=0jB4YWgAxUo">my talk</a> I explained how to use predictive prefetching of JavaScript using Guess.js. Together with my talk, I was also staffing at the "Performance Budgets" booth in the Web Sandbox. I had fantastic several days on the event, brainstorming on different challenging problems with hundreds of engineers from all around the world.
         </p>
       </section>
     </section>
@@ -37,7 +37,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           Working for a couple of years on different startups I noticed that I started spending more and more time building tools for developers, speaking on conferences, and writing technical content.
         </p>
         <p>
-          This way I decided to pursue my passion and start working on open source frameworks and tooling full-time. I interviewed with Google and joined the Angular team. You can read more about this in the following <a href="https://blog.mgechev.com/2018/11/02/joining-google/">article</a>.
+          This is why I decided to pursue my passion and start working full-time on open source frameworks and tooling. I interviewed with Google and joined the Angular team. You can read more about this in the following <a href="https://blog.mgechev.com/2018/11/02/joining-google/">article</a>.
         </p>
       </section>
     </section>
@@ -46,7 +46,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/guess.png">
         <p>
-          After my initial research on <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">"Machine Learning-Driven Bundling. The Future of JavaScript Tooling."</a>, I had a conversation with <a href="https://twitter.com/addyosmani">Addy Osmani</a> and it turned out that we're both solving similar problems.
+          After my initial research on <a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">"Machine Learning-Driven Bundling. The Future of JavaScript Tooling."</a>, I had a conversation with <a href="https://twitter.com/addyosmani">Addy Osmani</a> and it turned out that we're both working on solving similar problems.
         </p>
         <p>
           Together with <a href="https://twitter.com/addyosmani">Addy</a>, <a href="https://twitter.com/kylemathews">Kyle</a>, and <a href="https://twitter.com/katiehempenius">Katie</a>, we decided to join forces under the project <a href="https://github.com/guess-js/guess">Guess.js</a>.
@@ -64,10 +64,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           On ng-conf 2018, during my session "Optimizing an Angular Application", I had the opportunity to share with the world the product that our team has been working on since early 2017.
         </p>
         <p>
-          During the conference, another workshop for Bazel by a Google engineer used Rhyme.com in order to let their attendees practice along.
+          During the conference, another workshop for Bazel by a Google engineer used Rhyme.com to let their attendees practice along.
         </p>
         <p>
-          In these two sessions, over 250 people were using Rhyme in order to solidify their engineering skills.
+          In these two sessions, over 250 people were using Rhyme to solidify their engineering skills!
         </p>
       </section>
     </section>
@@ -82,7 +82,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           The article includes an extensive research in the area, a novel approach for achieving data-driven bundling on low level of granularity by using static analysis, and a working prototype with the state of the art Web tooling.
         </p>
         <p>
-          The techniques include data-driven pre-fetching and data-driven chunk clustering. A few weeks after I published my article, I had the opportunity to present the research in Oxford, UK during Render 2018.
+          The techniques include data-driven prefetching and data-driven chunk clustering. A few weeks after I published my article, I had the opportunity to present the research in Oxford, UK during Render 2018.
         </p>
       </section>
     </section>
@@ -94,10 +94,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/sta.png">
         <p>
-          A day before my birthday, on 1st of November 2017, the third edition of my book "Switching to Angular" got published!
+          A day before my birthday, on the 1st of November 2017, the third edition of my book "Switching to Angular" got published!
         </p>
         <p>
-          It incorporated the latest changes introduced by Angular version 5 and introduced additional improvements such as introduction to structural typing, alignment to the new `StaticInjector` API and many others.
+          It incorporated the latest changes introduced by Angular version 5 and incorporated additional improvements such as introduction to structural typing, alignment to the new <code>StaticInjector</code> API and many others.
         </p>
         <p>
           I am very thankful to the Angular team for their assistance during the alignment to the latest changes introduced to the framework. They are a constant inspiration!
@@ -109,7 +109,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/john-atanasoff.jpg">
         <p>
-          On 10th of October 2017, I became the first laureate, in the history of the national award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories.
+          On 10th of October 2017, I became the first laureate, in the history of the national award "John Atanasoff" of the President of the Republic of Bulgaria, who has been awarded in two different categories in one year.
         </p>
         <p>
           President Rumen Radev awarded me with a diploma for the award "John Atanasoff", which is given to young scientists and professionals with contributions with global impact to the development of computer science and software engineering.
@@ -127,10 +127,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/codelyzer.png">
         <p>
-          Early 2016, I started a project for static analysis of Angular applications. Some of my core motivations were an automatic check of the assignments of my students in the class "Advanced JavaScript" at Sofia University, and automatic, static verification for the rules in the Angular style guide I developed.
+          Early 2016, I started a project for static analysis of Angular applications. Some of my core motivations were an automatic verification of the assignments of my students in the class "Advanced JavaScript" at Sofia University, and automatic, static enforcement of the practices from the Angular style guide I worked on.
         </p>
         <p>
-          Later, the Angular team introduced codelyzer to the <a href="">Angular CLI</a>. In the same time I implemented a few more crucial modules related to templates and styles analysis.
+          Later, the Angular team introduced codelyzer to the <a href="https://cli.angular.io">Angular CLI</a>. In the same time I implemented a few more crucial modules related to templates and styles analysis.
         </p>
         <p>
           Late September 2016, codelyzer hit 1,000,000 monthly downloads!
@@ -152,7 +152,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           </ul>
         </p>
         <p>
-          After we stopped working on Brownie Points, we bootstrapped another idea we had over the years. Because of my high involvement from the beginning and the critical, high-quality modules of the product I developed, in both front end and back end, I got invited to join as a co-founder and CTO.
+          After we stopped working on Brownie Points, we bootstrapped another idea we had over the years. Because of my high involvement from the beginning and the critical, high-quality modules of the product I developed, in both the front-end and the back-end, I joined as a co-founder and the CTO.
         </p>
       </section>
     </section>
@@ -164,7 +164,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           During ng-conf 2017, the Angular team invited me to join as an organizer of Angular SF.
         </p>
         <p>
-          Since then I have the privilege to communicate with a lot of smart engineers and the DevRel teams of many terrific organizations who are hosting our events.
+          Since then I have the privilege to talk with a lot of smart engineers and the DevRel teams of many organizations which are hosting our events.
         </p>
       </section>
     </section>
@@ -173,7 +173,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/mad-science.png">
         <p>
-          In the beginning of 2017, I applied for a talk on ng-conf, called "Mad Science with the Angular Compiler". At the time I wrote the proposal I didn't have a clear idea of what my presentation is going to be about. I had some blurry thoughts about transpilers, visual UI builders for VSCode, and others.
+          In the beginning of 2017, I applied for a talk on ng-conf, called "Mad Science with the Angular Compiler". At the time I wrote the proposal I didn't have a clear idea of what my presentation is going to be about. I had some blurry thoughts about compilers, visual UI builders for VSCode, and others.
         </p>
         <p>
           A few weeks before my talk I got a few fun ideas:
@@ -193,7 +193,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/gsa.png">
         <p>
-          Because of the success of my book "Switching to Angular 2", Packt Publishing contacted me to work on a second edition, which incorporates the latest changes that the Angular team introduced into the framework.
+          Because of the success of my book "Switching to Angular 2", Packt Publishing contacted me to work on the second edition, which incorporates the latest changes that the Angular team introduced to the framework.
         </p>
         <p>
           In February 2017, the second edition of my book was released.
@@ -222,7 +222,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/silicon-valley.png">
         <p>
-          That was a big step. Especially after initial inconveniences regarding my bank account and accommodation, leaving everything back home kept me quite nostalgic.
+          That was a big step. Especially after initial inconveniences regarding my bank account and accommodation...leaving everything back home kept me quite nostalgic.
         </p>
         <p>
            On the other hand, I was looking forward for what North California has to offer.
@@ -257,10 +257,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <section>
         <img src="/images/story/gde.png">
         <p>
-          Because of my constant contributions to Angular and related projects, my frequent talks on international conferences, a popular blog, published book and other achievements, Jeff Cross from the Angular team invited me to join as a Google Developer Expert.
+          Because of my consistent contributions to Angular and related projects, my frequent talks on international conferences, a popular blog, published book and other achievements, Jeff Cross from the Angular team invited me to join as a Google Developer Expert.
         </p>
         <p>
-          I really appreciated the invitation and went through the process as quickly as possible. Although that was an amazing recognition from Google, I got even more thrilled by the opportunity to join the Angular organization on GitHub as a member with write access to the <a>mobile-toolkit</a> repository. This gave me the opportunity to create value with bigger reach!
+          I really appreciated the invitation and went through the process as quickly as possible. Although that was an amazing recognition from Google, I got even more thrilled by the opportunity to join the Angular organization on GitHub as a member with write access to the <code>mobile-toolkit</code> repository. This gave me the opportunity to create value with a bigger reach!
         </p>
       </section>
     </section>
@@ -286,7 +286,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           That was my first talk in front of more than 1,500 people!
         </p>
         <p>
-          During my presentation I officially announced codelyzer for first time.
+          During my presentation I officially announced codelyzer for the first time.
         </p>
       </section>
     </section>
@@ -309,10 +309,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Graduated MSc software engineering</h1>
       <section>
         <p>
-          In 2015, I graduated my MSc in Software Engineering from Sofia University. For my last class, I developed a programming language with a distributed front end and call stack.
+          In 2015, I graduated my MSc in Software Engineering from Sofia University. For my last class, I developed a programming language with a distributed front-end and call stack.
         </p>
         <p>
-          My thesis was on topic "Remote Access to Physical and Virtual Machines" and was related to modules of what we later called Rhyme.com.
+          My thesis was on topic "Remote Access to Physical and Virtual Machines" and was related to modules from what we later called Rhyme.com.
         </p>
       </section>
     </section>
@@ -323,7 +323,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           Because of my contributions to the AngularJS community, I was looking forward to trying Angular. I even included it as part of the program of "Advanced JavaScript" at Sofia University. I was looking for a reliable starter project which will help me handle the entire tooling overhead.
         </p>
         <p>
-          Unfortunately, such starter project didn't exist back then so I created one and called it Angular Seed. To the project joined the amazing contributor Ludvoic Henin, who did stunning job on the core architecture. Months after that, I used Angular Seed for "Advanced JavaScript" and my book "Switching to Angular 2".
+          Unfortunately, such starter project didn't exist back then so I created one and called it Angular Seed. To the project joined the amazing contributor Ludvoic Henin, who did a stunning job on the core architecture. Months after that, I used Angular Seed for "Advanced JavaScript" and my book "Switching to Angular 2".
         </p>
       </section>
     </section>
@@ -346,7 +346,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Wrote "Angular in Patterns"</h1>
       <section>
         <p>
-          AngularJS was the most well-designed JavaScript framework back in 2014 (well, now that's Angular). In my class for object-oriented design and design patterns, I worked on an article which explains the individual design patterns and their practical applications in AngularJS.
+          AngularJS was the most well-designed JavaScript framework back in 2014. In my class for object-oriented design and design patterns, I worked on an article which explains the individual design patterns and their practical applications in AngularJS.
         </p>
         <p>
           Later, worldwide contributors translated the document to French, Japanese, Russian, and Chinese.
@@ -388,7 +388,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           My professors invited me to join as a teaching assistant in the classes "Analysis and Design of Software Projects", "Programming with ASP.NET" and later as a part-time lecturer and expert in the class "Advanced JavaScript".
         </p>
         <p>
-          It was a great experience to explain in deep details the tools I was working with on a daily basis. I found it fascinating to connect concepts from the theoretical computer science with the wild JavaScript ecosystem.
+          It was a great experience to explain in deep details the tools I was working with on a daily basis. I found it fascinating to connect concepts from the theoretical computer science to the wild JavaScript ecosystem.
         </p>
       </section>
     </section>
@@ -445,7 +445,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
           In 2008, just before I got my black belt in karate, I became the National champion of Bulgaria in Kumite (sparing).
         </p>
         <p>
-          There is no better feeling than hearing "We Are The Champions" by Queen while getting my gold medal. This championship gave me the opportunity to train with the National Karate team as preparation for European championships.
+          There is no better feeling than hearing "We Are The Champions" by Queen while getting my gold medal. This championship gave me the opportunity to train with the National Karate team as preparation for the European championship.
         </p>
       </section>
     </section>
@@ -467,7 +467,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>My first web application</h1>
       <section>
         <p>
-          In 2007 I got introduced to Web development by my high school teacher Svilen Dimitrov. He provided an incredible support helping me understand the basics of JavaScript, MySQL, PHP, and Flash.
+          In 2007 I got introduced to Web development by my high school teacher Svilen Dimitrov. He provided an incredible support helping me to understand the basics of JavaScript, MySQL, PHP, and Flash.
         </p>
         <p>
           A few weeks after that, I developed my first website for the TV show "Perfect Strangers". Later, I developed a few more web applications for collecting data from observations of meteor showers.
@@ -484,7 +484,7 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>My first program</h1>
       <section>
         <p>
-          Well, although I developed my first "Space Invaders" game a bit earlier using different tools (drawing the graphics myself on MS Paint), I wrote my first real program on Pascal.
+          Well, although I developed my first "Space Invaders" game a bit earlier using different tools (drawing the graphics myself on MS Paint), I wrote my first real program in Pascal.
         </p>
         <p>
           It was one of these simple "Hello World!" programs. I was amazed that I was able to write instructions to control a machine.
@@ -498,10 +498,10 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
       <h1>Physics and astronomy</h1>
       <section>
         <p>
-          I was amazed by the space. I had my old Russian telescope reflector with the brand name "Alkor". I used to spend almost every clear night observing the sky, writing down my observations in a notebook.
+          I was fascinated by the space. I had my old Russian telescope reflector from the brand "Alkor". I used to spend almost every clear night observing the sky, writing down my observations in a notebook.
         </p>
         <p>
-          That's how I got introduced to our local Astronomy school, in Troyan, where I met one of the most dedicated teachers - Nadka Dankova. She was helping me with the preparation for the National astronomy competitions I was participating in.
+          That's how I got introduced to our local Astronomy school in Troyan where I met one of the most dedicated teachers - Nadka Dankova. She was helping me with the preparation for the National astronomy competitions I was participating in.
         </p>
       </section>
     </section>
