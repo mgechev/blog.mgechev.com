@@ -119,6 +119,7 @@ A few of the open source projects that I've developed in my spare time:
 - [Predictive Prefetching Using Machine Learning and Guess.js with Minko Gechev](https://www.youtube.com/watch?v=4nUaiCHVYYo)
 - [Angular and Bazel With Minko Gechev](https://www.youtube.com/watch?v=vlIhnYnMAX0)
 - [Minko Gechev: My Angular Story](https://dev.to/adventuresinangular/aia-mas-010-minko-gechev-my-angular-story)
+- [Minko Gechev: What's new in Angular version 8](https://devchat.tv/adv-in-angular/aia-249-whats-new-in-version-8-with-minko-gechev/)
 - [Angular Differs with Minko Gechev](https://www.youtube.com/watch?v=nLJqAAOn73c)
 - [Teaching Angular through Rhyme.com with Minko Gechev](https://www.youtube.com/watch?v=sq123GokC-c)
 - [Immutability & Angular with Minko Gechev](https://devchat.tv/adv-in-angular/054-aia-immutability-with-angular-with-minko-gechev/)
