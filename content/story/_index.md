@@ -17,6 +17,18 @@ For the sake of brevity, I've omitted a lot of important events, which happened 
   <section class="timeline-period">
     <header class="timeline-header">2019</header>
     <section class="timeline-event">
+      <h1>Rhyme acquired by Coursera</h1>
+      <section>
+        <img src="/images/story/rhyme-acquired.png">
+        <p>
+          A little over a year after <a href="https://www.youtube.com/watch?v=ybNj-id0kjY">I announced Rhyme</a> on ng-conf, the company got <a href="https://techcrunch.com/2019/08/28/coursera-makes-its-first-acquisition-rhyme-softworks-to-power-new-coursera-labs-offering/">acquired by Coursera</a>.
+        </p>
+        <p>
+          Thanks to the acquisition, Coursera expanded to Sofia, working with the engineering team that I built.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>Speaker at Google I/O</h1>
       <section>
         <img src="/images/story/io.gif">
