@@ -32,7 +32,7 @@ Part one includes only a high level overview of AngularJS, enjoy it.
 
 # AngularJS overview
 
-AngularJS is JavaScript framework developed by Google. It intents to provide solid base for the development of CRUD Single-Page Applications (SPA). SPA is web application, which once loaded, does not require full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better – the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intents to provide the optimal set of them out-of-the-box. Few important features of AngularJS are:
+AngularJS is JavaScript framework developed by Google. It intends to provide a solid base for the development of CRUD Single-Page Applications (SPA). SPA is a web application, which once loaded, does not require a full page reload when the user performs any actions with it. This means that all application resources (data, templates, scripts, styles) should be loaded with the initial request or better – the information and resources should be loaded on demand. Since most of the CRUD applications have common characteristics and requirements, AngularJS intends to provide the optimal set of them out-of-the-box. A few important features of AngularJS are:
 
 *   two-way data binding
 *   dependency injection
@@ -48,13 +48,13 @@ The separation of concerns is achieved by dividing each AngularJS application in
 *   services
 *   filters
 
-These components can be grouped inside different modules, which helps to achieve higher level of abstraction and handle complexity. Each of the components encapsulates specific piece of the application’s logic.
+These components can be grouped inside different modules, which helps achieve a higher level of abstraction and handle complexity. Each of the components encapsulates a specific piece of the application’s logic.
 
 ## Partials
 
-The partials are HTML strings. They may contain AngularJS expressions inside the elements or their attributes. One of the distinctions between AngularJS and the others frameworks is the fact that AngularJS’ templates are not in an intermediate format, which needs to be turned into HTML (which is the case with mustache.js and handlebars, for example).
+Partials are HTML strings. They may contain AngularJS expressions inside the elements or their attributes. One of the distinctions between AngularJS and others frameworks is the fact that AngularJS templates are not in an intermediate format, which need to be turned into HTML (which is the case with mustache.js and handlebars, for example).
 
-Initially each SPA loads index.html file. In the case of AngularJS this file contains a set of standard and custom HTML attributes, elements and comments, which configure and bootstrap the application. Each sub-sequenced user action requires only load of another partial or change of the state of the application, for example through the data binding provided by the framework.
+Initially each SPA loads an index.html file. In the case of AngularJS, this file contains a set of standard and custom HTML attributes, elements and comments, which configure and bootstrap the application. Each sub-sequenced user action only requires loading another partial or change of the state of the application, for example through the data binding provided by the framework.
 
 Sample partial
 
@@ -71,11 +71,11 @@ Sample partial
 </html>
 {{< / highlight >}}
 
-With AngularJS expressions partials define what kind of actions should be performed for handling different user interactions. In the example above the value of the attribute ng-click states that the method changeFoo of the current scope will be invoked.
+With AngularJS expressions, partials define what kind of actions should be performed for handling different user interactions. In the example above the value of the attribute ng-click states that the method changeFoo of the current scope will be invoked.
 
 ## Controllers
 
-The AngularJS controllers are JavaScript functions, which help handling the user interactions with the web application (for example mouse events, keyboard events, etc.), by attaching methods to the scope. All required external, for the controllers, components are provided through the Dependency Injection mechanism of AngularJS. The controllers are also responsible for providing the model to the partials by attaching data to the scope. We can think of this data as view model.
+AngularJS controllers are JavaScript functions, which help handle user interactions with the web application (for example mouse events, keyboard events, etc.), by attaching methods to the scope. All required external dependencies for the controllers and components are provided through the Dependency Injection mechanism of AngularJS. The controllers are also responsible for providing the model to partials by attaching data to the scope. We can think of this data as view model.
 
 {{< highlight javascript >}}function MyController($scope) {
 
@@ -89,17 +89,17 @@ The AngularJS controllers are JavaScript functions, which help handling the user
 }
 {{< / highlight >}}
 
-For example, if we wire the sample controller above with the partial provided in the previous section the user will be able to interact with the application in few different ways.
+For example, if we wire the sample controller above with the partial provided in the previous section, the user will be able to interact with the application in few different ways.
 
-Change the value of foo by typing in the input box. This will immediately reflect the value of foo because of the two-way data binding.  
-Change the value of foo by clicking the button, which will be labeled Click me to change foo!.  
-All the custom elements, attributes, comments or classes could be recognized as AngularJS directives if they are previously defined as ones.
+Change the value of foo by typing in the input box. This will immediately reflect the value of foo because of two-way data binding.
+Change the value of foo by clicking the button, which will be labeled "Click me to change foo!".  
+All of the custom elements, attributes, comments or classes could be recognized as AngularJS directives if they are previously defined as such.
 
 ## Scope
 
-In AngularJS scope is JavaScript object, which is exposed to the partials. The scope could contain different properties – primitives, objects or methods. All methods attached to the scope can be invoked by evaluation of AngularJS expression inside the partials associated with the given scope or direct call of the method by any component, which keeps reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
+In AngularJS, scope is a JavaScript object, which is exposed to partials. The scope could contain different properties – primitives, objects or methods. All methods attached to scope can be invoked by evaluation of AngularJS expression inside partials associated with the given scope or a direct call of the method by any component, which keeps a reference to the scope. By using appropriate directives, the data attached to the scope could be bound to the view in such way that each change in the partial will reflect a scope property and each change of a scope property will reflect the partial.
 
-Another important characteristic of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke methods of its parents since they are properties of its direct or indirect prototype.
+Another important characteristic of the scopes of any AngularJS application is that they are connected into a prototypical chain (except scopes, which are explicitly stated as isolated). This way any child scope will be able to invoke the methods of its parents since they are properties of its direct or indirect prototype.
 
 Scope inheritance is illustrated in the following example:
 
@@ -124,12 +124,12 @@ function ChildCtrl($scope) {
 }
 {{< / highlight >}}
 
-div#child is associated with ChildCtrl but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl), the method foo is accessible by button#parent-method.
+div#child is associated with ChildCtrl, but since the scope injected inside ChildCtrl inherits prototypically from its parent scope (i.e. the one injected inside BaseCtrl), the method foo is accessible by button#parent-method.
 
 ## Directives
 
-In AngularJS the directives are the place where all DOM manipulations should be placed. As a rule of thumb, when you have DOM manipulations in your controller you should create a new direcrive or consider refactoring of already existing one, which could handle the required DOM manipulations.  
-Each directive has a name and logic associated with it. In the simplest case the directive contains only name and definition of \*postLink\* function, which encapsulates all the logic required for the directive. In more complex cases the directive could contain a lot of properties such as:
+In AngularJS, directives are the place where all DOM manipulations should be placed. As a rule of thumb, when you have DOM manipulations in your controller, you should create a new directive or consider refactoring the already existing one, which could handle the required DOM manipulations.  
+Each directive has a name and logic associated with it. In the simplest case the directive contains only the name and definition of \*postLink\* function, which encapsulates all the logic required for the directive. In more complex cases the directive could contain a lot of properties such as:
 
 *   template
 *   compile function
@@ -163,13 +163,13 @@ Example:
 
 In the example above the tag <alert-button></alert-button> will be replaced by a button element. When the user clicks on the button, the string 42 will be alerted.
 
-Since the intent of this paper is not to explain the complete API of AngularJS, we will stop with the directives here.
+Since the intent of this paper is not to explain the complete API of AngularJS, we will stop with directives here.
 
 ## Filters
 
-The filters in AngularJS are responsible for encapsulating logic required for formatting data. Usually filters are used inside the partials but they are also accessible in the controllers, directives, services and other filters through Dependency Injection.
+Filters in AngularJS are responsible for encapsulating logic required for formatting data. Usually filters are used inside partials but they are also accessible in controllers, directives, services and other filters through Dependency Injection.
 
-Here is definition of a sample filter, which turns given string to uppercase:
+Here is definition of a sample filter, which turns a given string to uppercase:
 
 {{< highlight javascript >}}myModule.filter('uppercase', function () {
   return function (str) {
@@ -192,7 +192,7 @@ Inside a controller the filter could be used as follows:
 
 ## Services
 
-Every piece of logic, which doesn’t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too “fat” the repetitive code should be placed inside a service.
+Every piece of logic which doesn’t belong to the components described above should be placed inside a service. Usually services encapsulate the domain specific logic, persistence logic, XHR, WebSockets, etc. When the controllers in the application became too “fat”, repetitive code should be placed inside a service.
 
 {{< highlight javascript >}}myModule.service('Developer', function () {
   this.name = 'Foo';
