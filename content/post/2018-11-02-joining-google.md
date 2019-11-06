@@ -23,7 +23,7 @@ This work was driving some of my open source effort over the years. The original
 
 ![Open source](/images/google/coding.jpg)
 
-Reflecting on this, I realized that more and more frequently I was looking for an opportunities to work on tools for development productivity. The reason for this is my belief that the software development process nowadays is primitive and error-prone. Even for the development of a straightforward program, we need to consider tens of corner cases, trace mutable state, and verify our work by coming up with test cases. In the same time, we can hardly keep more than [seven things at once in our minds](https://en.wikipedia.org/wiki/Working_memory#Capacity) and as authors of our programs not finding test cases which break them does not mean that they are correct.
+Reflecting on this, I realized that more and more frequently I was looking for opportunities to work on tools for development productivity. The reason for this is my belief that the software development process nowadays is primitive and error-prone. Even for the development of a straightforward program, we need to consider tens of corner cases, trace mutable state, and verify our work by coming up with test cases. In the same time, we can hardly keep more than [seven things at once in our minds](https://en.wikipedia.org/wiki/Working_memory#Capacity) and as authors of our programs not finding test cases which break them does not mean that they are correct.
 
 Probably formal verification and machine learning can help, but there is no apparent solution. Most likely the universe in which every program we write has guaranteed correctness uses different programming languages, maybe even different computational paradigms.
 
