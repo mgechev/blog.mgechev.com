@@ -37,11 +37,11 @@ Hey, I'm
 
 In this section, you can find details about some of the work I've done.
 
-In 2017, I co-founded [Rhyme.com](https://rhyme.com). It was a fun journey to design and develop the entire system from scratch, and build an engineering team to work on it. Although nostalgic, in late 2018 I decided to move on.
+In 2017, I co-founded [Rhyme.com](https://rhyme.com). Rhyme is an EdTech company which aims to provide access to hands-on, world class trainings to everyone. I started working on the platform in 2015, later on I built an engineering team in Sofia, Bulgaria. In 2018, Rhyme joined Coursera as their first acquicision ever.
 
 ## Open source
 
-A few of the open source projects that I've developed in my spare time:
+A few of my open source projects:
 
 ### Selected
 
