@@ -5,8 +5,6 @@ author: minko_gechev
 layout: page
 ---
 
-<h1 class="timeline-my-story-header">My Story</h1>
-
 <div id="timeline" class="timeline">
   <section class="timeline-period">
     <header class="timeline-header">2019</header>
