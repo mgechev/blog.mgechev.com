@@ -7,6 +7,31 @@ layout: page
 
 <div id="timeline" class="timeline">
   <section class="timeline-period">
+    <header class="timeline-header">2020</header>
+    <section class="timeline-event">
+      <h1>Forbes 30 under 30</h1>
+      <section>
+        <img src="/images/story/forbes.jpg">
+        <p>
+          On the 4th of January, Forbes Bulgaria published an article called "Beautiful Code" about my story, including me in their selection "30 under 30" for 2018.
+        </p>
+        <p>
+          I received this privilledge because of the successful acquisition of Rhyme.com by Coursera and my influential open-source projects and articles.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
+      <h1>Rhyme acquired by Coursera</h1>
+      <section>
+        <img src="/images/story/rhyme-acquired.png">
+        <p>
+          A little over a year after <a href="https://www.youtube.com/watch?v=ybNj-id0kjY">I announced Rhyme</a> on ng-conf, the company got <a href="https://techcrunch.com/2019/08/28/coursera-makes-its-first-acquisition-rhyme-softworks-to-power-new-coursera-labs-offering/">acquired by Coursera</a>.
+        </p>
+        <p>
+          Thanks to the acquisition, Coursera expanded in Sofia, working with a talented engineering team that I built. This event is a big win for the emerging tech community in Bulgaria. I hope more tech giants discover the potential that this part of the world has!
+        </p>
+      </section>
+    </section>
     <header class="timeline-header">2019</header>
     <section class="timeline-event">
       <h1>Codelyzer with 1m downloads a week</h1>
