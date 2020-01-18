@@ -13,10 +13,10 @@ layout: page
       <section>
         <img src="/images/story/forbes.jpg">
         <p>
-          On the 4th of January, Forbes Bulgaria published an article called "Beautiful Code" about my story, including me in their selection "30 under 30" for 2018.
+          On the 4th of January, Forbes Bulgaria published an article called "Beautiful Code" about my story, including me in their selection "30 under 30" for 2019.
         </p>
         <p>
-          I received this privilledge because of the successful acquisition of Rhyme.com by Coursera and my influential open-source projects and articles.
+          I received this honor because of the successful acquisition of Rhyme.com by Coursera which attracted the EdTech giant to Bulgaria and my influential open-source projects and articles.
         </p>
       </section>
     </section>
