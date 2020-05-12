@@ -8,9 +8,25 @@ tags:
 - stripe
 - JavaScript
 - Angular
-title: Using Stripe with Angular
+title: Using Stripe with Angular (Deprecated)
 url: /2016/07/05/using-stripe-payment-with-angular-2/
 ---
+
+## The content in this post uses deprecated APIs
+
+<strong class="deprecation-notice">To learn about the latest version of the Stripe APIs check out their <a href="https://stripe.com/docs">documentation page</a></strong>.
+<br>
+<br>
+
+<style>
+#post-body {
+  color: #bbb;
+}
+
+.deprecation-notice {
+  color: black;
+}
+</style>
 
 Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you're offering using Stripe as a mediator.
 
@@ -281,4 +297,3 @@ and instead makes to be a bit more creative :-).
 With the custom form we faced another issue related to not triggering the Angular change detection once we get the card token. We discovered that this is due the uncommon way Stripe performs the Ajax request for registering the user's card.
 
 We solved the issue simply by wrapping the callback inside of a `zone.run(() => {...})` call!
-
