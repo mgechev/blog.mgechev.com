@@ -100,6 +100,7 @@ A few of my open source projects:
 
 ### Interviews
 
+- [Behind the Rise of JavaScript Front-end Frameworks](https://www.welcometothejungle.com/en/articles/btc-javascript-frontend-frameworks)
 - [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)
 - [RepoLovers, Interview: Minko Gechev - Google](https://repolovers.com/interviews/minko-gechev?fbclid=IwAR15uJHyNT9fwP5-7eW930dQ6dXi01yKtVm-SvMbFcPkehhxXhDgnWEZjqw)
 - [DevStyler interview with Minko Gechev (BG)](https://devstyler.io/blog/2019/06/10/kak-proticha-intervyu-za-rabota-v-ofisa-na-google/?fbclid=IwAR2PZ7yUkin45fB53owERt3rTvE4ZH-SUNQitR6IFpBX2r524YdhxqJHTdc)
