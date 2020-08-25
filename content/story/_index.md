@@ -110,6 +110,18 @@ layout: page
       </section>
     </section>
     <section class="timeline-event">
+      <h1>Release of Revive</h1>
+      <section>
+        <img src="/images/story/revive.png">
+        <p>
+          I found a gap in the Go ecosystem. They didn't have a fast, extensible framework for static analysis so I decided to fill it.
+        </p>
+        <p>
+          In February 2018 I released <a href="https://github.com/mgechev/revive">revive</a>. It is currently one of the most popular linters and frameworks for static code analysis for Go. It's used by Grafana, TIDB, etcd, Atlassian, and many other companies and projects. It's one of the recommended linters in VSCode.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>Release of Rhyme.com</h1>
       <section>
         <img src="/images/story/rhyme-release.jpg">
@@ -491,7 +503,7 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2008</header>
     <section class="timeline-event">
-      <h1>National champion in Karate</h1>
+      <h1>National Karate champion</h1>
       <section>
         <img src="/images/story/karate.jpg">
         <p>
