@@ -12,7 +12,7 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2020</header>
     <section class="timeline-event">
-      <h1>Medal from National Karate Cup</h1>
+      <h1>Medal from the National Karate Cup</h1>
       <section>
         <img src="/images/story/karate.png">
         <p>
