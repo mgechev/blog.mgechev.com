@@ -12,6 +12,18 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2020</header>
     <section class="timeline-event">
+      <h1>Medal from National Karate Cup</h1>
+      <section>
+        <img src="/images/story/karate.png">
+        <p>
+          That's mostly a sentimental cookie in the jar. My very first karate compeition was in kata around 1998-1999. Back then I was 8 years old and my kata was far from great as you can imagine :). That was one of my last kata competitions as well, since I switched to kumite soon afterwards. The reason was mostly that I did not feel prepared and my technique was not great.
+        </p>
+        <p>
+          Since then, I had the opportunity to train with some karate legends such as shihan Gosei Yamaguchi and sensei Buchwald in the Bay Area, California. 22 years after my first tournament, there was another karate competition in Veliko Tarnovo so I decided to join! I ended up getting the third place and I was 0.2 points away from the second. I also got a bronze and a silver medals in team kumite and kata, but that was due to my awesome teammates. It was a lot of fun to go back to the place where my karate adventures started :).
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>Angular Technical Lead & Manager</h1>
       <section>
         <img src="/images/story/angular.png">
