@@ -13,7 +13,7 @@ url: /2020/11/26/what-i-learned-doing-100-public-talks-part-i
 
 Over the past 7 years, I gave over [125+ talks for 20 countries](https://blog.mgechev.com/talks/) in front of over 50,000+ people. By any means, this doesn't make me an expert in public speaking, but I had the opportunity to learn a few things that I'd love to share.
 
-I'll spread the content between a couple of different posts covering everything from planning, preparing the talk, rehearsals, and presentation at the event. I'd not focus on research, but this phase will naturally produce artifacts for the planning process.
+I'll spread the content between a couple of different posts covering everything from planning, preparing the talk, rehearsals, and presentation at the event. I'd not discuss research, but this phase will naturally produce artifacts for the planning process.
 
 In this part, we'll focus on the talk planning process.
 
