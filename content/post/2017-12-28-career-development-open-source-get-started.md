@@ -82,7 +82,7 @@ Now, let's focus on the positive aspects of the open source software. There are 
 
 There are millions of open source projects out there. Thousands of them are very high quality and they are on a variety of topics - starting from simple documents with collections of useful resources to components for user interface, compilers, neural networks, renderers for virtual reality, etc. All of this is out there, open source. **You can dig into the source code and explore this concentrated knowledge**! There's so much wisdom there, staying a few clicks away from us! I've read the source code of hundreds of projects, from components for user interface to compilers and source code optimizers. For me, this has always been one of the best ways to learn.
 
-In fact, I learned a lot about interpreters from the implementation of the AngularJS' expression evaluator. From AngularJS I learned so many things that in the end I wrote my publication "[AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)" which got a lot of popularity in the community. It got translated into Chinese, Japanese, Russian and French. Later, I learned more about type systems from the TypeScript's type checker. And these are only two examples of extremely high-quality software written by Google and Microsoft, publicly available!
+In fact, I learned a lot about interpreters from the implementation of the AngularJS' expression evaluator. From AngularJS I learned so many things that in the end I wrote my publication "[AngularJS in Patterns](https://github.com/mgechev/angularjs-in-patterns)" which got a lot of visibility in the community. It got translated into Chinese, Japanese, Russian and French. Later, I learned more about type systems from the TypeScript's type checker. And these are only two examples of extremely high-quality software written by Google and Microsoft, publicly available!
 
 A lot of people learn best when they see the abstract theoretical concepts applied in practice. Well, good news! Everything you've studied in your computer science degree has already been applied in projects which source code is published on [GitHub](https://github.com/)!
 
@@ -112,11 +112,11 @@ I had the opportunity to get technical reviews from Miško Hevery, the creator o
 
 <img src="/images/open-source/best.png" style="display: block; margin: auto" alt="The Best">
 
-## Popularity and Reputation
+## Visibility and Reputation
 
 We already made it clear that open source can be a great source of wisdom. Having the chance to work with the best software engineers in the world, [Turing Award](https://en.wikipedia.org/wiki/Turing_Award) winners, etc. That's not the only direction the open source software could be helpful, though. **It can also increase your recognition and reputation in your community.**
 
-As I mentioned, corporations often use open source projects because they usually come for free and save a portion of the budget. Imagine you're one of the contributors to a popular technology. You're *one of the people working on it*. You know the roadmap, you know every corner case in the code. You're definitely a domain expert. If the project's popularity grows, your reputation and popularity grow as well. You'll be the first candidate a company using the given open source project would want to hire!
+As I mentioned, corporations often use open source projects because they usually come for free and save a portion of the budget. Imagine you're one of the contributors to a popular technology. You're *one of the people working on it*. You know the roadmap, you know every corner case in the code. You're definitely a domain expert. If the project's popularity grows, your reputation and visibility grow as well. You'll be the first candidate a company using the given open source project would want to hire!
 
 Over the past 2-3 of years, I've been contributing to a lot of open source projects, mostly Angular related. For this time, my followers on GitHub grew from below 100 to over 3.7k! I got tens of thousands of stars on projects I created. Some of my open source projects have over 1.3 million downloads per month! Over the past 2 years, I've flown over 200,000 km to give over 45 technical talks on worldwide conferences in locations such as Las Vegas, Germany, UK, The Bahamas, Salt Lake City, Russia and many others. This is not only great professional experience but also an amazing personal adventure!
 
