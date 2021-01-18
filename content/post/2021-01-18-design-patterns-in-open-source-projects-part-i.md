@@ -33,7 +33,7 @@ I plan to start the series with content for how [ngrev](https://github.com/mgech
 
 To get a better idea of the features of ngrev, I'd recommend you to have a look at this short video:
 
-<div style="display: block; margin: auto; width: 640px; padding-bottom:56.25%"><iframe width="640" height="360" src="https://www.youtube.com/embed/vmdVRErKot4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+<div style="display: block; margin: auto; width: 640px; height: 320px; padding-bottom:56.25%"><iframe width="640" height="360" src="https://www.youtube.com/embed/vmdVRErKot4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 
 ### High-Level Architecture
 
