@@ -11,11 +11,13 @@ tags:
 - Open-source
 - Software engineering
 title: Design Patterns in Open Source Projects - Part II
-og_image: /images/oss-design-patterns-i/hero.png
+og_image: /images/oss-design-patterns-ii/hero.jpg
 url: /2021/01/24/design-pattens-in-open-source-projects-part-ii
 ---
 
-This blog post introduces another design pattern into the context of [ngrev](https://github.com/mgechev/ngrev). If you're not yet familiar with the project, I'd strongly recommend reading the introduction and "Project Overview" sections in the [first part](https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/) of the series.
+This blog post introduces another design pattern into the context of [ngrev](https://github.com/mgechev/ngrev). If you're not yet familiar with the project, I'd strongly recommend taking 2 minutes to the introduction and "Project Overview" sections in the [first part](https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/) of the series.
+
+<img src="/images/oss-design-patterns-ii/hero.jpg" style="display: block; margin: auto;">
 
 If you did not take the time, [ngrev](https://github.com/mgechev/ngrev) is an Electron app that visualizes the structure of an [Angular](https://angular.io) app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a [state](https://en.wikipedia.org/wiki/State_pattern) object. You can read more about the state pattern and its application in [ngrev](https://github.com/mgechev/ngrev) [here](https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/).
 
