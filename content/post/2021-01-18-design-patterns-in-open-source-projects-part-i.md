@@ -16,6 +16,7 @@ url: /2021/01/18/design-pattens-in-open-source-projects-part-i
 ---
 
 I see two common frustrations around design patterns:
+
 1. It's easy to memorize patterns but hard to figure out where and how to use them
 2. OOP is lame, and design patterns suck
 
