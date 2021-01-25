@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html ⚡="" amp="">
+  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+    
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.55.5">
+
+<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+
+
+<link rel="canonical" href="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/">
+
+
+    
+    <style amp-custom=""></style>
+    
+    <title>Design Patterns in Open Source Projects - Part II - Minko Gechev&apos;s blog</title>
+    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="This blog post introduces another design pattern into the context of ngrev. If you&amp;rsquo;re not yet familiar with the project, I&amp;rsquo;d strongly recommend reading the introduction and &amp;ldquo;Project Overview&amp;rdquo; sections in the first part of the series.If you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object.">
+
+<meta property="og:title" content="Design Patterns in Open Source Projects - Part II - Minko Gechev&apos;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/">
+<meta property="og:site_name" content="Minko Gechev&apos;s blog">
+<meta property="og:description" content="This blog post introduces another design pattern into the context of ngrev. If you&amp;rsquo;re not yet familiar with the project, I&amp;rsquo;d strongly recommend reading the introduction and &amp;ldquo;Project Overview&amp;rdquo; sections in the first part of the series.If you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&apos;s blog">
+<meta name="twitter:url" content="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/">
+<meta name="twitter:title" content="Design Patterns in Open Source Projects - Part II - Minko Gechev&apos;s blog">
+<meta name="twitter:description" content="This blog post introduces another design pattern into the context of ngrev. If you&amp;rsquo;re not yet familiar with the project, I&amp;rsquo;d strongly recommend reading the introduction and &amp;ldquo;Project Overview&amp;rdquo; sections in the first part of the series.If you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object.">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https:\/\/blog.mgechev.com\/"
+    },
+    "headline": "Design Patterns in Open Source Projects - Part II - Minko Gechev\x27s blog",
+    "datePublished": "2021-01-24T00:00:00JST",
+    "dateModified": "2021-01-24T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev\x27s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev\x27s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https:\/\/blog.mgechev.com\/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "This blog post introduces another design pattern into the context of ngrev. If you\x26rsquo;re not yet familiar with the project, I\x26rsquo;d strongly recommend reading the introduction and \x26ldquo;Project Overview\x26rdquo; sections in the first part of the series.\nIf you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object."
+  }
+</script>
+
+
+    <style amp-custom="">
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&apos;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-1f356350658bf1f680bcc8a78b3ccae4">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/" class="thumbnail" title="Design Patterns in Open Source Projects - Part II"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Design Patterns in Open Source Projects - Part II</h1>
+        <ul class="p-facts">
+          <li><time datetime="2021-01-24T00:00:00JST">Jan 24, 2021</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f&amp;t=Design%20Patterns%20in%20Open%20Source%20Projects%20-%20Part%20II" title="Facebook&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f&amp;text=Design%20Patterns%20in%20Open%20Source%20Projects%20-%20Part%20II&amp;tw_p=tweetbutton" title="Twitter&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f" title="Google Plus&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>This blog post introduces another design pattern into the context of <a href="https://github.com/mgechev/ngrev">ngrev</a>. If you&#x2019;re not yet familiar with the project, I&#x2019;d strongly recommend reading the introduction and &#x201C;Project Overview&#x201D; sections in the <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">first part</a> of the series.</p>
+
+<p>If you did not take the time, <a href="https://github.com/mgechev/ngrev">ngrev</a> is an Electron app that visualizes the structure of an <a href="https://angular.io">Angular</a> app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a <a href="https://en.wikipedia.org/wiki/State_pattern">state</a> object. You can read more about the state pattern and its application in <a href="https://github.com/mgechev/ngrev">ngrev</a> <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">here</a>.</p>
+
+<p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an Angular app developed with TypeScript. At the same time, however, <strong>the post is conceptual, so even if you&#x2019;re not familiar with Angular, TypeScript, or Web development, you should be able to extract value.</strong></p>
+
+<h2 id="composite-pattern">Composite Pattern</h2>
+
+<blockquote>
+<p>In software engineering, the composite pattern is a structural design pattern. The composite pattern describes a group of objects treated the same way as a single instance of the same type of object. A composite intends to &#x201C;compose&#x201D; objects into tree structures to represent part-whole hierarchies. Implementing the composite pattern lets clients treat individual objects and compositions uniformly.</p>
+</blockquote>
+
+<p><amp-img src="/images/oss-design-patterns-ii/composite.svg" style="display: block; margin: auto;"></amp-img></p>
+
+<p>The composite pattern is arguably one of the most popular design patterns. You find its applications all over software engineering and computer science. For example, in file systems the leaves are the individual files and the composites are directories because they can contain other directories and files. In compiler design we can find the leaves being terminals and the composites being non-terminal <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a> nodes.</p>
+
+<p>In the case of <a href="https://github.com/mgechev/ngrev">ngrev</a>, both the composites and the leaves are instances of the state classes. The way we use the composite pattern here is attractive in at least two ways - the fact that we&#x2019;re using the pattern itself and the mechanism it interacts with the <a href="https://en.wikipedia.org/wiki/State_pattern">state design pattern</a>.</p>
+
+<p>To understand why the composite design pattern helps us in <a href="https://github.com/mgechev/ngrev">ngrev</a>, let us look at two of the views in the application:</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Dependencies</div>
+<amp-img src="/images/oss-design-patterns-ii/module-dependencies.png" style="display: block; margin: auto;"></amp-img></p>
+
+<p>Each <code>NgModule</code> in Angular can depend on 0 or more other modules. This view shows the dependencies of the <code>AnnounceBarModule</code>. <a href="https://github.com/mgechev/ngrev">ngrev</a> implements this functionality with the <code>ModuleTreeState</code> class.</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Declarations</div>
+<amp-img src="/images/oss-design-patterns-ii/module-declarations.png" style="display: block; margin: auto;"></amp-img></p>
+
+<p>Additionally, each module could have many declarations; for example, the <code>SharedModule</code> from the second image declares and exports <code>SearchResultComponent</code> and <code>SelectComponent</code>. In <a href="https://github.com/mgechev/ngrev">ngrev</a>, we implement this functionality with the <code>ModuleState</code> class.</p>
+
+<p>Now let us look at the default view of <a href="https://github.com/mgechev/ngrev">ngrev</a>:</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">App</div>
+<amp-img src="/images/oss-design-patterns-ii/app.png" style="display: block; margin: auto;"></amp-img></p>
+
+<p>This view shows a visualization of the dependencies between all the modules in our app and the declarations/exports for each one of them. Internally, <a href="https://github.com/mgechev/ngrev">ngrev</a> implements it with the <code>AppState</code> class.</p>
+
+<p>Even for a small apps like <a href="https://angular.io">angular.io</a> this could get quite messy; that&#x2019;s why we have the more specific views from above. But also notice that there&#x2019;s an overlap between the 3 visualizations - the application view is a composition of the views showing module dependencies and module declarations.</p>
+
+<p>What do I mean by composition? If we suppose that <code>ModuleState</code> and <code>ModuleTreeState</code> return sets of nodes and edges, their union will be a subset of the nodes and edges <code>AppState</code> returns.</p>
+
+<p>Having noticed this relation, we can express it with code in the following way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="k">class</span> <span class="nx">AppState</span> <span class="k">extends</span> <span class="nx">State</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">states</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleStates</span><span class="p">(),</span>
+    <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleTreeStates</span><span class="p">()</span>
+  <span class="p">];</span>
+
+  <span class="c1">//...
+</span><span class="c1"></span>
+  <span class="nx">getData</span><span class="p">()</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">graph</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">nodes</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">(),</span>
+        <span class="nx">edges</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">state</span><span class="o">:</span> <span class="nx">State</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">const</span> <span class="p">{</span> <span class="nx">graph</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">getData</span><span class="p">();</span>
+      <span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">node</span><span class="o">:</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">node</span><span class="p">));</span>
+      <span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">edge</span><span class="o">:</span> <span class="nx">Edge</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">edge</span><span class="p">));</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>In the snippet above, we first create the collection of states. <code>createModuleStates</code> and <code>createModuleTreeStates</code> instantiate state objects for each of the application modules. I haven&#x2019;t showed their implementation for simplicity.</p>
+
+<p>After that, when the UI process requests the data for visualizing the application view, the background process will indirectly invoke <code>appState.getData()</code>. The method will invoke <code>getData</code> for each of the nested states in <code>states</code> and add the corresponding nodes and edges to the result sets.</p>
+
+<p>That&#x2019;s it! This is entirely how the composite pattern implementation in <a href="https://github.com/mgechev/ngrev">ngrev</a> works.</p>
+
+<h2 id="use-cases">Use Cases</h2>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Design_Patterns">gang of four book</a> explains <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a> as the interaction between the patterns <a href="https://en.wikipedia.org/wiki/Strategy_pattern">Strategy</a>, <a href="https://en.wikipedia.org/wiki/Observer_pattern">Observer</a>, and <a href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a>. MVC uses composite for the user interface.</p>
+
+<p>Applications developed with modern Web frameworks and libraries such as Angular and React are expressed as compositions of components. In Angular, you could often think of directives and components with bare HTML nodes as &#x201C;leaf&#x201D; classes and components using directives or other components as &#x201C;composite&#x201D; classes.</p>
+
+<p>The composite design pattern is also heavily used in compilers - especially during interpretation and source code generation. Each AST node is either a terminal (leaf) or a non-terminal (composite).</p>
+
+<p>I&#x2019;m spending most of my days thinking about developer tooling and frameworks, so that&#x2019;s why my examples probably look a bit niche. If you&#x2019;ve recently used the composite design pattern in other contexts, please leave a comment below.</p>
+
+<h2 id="what-s-next">What&#x2019;s Next?</h2>
+
+<p>It&#x2019;s great you decided to read this article, but this is just part of the story. To get a better idea of how the composite pattern works, I&#x2019;d encourage you to read the <a href="https://github.com/mgechev/ngrev/blob/master/src/electron/states/app.state.ts">source code</a> implementing it.</p>
+
+<p>I hope you enjoyed this article! Until next time and happy coding!</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f&amp;t=Design%20Patterns%20in%20Open%20Source%20Projects%20-%20Part%20II" title="Facebook&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f&amp;text=Design%20Patterns%20in%20Open%20Source%20Projects%20-%20Part%20II&amp;tw_p=tweetbutton" title="Twitter&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f01%2f24%2fdesign-pattens-in-open-source-projects-part-ii%2f" title="Google Plus&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="https://blog.mgechev.com/">Minko Gechev&apos;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Design Patterns in Open Source Projects - Part II</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/categories/Design-patterns/">Design patterns</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Open-source/">Open-source</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Software-engineering/">Software engineering</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/tags/Design-patterns/">Design patterns</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Open-source/">Open-source</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Software-engineering/">Software engineering</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-44f7e855bf61587b948c61a813fbc0b6">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/" class="thumbnail" title="Design Patterns in Open Source Projects - Part I"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">Design Patterns in Open Source Projects - Part I</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2021-01-18T00:00:00JST">Jan 18, 2021</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-fb9219e3e82481c8d0ecc34aefa48327">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2020/11/26/what-i-learned-doing-100-public-talks-part-i/" class="thumbnail" title="What I learned doing 125 public talks - Part I"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2020/11/26/what-i-learned-doing-100-public-talks-part-i/">What I learned doing 125 public talks - Part I</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2020-11-26T00:00:00JST">Nov 26, 2020</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-1157e7059d1a22160f8b0a59f36bbe97">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2019/05/11/dynamic-imports-javascript/" class="thumbnail" title="Dynamic imports solve all the problems, right?"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2019/05/11/dynamic-imports-javascript/">Dynamic imports solve all the problems, right?</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2019-05-11T00:00:00JST">May 11, 2019</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&#xA9; Minko Gechev&apos;s blog</span></p>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="&#x30DA;&#x30FC;&#x30B8;&#x4E0A;&#x90E8;&#x3078;&#x623B;&#x308B;" rel="nofollow"></a>
+  </body>
+</html>
+

@@ -1,0 +1,243 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.55.5" />
+		<title>Design Patterns in Open Source Projects - Part II &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/style.css">
+		
+
+		
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2021/01/24/design-pattens-in-open-source-projects-part-ii/">
+		
+
+		<meta property="og:title" content="Design Patterns in Open Source Projects - Part II" />
+		<meta property="og:description" content="This blog post introduces another design pattern into the context of ngrev. If you&rsquo;re not yet familiar with the project, I&rsquo;d strongly recommend reading the introduction and &ldquo;Project Overview&rdquo; sections in the first part of the series.
+If you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object." />
+		<meta property="og:type" content="article" />
+		<meta property="og:url" content="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/" />
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/oss-design-patterns-i/hero.png"/>
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/oss-design-patterns-i/hero.png"/>
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href='https://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='https://blog.mgechev.com/post'>Posts</a>
+	<a href='https://blog.mgechev.com/about'>About</a>
+	<a href='https://blog.mgechev.com/talks'>Speaking</a>
+  </div>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Design Patterns in Open Source Projects - Part II
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2021-01-24-design-patterns-in-open-source-projects-part-ii.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Jan 24, 2021
+                    · 5 minutes read
+                    · <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/design-patterns">Design patterns</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/open-source">Open-source</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/software-engineering">Software engineering</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>This blog post introduces another design pattern into the context of <a href="https://github.com/mgechev/ngrev">ngrev</a>. If you&rsquo;re not yet familiar with the project, I&rsquo;d strongly recommend reading the introduction and &ldquo;Project Overview&rdquo; sections in the <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">first part</a> of the series.</p>
+
+<p>If you did not take the time, <a href="https://github.com/mgechev/ngrev">ngrev</a> is an Electron app that visualizes the structure of an <a href="https://angular.io">Angular</a> app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a <a href="https://en.wikipedia.org/wiki/State_pattern">state</a> object. You can read more about the state pattern and its application in <a href="https://github.com/mgechev/ngrev">ngrev</a> <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">here</a>.</p>
+
+<p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an Angular app developed with TypeScript. At the same time, however, <strong>the post is conceptual, so even if you&rsquo;re not familiar with Angular, TypeScript, or Web development, you should be able to extract value.</strong></p>
+
+<h2 id="composite-pattern">Composite Pattern</h2>
+
+<blockquote>
+<p>In software engineering, the composite pattern is a structural design pattern. The composite pattern describes a group of objects treated the same way as a single instance of the same type of object. A composite intends to &ldquo;compose&rdquo; objects into tree structures to represent part-whole hierarchies. Implementing the composite pattern lets clients treat individual objects and compositions uniformly.</p>
+</blockquote>
+
+<p><img src="/images/oss-design-patterns-ii/composite.svg" style="display: block; margin: auto;"></p>
+
+<p>The composite pattern is arguably one of the most popular design patterns. You find its applications all over software engineering and computer science. For example, in file systems the leaves are the individual files and the composites are directories because they can contain other directories and files. In compiler design we can find the leaves being terminals and the composites being non-terminal <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a> nodes.</p>
+
+<p>In the case of <a href="https://github.com/mgechev/ngrev">ngrev</a>, both the composites and the leaves are instances of the state classes. The way we use the composite pattern here is attractive in at least two ways - the fact that we&rsquo;re using the pattern itself and the mechanism it interacts with the <a href="https://en.wikipedia.org/wiki/State_pattern">state design pattern</a>.</p>
+
+<p>To understand why the composite design pattern helps us in <a href="https://github.com/mgechev/ngrev">ngrev</a>, let us look at two of the views in the application:</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Dependencies</div>
+<img src="/images/oss-design-patterns-ii/module-dependencies.png" style="display: block; margin: auto;"></p>
+
+<p>Each <code>NgModule</code> in Angular can depend on 0 or more other modules. This view shows the dependencies of the <code>AnnounceBarModule</code>. <a href="https://github.com/mgechev/ngrev">ngrev</a> implements this functionality with the <code>ModuleTreeState</code> class.</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Declarations</div>
+<img src="/images/oss-design-patterns-ii/module-declarations.png" style="display: block; margin: auto;"></p>
+
+<p>Additionally, each module could have many declarations; for example, the <code>SharedModule</code> from the second image declares and exports <code>SearchResultComponent</code> and <code>SelectComponent</code>. In <a href="https://github.com/mgechev/ngrev">ngrev</a>, we implement this functionality with the <code>ModuleState</code> class.</p>
+
+<p>Now let us look at the default view of <a href="https://github.com/mgechev/ngrev">ngrev</a>:</p>
+
+<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">App</div>
+<img src="/images/oss-design-patterns-ii/app.png" style="display: block; margin: auto;"></p>
+
+<p>This view shows a visualization of the dependencies between all the modules in our app and the declarations/exports for each one of them. Internally, <a href="https://github.com/mgechev/ngrev">ngrev</a> implements it with the <code>AppState</code> class.</p>
+
+<p>Even for a small apps like <a href="https://angular.io">angular.io</a> this could get quite messy; that&rsquo;s why we have the more specific views from above. But also notice that there&rsquo;s an overlap between the 3 visualizations - the application view is a composition of the views showing module dependencies and module declarations.</p>
+
+<p>What do I mean by composition? If we suppose that <code>ModuleState</code> and <code>ModuleTreeState</code> return sets of nodes and edges, their union will be a subset of the nodes and edges <code>AppState</code> returns.</p>
+
+<p>Having noticed this relation, we can express it with code in the following way:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="k">class</span> <span class="nx">AppState</span> <span class="k">extends</span> <span class="nx">State</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">states</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleStates</span><span class="p">(),</span>
+    <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleTreeStates</span><span class="p">()</span>
+  <span class="p">];</span>
+
+  <span class="c1">//...
+</span><span class="c1"></span>
+  <span class="nx">getData</span><span class="p">()</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">const</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">graph</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">nodes</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">(),</span>
+        <span class="nx">edges</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">()</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">state</span><span class="o">:</span> <span class="nx">State</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+      <span class="k">const</span> <span class="p">{</span> <span class="nx">graph</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">getData</span><span class="p">();</span>
+      <span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">node</span><span class="o">:</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">node</span><span class="p">));</span>
+      <span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">edge</span><span class="o">:</span> <span class="nx">Edge</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">edge</span><span class="p">));</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>In the snippet above, we first create the collection of states. <code>createModuleStates</code> and <code>createModuleTreeStates</code> instantiate state objects for each of the application modules. I haven&rsquo;t showed their implementation for simplicity.</p>
+
+<p>After that, when the UI process requests the data for visualizing the application view, the background process will indirectly invoke <code>appState.getData()</code>. The method will invoke <code>getData</code> for each of the nested states in <code>states</code> and add the corresponding nodes and edges to the result sets.</p>
+
+<p>That&rsquo;s it! This is entirely how the composite pattern implementation in <a href="https://github.com/mgechev/ngrev">ngrev</a> works.</p>
+
+<h2 id="use-cases">Use Cases</h2>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Design_Patterns">gang of four book</a> explains <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a> as the interaction between the patterns <a href="https://en.wikipedia.org/wiki/Strategy_pattern">Strategy</a>, <a href="https://en.wikipedia.org/wiki/Observer_pattern">Observer</a>, and <a href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a>. MVC uses composite for the user interface.</p>
+
+<p>Applications developed with modern Web frameworks and libraries such as Angular and React are expressed as compositions of components. In Angular, you could often think of directives and components with bare HTML nodes as &ldquo;leaf&rdquo; classes and components using directives or other components as &ldquo;composite&rdquo; classes.</p>
+
+<p>The composite design pattern is also heavily used in compilers - especially during interpretation and source code generation. Each AST node is either a terminal (leaf) or a non-terminal (composite).</p>
+
+<p>I&rsquo;m spending most of my days thinking about developer tooling and frameworks, so that&rsquo;s why my examples probably look a bit niche. If you&rsquo;ve recently used the composite design pattern in other contexts, please leave a comment below.</p>
+
+<h2 id="what-s-next">What&rsquo;s Next?</h2>
+
+<p>It&rsquo;s great you decided to read this article, but this is just part of the story. To get a better idea of how the composite pattern works, I&rsquo;d encourage you to read the <a href="https://github.com/mgechev/ngrev/blob/master/src/electron/states/app.state.ts">source code</a> implementing it.</p>
+
+<p>I hope you enjoyed this article! Until next time and happy coding!</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2021  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
+
+
+
+    </body>
+</html>
