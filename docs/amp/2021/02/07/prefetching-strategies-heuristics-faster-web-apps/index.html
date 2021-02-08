@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html ⚡="" amp="">
+  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+    
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="theme-color" content="#263238">
+
+<meta name="generator" content="Hugo 0.55.5">
+
+<link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
+
+
+<link rel="canonical" href="https://blog.mgechev.com/2021/02/07/prefetching-strategies-heuristics-faster-web-apps/">
+
+
+    
+    <style amp-custom=""></style>
+    
+    <title>Prefetching Heuristics - Minko Gechev&apos;s blog</title>
+    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    
+    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+    
+    
+<meta name="description" content="In this post, we&amp;rsquo;re going to focus on web performance. In particular, we&amp;rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&amp;rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.">
+
+<meta property="og:title" content="Prefetching Heuristics - Minko Gechev&apos;s blog">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.mgechev.com/2021/02/07/prefetching-strategies-heuristics-faster-web-apps/">
+<meta property="og:site_name" content="Minko Gechev&apos;s blog">
+<meta property="og:description" content="In this post, we&amp;rsquo;re going to focus on web performance. In particular, we&amp;rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&amp;rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="Minko Gechev&apos;s blog">
+<meta name="twitter:url" content="https://blog.mgechev.com/2021/02/07/prefetching-strategies-heuristics-faster-web-apps/">
+<meta name="twitter:title" content="Prefetching Heuristics - Minko Gechev&apos;s blog">
+<meta name="twitter:description" content="In this post, we&amp;rsquo;re going to focus on web performance. In particular, we&amp;rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&amp;rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https:\/\/blog.mgechev.com\/"
+    },
+    "headline": "Prefetching Heuristics - Minko Gechev\x27s blog",
+    "datePublished": "2021-02-07T00:00:00JST",
+    "dateModified": "2021-02-07T00:00:00JST",
+    "author": {
+      "@type": "Person",
+      "name": "Minko Gechev\x27s blog"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Minko Gechev\x27s blog",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https:\/\/blog.mgechev.com\/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "In this post, we\x26rsquo;re going to focus on web performance. In particular, we\x26rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user\x26rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app."
+  }
+</script>
+
+
+    <style amp-custom="">
+      html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
+
+      
+    </style>
+  </head>
+
+  <body>
+    
+    
+    <amp-analytics type="googleanalytics" id="analytics1">
+      <script type="application/json">
+        {
+          "vars": {
+            "account": "UA-18060688-3"
+          },
+          "triggers": {
+            "trackPageview": {
+              "on": "visible",
+              "request": "pageview"
+            }
+          }
+        }
+      </script>
+    </amp-analytics>
+    
+    
+
+    <header class="l-header">
+      <div class="l-container">
+        <div class="h-logo p-logo">
+          <a href="https://blog.mgechev.com/" class="h-logo">Minko Gechev&apos;s blog</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      
+<div class="l-container">
+  <article class="single article-8d3ec07bd3f788a40dd55cb4cb53ad8c">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2021/02/07/prefetching-strategies-heuristics-faster-web-apps/" class="thumbnail" title="Prefetching Heuristics"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h1 class="title">Prefetching Heuristics</h1>
+        <ul class="p-facts">
+          <li><time datetime="2021-02-07T00:00:00JST">Feb 7, 2021</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f&amp;t=Prefetching%20Heuristics" title="Facebook&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f&amp;text=Prefetching%20Heuristics&amp;tw_p=tweetbutton" title="Twitter&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f" title="Google Plus&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <div class="article-body">
+
+<p>In this post, we&#x2019;re going to focus on web performance. In particular, we&#x2019;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&#x2019;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.</p>
+
+<p>We can categorize different prefetching strategies based on three dimensions:</p>
+
+<ul>
+<li>Prefetching heuristic (or strategy) - when do we prefetch the resources?</li>
+<li>Resource types - what resources do we prefetch?</li>
+<li>Mechanism - what mechanism do we use for prefetching? For example, do we use an XHR, <code>link[rel=prefetch]</code>, a service worker, or HTTP/2 server push</li>
+</ul>
+
+<p>In this post, we&#x2019;ll focus on different prefetching heuristics. For simplicity, we&#x2019;ll discuss script prefetching, although most of the strategies are applicable for other resources as well. We&#x2019;ll also briefly discuss the advantages and disadvantages of different prefetching mechanisms.</p>
+
+<p><amp-img src="/images/prefetching/prefetching.png" style="display: block; margin: auto;"></amp-img></p>
+
+<h2 id="trade-offs">Trade-offs</h2>
+
+<p>Just like the solutions of any problem in software engineering, different prefetching heuristics have their trade-offs. A few dimensions we need to consider are:</p>
+
+<ul>
+<li>Accuracy</li>
+<li>Network usage</li>
+<li>CPU usage</li>
+<li>Setup cost</li>
+<li>Implementation size</li>
+</ul>
+
+<h3 id="accuracy">Accuracy</h3>
+
+<p>We can define a heuristic accuracy by the ratio of the number of resources we provided to the user from the cache over the number of resources they requested. For example, if the user needed two scripts while interacting with the apps and had one of them in the cache, the accuracy is <sup>1</sup>&#x2044;<sub>2</sub>.</p>
+
+<h3 id="network-usage">Network Usage</h3>
+
+<p>This dimension is pretty self-explanatory. The more aggressive a prefetching strategy is, the higher network usage it&#x2019;ll have. Often folks ignore network usage giving arguments such as &#x201C;Internet nowadays is fast and cheap!&#x201D; or &#x201C;Prefetching a few megabytes of scripts is not a big deal.&#x201D; These assumptions could be accurate in some situations (for example, internal dashboards), but I&#x2019;d argue that even in tech hubs such as Silicon Valley, high network usage can cause headaches.</p>
+
+<p>For example, <a href="https://fi.google.com/about/">Google Fi</a> charges $10 per gigabyte, which is ~1&#xA2; per 10MBs. Knowing I&#x2019;ll spend 1&#xA2; just by visiting a web page that will aggressively prefetch resources I&#x2019;d never need doesn&#x2019;t seem like fair use of my money. The average internet user in the US surfs 138.1 pages a day, meaning you could spend $1 and 30&#xA2; a day just browsing the web and downloading resources you&#x2019;d never use.</p>
+
+<p><amp-img src="/images/prefetching/consumption.png" style="display: block; margin: auto;"></amp-img>
+<div style="text-align: center; font-size: 0.9em; font-weight: bold;">High network usage</div></p>
+
+<h3 id="cpu-usage">CPU Usage</h3>
+
+<p>Some prefetching heuristics and mechanisms are more computationally intensive than others. For example, when you need to prefetch transitive dependencies of resources, you&#x2019;d often have to parse them. Parsing is not a cheap operation and can cause frame drops when executed at the wrong time and faster battery consumption.</p>
+
+<h3 id="setup">Setup</h3>
+
+<p>A prefetching heuristic could require a significant effort to set up. The setup effort does not only depend on the heuristic itself but also the underlying technologies. For example, Angular, Next.js, and Gatsby have static route declarations, which often allow a more straightforward setup for advanced prefetching strategies.</p>
+
+<h3 id="implementation-size">Implementation Size</h3>
+
+<p>The smaller our app is, the faster it&#x2019;ll load. Having a large prefetching algorithm that takes 500KB to 1MB might defeat its purpose in certain situations.</p>
+
+<h2 id="prefetching-heuristics">Prefetching Heuristics</h2>
+
+<p>In this section, I&#x2019;d want to introduce a few prefetching heuristics. The practices are mostly technology agnostic, so you should be able to apply them across the board. To make the article more practical, I&#x2019;ve applied links to implementations for different frameworks.</p>
+
+<div style="padding: 10px; background-color: #ff00001f; border-radius: 5px; margin-top: 10px; margin-bottom: 10px;">
+In the article below I&apos;ll be using the terms prefetching and preloading interchangeably. In the context of <code>link[rel=prefetch]</code> and <code>link[rel=preload]</code> they have <a href="https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf">different meanings</a>, but for the purpose of this article we won&apos;t need to go into prioritization.
+</div>
+
+<h3 id="tl-dr">TL;DR</h3>
+
+<p>In this table you can find a summary how the prefetching strategies from below compare to one another given the trade-offs from above:</p>
+
+<style>
+.good {
+  background-color: #0080001f !important;
+}
+.medium {
+  background-color: #ffff001f !important;
+}
+.bad {
+  background-color: #ff00001f !important;
+}
+td,
+tr {
+  border: 1px solid #0000001f !important;
+}
+</style>
+
+<table>
+<thead>
+  <th>
+    Heuristic
+  </th>
+  <th>
+    Accuracy
+  </th>
+  <th>
+    Network
+  </th>
+  <th>
+    CPU
+  </th>
+  <th>
+    Setup
+  </th>
+  <th>
+    Size
+  </th>
+</thead>
+<tbody>
+  <tr>
+    <td>
+      Prefetch all
+    </td>
+    <td class="good">
+      High
+    </td>
+    <td class="bad">
+      High
+    </td>
+    <td class="bad">
+      High
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Precaching
+    </td>
+    <td class="good">
+      High
+    </td>
+    <td class="bad">
+      High
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Quicklink
+    </td>
+    <td class="good">
+      High
+    </td>
+    <td class="medium">
+      Medium
+    </td>
+    <td class="medium">
+      Medium
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="medium">
+      Low/Medium
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Hover
+    </td>
+    <td class="medium">
+      Medium
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="medium">
+      Low/Medium
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Predictive
+    </td>
+    <td class="good">
+      Medium/High
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="good">
+      Low
+    </td>
+    <td class="bad">
+      High
+    </td>
+    <td class="bad">
+      Medium/High
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<h3 id="prefetch-all">Prefetch All</h3>
+
+<p>Prefetching all resources has the highest accuracy but also the highest network and CPU usage. Usually, you can implement it in just a few lines of code, so it&#x2019;ll not add up much to your bundles.</p>
+
+<p>Angular has a preloading strategy called <a href="https://angular.io/api/router/PreloadAllModules"><code>PreloadAllModules</code></a>. The router will prefetch all lazy-loaded modules and all of their children&#x2019;s routes using dynamic imports. The router needs to parse each preloaded module to discover its children&#x2019;s routes, making the strategy very inefficient from a network usage point of view and CPU cycles. Check the profile below:</p>
+
+<p><amp-img src="/images/prefetching/preload-all.png" style="display: block; margin: auto;"></amp-img></p>
+
+<p>It is from an <a href="https://github.com/mgechev/preload-all-stress-test">app</a> with 500 automatically generated routes, which uses <code>PreloadAllModules</code>. It&#x2019;s an artificial example but still shows accurately how inefficient this strategy could be in large apps.</p>
+
+<p>Does this mean that you should never be using <code>PreloadAllModules</code>? No. If your app has a dozen routes or so, preloading all routes will not significantly negatively impact your users&#x2019; experience. At the same time, the setup cost and maintenance will be very low.</p>
+
+<h4 id="precaching">Precaching</h4>
+
+<p>An alternative approach is using precaching with a service worker. By default, you&#x2019;re getting this behavior from the <a href="https://angular.io/guide/service-worker-intro">Angular Service Worker</a>. At build time, the Angular CLI will generate a manifest file with all your static assets and associated hash sums that the service worker will download and parse. At runtime, the service worker will download all the resources from the manifest and cache them.</p>
+
+<p>This strategy is still costly in terms of network consumption, but it has a much lower impact on the CPU usage because it is not running in the main UI thread.</p>
+
+<p><amp-img src="/images/prefetching/service-worker.svg" style="display: block; margin: auto;"></amp-img></p>
+
+<h3 id="prefetch-visible-links">Prefetch Visible Links</h3>
+
+<p>People often refer to this heuristic as &#x201C;<a href="https://github.com/GoogleChromeLabs/quicklink">quicklink</a>.&#x201D; Instead of downloading all the app scripts, it relies on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API"><code>IntersectionObserver</code></a> API to download only the scripts associated with links visible on the page.</p>
+
+<p><amp-img src="/images/prefetching/quicklink.png" style="display: block; margin: auto;"></amp-img></p>
+
+<p>There are implementations which work with <a href="https://getquick.link/">static pages</a> and <a href="https://www.npmjs.com/package/ngx-quicklink">Angular</a>.</p>
+
+<p>This strategy is often much cheaper than prefetching all the modules, but it could still have significant CPU and network usage for some apps. For example, imagine a Wikipedia-like app where developers can go to 100 different pages. Prefetching all of them could consume lots of data.</p>
+
+<p>I have another <a href="https://blog.mgechev.com/2018/12/24/quicklink-angular-prefetching-preloading-strategy/">post</a> which explains the Angular implementation and the trade-offs in depth.</p>
+
+<h3 id="prefetch-on-hover">Prefetch on Hover</h3>
+
+<p>With this heuristic, we start prefetching a page when the user hovers a corresponding link on the page. Usually, there is a 50-400ms delay before the user hovers the link and clicks it, which gives the browser enough time to start downloading the associated resources or at least initiate the chain of requests.</p>
+
+<p>There are popular solutions implemented for different technologies. One of the most popular ones is <a href="https://instant.page">instant.page</a>. I recently implemented such a <a href="https://www.npmjs.com/package/ngx-hover-preload">prefetching strategy for Angular</a>.</p>
+
+<p>This heuristic is relatively cheap in terms of network and CPU usage. I&#x2019;d say that the majority of applications would benefit from using it.</p>
+
+<h3 id="predictive-prefetching">Predictive Prefetching</h3>
+
+<p>Predictive prefetching is the most advanced heuristic. Based on user navigational patterns, we try to predict their subsequent action and download the resources we assume they need next. We can manually provide predictive prefetching instructions, hardcoding them in the source code, or use something like <a href="https://github.com/guess-js">Guess.js</a>.</p>
+
+<p>I&#x2019;ve written a lot about this strategy in the past in &#x201C;<a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling</a>&#x201D; and &#x201C;<a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a>&#x201D;.</p>
+
+<p><amp-img src="/images/prefetching/guess-js.jpg" style="display: block; margin: auto;"></amp-img></p>
+
+<p>Usually, the setup cost for this heuristic is higher. It requires integration with a data source that collects users&#x2019; journeys in the web app, and you need to plug it as part of the build process. Depending on the approach, predictive prefetching may also have a larger implementation size. Imagine you need to ship a TensorFlow model to predict user actions, for example. Guess.js takes a more straightforward approach, allowing it to send a distributed Markov chain that is relatively cheap and efficient, but it&#x2019;s also less accurate than a more advanced model.</p>
+
+<p>The apps which benefit from this prefetching heuristic are usually larger, with many pages where the navigation speed is critical. For example, e-commerce or content-heavy apps.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Often prefetching is a micro-optimization and a significant investment in this space could be a bad use of your time. I&#x2019;d recommend using some of the off-the-shelf solutions already available for your technology. Going this way will provide low cost performance benefits.</p>
+
+<p>Hover and quicklink prefetching works for the vast majority of web apps. I&#x2019;d recommend starting with hover prefetching moving to quicklink approach if fast navigation is from a high-priority and you don&#x2019;t have many links.</p>
+
+<p>In case you&#x2019;re building a complex app with a lot of possible transitions to other pages, predictive prefetching is something you may want to explore.</p>
+
+<p>Hope you enjoyed this post! Until next time and happy coding!</p>
+</div>
+
+  <aside class="p-share">
+  <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f&amp;t=Prefetching%20Heuristics" title="Facebook&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="fb" target="_blank" rel="nofollow"></a>
+  <a href="http://twitter.com/intent/tweet?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f&amp;text=Prefetching%20Heuristics&amp;tw_p=tweetbutton" title="Twitter&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="tw" target="_blank" rel="nofollow"></a>
+  <a href="https://plus.google.com/share?url=https%3a%2f%2fblog.mgechev.com%2f2021%2f02%2f07%2fprefetching-strategies-heuristics-faster-web-apps%2f" title="Google Plus&#x3067;&#x30B7;&#x30A7;&#x30A2;" class="gp" target="_blank" rel="nofollow"></a>
+</aside>
+
+
+  <footer class="article-footer">
+    <section>
+      <ol class="p-crumb">
+        <li><a href="https://blog.mgechev.com/">Minko Gechev&apos;s blog</a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li>Prefetching Heuristics</li>
+      </ol>
+
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/categories/">categories</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/categories/Web/">Web</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Performance/">Performance</a></li>
+            
+            <li><a href="https://blog.mgechev.com/categories/Prefetching/">Prefetching</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+      
+      <ul class="p-facts">
+        <li>
+          <header><a href="https://blog.mgechev.com/tags/">tags</a></header>
+          <ul>
+            
+            <li><a href="https://blog.mgechev.com/tags/Web/">Web</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Performance/">Performance</a></li>
+            
+            <li><a href="https://blog.mgechev.com/tags/Prefetching/">Prefetching</a></li>
+            
+          </ul>
+        </li>
+      </ul>
+      
+      
+    </section>
+  </footer>
+</article>
+
+
+
+  
+  
+  <section>
+    <header><span>Latests</span></header>
+    <ul class="p-articles thin">
+      <li><article class="li sm article-1f356350658bf1f680bcc8a78b3ccae4">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/" class="thumbnail" title="Design Patterns in Open Source Projects - Part II"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2021/01/24/design-pattens-in-open-source-projects-part-ii/">Design Patterns in Open Source Projects - Part II</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2021-01-24T00:00:00JST">Jan 24, 2021</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-44f7e855bf61587b948c61a813fbc0b6">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/" class="thumbnail" title="Design Patterns in Open Source Projects - Part I"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">Design Patterns in Open Source Projects - Part I</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2021-01-18T00:00:00JST">Jan 18, 2021</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li><li><article class="li sm article-fb9219e3e82481c8d0ecc34aefa48327">
+  <div class="header-wrapper">
+    <a href="https://blog.mgechev.com/2020/11/26/what-i-learned-doing-100-public-talks-part-i/" class="thumbnail" title="What I learned doing 125 public talks - Part I"></a>
+    <header class="article-header">
+      <div class="clearfix">
+        <h2 class="title"><a href="https://blog.mgechev.com/2020/11/26/what-i-learned-doing-100-public-talks-part-i/">What I learned doing 125 public talks - Part I</a></h2>
+        <ul class="p-facts">
+          <li><time datetime="2020-11-26T00:00:00JST">Nov 26, 2020</time></li>
+          <li><a href="https://blog.mgechev.com/post/">post</a></li>
+          
+        </ul>
+      </div>
+    </header>
+  </div>
+</article>
+</li>
+    </ul>
+  </section>
+  
+</div>
+
+
+    </main>
+
+    
+
+    <footer class="l-footer">
+      <div class="l-container">
+        <p><span class="h-logo">&#xA9; Minko Gechev&apos;s blog</span></p>
+      </div>
+    </footer>
+
+    <a href="#" class="p-movetop" title="&#x30DA;&#x30FC;&#x30B8;&#x4E0A;&#x90E8;&#x3078;&#x623B;&#x308B;" rel="nofollow"></a>
+  </body>
+</html>
+

@@ -10,9 +10,9 @@ tags:
 - Web
 - Performance
 - Prefetching
-title: Prefetching Strategies
-og_image: /images/oss-design-patterns-ii/hero.jpg
-url: /2021/01/24/design-pattens-in-open-source-projects-part-ii
+title: Prefetching Heuristics
+og_image: /images/prefetching/hero.png
+url: /2021/02/07/prefetching-strategies-heuristics-faster-web-apps
 ---
 
 In this post, we're going to focus on web performance. In particular, we'll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user's behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.
