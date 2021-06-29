@@ -10,13 +10,43 @@ layout: page
     Below I've focused on the positive side. I've filtered a non-exhaustive list of achievements. They are primarily intended for personal consumption as my private "cookie jar".
   </p>
   <section class="timeline-period">
+    <header class="timeline-header">2021</header>
+    <section class="timeline-event">
+      <h1>Release of Angular DevTools</h1>
+      <section>
+        <img src="/images/story/devtools.png">
+        <p>
+          On I/O 2021 my team released Angular DevTools. That was a project I had the opportunity to lead from end-to-end starting with analysis of user feedback and requirements, to development, and later rollout.
+        </p>
+        <p>
+          Angular DevTools went through a lot of phases! Early validation, development of the team, cross-collaboration across the organization at Google, integration within the Google I/O 2021 online experience, accessibility and UX audit, etc. I feel so grateful I had the opportunity to work with so many fascinating, talented, and smart people along the way. Angular DevTools hit 20k downloads in 2 days after I/O. After the first month it received over 50k downloads.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
+      <h1>Predictive Prefetching Pipeline</h1>
+      <section>
+        <img src="/images/story/tfjs-ng.png">
+        <p>
+          One of my highlights from I/O 2021 was the chance to work on a pipeline for predictive prefetching with the TensorFlow team.
+        </p>
+        <p>
+          After identifying the opportunity for predictive prefetching with Guess.js and building a solution in our partnership with TensorFlow we developed a sophisticated pipeline that receives data from Google Analytics, pipes to to TFX via BigQuery, generates a TensorFlow model that we can late use in TensorFlow.js to prefetch resources in any Angular (or not) application. You can read more about our work on the <a href="https://blog.tensorflow.org/2021/05/speed-up-your-sites-with-web-page-prefetching-using-ml.html">official TensorFlow blog</a>.
+        </p>
+        <p>
+          For I/O 2021 I also worked on TensorFlow.js <a href="https://github.com/mgechev/ngx-tfjs">bindings</a> for Angular that allow developers to use machine learning in the browser declaratively and efficiently!
+        </p>
+      </section>
+    </section>
+  </section>
+  <section class="timeline-period">
     <header class="timeline-header">2020</header>
     <section class="timeline-event">
       <h1>Medal from the National Karate Cup</h1>
       <section>
         <img src="/images/story/karate.png">
         <p>
-          That's mostly a sentimental cookie in the jar. My very first karate compeition was in kata around 1998-1999. Back then I was 8 years old and my kata was far from great as you can imagine :). That was one of my last kata competitions as well, since I switched to kumite soon afterwards. The reason was mostly that I did not feel prepared and my technique was not great.
+          That's mostly a sentimental cookie in the jar. My very first karate competition was in kata around 1998-1999. Back then I was 8 years old and my kata was far from great as you can imagine :). That was one of my last kata competitions as well, since I switched to kumite soon afterwards. The reason was mostly that I did not feel prepared and my technique was not great.
         </p>
         <p>
           Since then, I had the opportunity to train with some karate legends such as shihan Gosei Yamaguchi and sensei Buchwald in the Bay Area, California. 22 years after my first tournament, there was another karate competition in Veliko Tarnovo so I decided to join! I ended up getting the third place and I was 0.2 points away from the second. I also got a bronze and a silver medals in team kumite and kata, but that was due to my awesome teammates. It was a lot of fun to go back to the place where my karate adventures started :).
