@@ -64,6 +64,8 @@ A few of my open source projects:
 
 #### Angular
 
+- [Angular - as a lead for DevRel I've worked across the entire platform](https://angular.io/)
+- [Angular DevTools - developer tools for Angular](https://angular.io/devtools)
 - [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
 - [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
 - [Angular AOP - a framework for aspect-oriented programming with AngularJS](https://github.com/mgechev/angular-aop)
