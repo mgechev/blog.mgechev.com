@@ -182,7 +182,7 @@
 </span></code></pre></div><p>The snippet above contains a piece of the implementation of the generated <code>detectChangesInternal</code> method of a compiled component from the <a href="https://github.com/mgechev/angular-seed">angular-seed project</a>. It gets the values of the individual bindings by using a direct property access and compares them with the new values using the most efficient way. Once it finds that their values are different, it updates only the impacted DOM elements.</p>
 <p>By answering the question &#x201C;Why we need compilation?&#x201D; we answered the question &#x201C;What needs to be compiled?&#x201D; as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.</p>
 <h2 id="just-in-time-jit-vs-ahead-of-time-aot">Just-in-Time (JiT) vs Ahead-of-Time (AoT)</h2>
-<!-- raw HTML omitted -->
+<amp-img src="/images/aot-angular/timing.jpg" style="display: block; margin: auto;"></amp-img>
 <p>This section contains answer of the question:</p>
 <ul>
 <li><em>When the compilation takes place?</em>.</li>
@@ -232,7 +232,7 @@
 </ul>
 <p>A minimalistic AoT compilation demo you can find in <a href="https://github.com/mgechev/angular2-ngc-rollup-build">my GitHub account</a>.</p>
 <h2 id="ahead-of-time-compilation-in-depth">Ahead-of-Time Compilation in Depth</h2>
-<!-- raw HTML omitted -->
+<amp-img src="/images/aot-angular/mechanics.jpg" style="display: block; margin: auto;"></amp-img>
 <p>This section answers the questions:</p>
 <ul>
 <li><em>What artifacts the AoT compiler produces?</em></li>
@@ -415,9 +415,9 @@
 <h2 id="what-we-get-from-aot">What we get from AoT?</h2>
 <p>As you might have already guessed, from AoT we get performance. The <strong>initial rendering performance</strong> of each Angular applications we develop with AoT will be much faster compared to a JiT one since the JavaScript Virtual Machine needs to perform much less computations. We compile the templates to JavaScript only once as part of our development process, after that the user gets compiled templates for free!</p>
 <p>On the image below you can see how much time it takes to perform the initial rendering with JiT:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/aot-angular/jit.png" style="display: block; margin: auto;"></amp-img>
 <p>On the image below you can see how much time it takes to perform the initial rendering with AoT:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/aot-angular/aot.png" style="display: block; margin: auto;"></amp-img>
 <p>Another awesome thing about the Angular compiler is that it can emit not only JavaScript but TypeScript as well. This allows us to perform <strong>type checking in templates</strong>!</p>
 <p>Since the templates of the application are pure JavaScript/TypeScript, we know exactly what and where is used. This allows us to perform <strong>effective tree-shaking</strong> and drop all the directives/modules which are not used by the application out of the production bundle! On top of that we don&#x2019;t need to include the <code>@angular/compiler</code> module in the application bundle since we don&#x2019;t need to perform compilation at runtime!</p>
 <p><strong>Note that for large to medium size applications the bundle produced after performing AoT compilation will most likely be bigger</strong> compared to same application using JiT compilation. This is because the VM friendly JavaScript produced by <code>ngc</code> is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!</p>
@@ -425,7 +425,7 @@
 <p>Last but not least, <strong>energy efficiency</strong>! The user devices need to perform even less since it receives already compiled code. This reduces battery consumption but how much? Here are the results of a some funny calculations I did :-):</p>
 <p>Based on findings by the research &#x201C;Who Killed My Battery: Analyzing Mobile Browser Energy Consumption&#x201D; (by N. Thiagarajan, G. Aggarwal, A. Nicoara, D. Boneh, and J. Singh), the process of downloading and parsing jQuery when visiting Wikipedia takes about 4 Joules of energy. Since the paper doesn&#x2019;t mention specific version of jQuery, based on the date when it was published I assume it&#x2019;s talking about v1.8.x. Since Wikipedia uses gzip for compressing their static content this means that the bundle size of jQuery 1.8.3 will be 33K. The gzipped + minified version of <code>@angular/compiler</code> is 103K. This means that it&#x2019;ll cost us about 12.5J to download the compiler, process it with JavaScript Virtual Machine, etc. (we&#x2019;re ignoring the fact that we are not performing JiT, which will additionally reduce the processor usage. We do this because in both cases - jQuery and <code>@angular/compiler</code> we&#x2019;re opening only a single TCP connection, which is the biggest consumer of energy).</p>
 <p>iPhone 6s has a battery which is 6.9Wh which is 24840J. Based on the monthly visits of the official page of AngularJS 1.x there will be at least 1m developers who have built on average 5 Angular applications. Each application have ~100 users per day. <code>5 apps * 1m * 100 users = 500m</code>. In case we perform JiT and we download the <code>@angular/compiler</code> it&#x2019;ll cost to the Earth <code>500m * 12.5J = 6250000000J</code>, which is 1736.111111111KWh. According to Google, 1KWh = ~12 cents in the USA, which means that <strong>we&#x2019;ll spend about $210 for recovering the consumed energy for a day</strong>. Notice that we even didn&#x2019;t take the further optimization that we&#x2019;ll get by applying tree-shaking, which may allow us to drop the size of our application at least twice! :-)</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;"></amp-img>
 <h2 id="conclusion">Conclusion</h2>
 <p>The Angular&#x2019;s compiler improves the performance of our applications dramatically by taking advantage of the inline caching mechanism of the JavaScript Virtual Machines. On top of that we can perform it as part of our build process which solves problems such as forbidden <code>eval</code>, allows us to perform more efficient tree-shaking, improves the initial rendering time.</p>
 <p>Do we loose anything by not performing the compilation at runtime? In some very limited cases we may need to generate the templates of the components on demand. This will require us to load non-compiled components and perform the compilation process in the browser, in such cases we&#x2019;d need to include the <code>@angular/compiler</code> module as part of our application bundle. Another potential drawback of AoT compiled large to medium applications is the increase in their bundle size. Since the produced JavaScript for the components&apos; templates has bigger size compared to the templates themselves, this will most likely lead to bigger final bundle.</p>

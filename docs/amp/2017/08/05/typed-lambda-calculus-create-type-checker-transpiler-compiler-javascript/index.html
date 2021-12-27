@@ -135,7 +135,7 @@
 <p>The source code of the implementation can be found at my <a href="https://github.com/mgechev/typed-calc">GitHub profile</a>.</p>
 <h1 id="syntax">Syntax</h1>
 <p>The syntax of the language is going to be quite simple.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/syntax.jpg" alt="Syntax" style="display: block; margin: auto;"></amp-img>
 <p>Our programs will belong to the language defined by the following grammar:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-mysql" data-lang="mysql"><span class="n">t</span><span class="w"> </span><span class="p">::</span><span class="o">=</span><span class="w">
 </span><span class="w">  </span><span class="n">x</span><span class="w">   </span><span class="c1"># variable
@@ -155,10 +155,27 @@
 </code></pre></div><p>Notice that in contrast to other statically typed programming languages, such as Haskell or Elm, we do not have a syntactical construct for declaring the type of a function. In Haskell the semantics of the annotation <code>T1 &#x2192; T2</code> is a function which accepts one argument of type <code>T1</code> and returns result of type <code>T2</code>. In our grammar, we do not have this explicit type annotation because we&#x2019;re going to apply type inference in order to guess a function&#x2019;s type based on the type of its argument and body.</p>
 <h1 id="playground">Playground</h1>
 <p>Now after we&#x2019;re familiar with the syntax, we can try to write some code. In the textarea below enter your program and click on the button &#x201C;Evaluate&#x201D; to see the result:</p>
-<!-- raw HTML omitted -->
+<div>
+  <textarea id="code" style="width: 100%; height: 140px; padding: 5px; font-size: 13px;">
+(&#x3BB; a: Nat &#x2192; a)
+  (if
+    (&#x3BB; a: Nat &#x2192; iszero a) pred 0
+  then
+    (&#x3BB; a: Nat &#x2192; succ a)
+  else
+    (&#x3BB; a: Nat &#x2192; pred a))
+  0</textarea>
+</div>
+<div style="padding-top: 10px;">
+  <button id="add-lambda-btn">&#x3BB;</button>
+  <button id="add-arrow-btn">&#x2192;</button>
+  <button id="eval-btn">Evaluate</button>
+</div>
+<div style="padding-top: 10px;">Result: <span id="result"></span></div>
+<script src="/assets/js/typed-calc/run.js"></script>
 <h1 id="semantics">Semantics</h1>
 <p>Before going any further, lets show a few sample programs belonging to the programming language that we&#x2019;re going to develop.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/semantics.jpg" alt="Semantics" style="display: block; margin: auto;"></amp-img>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(&#x3BB; a: Nat &#x2192; succ succ a) 0
 </code></pre></div><p>In the example above we declare an anonymous function which accepts a single argument called <code>a</code> of type <code>Nat</code>. In the body of the function we apply twice the predefined function <code>succ</code> to <code>a</code>. The anonymous function we apply to <code>0</code>. This is going to produce <code>2</code> as final result.</p>
 <p>The equivalent of this program in JavaScript will be:</p>
@@ -171,11 +188,47 @@
     (&#x3BB; g: Nat &#x2192; f) 0
 ) (succ 0)
 </code></pre></div><p>Lets explain the evaluation step by step:</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<ol>
+  <li>
+Reduce the expression with left side <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; (&#x3BB; g: Nat &#x2192; f) 0)</code> and right side <code class="highlighter-rouge">(succ 0)</code>.
+<div class="highlight">
+<pre>
+<code>(
+  &#x3BB; f: Nat &#x2192;
+    (&#x3BB; g: Nat &#x2192; f) 0
+) (succ 0)</code>
+</pre>
+</div>
+  </li>
+  <li>
+Substitute <code class="highlighter-rouge">g</code> with <code class="highlighter-rouge">0</code> (apply <a href="https://en.wikipedia.org/wiki/Lambda_calculus#Beta_reduction">beta reduction</a>) in the expression <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; (&#x3BB; g: Nat &#x2192; f) 0)</code> and get <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; f)</code>.
+<div class="highlight">
+<pre>
+<code>(
+  &#x3BB; f: Nat &#x2192; f
+) (succ 0)</code>
+</pre>
+</div>
+  </li>
+  <li>
+Increment <code class="highlighter-rouge">0</code> in the expression <code class="highlighter-rouge">succ 0</code> and pass the result to <code class="highlighter-rouge">(&#x3BB; f: Nat &#x2192; f)</code>.
+<div class="highlight">
+<pre>
+<code>(
+  &#x3BB; f: Nat &#x2192; f
+) 1</code>
+</pre>
+</div>
+  </li>
+  <li>
+Return result.
+<div class="highlight">
+<pre>
+<code>1</code>
+</pre>
+</div>
+  </li>
+</ol>
 <p>Formally, we can show the small-step semantics of our language in the following way:</p>
 <h2 id="small-step-semantics">Small-step semantics</h2>
 <p>In this section we&#x2019;ll take a look at the <a href="https://en.wikipedia.org/wiki/Operational_semantics#Small-step_semantics">small-step semantics</a> of the language.</p>
@@ -247,7 +300,7 @@
 <p>In <code>2)</code> if <code>t1</code> evaluates to <code>v</code>, <code>t1 t2</code> evaluates to <code>v</code> applied to <code>t2</code>.</p>
 <p>The semantics of <code>3)</code> is that if <code>t2</code> evaluates to <code>v</code>, <code>v1 t2</code> evaluates to <code>t1</code> applied to <code>v</code>.</p>
 <h1 id="type-system">Type System</h1>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/type.jpg" alt="Type System" style="display: block; margin: auto;"></amp-img>
 <p>Although the small-step semantics laws above are quite descriptive and by using them we already can build an evaluator for our programming language, we still can construct some ridiculous programs. For instance the following program is a valid according to the grammar from the &#x201C;<a href="#syntax">Syntax</a>&#x201D; section above but is semantically incorrect:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">if 1 then true else 2
 </code></pre></div><p>The condition of the conditional expression is expected to be of type boolean, however, we pass a natural number. Another problem with the snippet is that the result of both branches of the expression should return result with the same type but this is not the case in our example.</p>
@@ -295,7 +348,7 @@ n : Nat, n &#x2208; &#x2115;
 <p>Finally, <code>6)</code> states that if we have <code>t1</code> of type <code>T &#x2192; Y</code> and <code>t2</code> of type <code>T</code> then <code>t1 t2</code> will be of type <code>Y</code>.</p>
 <p>It&#x2019;s interesting to see how the <a href="#type-rules">type rules</a> does not explain how to evaluate the individual expressions but only define a set of rules which the expressions should hold.</p>
 <h1 id="developing-the-compiler">Developing the Compiler</h1>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/develop.jpg" alt="Develop" style="display: block; margin: auto;"></amp-img>
 <p>Now from the formal definition of our programming language lets move to its actual implementation. In this section we will explain how the compiler&#x2019;s implementation works. Here are the high-level steps of execution:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">program</span> <span class="o">=</span> <span class="nx">readFileSync</span><span class="p">(</span><span class="nx">fileName</span><span class="p">,</span> <span class="p">{</span> <span class="nx">encoding</span><span class="o">:</span> <span class="s1">&apos;utf-8&apos;</span> <span class="p">});</span>
 <span class="kr">const</span> <span class="nx">ast</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">program</span><span class="p">);</span>
@@ -400,7 +453,7 @@ n : Nat, n &#x2208; &#x2115;
 <span class="p">}</span>
 </code></pre></div><p>We can see that it starts with an optional opening parenthesis, after that we have the lambda (<code>&#x3BB;</code>) symbol, followed by the parameter declaration and its type. After that, we have the hard to type arrow (<code>&#x2192;</code>) and the abstraction&#x2019;s body, which we try to match against the <code>Application</code> rule from above.</p>
 <p>For instance, the AST of the program: <code>(&#x3BB; a: Bool &#x2192; succ 0) iszero 0</code>, after parsing, will look like:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/ast.png" alt="AST" style="display: block; margin: auto;"></amp-img>
 <p>The root node is the application nonterminal (<code>t1 t2</code>), where <code>t1</code> equals the abstraction (i.e. <code>&#x3BB; a: Bool &#x2192; succ 0</code>) and <code>t2</code> the expression <code>iszero 0</code>.</p>
 <h2 id="developing-the-type-checker">Developing the Type Checker</h2>
 <p>Now lets take a look at the type checker. First, lets declare the set of primitive types:</p>
@@ -408,7 +461,7 @@ n : Nat, n &#x2208; &#x2115;
   <span class="nx">Natural</span><span class="o">:</span> <span class="s1">&apos;Nat&apos;</span><span class="p">,</span>
   <span class="nb">Boolean</span><span class="o">:</span> <span class="s1">&apos;Bool&apos;</span>
 <span class="p">};</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><amp-img src="/images/typed-lambda/guard.jpg" alt="Guard" style="display: block; margin: auto;"></amp-img>
 <h3 id="function-type">Function Type</h3>
 <p>We&#x2019;ll express the function type using an array of types, for instance <code>[&apos;Bool&apos;, &apos;Nat&apos;]</code> is a function which accepts an argument of type <code>Bool</code> and returns <code>Num</code>. From the following example, we can see that our language supports high-order functions:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(
@@ -547,8 +600,13 @@ n : Nat, n &#x2208; &#x2115;
 </code></pre></div><p>In case the program that we want to type check is the following:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">(&#x3BB; a: Nat &#x2192; succ succ 0) iszero true
 </code></pre></div><p>The diagnostics that the compiler will produce will be as follows:</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<pre style="font-family: monospace; font-size: 13px; padding: 10px; overflow: auto; background-color: #292929;">
+~/Projects/typed-calc <span style="color: #F22A2F">master</span> <span style="color: #FED669">&#x276F;</span> <span style="color: #C0C3C0">node index.js demo/incorrect1.lambda</span>
+<span style="color: #96A651">Evaluating &quot;demo/incorrect1.lambda&quot;.</span>
+
+<span style="color: #BA4E50">Incorrect type of IsZero</span>
+<span style="color: #BA4E50">Incorrect type of application</span>
+</pre>
 <h2 id="developing-the-interpreter">Developing the Interpreter</h2>
 <p>Once the compiler goes through the phase of type checking there are a few options:</p>
 <ul>
@@ -631,7 +689,7 @@ n : Nat, n &#x2208; &#x2115;
 <span class="p">}</span>
 </code></pre></div><h2 id="developing-a-code-generator">Developing a Code Generator</h2>
 <p>Here&#x2019;s a <a href="https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js">list of the languages</a> which compile to JavaScript. Why not create another language?</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/generation.jpg" alt="Generation" style="display: block; margin: auto;"></amp-img>
 <p>In fact, the transpilation (code generation) is going to be quite straightforward as well. The entire implementation of our &#x201C;to JavaScript compiler&#x201D; is on less than 40 lines of code. The entire transpiler can be found <a href="https://github.com/mgechev/typed-calc/blob/master/eval.js#L6-L7%601">here</a>`.</p>
 <p>Let&#x2019;s take a look at how we are going to translate application, abstraction and conditional expressions to JavaScript:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">CompileJS</span> <span class="o">=</span> <span class="nx">ast</span> <span class="p">=&gt;</span> <span class="p">{</span>
@@ -696,7 +754,7 @@ succ (
 <p>It&#x2019;s interesting how <strong>straightforward</strong> is the <strong>JavaScript implementation which we directly derived from the mathematical definitions</strong>. We just &#x201C;translated the math&#x201D; into source code. Of course, the process of designing the source code has it&#x2019;s own portion of creativity involved but the general algorithm is equivalent.</p>
 <p>Another interesting observation is how similar are the algorithms for interpretation and type checking. With the type checking algorithm we performed type inference which was quite similar to the actual source code evaluation. Although with our basic type system this similarity still can be noticed, in case of <a href="https://en.wikipedia.org/wiki/Dependent_type">dependent types</a> the boundary between evaluation and type checking becomes even blurrier.</p>
 <h2 id="where-to-go-from-here">Where to go from here?</h2>
-<!-- raw HTML omitted -->
+<amp-img src="/images/typed-lambda/next.jpg" alt="Next" style="display: block; margin: auto;"></amp-img>
 <p>A natural direction for further development of the language will be to extend its syntax and type system. In this case, there should be put some effort in improving the language&#x2019;s ergonomics. There are a few programming languages inspired by the lambda calculus and there are two main &#x201C;syntactic camps&#x201D; that they are in. For instance, the LISP-like languages can be distinguished by their intensive use of parentheses. On the other hand, the Haskell-like syntax often looks cleaner and has its own adoptions in languages like Elm.</p>
 <p>Another direction for improvement is a better error reporting. With the grammar produced by Peg.js we can easy get the exact position in the program of the individual symbols. This will allow us to throw errors at specific locations which will make debugging much easier.</p>
 <p>Will be happy to get your thoughts and observations from the article in the comments section below.</p>

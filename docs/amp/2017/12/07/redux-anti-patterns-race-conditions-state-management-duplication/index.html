@@ -139,7 +139,7 @@
 </ul>
 <h1 id="state-duplication">State Duplication</h1>
 <p>Sometimes we have instances of the same business entity used in different contexts. In such cases, instead of keeping the instances under the same store property we treat them differently.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/redux-anti-patterns/duplicate.jpg" style="display: block; margin: auto" alt="Duplication"></amp-img>
 <h2 id="problem">Problem</h2>
 <p>For example, lets suppose we are developing an application which provides tutoring functionality. A tutor can schedule sessions and also, once the time for given session comes, the tutor can join it. Lets model the session with the following interface:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
@@ -200,7 +200,7 @@
 <h3 id="coupling">Coupling</h3>
 <p>Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn&#x2019;t allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it&#x2019;s often is not good enough.</p>
 <p>Take a look at the next figure:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/redux-anti-patterns/cmp.png" style="display: block; margin: auto" alt="Component tree"></amp-img>
 <p>If component <code>A</code> holds the state that <code>C</code> and <code>D</code> consume then <code>B</code> should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven&#x2019;t experienced any serious issues with it for medium sized applications (above 40k SLOC).</p>
 <h3 id="mutation">Mutation</h3>
 <p>The mutation of the state now should happen through the parent component (on the diagram above <code>A</code>). This can be achieved by passing callbacks. When the callbacks need to be passed through several levels of children I often prefer to move the local state to the store.</p>
@@ -215,7 +215,7 @@
 <span class="p">}</span>
 </code></pre></div><p>Notice that there&#x2019;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><amp-img src="/images/redux-anti-patterns/encapsulation.jpg" style="display: block; margin: auto" alt="Hidden dependencies"></amp-img>
 <h2 id="solution-2">Solution</h2>
 <p>We should get rid of the properties which can be computed from another properties. This introduces additional calculations but they can be easily optimized since they are based on pure functions.</p>
 <p>I find the usage of <a href="https://github.com/reactjs/reselect"><code>reselect</code></a> very appropriate for this particular case. Another alternative is definition of methods in a parent component which encapsulate the computations required for the given computed state property. Efficiency there can be achieved using memoization.</p>

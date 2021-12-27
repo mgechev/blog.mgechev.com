@@ -98,7 +98,7 @@
 <p>Lets peek at the flux data flow once again:</p>
 <p><img src="/images/overview-components/flux-overview.png" alt="High-Level Overview"></p>
 <p>As we can see from the diagram above, the data flow starts in the view, goes to an action, which invokes the dispatcher, after that the store catches dispatcher&rsquo;s event and in the end the data arrives in the view again. Alright, so the store is responsible for providing the data to the view. So far so good. How we can make the store deliver the required by the view data? Well, it can trigger an event! Recently observables are getting quite popular. For good or bad, they are going to be included in the JavaScript standard. If this makes you angry because you have to learn new things and JavaScript is getting fatter, you can find the guy who stays behind all of this here:</p>
-<!-- raw HTML omitted -->
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lil4YCCXRYc" frameborder="0" allowfullscreen></iframe>
 <p>Observables are good way of building our store. If the view is able to observe the store for changes, it can update itself once the store updates. Lets take a look at the following design pattern (yeah, my friends already noticed I&rsquo;m talking about design patterns constantly and did an intervention for me but didn&rsquo;t help).</p>
 <p><a href="/images/intervention.jpg"><img src="/images/intervention.jpg" alt="Intervention"></a></p>
 <h3 id="chain-of-responsibility">Chain of Responsibility</h3>
@@ -108,7 +108,7 @@
   <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span> <span class="o">===</span> <span class="nb">document</span><span class="p">)</span>
 <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
 </code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;awesome-button&#34;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</code></pre></div><p><!-- raw HTML omitted -->JS Bin on jsbin.com<!-- raw HTML omitted --><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+</code></pre></div><p><a class="jsbin-embed" href="http://jsbin.com/hezizi/embed?output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.34.0"></script></p>
 <p>If you click on the <code>awesome-button</code>, you&rsquo;ll see two alert boxes: &ldquo;You actually clicked on element with #awesome-button, not directly on document&rdquo; and &ldquo;true&rdquo;. If you change the third parameter of <code>addEventListener</code> to <code>true</code>, the event will propagate in the opposite direction (i.e. from top to bottom, capturing mode).</p>
 <p>Why I said all of this? Well, this is the pattern Chain of Responsibility:</p>
 <blockquote>
@@ -180,12 +180,12 @@
 <span class="p">}</span>
 </code></pre></div><p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
 <h3 id="quick-faq">Quick FAQ:</h3>
-<p><em>Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position, we should go through the entire described data flow?</em><!-- raw HTML omitted -->
+<p><em>Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position, we should go through the entire described data flow?</em><br>
 This doesn&rsquo;t seem like quite a good idea. If you have a big store and huge component tree, re-rendering it on mouse move will impact the performance of your application dramatically! What will be the biggest slowdown? Well, you&rsquo;ll have to serialize the store to a POJO (Plain Old JavaScript Object), later you need to pass it to the root component, which is responsible for passing it down to its children and so on. And all of this because of two changed numbers? It is completely unnecessary. In such cases I&rsquo;d recommend adding event listeners in the specific component, which depends on the mouse position and creating a separate store for it.</p>
 <p>For example, if you&rsquo;re using <code>react-dnd</code> in your application, the drag &amp; drop component has its own state, which doesn&rsquo;t have to be merged with the rest of the store. It can live independently. Let me show you what I mean on the following diagram:</p>
 <p><a href="/images/store-services/two-stores.png"><img src="/images/store-services/two-stores.png" alt="Two Stores"></a></p>
 <p>In this example, when the store containing the dialog position updates it does not require update of the entire component tree.</p>
-<p><em>How should I make my store trigger events?</em><!-- raw HTML omitted -->
+<p><em>How should I make my store trigger events?</em><br>
 The same way you did that in the dispatcher - use <code>EventEmitter</code>. Since we want to implement Chain of Responsibility, you will be required to keep reference to the object&rsquo;s parent in order to propagate the event.</p>
 <h2 id="remote-services">Remote Services</h2>
 <p>This is a hot topic. Most of the single-page applications require communication with services through a transport protocol, in order to fetch and store data. However, in the overview of flux there&rsquo;s no such thing as <code>TransportChannel</code>, <code>RemoteService</code> or whatever. If there are involved a lot of different protocols (for example I&rsquo;m working on a application, which communicates with other applications and services through HTTP, WebSocket and WebRTC data channel) it could get a bit hairy if you don&rsquo;t create the proper abstractions.</p>
@@ -225,17 +225,17 @@ The same way you did that in the dispatcher - use <code>EventEmitter</code>. Sin
 <h2 id="third-party-services">Third-party Services</h2>
 <p>If you&rsquo;re using a third-party service (Twilio for example) you can process in a similar fashion. You can create a wrapper of the service (in the case of Twilio, the <code>Twilio</code> global) and bring it in your flux data-flow.</p>
 <h3 id="quick-faq-1">Quick FAQ:</h3>
-<p><em>Isn&rsquo;t <code>NetworkObserver</code> a &ldquo;God class&rdquo;?</em><!-- raw HTML omitted -->
+<p><em>Isn&rsquo;t <code>NetworkObserver</code> a &ldquo;God class&rdquo;?</em><br>
 Yep, it is. You can decompose it into a few smaller classes, same for <code>CommandDispatcher</code> where you can use the <a href="https://en.wikipedia.org/wiki/Strategy_pattern">strategy pattern</a> for dispatching the commands in the appropriate order.</p>
-<p><em>What are these <code>ProtocolDecorators</code>?</em><!-- raw HTML omitted -->
+<p><em>What are these <code>ProtocolDecorators</code>?</em><br>
 Since we can create our protocol based on another, already existing protocol (<a href="http://www.jsonrpc.org/">JSON-RPC</a>, <a href="http://bert-rpc.org/">BERT-RPC</a>, etc.), we can process the incoming messages by using a chain of decorators. For example, we receive a basic string, next the <code>JSONRPCDecorator</code> can parse it to a valid <code>JSON-RPC</code> message and pass it to the next decorator (<code>YourCustomProtocolDecorator</code>), etc.</p>
-<p><em>Can&rsquo;t I get cascading updates when update the model? Can&rsquo;t I reach a condition in which the view updates the store, it emits a change event, which is being handled by the <code>Service</code> module, which emits an event&hellip;etc.?</em><!-- raw HTML omitted -->
+<p><em>Can&rsquo;t I get cascading updates when update the model? Can&rsquo;t I reach a condition in which the view updates the store, it emits a change event, which is being handled by the <code>Service</code> module, which emits an event&hellip;etc.?</em><br>
 This can happen. There are two simple solutions:</p>
 <ul>
 <li>emit change event only when the value of given property is actually being changed</li>
 <li>emit <code>ui-change</code> event when update the model from the view and emit <code>server-change</code> event when change it from the server. The root component can listen for <code>/change/</code> events (yeah, this is a regex) and the server can listen for <code>ui-change</code>.</li>
 </ul>
-<p><em>I throw an event but a few stores are handling it?!</em><!-- raw HTML omitted -->
+<p><em>I throw an event but a few stores are handling it?!</em><br>
 Most likely you have collision in the action types. I&rsquo;d suggest to use the following schema for naming them: <code>storename:action-name</code> or something similar, which guarantees uniqness.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>The first part of this post shown how we can wire the store with the view. The second part was about the basic idea of the network communication with external services. The last section described a sample implementation of the black box responsible for handling external messages, store changes, serialization of the store and sending it through the network. Although the first two parts were relatively canonical and predefined by flux, the last chapter was completely custom implementation. With it I wanted to imply that the micro-architecture we use (MVC, MVP, MVVM, flux, whatever) does not provide us the entire project design. It only puts some rules on how we should organize our application, defines the main building blocks and how we can wire them together, however, if we want to build a real-life application, most likely we&rsquo;ll need to put some additional effort - the architecture or the framework won&rsquo;t be able to solve all our concerns.</p>

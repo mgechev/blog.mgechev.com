@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?Introducing Revive When I started using Go, a few years ago, I noticed how opinionated the ecosystem was.">
+<meta name="description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?You can find revive on GitHub at github.">
 
 <meta property="og:title" content="Fast, extensible, configurable, and beautiful linter for Go - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?Introducing Revive When I started using Go, a few years ago, I noticed how opinionated the ecosystem was.">
+<meta property="og:description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?You can find revive on GitHub at github.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2018/05/28/revive-golang-golint-linter/">
 <meta name="twitter:title" content="Fast, extensible, configurable, and beautiful linter for Go - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?Introducing Revive When I started using Go, a few years ago, I noticed how opinionated the ecosystem was.">
+<meta name="twitter:description" content="About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&amp;rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&amp;hellip;for analyzing programs written in it?You can find revive on GitHub at github.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn\u0026rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it\u0026hellip;for analyzing programs written in it?\nIntroducing Revive When I started using Go, a few years ago, I noticed how opinionated the ecosystem was."
+    "description": "About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn\u0026rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it\u0026hellip;for analyzing programs written in it?\nYou can find revive on GitHub at github."
   }
 </script>
 
@@ -131,11 +131,13 @@
 
 
   <div class="article-body"><p>About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&#x2019;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&#x2026;for analyzing programs written in it?</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<div style="background-color: rgba(33, 150, 243, 0.1); padding: 20px; margin-bottom: 10px;">
+You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mgechev/revive">github.com/mgechev/revive</a>.
+</div>
+<amp-img src="/images/revive/demo.svg" alt="Revive demo" style="width: 100%; display: block; margin: auto"></amp-img>
 <h1 id="introducing-revive">Introducing Revive</h1>
 <p>When I started using Go, a few years ago, I noticed how opinionated the ecosystem was. First, the syntax of the language is very minimalistic. Such property reduces the expressiveness but also makes the code much easier to read, compared to languages such as Perl and Ruby.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/gopher.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img>
 <p>Second, the &#x201C;tabs vs. spaces&#x201D; debate is not relevant in the Go world. We all use tabs. That&#x2019;s it. Do I prefer tabs over spaces? It doesn&#x2019;t matter - <code>gofmt</code> already picked tabs for me. I also noticed that there&#x2019;s <code>golint</code>. It&#x2019;s a tool which enforces semantical &amp; syntactical practices. There are few things in <code>golint</code> different from most linters, I&#x2019;ve used in the past:</p>
 <ul>
 <li>It&#x2019;s not extensible. You can&#x2019;t include/exclude rules, and the project is not wide open for new rules.</li>
@@ -148,7 +150,8 @@
 <li><a href="https://github.com/golang/lint/blob/85993ffd0a6cd043291f3f63d45d656d97b165bd/lint.go#L123-L134">Hacky solutions</a> for ignoring files</li>
 <li>Development of <a href="https://github.com/alecthomas/gometalinter"><code>gometalinter</code></a> which wraps most existing tools by invoking them internally and consuming their output. The tool provides a way to filter the produced reports</li>
 </ul>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/revive.png" alt="Logo of Revive" style="width: 350px; display: block; margin: auto"></amp-img>
+<div style="margin-top: 20px; font-size: 12px; text-align: center">The logo of revive by <a href="https://github.com/hawkgs">Georgi Serev</a></div>
 <p>That&#x2019;s why I decided to make my toy linter project public and share it with the community. <strong><code>Revive</code> implements all the rules which <code>golint</code> has and the failures have the same concept of &#x201C;confidence&#x201D; that <code>golint</code> introduced</strong>. In fact, invoking <code>revive</code> with no flags has the same behavior as <code>golint</code>, with the difference that it runs faster. <code>Revive</code> builds on top of <code>golint</code> by:</p>
 <ul>
 <li>Allowing us to enable or disable rules using a configuration file.</li>
@@ -171,10 +174,10 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">go get github.com/mgechev/revive
 </code></pre></div><p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
 <p>Using the tool with no flags has the same behavior as <code>golint</code>. The magic happens when we add the <code>-formatter</code> flag:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto"></amp-img>
 <p>From the image above, we can see that we got 31 warnings for the <code>&quot;exported&quot;</code> rule. This rule is port of a built-in rule from <code>golint</code> which enforces practices for exported symbols (find the full set of rules <a href="https://github.com/mgechev/revive#available-rules">here</a>).</p>
 <p>If we prefer to ignore these warnings for the entire project, we can use a config file in TOML format:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto"></amp-img>
 <p>What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
 
@@ -240,7 +243,7 @@ warningCode = 0
 <li><code>errorCode</code> and <code>warningCode</code> - these two properties let us have different return codes for the different severities. We may want your errors to fail the CI but our warnings not to.</li>
 </ul>
 <p>The remaining lines are related to rule configuration. <strong>Each rule can be configured</strong> by setting its arguments and its severity. For example, the rule for cyclomatic complexity above, fails if in our codebase there&#x2019;s a construction which exceeds the cyclomatic complexity of 10.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/looking-upwards.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img>
 <h2 id="extensibility-and-contributions">Extensibility and Contributions</h2>
 <p>Initially, I wanted to let developers use be able to create external plugins which later could be referenced by the configuration file and loaded dynamically. Unfortunately, <code>-buildmode=plugin</code> has very <a href="https://golang.org/pkg/plugin/">limited support with known issues</a>.</p>
 <p>Ignoring this limitation, there are other two easy ways to add new rules and run them against your code:</p>
@@ -276,7 +279,7 @@ sys     0m1.114s
 <h2 id="conclusion">Conclusion</h2>
 <p><code>Revive</code> is a simple, fast, configurable, extensible, flexible, and beautiful linter for Go. It runs the linting rules on top of each file in a separate goroutine which improves the performance significantly. <code>Revive</code> lets us configure the individual rules and disable them for the entire project, individual files, or range of lines within a file. Last but not least, <code>revive</code> lets us use a set of built-in formatters which output the failures in a digestible, accessible, and easy to consume format.</p>
 <p>The project is continuously evolving and open for new contributions in the form of new rules, formatters, or bug fixes! If you want to create an even stricter linting preset, cut the coding style discussions in your team to the minimum, and focus on the essential things, <code>revive</code> may help.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/revive/gopher.png" alt="Drop mic" style="width: 350px; display: block; margin: auto"></amp-img>
 </div>
 
   <aside class="p-share">

@@ -131,7 +131,7 @@
 
 
   <div class="article-body"><p>In this blog post, we&#x2019;ll make a brief introduction to what Bazel is and how we can build our TypeScript projects with it. If you&#x2019;re already familiar with the problems that Bazel solves, feel free to skip to the section &#x201C;Building TypeScript with Bazel.&#x201D; You can find the example from this blog post in <a href="https://github.com/mgechev/bazel-demo">my GitHub account</a>.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/bazel-intro/banner.png" style="display: block; margin: auto"></amp-img>
 <h2 id="inside-googles-ci">Inside Google&#x2019;s CI</h2>
 <p>Google manages a massive amount of source code. There are dependencies between the individual projects, for example, the user interface of Google Cloud depends on Angular &amp; Angular Material, Angular Material depends on Angular, which depends on TypeScript.</p>
 <p>The projects in Google use a single version for the individual libraries in the organization (including the third-party ones.) This simplifies the dependency management in the company dramatically. Another huge bonus of this convention is that an update of a library affects all the dependent projects. This way everyone can take advantage of the latest security fixes, performance improvements, and bug fixes. Following this process means that when Microsoft releases a new version of TypeScript, it gets synced inside of Google as soon as possible so that all the projects can take advantage of it. As you can imagine, changes in the type system of TypeScript may break a lot of code!</p>
@@ -139,7 +139,7 @@
 <p>Often projects depend on other projects. For example, Google Cloud depends on its UI and back-end services. When we update TypeScript, we don&#x2019;t want to rebuild the back-end services if they don&#x2019;t rely on the language.</p>
 <h2 id="whats-bazel">What&#x2019;s Bazel</h2>
 <p>Google open sourced the software responsible for building most of our projects under the name <a href="https://bazel.build">Bazel</a>. Bazel is a powerful tool which can keep track of the dependencies between different <strong>packages and build targets</strong>. For simplicity, we can think of a build target as a build rule - for example, &#x201C;build a TypeScript library&#x201D;; a package, on the other hand, is a directory with the files inside of it and specification of the dependencies among them. In the Google Cloud example above, Bazel will come up with a dependency graph similar to the one below:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/bazel-intro/deps.svg" style="display: block; margin: auto"></amp-img>
 <p>For simplicity, we can map the boxes from the diagram to build targets. When the output of a given target changes, Bazel will calculate which other targets depend on it directly or transitively and rebuild them. In the example above, if TypeScript changes, Bazel will rebuild Angular, Angular Material, Google Cloud&#x2019;s UI but it&#x2019;ll leave the back-end services untouched.</p>
 <p>Some of the cool features of Bazel are:</p>
 <ol>
@@ -212,7 +212,9 @@
   <span class="n">package_json</span> <span class="o">=</span> <span class="s2">&quot;//:package.json&quot;</span><span class="p">,</span>
   <span class="n">yarn_lock</span> <span class="o">=</span> <span class="s2">&quot;//:yarn.lock&quot;</span><span class="p">,</span>
 <span class="p">)</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+Keep in mind that this is a low-level introduction. In reality, it&apos;s very likely that you never have to manage your Bazel configuration by yourself.
+</div>
 <p>The file above uses a language called <a href="https://github.com/bazelbuild/starlark">Starlark</a>, you can think of it as a subset of Python. Here&#x2019;s what we declare:</p>
 <ol>
 <li>The name of the workspace is <code>lang</code></li>
@@ -265,7 +267,7 @@
 </code></pre></div><p>Now run (you may need to install <code>graphviz</code> before that):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">./node_modules/.bin/bazel query --output<span class="o">=</span>graph ... <span class="p">|</span> dot -Tpng &gt; graph.png
 </code></pre></div><p>The output of the command looks as follows:</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/bazel-intro/graph.png" style="display: block; margin: auto"></amp-img>
 <p>We can see the dependencies between the individual targets - <code>:bundle</code> depends on the <code>:app</code> target, which depends on the <code>:interpreter</code>, <code>:parser</code>, and the <code>:lexer</code>. The output <code>//parser:parser</code> means &#x201C;the target <code>:parser</code> from the package <code>//parser</code>.</p>
 <p>Now we&#x2019;re ready to build the project! Run:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">./node_modules/.bin/bazel build :bundle
@@ -273,13 +275,17 @@
 <p>Now let us verify that everything works as expected by executing the produced bundle:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">node bazel-bin/bundle.js
 <span class="m">43</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+Once you build a target Bazel will create a bunch of symlinks in your workspace. They contain different build artifacts. If you prefer to get rid of them, you can configure Bazel with <code>bazel.rc</code>.
+</div>
 <h2 id="watch-mode">Watch Mode</h2>
 <p>How about watching the files of the project and rebuilding on change? For the purpose, we need to install <code>@bazel/ibazel</code> and run:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Don&#x2019;t forget yarn add -D @bazel/ibazel</span>
 ./node_modules/.bin/ibazel build :app
 </code></pre></div><p>With both <code>ibazel</code> and <code>bazel</code> we&#x2019;ll rebuild given target only when any of its direct or transitive dependencies change.</p>
-<!-- raw HTML omitted -->
+<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+Notice that in the <code>ibazel</code> example above we build the <code>:app</code> target. This is because we wouldn&#x2019;t be able to demonstrate incrementality with the <code>:bundle</code> target since at the time of writing the Rollup.js rule for Bazel is still under active development.
+</div>
 <p>Let us now create some shortcuts so that we don&#x2019;t directly invoke <code>./node_modules/.bin/bazel</code> or <code>./node_modules/.bin/ibazel</code> every time:</p>
 <p>Update <code>package.json</code> and add the following two scripts:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html ⚡="" amp="">
-  <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
+  <head><script async custom-element="amp-youtube" src="https://cdn.ampproject.org/v0/amp-youtube-0.1.js"></script><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
     
 <meta name="pinterest" content="nopin">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
@@ -138,14 +138,16 @@
 <p>If the second bullet point resonates with you, this blog post is probably not a good use of your time.</p>
 <p>Now let&#x2019;s focus on the first point. It&#x2019;s not easy to understand design patterns just by reading the <a href="https://www.amazon.com/Design-Patterns-Object-Oriented-Addison-Wesley-Professional-ebook/dp/B000SEIBB8">gang of four book</a> or dummy examples on Wikipedia. That&#x2019;s why I want to share a couple of real-world applications in open source projects that you can see and run yourself.</p>
 <p>I plan to start the series with content for how <a href="https://github.com/mgechev/ngrev">ngrev</a> uses State, Composite, and Memento. Today we&#x2019;re going to focus on the State pattern.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/oss-design-patterns-i/hero.png" style="display: block; margin: auto;"></amp-img>
 <h2 id="project-overview">Project Overview</h2>
 <p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an open-source application for reverse engineering of Angular apps. I developed it originally for my talk &#x201C;<a href="https://www.youtube.com/watch?v=tBV4IQwPssU">Mad Science with the Angular Compiler</a>&#x201D; for ng-conf 2017, but kept maintaining it over the years. Later on, the Angular team released Ivy and introduced a brand new compiler, which broke the parsing infrastructure of ngrev. Recently, however, <a href="https://github.com/GrandSchtroumpf">Fran&#xE7;ois</a> and <a href="https://github.com/vik-13">Viktor</a> helped me to revive the project.</p>
 <p>To get a better idea of the features of ngrev, I&#x2019;d recommend you to have a look at this short video:</p>
-<!-- raw HTML omitted -->
+<div style="display: block; margin: auto; width: 640px; height: 320px; padding-bottom:56.25%">
+    <amp-youtube data-videoid="vmdVRErKot4" width="640" height="360" layout="responsive">
+    </amp-youtube></div>
 <h3 id="high-level-architecture">High-Level Architecture</h3>
 <p>ngrev is an Electron app, so it has its main process, referenced as User Interface (UI) on the diagram below, and Render Process. Additionally, the Render Process also starts a Background Process used for heavy computations to keep the Render Process responsive to the UI queries.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/oss-design-patterns-i/ngrev-architecture.svg" style="display: block; margin: auto;"></amp-img>
 <p>All the communication within the processes of the application is happening via IPC (Inter-Process Communication) via <a href="https://en.wikipedia.org/wiki/Message_passing">message passing</a>.</p>
 <h3 id="implementation-overview">Implementation Overview</h3>
 <p>Let us look at how the app works, to get a better idea of where the state pattern fits in the picture.</p>
@@ -157,7 +159,7 @@
 <blockquote>
 <p>The state pattern is a behavioral software design pattern that allows an object to alter its behavior when its internal state changes. This pattern is close to the concept of finite-state machines. The state pattern can be interpreted as a strategy pattern, which is able to switch a strategy through invocations of methods defined in the pattern&#x2019;s interface.</p>
 </blockquote>
-<!-- raw HTML omitted -->
+<amp-img src="/images/oss-design-patterns-i/state.svg" style="display: block; margin: auto;"></amp-img>
 <p>The Background Process represents each view with an instance of a concrete implementation of the <code>State</code> class:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="kr">abstract</span> <span class="nx">getData</span><span class="p">()</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>

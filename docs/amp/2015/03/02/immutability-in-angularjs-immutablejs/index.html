@@ -354,11 +354,71 @@
 </code></pre></div><h3 id="results">Results</h3>
 <h4 id="plain-javascript-array">Plain JavaScript array</h4>
 <p>Here are the results I got from running the benchmark with plain JavaScript array:</p>
-<!-- raw HTML omitted -->
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>20</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>100</td>
+<td>2.517</td>
+<td>2.56</td>
+<td>2.573</td>
+<td>2.58</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>2.555</td>
+<td>2.675</td>
+<td>2.747</td>
+<td>2.853</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>2.861</td>
+<td>4.025</td>
+<td>7.736</td>
+<td>15.68</td>
+</tr>
+</tbody></table>
 <p>When the collection gets bigger the test case running time gets slower. When we increase the bindings (watchers), everything gets even slower because of the additional iterations performed by <code>$watchCollection</code>.</p>
 <h4 id="immutable-javascript-list">Immutable JavaScript list</h4>
 <p>Here are the results running the same code with immutable list:</p>
-<!-- raw HTML omitted -->
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>10</th>
+<th>20</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>100</td>
+<td>2.696</td>
+<td>2.507</td>
+<td>2.562</td>
+<td>2.569</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>2.715</td>
+<td>2.54</td>
+<td>2.569</td>
+<td>2.49</td>
+</tr>
+<tr>
+<td>10000</td>
+<td>2.832</td>
+<td>2.538</td>
+<td>2.599</td>
+<td>2.708</td>
+</tr>
+</tbody></table>
 <p>We see how much better performance the Immutable.js collection has. Once we increase the collection size and the number of watchers the running time of the <code>Plain JavaScript array</code> test case grows exponentially. In the case of immutable data the running time stays stable.</p>
 <p>On the other hand, since when using immutable list, the watcher runs with a constant complexity we have only the simple overhead caused by creating a new data-structure on each change.</p>
 <h3 id="dom-rendering">DOM rendering</h3>
@@ -391,7 +451,33 @@
 </ul>
 <p>The watcher added by <code>ng-repeat</code> is being ignored for now.</p>
 <p>And here are the results:</p>
-<!-- raw HTML omitted -->
+<table><thead>
+<tr>
+<th></th>
+<th>1</th>
+<th>5</th>
+<th>15</th>
+<th>25</th>
+<th>30</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Immutable</td>
+<td>14.714</td>
+<td>14.296</td>
+<td>14.8</td>
+<td>14.489</td>
+<td>14.331</td>
+</tr>
+<tr>
+<td>Plain</td>
+<td>13.308</td>
+<td>15.689</td>
+<td>23.415</td>
+<td>19.986</td>
+<td>27.526</td>
+</tr>
+</tbody></table>
 <p>Here is a chart for better understanding of the benchmark:</p>
 <p><a href="/images/immutable-angular/immutable-angular-1.png"><amp-img src="/images/immutable-angular/immutable-angular-1.png" alt=""></amp-img></a></p>
 <p>Initially the plain JavaScript array does better but once we increase the number of bindings the performance decreases dramatically.</p>

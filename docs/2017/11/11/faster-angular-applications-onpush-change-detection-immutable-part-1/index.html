@@ -99,7 +99,7 @@
 <p>On the other hand, the runtime performance of our applications is entirely in our own hands. Before going any further, lets put the practices that we&rsquo;re going to look at into the context of a simplified business application.</p>
 <h1 id="introducing-a-sample-business-application">Introducing a Sample Business Application</h1>
 <p>We&rsquo;re going to put all the practices for performance improvement into the context of this sample business application.</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/app.gif" style="border: 1px solid #ccc;">
 <p>On the GIF above you can see the business application that we&rsquo;re going to optimize. On the screen we have:</p>
 <ul>
 <li>Two lists of the employees in two different departments - Sales and R&amp;D.</li>
@@ -108,7 +108,7 @@
 <li>Each of the department lists has a text input where we can enter the name of a new employee. When we add a new item, we get the employees numeric value somehow (in our case we&rsquo;ll generate it), process it with our business calculation and visualize it on the screen.</li>
 </ul>
 <p>That&rsquo;s pretty much all we have! Let&rsquo;s take a brief look at the component structure of the application.</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/structure.png">
 <p>The image above shows the component structure of the application. We have a component called <code>AppComponent</code> which wraps the entire application, and two instances of the <code>EmployeeListComponent</code> which show the employees from the individual departments.</p>
 <p>Now lets take a look at the template of the <code>EmployeeListComponent</code>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span> <span class="na">title</span><span class="o">=</span><span class="s">&#34;Department&#34;</span><span class="p">&gt;</span>{{ department }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
@@ -178,8 +178,8 @@
 <p>The inputs are going to be passed from the <code>AppComponent</code> to its child <code>EmployeeListComponent</code> instances.</p>
 <h2 id="business-calculation">Business Calculation</h2>
 <p>Notice that we&rsquo;re mocking the business calculation with a function which calculates the number of Fibonacci from the employee&rsquo;s numeric value. This way instead of introducing a complicated business calculation we can focus entirely on the performance optimizations that we&rsquo;re going to perform. The Fibonacci function defined above has the same properties as any other mathematical function which we may use for calculating some meaningful value for the employee.</p>
-<p>You might have also noticed that we&rsquo;re calculating the <code>n</code><!-- raw HTML omitted -->th<!-- raw HTML omitted --> number of Fibonacci by performing an extremely inefficient calculation:</p>
-<!-- raw HTML omitted -->
+<p>You might have also noticed that we&rsquo;re calculating the <code>n</code><sup>th</sup> number of Fibonacci by performing an extremely inefficient calculation:</p>
+<img src="/images/faster-ng-apps-1/fibonacci.png" style="border: 1px solid #ccc;">
 <p>We do that to slow down our application artificially and simulate as precisely as possible a computationally intensive business calculation.</p>
 <h2 id="application-structure-recap">Application Structure Recap</h2>
 <ul>
@@ -189,13 +189,13 @@
 </ul>
 <h1 id="typing-speed">Typing Speed</h1>
 <p>On the image below you can see what the typing experience is when both lists have in total of 140 items. No, unfortunately, it does not look slow because of the frame rate of the GIF.</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/slow-typing.gif" style="border: 1px solid #ccc;">
 <p>There&rsquo;s obviously something going on. In order to debug it, we can turn to <code>Chrome DevTools &gt; Performance</code>:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/script-time.png" style="border: 1px solid #ccc;">
 <p>As we can see from this screenshot, as expected, most of the slowdowns happen because of a heavy computations happening in the main thread. If we switch to the <code>Bottom-Up</code> tab we can see the following:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/fibonacci-slow.png" style="border: 1px solid #ccc;">
 <p>We can see that the <code>fibonacci</code> function takes most of the script time. Lets see how often it gets invoked by adding a log statement inside of the <code>calculate</code> method defined in <code>EmployeeListComponent</code>:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/why-slow.gif" style="border: 1px solid #ccc;">
 <p>The image above shows that the <code>fibonacci</code> function gets invoked multiple times for each entry in both lists. In fact, it gets invoked at least twice for each item in the list when we type a single character:</p>
 <ul>
 <li>Once after the callbacks associated with the <code>mousedown</code> event of the input.</li>
@@ -313,10 +313,10 @@
 <h2 id="on-push-and-immutablejs">On Push and Immutable.js</h2>
 <p>In order to see what are going to be the performance implications of using <code>OnPush</code> with immutable.js, I developed an e2e test with protractor which types a number of characters in the text input for the sales department. On top of that, I run <a href="https://www.npmjs.com/package/@angular/benchpress">benchpress</a> on top of it which by using APIs provided by Google Chrome can measure the time required for this operation to be completed.</p>
 <p>The e2e test I run for both - the optimized version of the application (<code>OnPush</code> &amp; Immutable.js) and the non-optimized one. Here are the results:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/onpush-vs-non-optimized.png" style="border: 1px solid #ccc;">
 <p>It looks like we have a decent optimization. We&rsquo;re about 3x faster! Based on the benchmarks it looks like typing the string &ldquo;AngularConnect&rdquo; in the sales department&rsquo;s input took 13124.81ms for the non-optimized version and 5804.12ms for the optimized one.</p>
 <p>Lets see the typing speed again:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/slow-on-push.gif" style="border: 1px solid #ccc;">
 <p>All right, so we&rsquo;re still quite slow. As we can see, the <code>calculate</code> method gets executed less frequently but still gets invoked quite a lot. If we take a more careful look, we can notice that this time we recalculate only the numeric values for all the employees in the sales department. So, <code>OnPush</code> optimization <em>almost worked</em>.</p>
 <p>While typing, we&rsquo;re not getting new instances of the <code>salesList</code> since we&rsquo;re not applying any operations which are mutating it. Why we&rsquo;re getting the change detection for the sales department triggered?</p>
 <p>The answer lies in the way <code>OnPush</code> works. Using <code>OnPush</code> change detection strategy the change detection for a given component will be triggered when we pass a new value to any of its inputs <strong>or when an event inside of the component happens</strong>. The second part is not completely obvious from the documentation, but it can be seen in <strong><a href="https://github.com/angular/angular/blob/56238fe94e5022f2a4c450ba9a23022bfff81eb9/packages/core/test/linker/integration_spec.ts#L641-L677">this e2e test</a></strong> in the Angular&rsquo;s core repository.</p>
@@ -327,12 +327,12 @@
 <li><code>NameInputComponent</code> - responsible for holding the new name of the employee we want to add to the list.</li>
 <li><code>ListComponent</code> - will list the individual employees and calculate their numeric values:</li>
 </ul>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/enforce-separation-of-concerns.png">
 <p>Now lets run the e2e tests again and see what we got:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/fast-typing.png" style="border: 1px solid #ccc;">
 <p>It may look like there&rsquo;s a glitch in the chart. No there isn&rsquo;t, we&rsquo;re just hundreds of times faster - 13124.81ms vs. 10.45ms for typing the string &ldquo;AngularConnect.&rdquo;</p>
 <p>And here&rsquo;s the user experience when typing in the text input for the optimized version:</p>
-<!-- raw HTML omitted -->
+<img src="/images/faster-ng-apps-1/fast-typing.gif" style="border: 1px solid #ccc;">
 <h1 id="conclusion">Conclusion</h1>
 <p>In this part of the series &ldquo;Faster Angular Applications,&rdquo; we covered how we can optimize an Angular application regarding runtime performance by using immutable data structures and a custom change detection strategy.</p>
 <p>We started by introducing a sample business application which lists two departments of employees and using a heavy computation calculates a numeric value for each of them.</p>

@@ -100,7 +100,7 @@
 <p>So far so good, but creation of a new data structure will have two major performance impacts:</p>
 <ul>
 <li>Copying the initial collection and making the change, before &ldquo;freezing it&rdquo;.</li>
-<li><!-- raw HTML omitted -->More work for the garbage collector.<!-- raw HTML omitted --></li>
+<li><strike>More work for the garbage collector.</strike></li>
 </ul>
 <p>In &ldquo;<a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">Boost the Performance of an AngularJS Application Using Immutable Data - Part 2</a>&ldquo;we saw that the second point is not such a big concern but copying the entire data structure slows us down significantly.</p>
 <p>The data structure described in this blog post could be <a href="https://github.com/mgechev/versionable-collections">found at my GitHub profile</a>, it does further optimizations for even faster collection data bindings..</p>
@@ -240,7 +240,7 @@
 <p>With 1k collection size the immutable list performs better than the built-in JavaScript array and is with almost constant running time (the bindings almost don&rsquo;t impact the running time, since they have constant complexity). The <code>VersionableList</code> performs even better since it doesn&rsquo;t require copying of the collection on change.</p>
 <h3 id="10000-entries">10,000 entries</h3>
 <p><img src="/images/faster-collections/data-size-10000.png" alt=""></p>
-<p>The supreme champion is the <code>VersionableList</code>. The interesting fact here is that the immutable list performs just slightly worst than the <code>VersionableList</code> list, although on each change <!-- raw HTML omitted -->a new collection with 10,000 items is created<!-- raw HTML omitted --> a lot of operations for maintaining the <a href="https://en.wikipedia.org/wiki/Persistent_data_structure">persistent data structure</a> are performed.</p>
+<p>The supreme champion is the <code>VersionableList</code>. The interesting fact here is that the immutable list performs just slightly worst than the <code>VersionableList</code> list, although on each change <strike>a new collection with 10,000 items is created</strike> a lot of operations for maintaining the <a href="https://en.wikipedia.org/wiki/Persistent_data_structure">persistent data structure</a> are performed.</p>
 <h2 id="further-optimization">Further Optimization</h2>
 <p>There&rsquo;s no way to go much further without making any optimizations in the AngularJS' internal change detection. We may gain slight performance improvement if AngularJS doesn&rsquo;t invoke <code>hasOwnProperty</code> in the <code>$watchCollection</code> dirty checking strategy, since the poor performance of the method. This will require us to change <code>VersionableList</code> to something &ldquo;array-like&rdquo; in order to enter <a href="https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601">the second case of <code>$watchCollection</code>&rsquo;s interceptor</a>.</p>
 <h2 id="conclusion">Conclusion</h2>

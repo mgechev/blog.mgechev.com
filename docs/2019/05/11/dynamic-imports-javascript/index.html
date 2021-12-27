@@ -86,7 +86,7 @@ As engineers, we often have the perception that dynamic == good. With statically
                 
                 <section id="post-body">
                     <p>Since Angular version 8, we support dynamic imports in <code>loadChildren</code> in the route declaration. In this article, I want to give more information about why dynamic imports could be tricky to handle from tooling perspective and why you should be careful with them.</p>
-<!-- raw HTML omitted -->
+<img src="/images/dynamic-imports/imports.png" style="display: block; margin: auto; width: 100%;">
 <p>As engineers, we often have the perception that <code>dynamic == good</code>. With statically typed languages, such as TypeScript, this has shifted over the years. Because of compile-time checking, more folks started appreciating what tooling can give us if we provide statically analyzable information at build time.</p>
 <p>In the past, I&rsquo;ve heard a lot of complaints around the static imports in JavaScript:</p>
 <blockquote>
@@ -189,11 +189,11 @@ Entrypoint <span class="nv">main</span> <span class="o">=</span> main.js
 
 <span class="c1">// bar.ts
 </span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./foo&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><img src="/images/dynamic-imports/foo-num.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;">
 <p>If we open <code>bar.ts</code> in a text editor and we point over <code>m.foo</code>, we&rsquo;ll see that it&rsquo;s of type <code>number</code>. This means that TypeScript&rsquo;s type inference has tracked the reference and figured out its type. Now, change <code>bar.ts</code> to:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// bar.ts
 </span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&#39;./foo&#39;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
-</code></pre></div><!-- raw HTML omitted -->
+</code></pre></div><img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;">
 <p>If we point over <code>m.foo</code> again, we&rsquo;ll find out that it has type <code>any</code> (TypeScript version 3.1.3). Why both differ? When TypeScript finds out that we&rsquo;ve passed a string literal to the dynamic import it follows the module reference and performs type inference; if it finds an expression, it fallbacks to type <code>any</code>.</p>
 <p>Let&rsquo;s go through a quick recap of our observations:</p>
 <ul>

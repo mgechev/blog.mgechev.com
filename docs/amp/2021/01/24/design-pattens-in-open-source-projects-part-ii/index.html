@@ -131,23 +131,26 @@
 
 
   <div class="article-body"><p>This blog post introduces another design pattern into the context of <a href="https://github.com/mgechev/ngrev">ngrev</a>. If you&#x2019;re not yet familiar with the project, I&#x2019;d strongly recommend taking 2 minutes to the introduction and &#x201C;Project Overview&#x201D; sections in the <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">first part</a> of the series.</p>
-<!-- raw HTML omitted -->
+<amp-img src="/images/oss-design-patterns-ii/hero.jpg" style="display: block; margin: auto;"></amp-img>
 <p>If you did not take the time, <a href="https://github.com/mgechev/ngrev">ngrev</a> is an Electron app that visualizes the structure of an <a href="https://angular.io">Angular</a> app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a <a href="https://en.wikipedia.org/wiki/State_pattern">state</a> object. You can read more about the state pattern and its application in <a href="https://github.com/mgechev/ngrev">ngrev</a> <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">here</a>.</p>
 <p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an Angular app developed with TypeScript. At the same time, however, <strong>the post is conceptual, so even if you&#x2019;re not familiar with Angular, TypeScript, or Web development, you should be able to extract value.</strong></p>
 <h2 id="composite-pattern">Composite Pattern</h2>
 <blockquote>
 <p>In software engineering, the composite pattern is a structural design pattern. The composite pattern describes a group of objects treated the same way as a single instance of the same type of object. A composite intends to &#x201C;compose&#x201D; objects into tree structures to represent part-whole hierarchies. Implementing the composite pattern lets clients treat individual objects and compositions uniformly.</p>
 </blockquote>
-<!-- raw HTML omitted -->
+<amp-img src="/images/oss-design-patterns-ii/composite.svg" style="display: block; margin: auto;"></amp-img>
 <p>The composite pattern is arguably one of the most popular design patterns. You find its applications all over software engineering and computer science. For example, in file systems the leaves are the individual files and the composites are directories because they can contain other directories and files. In compiler design we can find the leaves being terminals and the composites being non-terminal <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a> nodes.</p>
 <p>In the case of <a href="https://github.com/mgechev/ngrev">ngrev</a>, both the composites and the leaves are instances of the state classes. The way we use the composite pattern here is attractive in at least two ways - the fact that we&#x2019;re using the pattern itself and the mechanism it interacts with the <a href="https://en.wikipedia.org/wiki/State_pattern">state design pattern</a>.</p>
 <p>To understand why the composite design pattern helps us in <a href="https://github.com/mgechev/ngrev">ngrev</a>, let us look at two of the views in the application:</p>
-<!-- raw HTML omitted -->
+<div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Dependencies</div>
+<amp-img src="/images/oss-design-patterns-ii/module-dependencies.png" style="display: block; margin: auto;"></amp-img>
 <p>Each <code>NgModule</code> in Angular can depend on 0 or more other modules. This view shows the dependencies of the <code>AnnounceBarModule</code>. <a href="https://github.com/mgechev/ngrev">ngrev</a> implements this functionality with the <code>ModuleTreeState</code> class.</p>
-<!-- raw HTML omitted -->
+<div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Declarations</div>
+<amp-img src="/images/oss-design-patterns-ii/module-declarations.png" style="display: block; margin: auto;"></amp-img>
 <p>Additionally, each module could have many declarations; for example, the <code>SharedModule</code> from the second image declares and exports <code>SearchResultComponent</code> and <code>SelectComponent</code>. In <a href="https://github.com/mgechev/ngrev">ngrev</a>, we implement this functionality with the <code>ModuleState</code> class.</p>
 <p>Now let us look at the default view of <a href="https://github.com/mgechev/ngrev">ngrev</a>:</p>
-<!-- raw HTML omitted -->
+<div style="text-align: center; font-size: 0.9em; font-weight: bold;">App</div>
+<amp-img src="/images/oss-design-patterns-ii/app.png" style="display: block; margin: auto;"></amp-img>
 <p>This view shows a visualization of the dependencies between all the modules in our app and the declarations/exports for each one of them. Internally, <a href="https://github.com/mgechev/ngrev">ngrev</a> implements it with the <code>AppState</code> class.</p>
 <p>Even for a small apps like <a href="https://angular.io">angular.io</a> this could get quite messy; that&#x2019;s why we have the more specific views from above. But also notice that there&#x2019;s an overlap between the 3 visualizations - the application view is a composition of the views showing module dependencies and module declarations.</p>
 <p>What do I mean by composition? If we suppose that <code>ModuleState</code> and <code>ModuleTreeState</code> return sets of nodes and edges, their union will be a subset of the nodes and edges <code>AppState</code> returns.</p>

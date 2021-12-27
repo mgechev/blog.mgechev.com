@@ -68,7 +68,7 @@
                         <i class="fa fa-pencil-square-o"></i> Edit
                     </a>
                     · Jan 21, 2017
-                    · 9 minutes read
+                    · 10 minutes read
                     · <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
                       <span class="tags">
                       
@@ -103,7 +103,7 @@
 <p><em>If you find anything important missing, please don&rsquo;t hesitate to comment below.</em></p>
 <h1 id="writing-platform-independent-components">Writing platform independent components</h1>
 <p>One of the greatest strengths of Angular is that the framework is platform agnostic. Basically, all the modules which have to interact with the underlying platform depend on an abstraction. This is the abstract <code>Renderer</code>. The code you write should also depend on an abstraction, instead of a concrete platform APIs (see the <a href="https://en.wikipedia.org/wiki/Dependency_inversion_principle">dependency inversion principle</a>). In short, if you&rsquo;re building your library for the Web, you should not touch the DOM directly because this will make it unable to work in Web Workers and on the server and most developers need that!</p>
-<!-- raw HTML omitted -->
+<img src="/images/ng-lib/decouple.jpg" alt="Decouple package" style="display: block; margin: auto">
 <p>Lets take a look at an example:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// ANTI-PATTERN
 </span><span class="c1"></span>
@@ -211,7 +211,7 @@
 <li>Developers should be able to use them as easy as possible in development mode, i.e. no transpilation of any kind should be required.</li>
 <li>We need to keep the package lean to save network bandwidth and download time.</li>
 </ol>
-<!-- raw HTML omitted -->
+<img src="/images/ng-lib/package.jpg" alt="Distribute package" style="display: block; margin: auto">
 <p>In order to keep the module tree-shakable, we need to distribute it in a way that it uses ES2015 modules (also known as <code>esm</code>). By having it in this format bundlers, such as <a href="http://rollupjs.org/">Rollup</a> and <a href="https://webpack.github.io/">Webpack</a>, will be able to get rid of unused exports.</p>
 <p>For this purpose we can use <code>tsc</code> so our <code>tsconfig.json</code> should look something like:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
@@ -293,7 +293,7 @@
 <span class="p">}</span>
 </code></pre></div><h1 id="compatibility-with-angulars-aot-compiler">Compatibility with Angular&rsquo;s AoT Compiler</h1>
 <p>Ahead-of-Time compilation is a great feature and we need to develop &amp; distribute our modules compatible with the compiler.</p>
-<!-- raw HTML omitted -->
+<img src="/images/ng-lib/compatible.jpg" alt="Compatible with compiler" style="display: block; margin: auto">
 <p>If we distribute our module as JavaScript without any additional metadata, users who depend on them will not be able to compile their Angular application. But how can we provide metadata to <code>ngc</code>? Well, we can include the TypeScript version of our modules as well&hellip;but it&rsquo;s not required.</p>
 <p>Instead, we should precompile our module with <code>ngc</code> and enable the <code>skipTemplateCodegen</code> flag in <code>tsconfig.json</code>&rsquo;s <code>angularCompilerOptions</code>. After the last update our <code>tsconfig.json</code> will look like:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
@@ -361,11 +361,29 @@
 <li>It uses a component as an attribute. This is a practice which violation is acceptable in this specific case because of implementation details of the component.</li>
 </ul>
 <p><em>Note that using <code>ng</code> as prefix of selector for your directives/components is not recommended because of possible collisions with components coming from Google.</em></p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<div style="padding: 20px; background-color: #E3F8FF;">
+<h1 id="checklist">Distributing an Angular Library - Checklist</h1>
 <p>In this section we&rsquo;ll wrap things up, by briefly mentioning each point you need to consider:</p>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<ul>
+  <li>Try not to directly access DOM APIs (i.e. follow the dependency inversion principle).</li>
+  <li>Provide <code>esm</code> version of your library in order to allow tree-shaking.
+    <ul>
+      <li>Reference the <code>esm</code> version under the <code>module</code> and <code>jsnext:main</code> properties in <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Provide ES5 UMD bundle of your library.
+    <ul>
+      <li>Reference the bundle under the <code>main</code> property of your <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Provide the type definitions of your library by generating them with <code>tsc</code> with the <code>declaration</code> flag set to <code>true</code>.
+    <ul>
+      <li>Reference the type definitions corresponding to the main module of your package in the <code>types</code> property in your <code>package.json</code>.</li>
+    </ul>
+  </li>
+  <li>Compile your library with <code>ngc</code> and include the generated <code>*.metadata.json</code> files in your package. The <code>tsconfig.json</code> used by <code>ngc</code> should have <code>skipTemplateCodegen</code> set to true, under <code>angularCompilerOptions</code>.</li>
+</ul>
+</div>
 <h1 id="conclusion">Conclusion</h1>
 <p>In this blog post we briefly explained the most important things you need to consider when it comes to distributing your Angular library.</p>
 <p>We explained how to keep the library decoupled from the underlying platform. After that, we went to distributing our code in a way that it&rsquo;s tree-shakable and has minimum overhead over the user. As next section we described how to make the library friendly to the Angular&rsquo;s Ahead-of-Time compiler.</p>

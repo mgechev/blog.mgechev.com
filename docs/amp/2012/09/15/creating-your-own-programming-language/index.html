@@ -135,15 +135,30 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IStatement</span> <span class="o">{</span>
 &#xA0;&#xA0;&#xA0;&#xA0;<span class="kt">void</span> <span class="nf">execute</span><span class="o">();</span>
 <span class="o">}</span></code></pre></div>
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
-<!-- raw HTML omitted -->
+<div>
+</div>
+<div>
+  Another key part is the interface IExpression which was something similar but:
+</div>
+<div>
+</div>
+<div>
+  <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IExpression</span> <span class="o">{</span>
+&#xA0;&#xA0;&#xA0;&#xA0;<span class="n">Value</span> <span class="nf">evaluate</span><span class="o">();</span>
+<span class="o">}</span></code></pre></div>
+</div>
+<div>
+</div>
+<div>
+  As you might guess Value is a terminal which is a class defined by myself. The statement actually is a list of IStatement-s (Composite). Well it&#x2019;s not exactly accurate because the if statement, for example, which also implements IStatement has a list of &#xA0;IStatements and a condition which is actually an IExpression :-). Depending on the current token I make decisions what kind of statement (or expression) should I create. Very important moment is that the variables must be variables in the statements even after the statement is evaluated! Why? Because there&#x2019;s a while statement. The statements inside the while statement are executed multiple times so if we substitute the variable with it&#x2019;s value we will loose our statement and possibly create an infinite loop. All expressions are parsed into a <a href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">reverse polish notation</a>. This is an easy algorithm which can be found just everywhere...Expressions are lists of symbols. A single symbol could be &#x2013; variable, value (boolean/string/number) or an operator. After an expression is created it can be evaluated with it&#x2019;s method evaluate (implemented because of the implementation of IExpression). Evaluating expressions in reverse polish notation is quite easy.
+</div>
+<div>
+</div>
+<div>
+  With this construction the interpreting process is extremely simple:
+</div>
+<div>
+</div>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Java" data-lang="Java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">interpret</span><span class="o">()</span> <span class="o">{</span>
     <span class="n">Iterator</span> <span class="n">iter</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">statements</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
     <span class="n">IStatement</span> <span class="n">current</span><span class="o">;</span>
