@@ -47,12 +47,14 @@ A few of my open source projects:
 
 <div class="top-projects">
   <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
-  <a href="http://codelyzer.com/"><img src="/images/about/codelyzer.png"></a>
+  <a href="http://angular.io/"><img src="/images/about/angular.png"></a>
   <a href="http://revive.run"><img src="/images/about/revive.png"></a>
 </div>
 
 ### Popular
 
+- [Codelyzer](https://github.com/mgechev/codelyzer)
+- [Angular DevTools](https://angular.io/devtools)
 - [The official Angular style guide](https://angular.io/styleguide)
 - [The first AngularJS style guide](https://github.com/mgechev/angularjs-style-guide)
 - [angular-seed](https://github.com/mgechev/angular-seed)
