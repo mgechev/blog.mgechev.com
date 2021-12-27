@@ -66,8 +66,8 @@ A few of my open source projects:
 
 #### Angular
 
-- [Angular - as a lead for DevRel I've worked across the entire platform](https://angular.io/)
-- [Angular DevTools - developer tools for Angular](https://angular.io/devtools)
+- [Angular](https://angular.io/) - as a DevRel lead I've worked across the entire platform
+- [Angular DevTools](https://angular.io/devtools) - developer tools for Angular
 - [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
 - [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
 - [Angular AOP - a framework for aspect-oriented programming with AngularJS](https://github.com/mgechev/angular-aop)
@@ -105,7 +105,6 @@ A few of my open source projects:
 ### Interviews
 
 - [Bulgarian National Radio](https://bnr.bg/en/post/101542983/minko-gechev-about-the-road-from-troyan-to-a-leading-position-in-google)
-- [Software Engineering Daily](https://softwareengineeringdaily.com/2021/11/05/angular-dev-tools-with-minko-gechev/)
 - [Angular Discord Q&A](https://www.youtube.com/watch?v=ax0JXFeCBIg)
 - [Behind the Rise of JavaScript Front-end Frameworks](https://www.welcometothejungle.com/en/articles/btc-javascript-frontend-frameworks)
 - [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)
@@ -123,6 +122,7 @@ A few of my open source projects:
 
 ### Podcasts
 
+- [Software Engineering Daily](https://softwareengineeringdaily.com/2021/11/05/angular-dev-tools-with-minko-gechev/)
 - [Modern Web Podcast - All About Compilers with Minko Gechev, Kristofer Baxter, Radoslav Kirov, Jake Dohm, and Rob Ocel](https://dev.to/modernweb/s06e3-modern-web-podcast-all-about-compilers-with-minko-gechev-kristofer-baxter-radoslav-kirov-jake-dohm-and-rob-ocel)
 - [Codelyzer and Static Analysis Tools for Angular with Minko Gechev](https://dev.to/adventuresinangular/aia-147-codelyzer-and-static-analysis-tools-for-angular-with-minko-gechev)
 - [Angular Tooling with Minko Gechev](https://www.youtube.com/watch?v=PZ0WoyLbrso)
