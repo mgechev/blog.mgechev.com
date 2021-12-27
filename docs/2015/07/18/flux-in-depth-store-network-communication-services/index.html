@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Flux in Depth. Store and Network Communication. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -92,58 +92,36 @@
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>This is the second, and probably be the last, blog post of the series &ldquo;Flux in Depth&rdquo;. In <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">the first post</a> we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.</p>
-
+                    <p>This is the second, and probably be the last, blog post of the series &ldquo;Flux in Depth&rdquo;. In <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">the first post</a> we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.</p>
 <h2 id="store">Store</h2>
-
 <p>As we said, the UI in flux is built with pure components, which are (mostly) not holding any state. However, our application can&rsquo;t be completely stateless. We have at least business data, UI state and an application configuration. The store is the place, which keeps this data.</p>
-
 <p>Lets peek at the flux data flow once again:</p>
-
-<p><img src="/images/overview-components/flux-overview.png" alt="High-Level Overview" /></p>
-
+<p><img src="/images/overview-components/flux-overview.png" alt="High-Level Overview"></p>
 <p>As we can see from the diagram above, the data flow starts in the view, goes to an action, which invokes the dispatcher, after that the store catches dispatcher&rsquo;s event and in the end the data arrives in the view again. Alright, so the store is responsible for providing the data to the view. So far so good. How we can make the store deliver the required by the view data? Well, it can trigger an event! Recently observables are getting quite popular. For good or bad, they are going to be included in the JavaScript standard. If this makes you angry because you have to learn new things and JavaScript is getting fatter, you can find the guy who stays behind all of this here:</p>
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/lil4YCCXRYc" frameborder="0" allowfullscreen></iframe>
-
+<!-- raw HTML omitted -->
 <p>Observables are good way of building our store. If the view is able to observe the store for changes, it can update itself once the store updates. Lets take a look at the following design pattern (yeah, my friends already noticed I&rsquo;m talking about design patterns constantly and did an intervention for me but didn&rsquo;t help).</p>
-
-<p><a href="/images/intervention.jpg"><img src="/images/intervention.jpg" alt="Intervention" /></a></p>
-
+<p><a href="/images/intervention.jpg"><img src="/images/intervention.jpg" alt="Intervention"></a></p>
 <h3 id="chain-of-responsibility">Chain of Responsibility</h3>
-
 <p>This is a design pattern, which is exclusively used in the event-driven programming. Lets change the context and talk about DOM for a while. I bet you know that you can listen for any event on the document, for example once a user clicks on a button the event will propagate to the root of the DOM tree (eventually, if nothing stop it) and be caught by your listener:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="sb">`You actually clicked on element with #</span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">, not on document`</span><span class="p">);</span>
   <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span> <span class="o">===</span> <span class="nb">document</span><span class="p">)</span>
 <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;awesome-button&#34;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span></code></pre></div>
-<p><a class="jsbin-embed" href="http://jsbin.com/hezizi/embed?output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.34.0"></script></p>
-
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;awesome-button&#34;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div><p><!-- raw HTML omitted -->JS Bin on jsbin.com<!-- raw HTML omitted --><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
 <p>If you click on the <code>awesome-button</code>, you&rsquo;ll see two alert boxes: &ldquo;You actually clicked on element with #awesome-button, not directly on document&rdquo; and &ldquo;true&rdquo;. If you change the third parameter of <code>addEventListener</code> to <code>true</code>, the event will propagate in the opposite direction (i.e. from top to bottom, capturing mode).</p>
-
 <p>Why I said all of this? Well, this is the pattern Chain of Responsibility:</p>
-
 <blockquote>
 <p>In object-oriented design, the chain-of-responsibility pattern is a design pattern consisting of a source of command objects and a series of processing objects. Each processing object contains logic that defines the types of command objects that it can handle; the rest are passed to the next processing object in the chain. A mechanism also exists for adding new processing objects to the end of this chain.</p>
 </blockquote>
-
 <p>Or if you&rsquo;re have more enterprise taste, here is the UML class diagram of this design pattern:</p>
-
-<p><a href="/images/patterns/behavioral/chain-of-responsibilities.svg"><img src="/images/patterns/behavioral/chain-of-responsibilities.svg" alt="Chain of Responsibility" /></a></p>
-
+<p><a href="/images/patterns/behavioral/chain-of-responsibilities.svg"><img src="/images/patterns/behavioral/chain-of-responsibilities.svg" alt="Chain of Responsibility"></a></p>
 <p>Why do we need Chain of Responsibility? Well, our store is a tree of objects, once a property in an internal node in the tree changes, it&rsquo;ll propagate this change to the root. The root component in the view will listen for events triggered by the store object. Once it detects a change it&rsquo;ll set its state. I&rsquo;m sure it sounds weird and obfuscated, lets take a look at a diagram, which illustrates a simple chat application:</p>
-
 <h3 id="from-the-store-to-the-view">From the Store to the View</h3>
-
 <p>Lets take a look at the following diagram, it illustrates the initial setup of our application:</p>
-
-<p><a href="/images/store-services/initial-setup.png"><img src="/images/store-services/initial-setup.png" alt="Initial Setup" /></a></p>
-
+<p><a href="/images/store-services/initial-setup.png"><img src="/images/store-services/initial-setup.png" alt="Initial Setup"></a></p>
 <p>The tree on the left-hand side is the store, which serialized into JSON looks the following way:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
   <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;foo&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
     <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
@@ -151,14 +129,14 @@
   <span class="nt">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nt">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;Hey foo&#34;</span><span class="p">,</span> <span class="nt">&#34;by&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&#34;timestamp&#34;</span><span class="p">:</span> <span class="mi">1437147880686</span> <span class="p">}</span>
   <span class="p">]</span>
-<span class="p">}</span></code></pre></div>
-<p>The tree on the right-hand side is the component tree. We already described the component trees in the <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">previous part</a>. Here is a snippet, which shows the relation between the <code>Chat</code> store and the <code>ChatBox</code> component:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&#39;../store/Chat&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>The tree on the right-hand side is the component tree. We already described the component trees in the <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">previous part</a>. Here is a snippet, which shows the relation between the <code>Chat</code> store and the <code>ChatBox</code> component:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&#39;../store/Chat&#39;</span><span class="p">;</span>
 
-<span class="k">class</span> <span class="nx">ChatBox</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<span class="kr">class</span> <span class="nx">ChatBox</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
     <span class="nx">Chat</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span>
     <span class="p">});</span>
@@ -172,34 +150,22 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>Basically, the root component (<code>ChatBox</code>) is subscribed to the <code>change</code> event of the <code>Chat</code>. When the <code>Chat</code> emits a <code>change</code> event, the <code>ChatBox</code> sets its state to be the current store and passes the store&rsquo;s content down the component tree. That&rsquo;s it.</p>
-
+</code></pre></div><p>Basically, the root component (<code>ChatBox</code>) is subscribed to the <code>change</code> event of the <code>Chat</code>. When the <code>Chat</code> emits a <code>change</code> event, the <code>ChatBox</code> sets its state to be the current store and passes the store&rsquo;s content down the component tree. That&rsquo;s it.</p>
 <p>What happens if something change our store?</p>
-
-<p><a href="/images/store-services/message-change.png"><img src="/images/store-services/message-change.png" alt="Change of store" /></a></p>
-
+<p><a href="/images/store-services/message-change.png"><img src="/images/store-services/message-change.png" alt="Change of store"></a></p>
 <p>On the diagram above something changed the first message in the <code>Chat</code> store (lets say the <code>text</code> property was changed). Once a property in a <code>message</code> changes, the message emits an event and propagates it to the parent (step <code>1</code>) which means that the event reaches the <code>messages</code> collection. The <code>messages</code> collection triggers change event and propagates the event to the <code>chat</code> (root object, step <code>2</code>). The <code>chat</code> object emits a change event, which is being caught by the <code>ChatBox</code> component, which sets its state to the content of the store. That&rsquo;s it&hellip;</p>
-
 <p>In the next section, we&rsquo;re going to take a look how the view can modify the store using Actions.</p>
-
 <h3 id="from-the-view-to-the-store">From the View to the Store</h3>
-
 <p>Now lets suppose the user enters a message and sends it. Inside a send handler, defined in <code>MessageInput</code> we invoke the action <code>addMessage(text, user)</code> the <code>MessageActions</code> object (step 1) (peek at the flux overview diagram above). The <code>MessageActions</code> explicitly invokes the <code>Dispatcher</code> (step 2), which throws an event. This event is being handled by the <code>Messages</code> component (step 3), which adds the message to the list of messages and triggers a <code>change</code> event. Now we&rsquo;re going to the previous case - &ldquo;Store to View&rdquo;. All of this is better illustrated on the following diagram:</p>
-
-<p><a href="/images/store-services/component-update-store.png"><img src="/images/store-services/component-update-store.png" alt="Component updates store" /></a></p>
-
+<p><a href="/images/store-services/component-update-store.png"><img src="/images/store-services/component-update-store.png" alt="Component updates store"></a></p>
 <h3 id="model-vs-ui-state">Model vs UI state</h3>
-
 <p>Most likely you&rsquo;re building an application, which works on business data over given domain. For example, in our case we had:</p>
-
 <ul>
 <li>Messages</li>
 <li>Users</li>
 </ul>
-
 <p>However, in most cases, this is not enough. Your application also has a UI state. For example, whether given dialog is opened or no, what is the dialog&rsquo;s position, etc. The data, which defines now your components will be rendered, depends on both - your UI state and the model. This is the reason I create a combined store, which presents both. For example, if we add a few dialogs to our chat application, the JSON representation of the store may look like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
   <span class="nt">&#34;users&#34;</span><span class="p">:</span> <span class="p">[</span>
     <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;foo&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
     <span class="p">{</span> <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;bar&#34;</span><span class="p">,</span> <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
@@ -211,111 +177,67 @@
     <span class="nt">&#34;nicknameInput&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
     <span class="nt">&#34;editMessage&#34;</span><span class="p">:</span> <span class="kc">false</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-<p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
 <h3 id="quick-faq">Quick FAQ:</h3>
-
-<p><em>Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position, we should go through the entire described data flow?</em><br>
+<p><em>Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position, we should go through the entire described data flow?</em><!-- raw HTML omitted -->
 This doesn&rsquo;t seem like quite a good idea. If you have a big store and huge component tree, re-rendering it on mouse move will impact the performance of your application dramatically! What will be the biggest slowdown? Well, you&rsquo;ll have to serialize the store to a POJO (Plain Old JavaScript Object), later you need to pass it to the root component, which is responsible for passing it down to its children and so on. And all of this because of two changed numbers? It is completely unnecessary. In such cases I&rsquo;d recommend adding event listeners in the specific component, which depends on the mouse position and creating a separate store for it.</p>
-
 <p>For example, if you&rsquo;re using <code>react-dnd</code> in your application, the drag &amp; drop component has its own state, which doesn&rsquo;t have to be merged with the rest of the store. It can live independently. Let me show you what I mean on the following diagram:</p>
-
-<p><a href="/images/store-services/two-stores.png"><img src="/images/store-services/two-stores.png" alt="Two Stores" /></a></p>
-
+<p><a href="/images/store-services/two-stores.png"><img src="/images/store-services/two-stores.png" alt="Two Stores"></a></p>
 <p>In this example, when the store containing the dialog position updates it does not require update of the entire component tree.</p>
-
-<p><em>How should I make my store trigger events?</em><br>
+<p><em>How should I make my store trigger events?</em><!-- raw HTML omitted -->
 The same way you did that in the dispatcher - use <code>EventEmitter</code>. Since we want to implement Chain of Responsibility, you will be required to keep reference to the object&rsquo;s parent in order to propagate the event.</p>
-
 <h2 id="remote-services">Remote Services</h2>
-
 <p>This is a hot topic. Most of the single-page applications require communication with services through a transport protocol, in order to fetch and store data. However, in the overview of flux there&rsquo;s no such thing as <code>TransportChannel</code>, <code>RemoteService</code> or whatever. If there are involved a lot of different protocols (for example I&rsquo;m working on a application, which communicates with other applications and services through HTTP, WebSocket and WebRTC data channel) it could get a bit hairy if you don&rsquo;t create the proper abstractions.</p>
-
 <p>In this section I&rsquo;ll describe the basics of the network communication and later we&rsquo;re going to discuss more interesting details.</p>
-
 <p>Alright, in the diagram which shows the overview of flux there is a &ldquo;hanging&rdquo; action. There&rsquo;s no incoming arrow to the leftmost action but there&rsquo;s outgoing one:</p>
-
-<p><img src="/images/store-services/flux-overview.png" alt="Overview Incoming Action" /></p>
-
+<p><img src="/images/store-services/flux-overview.png" alt="Overview Incoming Action"></p>
 <h3 id="from-the-network-to-the-ui">From the Network to the UI</h3>
-
 <p>We can use this &ldquo;hanging&rdquo; action in order to integrate the communication with the external services. Lets take a look at the following picture, in order to visualize basic communication with external service:</p>
-
-<p><a href="/images/store-services/basic-service.png"><img src="/images/store-services/basic-service.png" alt="Basic Service Communication" /></a></p>
-
+<p><a href="/images/store-services/basic-service.png"><img src="/images/store-services/basic-service.png" alt="Basic Service Communication"></a></p>
 <p>In it we can trace how a network event is being processed. The cloud is an external service/application. Initially we get a new message, it is being processed by the <code>Service</code> object (it is black on the diagram because it is like a black box for us right now, it may get quite complex depending on your application), later the semantics behind the received message is found and based on it, <code>Service</code> invokes a <code>StoreAction</code>. Now the flow goes exactly the way we described it earlier (From the Store to the View). We&rsquo;re good for now. But what happens if the store changes? Nothing so far.</p>
-
 <h3 id="from-the-ui-to-the-network">From the UI to the Network</h3>
-
 <p>In order to send network events based on changes of the store we can observe it and perform a specific action based on the change. Since it extends <code>EventEmitter</code> we can simply add <code>on change</code> handlers to the store inside the <code>Service</code> and this way we can easily handle all changes and process them:</p>
-
-<p><a href="/images/store-services/store-to-network.png"><img src="/images/store-services/store-to-network.png" alt="Store to Network" /></a></p>
-
+<p><a href="/images/store-services/store-to-network.png"><img src="/images/store-services/store-to-network.png" alt="Store to Network"></a></p>
 <p>But why the <code>Service</code> module shuld listen for store changes? Can&rsquo;t it listen directly on the dispatcher? Most likely, in the store we&rsquo;ll have some logic for handling the action passed by the dispatcher (for example format the raw data passed by the view). If the <code>Service</code> module listens for changes at the dispatcher we will duplicate this logic twice.</p>
-
 <p>Everything looks good so far. But the <code>Service</code> module is still a huge black box. In the next section I&rsquo;ll suggest a sample design of this module. If you don&rsquo;t agree with something, have any questions or recommendations let me know.</p>
-
 <h2 id="the-service-module">The Service Module</h2>
-
 <p>I was wondering whether to use UML for showing the components building the <code>Service</code> module, however I choose to make a colorful diagram like the one bellow:</p>
-
-<p><a href="/images/store-services/service-components.png"><img src="/images/store-services/service-components.png" alt="The Service Module" /></a></p>
-
+<p><a href="/images/store-services/service-components.png"><img src="/images/store-services/service-components.png" alt="The Service Module"></a></p>
 <p>There are a lot of boxes here. The yellow ones are part of the flux architecture. The blue ones are responsible for sending updates from the application to the remote service, the red ones are responsible for handling network events and the green ones are the intersection between the last two categories. One component could be implemented with a few classes, we&rsquo;re not restricting ourselves to these components. We can think of them more like categories rather then specific classes. Here we&rsquo;ll demonstrate a sample decomposition of the service module. Lets describe the most interesting components one by one.</p>
-
 <h3 id="channel"><code>Channel</code></h3>
-
 <p>Abstract channel. It could be extended by <code>HTTPChannel</code>, <code>WebSocketChannel</code>, <code>WebRTCDataChannel</code>, etc.</p>
-
 <h3 id="package"><code>Package</code></h3>
-
 <p>The <code>Package</code> component represents the packages used by our protocol. There could be a hierarchy of package types. For example, if we build our protocol on top of JSON-RPC, we may want to extend the base <code>Package</code> class.</p>
-
 <h3 id="command"><code>Command</code></h3>
-
 <p>Implements the <a href="https://en.wikipedia.org/wiki/Command_pattern">Command design pattern</a>.</p>
-
 <h3 id="commanddispatcher"><code>CommandDispatcher</code></h3>
-
 <p>Responsible for dispatching commands. There&rsquo;s one more link, which is not represented on the diagram - the <code>CommandDispatcher</code> owns reference to the <code>Channel</code> component. It checks whether the channel is open before sending the command, if it isn&rsquo;t the <code>CommandDispatcher</code> retries after a given timeout. This component is also responsible for buffering commands, invoking their undo actions in case the command&rsquo;s execution fails. The <code>CommandDispatcher</code> may implement different dispatching strategies:</p>
-
 <ul>
 <li>Request/response</li>
 <li><a href="https://en.wikipedia.org/wiki/Sliding_window_protocol">Sliding window technique</a></li>
 <li>Build a graph of the dependencies between the commands, process a topological sort and invoke the commands in the appropriate order</li>
 </ul>
-
 <h3 id="storeobserver"><code>StoreObserver</code></h3>
-
 <p>The <code>StoreObserver</code> is responsible for handling change events of the store. Once it detects change in the store it creates a new command using the <code>CommandBuilder</code> and invokes it through the <code>CommandDispatcher</code>.</p>
-
 <h3 id="networkobserver"><code>NetworkObserver</code></h3>
-
 <p>Waits for new messages emitted by the data <code>Channel</code>. This component is responsible for parsing the messages and processing them. Once the message is parsed, based on its content the <code>NetworkObserver</code> invokes specific <code>Action</code>.</p>
-
 <h2 id="third-party-services">Third-party Services</h2>
-
 <p>If you&rsquo;re using a third-party service (Twilio for example) you can process in a similar fashion. You can create a wrapper of the service (in the case of Twilio, the <code>Twilio</code> global) and bring it in your flux data-flow.</p>
-
 <h3 id="quick-faq-1">Quick FAQ:</h3>
-
-<p><em>Isn&rsquo;t <code>NetworkObserver</code> a &ldquo;God class&rdquo;?</em><br>
+<p><em>Isn&rsquo;t <code>NetworkObserver</code> a &ldquo;God class&rdquo;?</em><!-- raw HTML omitted -->
 Yep, it is. You can decompose it into a few smaller classes, same for <code>CommandDispatcher</code> where you can use the <a href="https://en.wikipedia.org/wiki/Strategy_pattern">strategy pattern</a> for dispatching the commands in the appropriate order.</p>
-
-<p><em>What are these <code>ProtocolDecorators</code>?</em><br>
+<p><em>What are these <code>ProtocolDecorators</code>?</em><!-- raw HTML omitted -->
 Since we can create our protocol based on another, already existing protocol (<a href="http://www.jsonrpc.org/">JSON-RPC</a>, <a href="http://bert-rpc.org/">BERT-RPC</a>, etc.), we can process the incoming messages by using a chain of decorators. For example, we receive a basic string, next the <code>JSONRPCDecorator</code> can parse it to a valid <code>JSON-RPC</code> message and pass it to the next decorator (<code>YourCustomProtocolDecorator</code>), etc.</p>
-
-<p><em>Can&rsquo;t I get cascading updates when update the model? Can&rsquo;t I reach a condition in which the view updates the store, it emits a change event, which is being handled by the <code>Service</code> module, which emits an event&hellip;etc.?</em><br>
-This can happen. There are two simple solutions:
-- emit change event only when the value of given property is actually being changed
-- emit <code>ui-change</code> event when update the model from the view and emit <code>server-change</code> event when change it from the server. The root component can listen for <code>/change/</code> events (yeah, this is a regex) and the server can listen for <code>ui-change</code>.</p>
-
-<p><em>I throw an event but a few stores are handling it?!</em><br>
+<p><em>Can&rsquo;t I get cascading updates when update the model? Can&rsquo;t I reach a condition in which the view updates the store, it emits a change event, which is being handled by the <code>Service</code> module, which emits an event&hellip;etc.?</em><!-- raw HTML omitted -->
+This can happen. There are two simple solutions:</p>
+<ul>
+<li>emit change event only when the value of given property is actually being changed</li>
+<li>emit <code>ui-change</code> event when update the model from the view and emit <code>server-change</code> event when change it from the server. The root component can listen for <code>/change/</code> events (yeah, this is a regex) and the server can listen for <code>ui-change</code>.</li>
+</ul>
+<p><em>I throw an event but a few stores are handling it?!</em><!-- raw HTML omitted -->
 Most likely you have collision in the action types. I&rsquo;d suggest to use the following schema for naming them: <code>storename:action-name</code> or something similar, which guarantees uniqness.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>The first part of this post shown how we can wire the store with the view. The second part was about the basic idea of the network communication with external services. The last section described a sample implementation of the black box responsible for handling external messages, store changes, serialization of the store and sending it through the network. Although the first two parts were relatively canonical and predefined by flux, the last chapter was completely custom implementation. With it I wanted to imply that the micro-architecture we use (MVC, MVP, MVVM, flux, whatever) does not provide us the entire project design. It only puts some rules on how we should organize our application, defines the main building blocks and how we can wire them together, however, if we want to build a real-life application, most likely we&rsquo;ll need to put some additional effort - the architecture or the framework won&rsquo;t be able to solve all our concerns.</p>
 
                 </section>
@@ -368,7 +290,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

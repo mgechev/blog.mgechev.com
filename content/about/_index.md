@@ -102,6 +102,8 @@ A few of my open source projects:
 
 ### Interviews
 
+- [Bulgarian National Radio](https://bnr.bg/en/post/101542983/minko-gechev-about-the-road-from-troyan-to-a-leading-position-in-google)
+- [Software Engineering Daily](https://softwareengineeringdaily.com/2021/11/05/angular-dev-tools-with-minko-gechev/)
 - [Angular Discord Q&A](https://www.youtube.com/watch?v=ax0JXFeCBIg)
 - [Behind the Rise of JavaScript Front-end Frameworks](https://www.welcometothejungle.com/en/articles/btc-javascript-frontend-frameworks)
 - [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)

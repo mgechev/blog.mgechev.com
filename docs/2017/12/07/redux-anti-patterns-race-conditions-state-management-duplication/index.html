@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Redux Anti-Patterns - Part 1. State Management. &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -88,152 +88,108 @@ All of the anti-patterns below have the following structure:
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.</p>
-
+                    <p>For the past year I&rsquo;ve been working on a project which uses React with TypeScript and Redux. In a few blog posts I&rsquo;m planning to share lessons learned while combining these technologies. In this article I&rsquo;ll share a few anti-patterns related to state management that I noticed in our development process. In the second article I&rsquo;ll focus on testability.</p>
 <p>All of the anti-patterns below have the following structure:</p>
-
 <ul>
 <li>Introduction</li>
 <li>Problem definition</li>
 <li>Sample solutions with discussion of their pros and cons</li>
 </ul>
-
 <h1 id="state-duplication">State Duplication</h1>
-
 <p>Sometimes we have instances of the same business entity used in different contexts. In such cases, instead of keeping the instances under the same store property we treat them differently.</p>
-
-<p><img src="/images/redux-anti-patterns/duplicate.jpg" style="display: block; margin: auto" alt="Duplication"></p>
-
+<!-- raw HTML omitted -->
 <h2 id="problem">Problem</h2>
-
 <p>For example, lets suppose we are developing an application which provides tutoring functionality. A tutor can schedule sessions and also, once the time for given session comes, the tutor can join it. Lets model the session with the following interface:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&rsquo;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div><p>In the scheduler we want to allow the guide to schedule multiple sessions, however, once they join a session we&rsquo;re only interested in the particular session itself. Following this logic we may declare the store in the following way:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">Session</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>Although such shape of the store is logically correct, it introduces state duplication. For example, lets suppose the user schedules the following session and later joins it:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div><p>Although such shape of the store is logically correct, it introduces state duplication. For example, lets suppose the user schedules the following session and later joins it:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span>
   <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Introduction to Go&#39;</span><span class="p">,</span>
   <span class="nx">start</span>: <span class="kt">startTime</span><span class="p">,</span>
   <span class="nx">end</span>: <span class="kt">endTime</span>
-<span class="p">};</span></code></pre></div>
-<p>This way we&rsquo;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
-
+<span class="p">};</span>
+</code></pre></div><p>This way we&rsquo;ll have it in both: the <code>sessions</code> array and as value of <code>currentSession</code> property. Imagine the user navigates between the page with the scheduler and pages for different sessions. This will require two additional actions in order to keep the state consistent:</p>
 <ul>
 <li>If we modify the current session, we need to update the <code>sessions</code> array and <code>currentSession</code>.</li>
 <li>If we switch between sessions we need to clean the <code>currentSession</code> and replace it with the session corresponding to the page we&rsquo;ve navigated to.</li>
 </ul>
-
 <h2 id="solution">Solution</h2>
-
 <p>The solution is to keep a value pointing to the current session in the <code>sessions</code> array as value of the <code>currentSession</code> property. For instance, we can use the <code>Session</code>&rsquo;s <code>id</code> for the purpose:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span>: <span class="kt">Session</span><span class="p">[];</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>This has an implication - we need to select the correct session from the &ldquo;master&rdquo; property. In this specific case, it&rsquo;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div><p>This has an implication - we need to select the correct session from the &ldquo;master&rdquo; property. In this specific case, it&rsquo;ll take <code>O(n)</code> time to do that; often when we work with small collections this is good enough. If we have, however, a few thousands of sessions selecting the correct one would cause slowdowns in the application. In such case, we can modify the <code>Store</code> interface to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Store</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>This way we will be able to access the current session with constant complexity:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span></code></pre></div>
-<h1 id="incorrect-information-expert">Incorrect Information Expert</h1>
-
+<span class="p">}</span>
+</code></pre></div><p>This way we will be able to access the current session with constant complexity:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">store</span><span class="p">.</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">store</span><span class="p">.</span><span class="nx">currentSession</span><span class="p">];</span>
+</code></pre></div><h1 id="incorrect-information-expert">Incorrect Information Expert</h1>
 <p>There&rsquo;s a collection of patterns called <a href="https://en.wikipedia.org/wiki/GRASP_(object-oriented_design)">GRASP</a>, standing for General Responsibility Assignment Patterns (or Principle). The patterns are well described in the book &ldquo;<a href="https://www.amazon.com/Applying-UML-Patterns-Introduction-Object-Oriented/dp/0131489062">Applying UML and Patterns</a>&rdquo;. One of them is called &ldquo;Information Expert&rdquo;. The book describes this practice as:</p>
-
 <blockquote>
 <p>Assign a responsibility to the information expert class that has the information necessary to fulfill the responsibility.</p>
 </blockquote>
-
 <p>The pattern suggests that we should assign the responsibilities to given class based on the information it holds. At first this doesn&rsquo;t seem applicable to the functional approach of redux (sounds soo &ldquo;object-orienty&rdquo;, doesn&rsquo;t it).</p>
-
 <p>If we suppose that the pattern is symmetric, we can take a look at it the another angle:</p>
-
 <blockquote>
 <p>Keep the information in given component which helps it to fulfill its responsibilities.</p>
 </blockquote>
-
 <p>Keep in mind that the information expert for the entire redux application is the store itself. On the other hand, often we have local state which is shared only among the components belonging to given component sub-tree.</p>
-
 <p>Whether and how we should use local state in redux is already well discussed in multiple sources. In general, the local state often UI state which can be preserved in given component instead of moved to the store. This reduces boilerplates and often increase development productivity.</p>
-
 <h2 id="problem-1">Problem</h2>
-
 <p>An anti-pattern that I have noticed is that often the state is hold by an incorrect component in the hierarchy. Commonly multiple child components hold copy of shared, local state.</p>
-
 <p>This has a serious implication - when the state need to be mutated, it often gets changed only in one of the components which breaks consistency.</p>
-
 <h2 id="solution-1">Solution</h2>
-
-<p>The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components&rsquo; children.</p>
-
+<p>The solution usually is quite simple - move the state to the closest common parent of the components sharing the state and pass the state as properties to the components' children.</p>
 <p>Sometimes, it makes more sense to move the state directly to the store and use more systematic mechanism for mutating it (through actions and reducers).</p>
-
 <p>As result we get:</p>
-
 <h3 id="coupling">Coupling</h3>
-
 <p>Often the state needs to be passed to indirect successors. Unfortunately, this couples all the parent components of the state consumers to the shape of the state. One can argue that we can just use the spread operator and pass whatever properties the parent component has. This doesn&rsquo;t allow any static verification through a type system or still requires declaration of the types of the properties given parent component passes to its children, so it&rsquo;s often is not good enough.</p>
-
 <p>Take a look at the next figure:</p>
-
-<p><img src="/images/redux-anti-patterns/cmp.png" style="display: block; margin: auto" alt="Component tree"></p>
-
+<!-- raw HTML omitted -->
 <p>If component <code>A</code> holds the state that <code>C</code> and <code>D</code> consume then <code>B</code> should also be aware of it as well. Although this coupling is often mentioned as a problem in the redux architecture, personally I haven&rsquo;t experienced any serious issues with it for medium sized applications (above 40k SLOC).</p>
-
 <h3 id="mutation">Mutation</h3>
-
 <p>The mutation of the state now should happen through the parent component (on the diagram above <code>A</code>). This can be achieved by passing callbacks. When the callbacks need to be passed through several levels of children I often prefer to move the local state to the store.</p>
-
 <h1 id="implicit-state-duplication">Implicit State Duplication</h1>
-
 <p>Often we have a piece of the state which can be computed from another. In such cases we have implicit state duplication.</p>
-
 <h2 id="problem-2">Problem</h2>
-
 <p>Lets suppose we have the following global store:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="nx">sessions</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span>: <span class="kt">number</span><span class="p">]</span><span class="o">:</span> <span class="nx">Session</span><span class="p">};</span>
   <span class="nx">totalSessions</span>: <span class="kt">number</span><span class="p">;</span>
   <span class="nx">currentSession</span>: <span class="kt">number</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>Notice that there&rsquo;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span></code></pre></div>
-<p><img src="/images/redux-anti-patterns/encapsulation.jpg" style="display: block; margin: auto" alt="Hidden dependencies"></p>
-
+<span class="p">}</span>
+</code></pre></div><p>Notice that there&rsquo;s implicit dependency between two of the <code>State</code>s properties: in the snippet above, the <code>totalSessions</code> property is a function of the <code>sessions</code> map. We can computed it using:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">sessions</span><span class="p">).</span><span class="nx">length</span>
+</code></pre></div><!-- raw HTML omitted -->
 <h2 id="solution-2">Solution</h2>
-
 <p>We should get rid of the properties which can be computed from another properties. This introduces additional calculations but they can be easily optimized since they are based on pure functions.</p>
-
 <p>I find the usage of <a href="https://github.com/reactjs/reselect"><code>reselect</code></a> very appropriate for this particular case. Another alternative is definition of methods in a parent component which encapsulate the computations required for the given computed state property. Efficiency there can be achieved using memoization.</p>
-
 <h1 id="overwriting-state-updates">Overwriting State Updates</h1>
-
 <p>In this section we&rsquo;ll take a look at another issue which is related to inconsistent state mutation.</p>
-
 <h2 id="problem-3">Problem</h2>
-
 <p>Lets suppose that our redux project uses immutable.js and we have a record for the <code>Session</code> model which has the following interface.</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Session</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">title</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">start</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">end</span>: <span class="kt">Date</span><span class="p">;</span>
   <span class="nx">guide</span>: <span class="kt">User</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
-<p>&hellip;and the following actions&rsquo; definitions:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="nx">type</span>: <span class="kt">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div><p>&hellip;and the following actions' definitions:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateLocalSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="kr">type</span><span class="o">:</span> <span class="nx">UpdateSession</span><span class="p">,</span> <span class="nx">session</span> <span class="p">});</span>
 
 <span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
@@ -251,17 +207,16 @@ All of the anti-patterns below have the following structure:
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span></code></pre></div>
-<p>And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">)))));</span>
+</code></pre></div><p>And now, somewhere in the component tree we want to update the session title and get the associated to the session guide:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span></code></pre></div>
-<p>The code looks fine at first but lets trace what is actually going on:</p>
-
+<span class="p">...</span>
+</code></pre></div><p>The code looks fine at first but lets trace what is actually going on:</p>
 <ol>
 <li>We assign reference to the <code>session</code> property to the constant called <code>session</code>.</li>
 <li>We update the title of the session by invoking the set method of the record.</li>
@@ -272,76 +227,64 @@ All of the anti-patterns below have the following structure:
 <li>In the action we get the guide from the network.</li>
 <li>We update the <code>guide</code> property of the session and update the store with the returned by the <code>set</code> method value.</li>
 </ol>
-
 <p>Notice that at step <code>6.</code> we pass reference to the old <code>session</code> object where we still have the old <code>title</code>. This way the reducer will overwrite the session in the store and replace it with an object with the old <code>title</code> and the <code>guide</code> property set.</p>
-
 <p>With this simple example the problem looks obvious. In case when we have multiple asynchronous calls and the control flow gets less intuitive, the issue may get tricker.</p>
-
 <h2 id="solutions">Solutions</h2>
-
 <p>There are several solutions to this problem; lets describe them one by one:</p>
-
 <h3 id="using-getstate">Using <code>getState</code></h3>
-
 <p>We can update <code>setGuide</code> to:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">getStore</span><span class="p">().</span><span class="nx">sessions</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
-<span class="p">};</span></code></pre></div>
-<p>This way we can make sure that we always get the latest session inside of the <code>setGuide</code> async action.</p>
-
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="nx">updateSession</span><span class="p">(</span><span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">))));</span>
+<span class="p">};</span>
+</code></pre></div><p>This way we can make sure that we always get the latest session inside of the <code>setGuide</code> async action.</p>
 <h3 id="using-resolve-argument">Using Resolve Argument</h3>
-
 <p>We can refactor <code>setGuide</code> in a different way:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">setGuide</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/session/</span><span class="si">${</span><span class="nx">session</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="sb">/guide`</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
     <span class="p">})</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">json</span><span class="p">())</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">guide</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">));</span>
+      <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">guide</span><span class="p">));</span>
       <span class="nx">updateSession</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
       <span class="k">return</span> <span class="nx">s</span><span class="p">;</span>
     <span class="p">});</span>
-<span class="p">};</span></code></pre></div>
-<p>Respectively, we can update the component to:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
+<span class="p">};</span>
+</code></pre></div><p>Respectively, we can update the component to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">s</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="nx">s</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span></code></pre></div>
-<p>Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:</p>
-
+<span class="p">...</span>
+</code></pre></div><p>Although the last two solutions work, they look imperative because of the extra constant assignment. Third approach could be:</p>
 <h3 id="updated-props">Updated Props</h3>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">...</span>
 <span class="nx">createSession() {</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateSession</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Advanced Go&#39;</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">setGuide</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">session</span><span class="p">)));</span>
 <span class="p">}</span>
-<span class="p">...</span></code></pre></div>
-<p>The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of <code>updateSession</code> looks like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="p">...</span>
+</code></pre></div><p>The promise API is always asynchronous; it will push a new micro-task into the queue. Even if in the implementation of <code>updateSession</code> looks like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">updateSession</span> <span class="o">=</span> <span class="p">(</span><span class="nx">session</span>: <span class="kt">Session</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getStore</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">dispatch</span><span class="p">(</span><span class="nx">updateLocalSession</span><span class="p">(</span><span class="nx">session</span><span class="p">));</span>
   <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">session</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
-<p>&hellip;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
+<span class="p">};</span>
 
+</code></pre></div><p>&hellip;we know that <code>this.props.session</code> will have the updated value of <code>session</code> inside of the resolve callback of the promise returned by the first invocation of <code>dispatch</code>.</p>
 <h1 id="conclusion">Conclusion</h1>
-
 <p>In this blog post we explored four basic state management anti-patterns in Redux:</p>
-
 <ul>
 <li>State duplication</li>
 <li>Wrong information expert</li>
 <li>Implicit state duplication</li>
 <li>Overwriting state updates</li>
 </ul>
-
 <p>We discussed their consequences and proposed sample solutions. In the next post I&rsquo;ll share a few lessons I learned about testing.</p>
 
                 </section>
@@ -394,7 +337,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

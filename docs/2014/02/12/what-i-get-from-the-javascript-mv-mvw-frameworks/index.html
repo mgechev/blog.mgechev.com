@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>What I get from the JavaScript MV* frameworks &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -95,61 +95,35 @@ When I talk with people, who are beginners/intermediate in JavaScript I’m ofte
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>Why should I use JavaScript MVC, MVVM, MVP or simply MV<strong>W</strong>(<strong>hatever works for you</strong>)?</p>
-
+                    <p>Why should I use JavaScript MVC, MVVM, MVP or simply MV<strong>W</strong>(<strong>hatever works for you</strong>)?</p>
 <p>When I talk with people, who are beginners/intermediate in JavaScript I’m often asked this question. They are usually people who, until now, have used JavaScript only for making their website “fancier” – adding client-side form validation, creating carousel, checking whether a user already exists with simple Ajax request. When you start building something bigger (+10k lines of JavaScript) I truly believe that there are a few benefits from using such micro-architectural frameworks.</p>
-
 <h1 id="reusability">Reusability</h1>
-
 <p>Each of the frameworks provides you two types of code reuse:</p>
-
 <h4 id="boilerplates">Boilerplates</h4>
-
 <p>Alright, jQuery takes care of some boilerplates as well, but these boilerplates are usually DOM/Ajax oriented. There’s nothing in the core of jQuery, which provides you two-way data-binding, for example. When you develop Single-Page web application you see that there are a lot of cases where you need to explicitly set the content of given DOM elements, or recompile template when some data changes. Frameworks like Ember.js and AngularJS do this for you!</p>
-
 <h4 id="reuse-of-your-own-code">Reuse of your own code</h4>
-
 <p>You have out-of-the-box Separation of Concerns. In each MV* framework you have Model and View. They both have their own responsibilities – the model is responsible for encapsulating your domain specific models (in case of twitter – Tweet, User), on the other hand the view is responsible for showing the model (and eventually handling events, it depends on the framework). This means that your model is not coupled with its representation and eventually can be easily reuse it in different project. In this type of code reuse, usually you cannot reuse as much source code, across your projects, as in the case of boilerplates but you still have it, without any extra work.</p>
-
 <h1 id="level-of-abstraction">Level of abstraction</h1>
-
 <p>Each framework provides you a higher level of abstraction, which allows you to handle more complex applications. Try to build something large without any framework and you will find yourself dividing the code into different coherent modules, trying to decouple them as much as possible. Probably you will end up with something like <a href="http://www.slideshare.net/nzakas/scalable-javascript-application-architecture">this module architecture</a>. Of course, if you don’t follow any guidelines for good OO design (explicitly or implicitly), it is very likely to end up with large bunch of spaghetti.</p>
-
 <h1 id="testability">Testability</h1>
-
 <p>Most of the MV* frameworks are build with testing in mind. For example, in AngularJS you have Dependency Injection, which allows you to mock given service quite easily. You don’t need monkey patching anymore! One of the drawbacks of the module architecture, which was referred above, is its hard testability.</p>
-
 <h1 id="implicit-conventions">Implicit conventions</h1>
-
 <p>JavaScript is weird. It doesn’t tell you how you should write your code. You can use functional style, procedural style, OO style. There’s a lack of many of the tools available in languages like Java and C#. You don’t have namespaces, you even don’t have a single way for creating objects. You can create object by using the object literal:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">42</span> <span class="p">};</span>
-</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="mi">42</span> <span class="p">};</span></code></pre></div>
 <p>or the module pattern</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">foo</span><span class="o">:</span> <span class="nx">bar</span>
   <span class="p">};</span>
-<span class="p">}());</span>
-</code></pre></div>
-
+<span class="p">}());</span></code></pre></div>
 <p>or constructor function</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
-</code></pre></div>
-
+<span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span></code></pre></div>
 <p>&hellip;If you have team with 15 JavaScript developers and each of them has his own opinion how JavaScript should be used you are in big troubles. MV* frameworks give you strict guidelines for how you should organize your code. Each of the developers will be forced to use “the Angular way”, “the Backbone way”, or whatever way your project uses.</p>
-
 <h1 id="conclusion">Conclusion</h1>
-
 <p>Why not to create a custom framework and build my applications with it? First, you already have pretty good solutions, which are build by great developers and tested by hundreds others. Second, if your team is dynamic you will increase the learning curve for the new developers who are joining your team. Each of them should spend time studying your problem domain, your proprietary framework and your existing code base.</p>
 
                 </section>
@@ -202,7 +176,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Introducing Bazel Schematics for Angular CLI - Minko Gechev\x27s blog",
+    "headline": "Introducing Bazel Schematics for Angular CLI - Minko Gechev\u0027s blog",
     "datePublished": "2018-12-17T00:00:00JST",
     "dateModified": "2018-12-17T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular\/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.\nWhat\x26rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets."
+    "description": "In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular\/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.\nWhat\u0026rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets."
   }
 </script>
 
@@ -130,38 +130,26 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by <a href="https://github.com/kyliau">Keen Liau</a> on <a href="https://github.com/angular/angular/pull/27277">GitHub</a>. With the <code>@angular/bazel</code> package, we want to let developers use Angular CLI with Bazel as a build tool.</p>
-
-<h2 id="what-s-bazel">What&#x2019;s Bazel?</h2>
-
+  <div class="article-body"><p>In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by <a href="https://github.com/kyliau">Keen Liau</a> on <a href="https://github.com/angular/angular/pull/27277">GitHub</a>. With the <code>@angular/bazel</code> package, we want to let developers use Angular CLI with Bazel as a build tool.</p>
+<h2 id="whats-bazel">What&#x2019;s Bazel?</h2>
 <p>Google open sourced the software responsible for building most of our projects under the name <a href="https://bazel.build">Bazel</a>. Bazel is a powerful tool which can keep track of the dependencies between different <strong>packages and build targets</strong>.</p>
-
 <p>Some of the cool features of Bazel are:</p>
-
 <ol>
 <li>It has a smart algorithm for determining the build dependencies</li>
 <li>Bazel is independent of the tech stack. We can build anything we want with it using the same interface. For example, there are plugins for Java, Go, TypeScript, JavaScript, and more!</li>
 </ol>
-
 <p>Let us take a look at the first point. Based on the dependency graph of a project, Bazel determines which targets it can build in parallel. Such a feature is only possible because the individual units have well-defined inputs and outputs, and they don&#x2019;t produce side effects. To some extent, we can think of them as &#x201C;pure functions.&#x201D; One of the benefits of such a computational model is that it&#x2019;s straightforward to optimize the calculations using parallelism and caching. That&#x2019;s true for Bazel as well. It can cache the produced outputs from the individual build tasks anywhere, including in the cloud.</p>
-
 <p>Why does the cloud cache matter? If Bazel has built a target and cached it in the cloud, anyone can reuse it without building it from scratch! If you&#x2019;re in a large organization, this is quite attractive, but even small teams can take advantage of such a feature. Bazel is not coupled to any particular cloud platform, which means that we can take advantage of the remote build execution and caching in Google Cloud, Azure, AWS, or our on-premise infrastructure.</p>
-
 <p><strong>Does this mean we want to replace webpack in Angular CLI? No.</strong> Although webpack and Bazel have some intersection regarding vision, to a large extent they are orthogonal. For example, Bazel is a universal build tool which can bundle JavaScript projects with webpack.</p>
-
 <h2 id="introducing-bazel-schematics-for-angular-cli">Introducing Bazel Schematics for Angular CLI</h2>
-
 <p>The <code>@angular/bazel</code> schematics allow us to bootstrap a project in a way that our build will be managed by Bazel. Here&#x2019;s how we can use them:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm i -g yarn
-yarn global add @angular/bazel@7.2.0-rc.0</code></pre></div>
-<p>After we have the schematics installed, just execute:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">ng new bzl-app --collection<span class="o">=</span>@angular/bazel</code></pre></div>
-<p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g yarn
+yarn global add @angular/bazel@7.2.0-rc.0
+</code></pre></div><p>After we have the schematics installed, just execute:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">ng new bzl-app --collection<span class="o">=</span>@angular/bazel
+</code></pre></div><p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
 <p>This will create the following directory structure:</p>
-<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">.
 &#x251C;&#x2500;&#x2500; BUILD.bazel
 &#x251C;&#x2500;&#x2500; README.md
 &#x251C;&#x2500;&#x2500; WORKSPACE
@@ -200,78 +188,51 @@ yarn global add @angular/bazel@7.2.0-rc.0</code></pre></div>
 &#x251C;&#x2500;&#x2500; tslint.json
 &#x2514;&#x2500;&#x2500; yarn.lock
 
-6 directories, 36 files</code></pre></div>
-<p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
-
+6 directories, 36 files
+</code></pre></div><p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
 <ul>
 <li>We have a <code>WORKSPACE</code> file. It configures our build dependencies, such as Bazel rules for TypeScript, web testing, and others.</li>
 <li>There are a few <code>BUILD.bazel</code> files which contain build configuration. We don&#x2019;t have to worry about them at the moment. In the future releases, Angular CLI will manage them automatically for us. In short, they divide our project into packages, configure the build configuration for each package, and define the dependencies between the individual packages.</li>
 <li>We have a few <code>main</code> files, for the individual environments. This is another implementation detail that we&#x2019;ll hide in the stable version of the schematics.</li>
 </ul>
-
 <p>In future releases, we&#x2019;ll make the build as encapsulated as possible so we won&#x2019;t have to worry about any of these details.</p>
-
 <p>Before running our development server, we need to go through a few manual steps:</p>
-
 <ul>
 <li>Open <code>package.json</code> and update the <code>@angular/bazel</code> version to <code>7.2.0-rc.0</code></li>
 <li>After that, open <code>WORKSPACE</code> and update the value of the <code>ANGULAR_VERSION</code> constant to <code>7.2.0-rc.0</code> as well</li>
 </ul>
-
 <p>These steps are required to ensure that the Bazel rules for Angular are the same in both <code>node_modules</code> and in the Bazel workspace. In the next versions of the schematics, Bazel will reuse the rules from the <code>node_modules</code> directory.</p>
-
 <p>Now in the project folder run:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yarn</code></pre></div>
-<p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yarn
+</code></pre></div><p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
 <p>As the next step, let us start the development server! As expected, run <code>ng serve</code> (or <code>npm start</code>). The cold build may take a few minutes, please, don&#x2019;t interrupt it. Once it completes, open <a href="http://127.0.0.1:4200">127.0.0.1:4200</a>. If all the steps so far have been successful, you should see the familiar home screen of the CLI:</p>
-
-<p><amp-img src="/images/bazel-angular-cli/angular-cli.png" style="display: block; margin: auto"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>Notice that if we update <code>app.component.ts</code> the browser will not automatically refresh. Bazel will not even recompile the changed file. In future releases of the schematics, this will be fixed. Until now, feel free to use <code>ibazel</code>:</p>
-
 <ul>
 <li>First, install <code>ibazel</code> using <code>yarn add @bazel/ibazel</code></li>
 <li>Instead of starting the development server with <code>npm start</code> use <code>./node_modules/.bin/ibazel run //src:devserver</code></li>
 </ul>
-
 <p>That&#x2019;s it! Now we have a fully functional development server with live reloading. &#x1F389;</p>
-
 <p>We can make sure the rest of the commands work by running: <code>ng test</code>, <code>ng e2e</code>, and <code>ng build --prod</code>.</p>
-
 <h2 id="what-else-do-we-have">What else do we have?</h2>
-
 <p>Currently, the Bazel schematics for Angular CLI provide the following set of features:</p>
-
 <ul>
 <li>High-performance Go development server</li>
 <li>Unit testing with Karma and Jasmine</li>
 <li>End-to-end testing with protractor</li>
 <li>Production build</li>
 </ul>
-
 <p>In the future releases, we&#x2019;ll reduce the feature gap even further. The Bazel schematics will provide some of our favorite features such as PWA support, generators, and much more!</p>
-
 <h2 id="why-that-excited">Why that excited?</h2>
-
 <p>If you&#x2019;ve followed all the steps so far, I&#x2019;m sure you didn&#x2019;t have the best tooling experience in your life. Everything was slow and not too intuitive. Although this will certainly change in the future releases and the development experience will be at least as good as the one with Angular CLI nowadays, even today the Bazel schematics have a lot to offer!</p>
-
 <p><strong>Bazel allows us to build at scale</strong>, this is what I explained in my previous blog post &#x201C;<a href="https://blog.mgechev.com/2018/11/19/introduction-bazel-typescript-tutorial/">Building TypeScript Projects with Bazel</a>&#x201D;. Ideally, the initial build time with Bazel will be comparable to the traditional JavaScript tooling; the difference is that the time will not grow exponentially when our application&#x2019;s size increases. Many large projects report a significant increase in their incremental builds when their codebase grows. With Bazel most of the time the build time will stay constant. By analyzing the build graph provided by the <code>BUILD.bazel</code> files, <strong>Bazel rebuilds only the packages which have changed</strong> and nothing else!</p>
-
 <p>This is well proven in Google where we rely on the internal version of Bazel (Blaze) every day. Our Continuous Integration system rebuilds all the projects in our monorepo on each commit, and for the purpose it uses Bazel.</p>
-
 <p>Two features that I want to come back to our remote caching and remote build execution. In short, remote caching allows us to build the project&#x2019;s artifacts only once and upload them to a remote cache. This is very attractive not just because we won&#x2019;t have to rebuild the same code twice but also because all of our team members and our CI can reuse the same cache! The remote build execution takes this even further. Bazel can build our code in the cloud on a cluster of machines. This would allow us to build a project with the scale of Google Cloud, which has hundreds of thousands of TypeScript files, on our cell phone.</p>
-
 <h2 id="current-limitations">Current Limitations</h2>
-
 <p>A significant limitation at the moment is the single <code>BUILD.bazel</code> file that the scaffolded project has under the <code>src</code> directory. This means that the project is a single compilation unit, which will prevent Bazel from running an optimal build. In case you want to experiment a bit further on a larger project, we&#x2019;d strongly recommend you to create a <code>BUILD.bazel</code> file for each of your <code>@NgModule</code>s. Each <code>@NgModule</code> should be in a separate directory, and each <code>BUILD.bazel</code> file should declare its dependencies, together with the build rules, similarly to the <code>BUILD.bazel</code> file under <code>src</code>.</p>
-
 <p>Once Bazel has the build configuration for the individual <code>@NgModule</code>s and their dependencies, it can compile them in isolation only when required.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>In this post, we looked at the Bazel schematics for Angular CLI. We saw how we can scaffold a new Angular project and build it with Bazel! In the process, we discussed the high-level build configuration, including the <code>WORKSPACE</code> file and the <code>BUILD.bazel</code> files which declare the build rules for the individual <code>@NgModule</code>s (or in the general case, Bazel packages).</p>
-
 <p>We hope this will make it much easier to try Bazel today! Keep in mind that everything is work in progress &#x1F469;&#x200D;&#x1F52C;. In the next months, we&#x2019;ll be working hard on implementing a complete feature set of tools stepping on top of Bazel, which provide a polished development experience &#x1F680;</p>
 </div>
 

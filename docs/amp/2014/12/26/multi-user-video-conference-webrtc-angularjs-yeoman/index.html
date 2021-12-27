@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Multi-User Video Conference with WebRTC - Minko Gechev\x27s blog",
+    "headline": "Multi-User Video Conference with WebRTC - Minko Gechev\u0027s blog",
     "datePublished": "2014-12-26T00:00:00JST",
     "dateModified": "2014-12-26T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "This is a tutorial for how to implement a multi-user video conference with WebRTC, AngularJS and Yeoman. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the ICE (Interactive-Connectivity Establishment) framework is used for NAT traversal.\nYou can find deployed version of the project, we\x26rsquo;re going to take a look at in this tutorial, at Heroku, the source code can be found at GitHub."
+    "description": "This is a tutorial for how to implement a multi-user video conference with WebRTC, AngularJS and Yeoman. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the ICE (Interactive-Connectivity Establishment) framework is used for NAT traversal.\nYou can find deployed version of the project, we\u0026rsquo;re going to take a look at in this tutorial, at Heroku, the source code can be found at GitHub."
   }
 </script>
 
@@ -130,46 +130,27 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>This is a tutorial for how to implement a multi-user video conference with <a href="http://webrtc.org">WebRTC</a>, <a href="http://angularjs.org">AngularJS</a> and <a href="http://yeoman.io/">Yeoman</a>. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the <a href="https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment">ICE (Interactive-Connectivity Establishment) framework</a> is used for NAT traversal.</p>
-
+  <div class="article-body"><p>This is a tutorial for how to implement a multi-user video conference with <a href="http://webrtc.org">WebRTC</a>, <a href="http://angularjs.org">AngularJS</a> and <a href="http://yeoman.io/">Yeoman</a>. It also includes a detailed explanation of how WebRTC works, how the peer to peer connections are being established and how the <a href="https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment">ICE (Interactive-Connectivity Establishment) framework</a> is used for NAT traversal.</p>
 <p>You can find deployed version of the project, we&#x2019;re going to take a look at in this tutorial, at <a href="https://mgechev-webrtc.herokuapp.com">Heroku</a>, the source code can be found <a href="https://github.com/mgechev/angular-webrtc">at GitHub</a>.</p>
-
 <p>Why I chose Yeoman and AngularJS?</p>
-
 <p>Yeoman&#x2019;s generators can handle very quickly all the boilerpates required for the application. Yeoman creates a Grunt build configuration, which allows you to deploy well optimized application with only a few lines of bash:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">grunt build
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">grunt build
 git remote add heroku git@uri
 git push heroku master</code></pre></div>
-
 <p>Why AngularJS? Well, AngularJS comes with out-of-the-box router (if you use the module <code>angular-route</code>), with well defined components, which enforce the separation of concerns principle and nice data-binding mechanism.</p>
-
 <p>Can I use something else, instead of AngularJS? Yes, sure you can. For such single-page applications, with highly intensive DOM manipulations and limited amount of views (which I call vertical single-page applications), I&#x2019;d recommend React.js or WebComponents.</p>
-
 <p><amp-img src="/images/yeoman-angular-webrtc/webrtc-yeoman.png" alt="Yeoman and WebRTC"></amp-img></p>
-
 <h2 id="webrtc-intro">WebRTC intro</h2>
-
 <p>In my blog post <a href="https://blog.mgechev.com/2014/09/03/webrtc-peer-to-peer-chat-with-react/">&#x201C;WebRTC chat with React.js&#x201D;</a> I already did a brief introduction about what WebRTC is and how it works:</p>
-
 <blockquote>
 <p>RTC stands for Real-Time Communication. Until browsers implemented WebRTC our only way to provide communication between several browsers was to proxy the messages via a server between them (using WebSockets or HTTP). WebRTC makes the peer-to-peer communication between browsers possible. Using the NAT traversal framework - ICE, we are able find the most appropriate route between the browsers and make them communicate without mediator. Since 1st of July 2014, v1.0 of the WebRTC browser APIs standard is <a href="http://dev.w3.org/2011/webrtc/editor/webrtc.html">already published</a> by W3C.</p>
 </blockquote>
-
 <p>In the previous article we used Peer.js in order to open data channel between the peers, who participate in the chat room.</p>
-
 <p>This time we&#x2019;ll use the plain browser WebRTC API and I&#x2019;ll explain in a little bit deeper details how a WebRTC session is being established. If you don&#x2019;t aim deep technical understanding you can skip this section and go directly to the server&#x2019;s implementation.</p>
-
 <h3 id="how-webrtc-works">How WebRTC works?</h3>
-
 <p>Now let&#x2019;s take a look at the following UML sequence diagram:</p>
-
-<p><a href="/images/yeoman-angular-webrtc/sequence-webrtc.png"><amp-img src="/images/yeoman-angular-webrtc/sequence-webrtc.png" alt="&quot;Sequence diagram&quot;" title="WebRTC Sequence Diagram"></amp-img></a></p>
-
+<p><a href="/images/yeoman-angular-webrtc/sequence-webrtc.png"><amp-img src="/images/yeoman-angular-webrtc/sequence-webrtc.png" alt="&#x201C;Sequence diagram&#x201D;" title="WebRTC Sequence Diagram"></amp-img></a></p>
 <p>In the sequence diagram above we&#x2019;re following how <code>Alice</code> establishes peer connection with <code>Bob</code>, through the application server in the middle (<code>Web App</code>).</p>
-
 <ol>
 <li>Initially <code>Alice</code> calls <code>Bob</code>, through the application server (<code>Web App</code>), for example by invoking a RESTful method (<code>POST /call/Bob</code>).</li>
 <li>Through a push notification the application server tells <code>Bob</code> that <code>Alice</code> is calling him. The <code>Web App</code> may use WebSockets and send a notification to <code>Bob</code> about <code>Alice</code>&#x2019;s call.</li>
@@ -181,88 +162,56 @@ git push heroku master</code></pre></div>
 <li><code>Bob</code> gathers his own ICE candidates.</li>
 <li><code>Bob</code> prepares SDP answer (similar to the SDP offer by <code>Alice</code>) and sends it back to <code>Alice</code>, via the <code>Web App</code> (note that <code>Alice</code> and <code>Bob</code> still cannot establish p2p connection).</li>
 <li><code>Web App</code> redirects <code>Bob</code>&#x2019;s response to <code>Alice</code>.</li>
-<li><code>Alice</code> and <code>Bob</code> try to establish p2p connection through the ICE candidates they already have. During this phase more ICE candidates may come up.
-
+<li><code>Alice</code> and <code>Bob</code> try to establish p2p connection through the ICE candidates they already have. During this phase more ICE candidates may come up.</li>
+</ol>
 <ul>
 <li><code>Alice</code> and <code>Bob</code> make the Cartesian product of the ICE candidates they already have, i.e. <code>Bob</code> combines all the candidates he have received by <code>Alice</code> with his own candidates, prioritize them and tries to establish connection between them.</li>
-</ul></li>
-</ol>
-
+</ul>
 <p>If <code>Alice</code> and <code>Bob</code> are not able to establish p2p connection using the ICE candidates they already have, it is very likely they both to be behind <a href="http://think-like-a-computer.com/2011/09/19/symmetric-nat/">symmetric NATs</a>. In this case, if we have provided a TURN server, the video/audio connection will be relayed through it, otherwise they won&#x2019;t be able to initiate connection between each other.</p>
-
 <h4 id="ice-gathering-process">ICE gathering process</h4>
-
 <p>When we use the browser&#x2019;s WebRTC API for creating a new <code>RTCPeerConnection</code>, we provide a config object. It contains a set of <code>STUN</code> and <code>TURN</code> servers: <code>new RTCPeerConnection({ &apos;iceServers&apos;: [{ &apos;url&apos;: &apos;stun:stun.l.google.com:19302&apos; }]})</code>.</p>
-
 <p>In order to understand how we use <code>STUN</code>, you first have to be aware of why we need it. First, lets take a look at what <code>NAT</code> is:</p>
-
 <h5 id="nat">NAT</h5>
-
 <p>Before we continue with the tutorial, lets say a few words about what NAT is. NAT stands for Network Address Translation. It is quite common way for translating internal (private) IP addresses to public ones and vice verse. A lot of ISP providers with limited capacity of public IP addresses uses this way of scaling using private IP addresses in their internal networks and translating them to public addresses visible to the outside world. More about NAT and the different types of NAT could be read in <a href="https://en.wikipedia.org/wiki/Network_address_translation">this wiki article</a>.</p>
-
 <p>When given host is behind NAT it doesn&#x2019;t has a public IP address. This means that its IP address looks something <a href="https://en.wikipedia.org/wiki/Private_network">like <code>192.168.0.102</code></a>. When given host wants to reach a service, outside the local network, it makes a request through the NAT server. The NAT server &#x201C;translates&#x201D; the request by changing the source address to the IP address of the NAT server and redirects the request to the destination. The NAT also creates a mapping in the NAT table, which maps the source address (host name and port) to the translated address (host name of the NAT and port assigned for the given request). Once the NAT receives a response by the remote service it uses the NAT table to find the initial source of the request and redirects the response to it.</p>
-
 <h5 id="stun">STUN</h5>
-
 <p>So why we would need the STUN servers and what actually are they? Before answering these questions lets answer another one &#x201C;How we can understand whether we&#x2019;re behind a NAT or not?&#x201D;.</p>
-
 <p>Let&#x2019;s suppose we&#x2019;re behind a NAT and we want to reach a remote service. If we make a request to the service and the service response us with the source address of the request we can compare it with the address of our machine. If they differ we&#x2019;re obviously behind a NAT. Note that the service must be located outside of our local network(s).</p>
-
 <p>How we can be sure whether the received address by the service&#x2019;s response is the one of the NAT directly above us? We can&#x2019;t. In case of nested NATs we might be behind a few NATs but basically the NAT traversal procedure of ICE remains the same.</p>
-
 <p>The service, which response us with the address of the source of the request is what STUN does. Now when we have the IP address of the NAT we can use a new ICE candidate called reflexive ICE candidate, with value the IP address and port, which the NAT server used in the network address translation.</p>
-
 <h2 id="implementation">Implementation</h2>
-
 <p>As next step lets take a look at our sample application&#x2019;s implementation. The application has two main components:</p>
-
 <ul>
 <li>back-end - the application server, which is responsible for the communication between the different peers until a p2p connection is established (the <code>Web App</code> from the sequence diagram above)</li>
 <li>web app - the AngularJS application, which is the actual multi-user video chat (<code>Alice</code> and <code>Bob</code> from the sequence diagram above are two different instances of this application)</li>
 </ul>
-
 <p>You can try the application at <a href="https://mgechev-webrtc.herokuapp.com">Heroku</a>.</p>
-
 <h2 id="back-end">Back-end</h2>
-
 <p>In this section we will implement our back-end. The back-end is the <code>Web App</code> component from the sequence diagram above. Basically it&#x2019;s main functionality is to provide static files (htmls, js, css) and to redirect requests by the peers.</p>
-
 <p>This component will maintain a collection of rooms, to each room we will have associated collection of <code>socket.io</code> sockets of the peers connected to the given room.</p>
-
 <p>In order to implement the whole functionality of our WebRTC application with JavaScript we can use Node.js for our back-end.</p>
-
 <p>So let&#x2019;s begin!</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">mkdir webrtc-app <span class="o">&amp;&amp;</span> <span class="nb">cd</span> webrtc-app
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mkdir webrtc-app <span class="o">&amp;&amp;</span> <span class="nb">cd</span> webrtc-app
 <span class="c1"># initialize the app</span>
 npm init
 mkdir lib
 touch index.js</code></pre></div>
-
 <p>Inside the file called <code>index.js</code> in the root add the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;./config/config.json&apos;</span><span class="p">),</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;./config/config.json&apos;</span><span class="p">),</span>
     <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;./lib/server&apos;</span><span class="p">);</span>
 
 <span class="c1">// In case the port is set using an environment variable (Heroku)
 </span><span class="c1"></span><span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span><span class="p">;</span>
 
-<span class="nx">server</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
-</code></pre></div>
-
+<span class="nx">server</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span></code></pre></div>
 <p>Inside the root of your app, invoke the following commands, in order to install the required dependencies:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm install express --save
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install express --save
 npm install socket.io --save
 npm install node-uuid --save</code></pre></div>
-
 <p>Now go to <code>lib</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">cd lib</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">cd lib</code></pre></div>
 <p>And create a file called <code>server.js</code>. It should has the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
     <span class="nx">expressApp</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
     <span class="nx">socketio</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;socket.io&apos;</span><span class="p">),</span>
     <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;http&apos;</span><span class="p">),</span>
@@ -327,12 +276,9 @@ npm install node-uuid --save</code></pre></div>
       <span class="p">});</span>
     <span class="p">});</span>
   <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>Now let&#x2019;s take a look at the code above step-by-step:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
     <span class="nx">expressApp</span> <span class="o">=</span> <span class="nx">express</span><span class="p">(),</span>
     <span class="nx">socketio</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;socket.io&apos;</span><span class="p">),</span>
     <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;http&apos;</span><span class="p">),</span>
@@ -341,22 +287,16 @@ npm install node-uuid --save</code></pre></div>
     <span class="nx">rooms</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="nx">userIds</span> <span class="o">=</span> <span class="p">{};</span>
 
-<span class="nx">expressApp</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&apos;/../public/dist/&apos;</span><span class="p">));</span>
-</code></pre></div>
-
+<span class="nx">expressApp</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&apos;/../public/dist/&apos;</span><span class="p">));</span></code></pre></div>
 <p>In the snippet above we require all dependencies and configure the created express app to use a directory for providing static files. This directory is located inside a directory called <code>public</code>, which is in the root of our app.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Listening on&apos;</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">PORT</span><span class="p">);</span>
 <span class="nx">socketio</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">server</span><span class="p">,</span> <span class="p">{</span> <span class="nx">log</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
 <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;connection&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Additional logic
-</span><span class="c1"></span><span class="p">});</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">});</span></code></pre></div>
 <p>We start the HTTP server and attach <code>socket.io</code> to it (decorate it with <code>socket.io</code>). The <code>connection</code> event in <code>socket.io</code> means that client has connected to our server. Once we have such connection established we need to attach the corresponding event handlers:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">currentRoom</span><span class="p">,</span> <span class="nx">id</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">currentRoom</span><span class="p">,</span> <span class="nx">id</span><span class="p">;</span>
 
 <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;init&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Handle init message
@@ -368,12 +308,9 @@ npm install node-uuid --save</code></pre></div>
 
 <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;disconnect&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="c1">// Handle disconnect event
-</span><span class="c1"></span><span class="p">});</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">});</span></code></pre></div>
 <p>These are the three events we&#x2019;re going to handle. The <code>init</code> event is used for initialization of given room. If the room is already created we join the current client to the room by adding its socket to the collection of sockets associated to the given room (<code>rooms[room_id]</code> is an array of sockets). If the room is not created we create the room and add the current client to it. We generate room randomly using <a href="https://github.com/broofa/node-uuid#getting-started"><code>node-uuid</code> module</a>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">currentRoom</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span> <span class="o">||</span> <span class="p">{}).</span><span class="nx">room</span> <span class="o">||</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v4</span><span class="p">();</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">currentRoom</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span> <span class="o">||</span> <span class="p">{}).</span><span class="nx">room</span> <span class="o">||</span> <span class="nx">uuid</span><span class="p">.</span><span class="nx">v4</span><span class="p">();</span>
 <span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span> <span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">];</span>
 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nx">socket</span><span class="p">];</span>
@@ -392,29 +329,20 @@ npm install node-uuid --save</code></pre></div>
   <span class="p">});</span>
   <span class="nx">room</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">socket</span><span class="p">;</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Peer connected to room&apos;</span><span class="p">,</span> <span class="nx">currentRoom</span><span class="p">,</span> <span class="s1">&apos;with #&apos;</span><span class="p">,</span> <span class="nx">id</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>One more detail is that when a client connects to given room we notify all other peers associated to the room about the newly connected peer.</p>
-
 <p>We also have a callback (<code>fn</code>), which we invoke with the client&#x2019;s ID and the room&#x2019;s id, once the client has successfully connected.</p>
-
 <p>The <code>msg</code> event is an <code>SDP</code> message or <code>ICE</code> candidate, which should be redirected from specific peer to another peer:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">to</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">to</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">to</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">to</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">][</span><span class="nx">to</span><span class="p">])</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Redirecting message to&apos;</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="s1">&apos;by&apos;</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">by</span><span class="p">);</span>
   <span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">][</span><span class="nx">to</span><span class="p">].</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;msg&apos;</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="s1">&apos;Invalid user&apos;</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>The id of given peer is always an integer so that&#x2019;s why we parse it as first line of the event handler. After that we emit the message to the specified peer in the <code>to</code> property of the event data object.</p>
-
 <p>The last event handler (and last part of the server) is the disconnect handler:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">currentRoom</span> <span class="o">||</span> <span class="o">!</span><span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">])</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">currentRoom</span> <span class="o">||</span> <span class="o">!</span><span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">])</span> <span class="p">{</span>
   <span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="k">delete</span> <span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">][</span><span class="nx">rooms</span><span class="p">[</span><span class="nx">currentRoom</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">socket</span><span class="p">)];</span>
@@ -422,63 +350,40 @@ npm install node-uuid --save</code></pre></div>
   <span class="k">if</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;peer.disconnected&apos;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="nx">id</span> <span class="p">});</span>
   <span class="p">}</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>Once given peer disconnects from the server (for example the user close his or her browser or refresh the page), we remove its socket from the collection of sockets associated with the given room (the delete operator usage). After that we emit <code>peer.disconnected</code> event to all other peers in the room, with the <code>id</code> of the disconnected peer. This way all peers connected to the disconnected peer will be able to remove the video element associated with the disconnected client.</p>
-
 <p>The last part of the back-end is the configuration. Inside the root create a directory called config:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> .. <span class="c1"># if you&apos;re inside the lib directory</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> .. <span class="c1"># if you&apos;re inside the lib directory</span>
 mkdir config <span class="o">&amp;&amp;</span> <span class="nb">cd</span> config</code></pre></div>
-
 <p>Create a file called <code>config.json</code> and set the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
   <span class="nt">&quot;PORT&quot;</span><span class="p">:</span> <span class="mi">5555</span>
 <span class="p">}</span></code></pre></div>
-
 <h2 id="web-client">Web client</h2>
-
 <h3 id="setup">Setup</h3>
-
-<p>In order to create a new application using AngularJS&#x2019; Yeoman generator you can follow these steps:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm install -g yeoman
+<p>In order to create a new application using AngularJS&apos; Yeoman generator you can follow these steps:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install -g yeoman
 npm install -g generator-angular
 <span class="c1"># if you&apos;re inside config</span>
 <span class="nb">cd</span> ..
 mkdir public <span class="o">&amp;&amp;</span> <span class="nb">cd</span> public
 yo angular</code></pre></div>
-
 <p>You&#x2019;ll be asked a few questions, answer them as follows:</p>
-
 <p><amp-img src="/images/yeoman-angular-webrtc/setup.png" alt="Setup" title="Setup"></amp-img></p>
-
 <p>Basically, we only need <code>angular-route</code> as dependency and since we want our application to look relatively well designed with little amount of effort we require Bootstrap as well.</p>
-
 <h3 id="implementation-1">Implementation</h3>
-
 <p>As first step, we need to handle some browser inconsistencies. Inside <code>public/app/scripts</code>, create a file called <code>adapter.js</code> and add the following content inside it:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitRTCPeerConnection</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">mozRTCPeerConnection</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitRTCPeerConnection</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">mozRTCPeerConnection</span><span class="p">;</span>
 <span class="nb">window</span><span class="p">.</span><span class="nx">RTCIceCandidate</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">RTCIceCandidate</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">mozRTCIceCandidate</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitRTCIceCandidate</span><span class="p">;</span>
 <span class="nb">window</span><span class="p">.</span><span class="nx">RTCSessionDescription</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">RTCSessionDescription</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">mozRTCSessionDescription</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitRTCSessionDescription</span><span class="p">;</span>
 <span class="nb">window</span><span class="p">.</span><span class="nx">URL</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">URL</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">mozURL</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">webkitURL</span><span class="p">;</span>
-<span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">webkitGetUserMedia</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">mozGetUserMedia</span><span class="p">;</span>
-</code></pre></div>
-
+<span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">webkitGetUserMedia</span> <span class="o">||</span> <span class="nb">window</span><span class="p">.</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">mozGetUserMedia</span><span class="p">;</span></code></pre></div>
 <p>Since Firefox and Chrome still support the WebRTC API with <code>moz</code> and <code>webkit</code> prefixes, we need to take care of it.</p>
-
 <p>Great! So far our future app will work on Chrome and Firefox!</p>
-
 <p>Now lets create a service, called <code>VideoStream</code>, which is responsible for providing us a media stream to the other components in the application:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory VideoStream</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory VideoStream</code></pre></div>
 <p>And lets edit its content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;VideoStream&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">stream</span><span class="p">;</span>
     <span class="k">return</span> <span class="p">{</span>
@@ -500,20 +405,13 @@ yo angular</code></pre></div>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p><code>VideoStream</code> uses <code>$q</code> in order to provide a video stream using <code>getUserMedia</code>. Once we invoke <code>getUserMedia</code> the browser will ask the user for permissions over his/her microphone and web cam:</p>
-
 <p><amp-img src="/images/yeoman-angular-webrtc/webcam-permissions.png" alt="" title="Permissions for using the camera and microphone"></amp-img></p>
-
 <p>After we gain access to the video stream we cache it inside the <code>stream</code> variable, in order to not ask the user for web camera permissions each time we want to access it.</p>
-
 <h4 id="application-configuration">Application configuration</h4>
-
 <p>Now it&#x2019;s time to configure the routes in our application. Edit<code>public/app/scripts/app.js</code> and add the following route definition:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span>
   <span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">,</span> <span class="p">[</span>
     <span class="s1">&apos;ngRoute&apos;</span>
   <span class="p">])</span>
@@ -530,57 +428,37 @@ yo angular</code></pre></div>
       <span class="p">.</span><span class="nx">otherwise</span><span class="p">({</span>
         <span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&apos;/room&apos;</span>
       <span class="p">});</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p>Here we define two routes:</p>
-
 <ul>
 <li><code>/room</code> - for users accessing the application for first time (without having link to a specific room). They will visit <code>/room</code> and after allowing access to their web cam (because of logic inside <code>RoomCtrl</code>), they will automatically create a new room and will be redirected to another URL (<code>/room/:roomId</code>). Once they are redirected to this URL they can share it with other users they want to talk with.</li>
 <li><code>/room/:roomId</code> - users who have already created room can share their URL with other users, who can join the video call.</li>
 </ul>
-
-<p>Of course, if you guess the URL of another users&#x2019; session you can join their video call without much effort, for the sake of simplicity we&#x2019;ve used this simple (and not secure) mechanism. Be polite and do not violate other users&#x2019; privacy. :-)</p>
-
+<p>Of course, if you guess the URL of another users&apos; session you can join their video call without much effort, for the sake of simplicity we&#x2019;ve used this simple (and not secure) mechanism. Be polite and do not violate other users&apos; privacy. :-)</p>
 <p>Add this constant definition in the bottom of <code>app.js</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">constant</span><span class="p">(</span><span class="s1">&apos;config&apos;</span><span class="p">,</span> <span class="p">{</span>
       <span class="c1">// Change it for your app URL
 </span><span class="c1"></span>      <span class="nx">SIGNALIG_SERVER_URL</span><span class="o">:</span> <span class="nx">YOUR_APP_URL</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p>We will use this constant in order connect <code>socket.io</code> client with the server.</p>
-
 <h4 id="io">Io</h4>
-
 <p>Now lets create one more service called <code>Io</code>.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory Io</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory Io</code></pre></div>
 <p>Inside <code>/public/app/scripts/services/io.js</code> set the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;Io&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">io</span> <span class="o">===</span> <span class="s1">&apos;undefined&apos;</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&apos;Socket.io required&apos;</span><span class="p">);</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="nx">io</span><span class="p">;</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p>Basically here we wrap <code>io</code> inside a service, in order to allow the users to inject it, instead of using the global <code>io</code>. This will allow us to mock <code>io</code> easily instead of monkey patching it, when we want to write tests.</p>
-
 <h4 id="roomctrl">RoomCtrl</h4>
-
 <p>Now lets create a new controller, called <code>RoomCtrl</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:controller Room</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yo angular:controller Room</code></pre></div>
 <p>Edit <code>/public/app/scripts/controllers/room.js</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;RoomCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$sce</span><span class="p">,</span> <span class="nx">VideoStream</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">$routeParams</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="nx">Room</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">||</span> <span class="o">!</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span><span class="p">)</span> <span class="p">{</span>
@@ -624,13 +502,9 @@ yo angular</code></pre></div>
     <span class="nx">$scope</span><span class="p">.</span><span class="nx">getLocalVideo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">$sce</span><span class="p">.</span><span class="nx">trustAsResourceUrl</span><span class="p">(</span><span class="nx">stream</span><span class="p">);</span>
     <span class="p">};</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p>Now lets look at the code step-by-step:</p>
-
 <p><code>RoomCtrl</code> accepts as dependencies the following components:</p>
-
 <ul>
 <li><code>$sce</code> - used for setting the source of the video elements</li>
 <li><code>VideoStream</code> - used for getting the video stream from the user&#x2019;s camera</li>
@@ -639,16 +513,12 @@ yo angular</code></pre></div>
 <li><code>$scope</code> - used for attaching data to it in order to achieve data-binding with the view</li>
 <li><code>Room</code> - service which we are going to define next. It is used for managing the peer connections.</li>
 </ul>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">||</span> <span class="o">!</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">window</span><span class="p">.</span><span class="nx">RTCPeerConnection</span> <span class="o">||</span> <span class="o">!</span><span class="nx">navigator</span><span class="p">.</span><span class="nx">getUserMedia</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="s1">&apos;WebRTC is not supported by your browser. You can try the app with Chrome and Firefox.&apos;</span><span class="p">;</span>
   <span class="k">return</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>In the snippet above we check whether WebRTC is supported. If it isn&#x2019;t we simply set content of the <code>$scope.error</code> property and stop the controller execution.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">stream</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">stream</span><span class="p">;</span>
 <span class="nx">VideoStream</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
 <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">stream</span> <span class="o">=</span> <span class="nx">s</span><span class="p">;</span>
@@ -664,16 +534,11 @@ yo angular</code></pre></div>
   <span class="p">}</span>
 <span class="p">},</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="s1">&apos;No audio/video permissions. Please refresh your browser and allow the audio/video capturing.&apos;</span><span class="p">;</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p><code>VideoStream.get()</code> returns a promise, which once resolved gives us the media stream of the user. When the promise is resolved we initialize the <code>Room</code> passing the stream as argument. In order to visualize the video captured by our web cam we use <code>URL.createObjectURL</code>, to be able to set it as <code>src</code> of a video element in our HTML.</p>
-
 <p>As next step we check whether the <code>roomId</code> is provided. If it is provided we simply join the room with the associated <code>roomId</code>: <code>Room.joinRoom($routeParams.roomId);</code>, otherwise we create a new room. Once the room is created we redirect the user to the room&#x2019;s URL.</p>
-
 <p>The rest of the <code>RoomCtrl</code> is handling two events:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Room</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;peer.stream&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">peer</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Room</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;peer.stream&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">peer</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Client connected, adding new stream&apos;</span><span class="p">);</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">peers</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
     <span class="nx">id</span><span class="o">:</span> <span class="nx">peer</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
@@ -685,23 +550,16 @@ yo angular</code></pre></div>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">peers</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">peers</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">p</span><span class="p">.</span><span class="nx">id</span> <span class="o">!==</span> <span class="nx">peer</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
   <span class="p">});</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <ul>
 <li><code>peer.stream</code> - a peer stream is received. Once we receive a new peer stream we add it to the array <code>$scope.peers</code>, which is visualized on the page. The markup on the page maps each <code>stream</code> to a video element.</li>
 <li><code>peer.disconnected</code> - once a peer disconnects the <code>peer.disconnected</code> event is being fired. When we receive this event we can simply remove the disconnected peer from the collection.</li>
 </ul>
-
 <h4 id="room-service">Room service</h4>
-
 <p>The last component from our application is the <code>Room</code> service:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory Room</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yo angular:factory Room</code></pre></div>
 <p>Edit the file <code>/public/app/scripts/services/room.js</code> and set the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;Room&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$rootScope</span><span class="p">,</span> <span class="nx">$q</span><span class="p">,</span> <span class="nx">Io</span><span class="p">,</span> <span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="kd">var</span> <span class="nx">iceConfig</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&apos;iceServers&apos;</span><span class="o">:</span> <span class="p">[{</span> <span class="s1">&apos;url&apos;</span><span class="o">:</span> <span class="s1">&apos;stun:stun.l.google.com:19302&apos;</span> <span class="p">}]},</span>
@@ -819,21 +677,16 @@ yo angular</code></pre></div>
 
     <span class="nx">addHandlers</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">api</span><span class="p">;</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p><code>Room</code> accepts the following dependencies:</p>
-
 <ul>
 <li><code>$rootScope</code> - it is used in order to invoke the <code>$digest</code> loop, once <code>socket.io</code> event is received. Since the <code>socket.io</code> event handlers are not wrapped inside <code>$scope.$appy</code> we need to invoke <code>$digest</code> manually.</li>
 <li><code>$q</code> - in order to provide promise based interface</li>
 <li><code>Io</code> - the wrapped <code>socket.io</code> global function</li>
 <li><code>config</code> - the configuration constant we defined in <code>app.js</code>.</li>
 </ul>
-
 <p><code>Room</code> provides the following public API:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">api</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">api</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">joinRoom</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">connected</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;init&apos;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">room</span><span class="o">:</span> <span class="nx">r</span> <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">roomid</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
@@ -856,22 +709,16 @@ yo angular</code></pre></div>
   <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">stream</span> <span class="o">=</span> <span class="nx">s</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>As described above <code>joinRoom</code> is used for joining already existing rooms, <code>createRoom</code> is used for creating new rooms and <code>init</code> is used for initializing the <code>Room</code> service.</p>
-
 <p>The <code>socket.io</code> events handled in this service are:</p>
-
 <ul>
 <li><code>peer.connected</code> - fired when new peer joins the room. Once this event is fired we initiate new SDP offer to this peer</li>
 <li><code>peer.disconnected</code> - fired when peer disconnects</li>
 <li><code>msg</code> - fired when new SDP offer/answer or ICE candidate are received</li>
 </ul>
-
 <p>Lets take a look at how new offer is being initiated, when a peer connects the room:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">makeOffer</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">makeOffer</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">pc</span> <span class="o">=</span> <span class="nx">getPeerConnection</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
   <span class="nx">pc</span><span class="p">.</span><span class="nx">createOffer</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">sdp</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">pc</span><span class="p">.</span><span class="nx">setLocalDescription</span><span class="p">(</span><span class="nx">sdp</span><span class="p">);</span>
@@ -881,21 +728,14 @@ yo angular</code></pre></div>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="p">{</span> <span class="nx">mandatory</span><span class="o">:</span> <span class="p">{</span> <span class="nx">OfferToReceiveVideo</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">OfferToReceiveAudio</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}});</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>Once new peer joins the room <code>makeOffer</code> is invoked with the peer&#x2019;s id. The first thing we do is to <code>getPeerConnection</code>. If connection with the specified peer id already exists <code>getPeerConnection</code> will return it, otherwise it will create a new <code>RTCPeerConnection</code> and attach the required event handlers to it. After we have the peer connection we invoke the <code>createOffer</code> method. This method will make a new request to the provided STUN server in the <code>RTCPeerConnection</code> configuration and will gather the ICE candidates. Based on the ICE candidates and the supported codecs, etc. it will create a new SDP offer, which we will send to the server. As we saw above the server will redirect the offer to the peer pointed by the property <code>to</code> of the event object.</p>
-
 <p>Now lets take a look at the handler of the <code>msg</code> message:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;msg&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;msg&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">handleMessage</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>Here we directly invoke <code>handleMessage</code>, so lets trace the function&#x2019;s implementation:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleMessage</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleMessage</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">pc</span> <span class="o">=</span> <span class="nx">getPeerConnection</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">by</span><span class="p">);</span>
   <span class="k">switch</span> <span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">case</span> <span class="s1">&apos;sdp-offer&apos;</span><span class="o">:</span>
@@ -921,20 +761,15 @@ yo angular</code></pre></div>
       <span class="p">}</span>
       <span class="k">break</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>In the first line we get the peer connection with the peer with id pointed by the <code>by</code> property. Once we get the connection we switch through the different message types:</p>
-
 <ul>
 <li><code>sdp-offer</code> - if we receive this message, this means that we have just connected to the room and the rest of the peers inside this room want to initiate new peer connection with us. In order to answer them with our ICE candidates, video codecs, etc. we create a new answer using <code>createAnswer</code> but before that we <code>setRemoteDescription</code> (the description of the remote peer). Once we prepare the SDP answer we send it to the appropriate peer via the server.</li>
 <li><code>sdp-answer</code> - if we receive SDP answer by given peer, this means that we have already sent SDN offer to this peer. We set the remote description and we hope that we&#x2019;ll successfully initiate the media connection between us (we hope we&#x2019;re not both behind symmetric NATs).</li>
 <li><code>ice</code> - if in the process of negotiation new ICE candidates are being discovered the <code>RTCPeerConnection</code> instance will trigger <code>onicecandidate</code> event, which will redirect new <code>msg</code> message to the peer with whom we&#x2019;re currently negotiating. We simply add the ICE candidate to the appropriate peer connection using the <code>addIceCandidate</code> method.</li>
 </ul>
-
 <p>The last method we&#x2019;re going to take a look at, in this tutorial, is <code>getPeerConnection</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">peerConnections</span> <span class="o">=</span> <span class="p">{};</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">peerConnections</span> <span class="o">=</span> <span class="p">{};</span>
 
 <span class="kd">function</span> <span class="nx">getPeerConnection</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">peerConnections</span><span class="p">[</span><span class="nx">id</span><span class="p">])</span> <span class="p">{</span>
@@ -957,22 +792,14 @@ yo angular</code></pre></div>
     <span class="p">}</span>
   <span class="p">};</span>
   <span class="k">return</span> <span class="nx">pc</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>This method uses <code>peerConnections</code> object, which creates a mapping between peer id and <code>RTCPeerConnection</code> object. Initially we check whether we have associated peer connection to the given id, if we do we simply return it. If we don&#x2019;t have such peer connection we create a new one, we add the event handlers <code>onicecandidate</code> and <code>onaddstream</code>, we cache it and we return it.</p>
-
 <p>Once <code>onaddstream</code> is triggered, this means that the connection was successfully initiated. We can trigger <code>peer.stream</code> event and later visualize it in a video element on the page.</p>
-
 <h4 id="videoplayer">videoPlayer</h4>
-
 <p>This is the last component in our application. Create it using:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">yo angular:directive videoPlayer</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yo angular:directive videoPlayer</code></pre></div>
 <p>Inside <code>public/app/scripts/directives/videoplayer.js</code> set the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;publicApp&apos;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;videoPlayer&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$sce</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;div&gt;&lt;video ng-src=&quot;{{trustSrc()}}&quot; autoplay&gt;&lt;/video&gt;&lt;/div&gt;&apos;</span><span class="p">,</span>
@@ -991,34 +818,21 @@ yo angular</code></pre></div>
         <span class="p">};</span>
       <span class="p">}</span>
     <span class="p">};</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <h2 id="conclusion">Conclusion</h2>
-
 <p>Now lets make a retrospective of the solution provided above.</p>
-
 <h3 id="full-mesh-limitations">Full-mesh limitations</h3>
-
 <p>As you can experience from the tutorial&#x2019;s demo, the application works effectively with less than 10 users (or even 5, depending on your network bandwidth capacity and CPU).</p>
-
 <p>This is limitation of the full-mesh topology. When we have session with <code>n</code> peers each of these <code>n</code> peers should establish <code>n-1</code> <code>RTCPeerConnection</code> with the other peers in the room. This means that his video stream will be encoded <code>n-1</code> times and will be sent <code>n-1</code> times through the network. This is very inefficient and is almost impractical in production, when communication between multiple parties is required. Solution for this problem is the usage of WebRTC gateway. There are a few open-source projects which solve this issue:</p>
-
 <ul>
 <li><a href="https://jitsi.org/Projects/JitsiVideobridge">Jitsi Videobridge</a> - Jitsi&#x2019;s team have build a WebRTC compatible video bridge, which uses XMPP Jingle for signaling and Colibri (XMPP extension created by the Jitsi&#x2019;s team) for establishment of connection with the bridge. The bridge provides audio mixing with very high quality and only forwards the video, which makes it very effective when using a cheap hardware with low computational power.</li>
 <li><a href="http://lynckia.com/licode/">licode</a> - another open-source project, which provides video and audio mixing and custom JSON based protocol for signaling. The last time I tried to use it, its mixing wasn&#x2019;t with very high quality, in case of background sound the audio connection was almost impossible to use.</li>
 </ul>
-
 <h3 id="signaling-protocol">Signaling protocol</h3>
-
 <p>In this tutorial we used custom JSON protocol for signaling. Better choice will be to use standardized protocol, such as XMPP Jingle or SIP. This will allow you better flexibility in case you need to integrate your service with other, already existing services.</p>
-
 <h3 id="more">More</h3>
-
 <p>There are a plenty of other topics we didn&#x2019;t cover but they are unfortunately outside the scope of this tutorial. If you&#x2019;re interested in further reading you can check out the resources below or ping me for additional information.</p>
-
 <h2 id="resources">Resources</h2>
-
 <ul>
 <li><a href="http://www.html5rocks.com/en/tutorials/webrtc/basics/">HTML5 Rocks WebRTC intro</a></li>
 <li><a href="http://www.html5rocks.com/en/tutorials/webrtc/infrastructure/">HTML5 Rocks, WebRTC infrastructure</a></li>

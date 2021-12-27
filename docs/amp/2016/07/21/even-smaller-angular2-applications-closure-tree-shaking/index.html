@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev\x27s blog",
+    "headline": "2.5X Smaller Angular 2 Applications with Google Closure Compiler - Minko Gechev\u0027s blog",
     "datePublished": "2016-07-21T00:00:00JST",
     "dateModified": "2016-07-21T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "In the post \x26ldquo;Building an Angular 2 Application for Production\x26rdquo; we explored how we can decrease the bundle size of a \x26ldquo;Hello world!\x26rdquo; application to from about 1.6M (non-minified \x26amp; uncompressed) to 49K! We did this by using the following techniques:\n Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!"
+    "description": "In the post \u0026ldquo;Building an Angular 2 Application for Production\u0026rdquo; we explored how we can decrease the bundle size of a \u0026ldquo;Hello world!\u0026rdquo; application to from about 1.6M (non-minified \u0026amp; uncompressed) to 49K! We did this by using the following techniques:\n Angular offline template compiler for generating tree-shakable code. Tree-shaking of ES2015 modules with rollup. Bundling of the application. Minification with uglifyjs. Compression with gzip.  Although we achieved impressive results we can do even better!"
   }
 </script>
 
@@ -130,10 +130,7 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>In the post &#x201C;<a href="https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">Building an Angular 2 Application for Production</a>&#x201D; we explored how we can decrease the bundle size of a &#x201C;Hello world!&#x201D; application to from about 1.6M (non-minified &amp; uncompressed) to 49K! We did this by using the following techniques:</p>
-
+  <div class="article-body"><p>In the post &#x201C;<a href="https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">Building an Angular 2 Application for Production</a>&#x201D; we explored how we can decrease the bundle size of a &#x201C;Hello world!&#x201D; application to from about 1.6M (non-minified &amp; uncompressed) to 49K! We did this by using the following techniques:</p>
 <ul>
 <li>Angular offline template compiler for generating tree-shakable code.</li>
 <li>Tree-shaking of ES2015 modules with rollup.</li>
@@ -141,60 +138,38 @@
 <li>Minification with uglifyjs.</li>
 <li>Compression with gzip.</li>
 </ul>
-
 <p>Although we achieved impressive results we can do even better! In this post I&#x2019;ll show some of the work done by <a href="https://twitter.com/Jakeherringbone">Alex Eagle</a> and <a href="https://twitter.com/jeffbcross">Jeff Cross</a> from the Angular core team.</p>
-
-<div class="warning-box">
-  <strong>Disclaimer</strong>: This article explains a research which uses experimental tools tools which <strong>WILL</strong> change in near future. <strong>Do not</strong> use anything described here in production.
-</div>
-
+<!-- raw HTML omitted -->
 <h2 id="closure-compiler">Closure Compiler</h2>
-
 <p>For our purpose we&#x2019;ll use the Google Closure Compiler:</p>
-
 <blockquote>
 <p>The Closure Compiler is a tool for making JavaScript download and run faster. Instead of compiling from a source language to machine code, it compiles from JavaScript to better JavaScript. It parses your JavaScript, analyzes it, removes dead code and rewrites and minimizes what&#x2019;s left. It also checks syntax, variable references, and types, and warns about common JavaScript pitfalls.</p>
 </blockquote>
-
 <p>The steps that we are going to go through this time will be simplified since Closure Compiler can do most of the work for us, such as tree-shaking, minification and bundling! This will help us to reduce the tools from our tool-chain to only ngc and Closure Compiler!</p>
-
 <p>Everything looks like a piece of cake at first, however, there are some complications:</p>
-
-<h2 id="obstacles-incomplete-es2015-module-support">Obstacles - Incomplete ES2015 Module Support</h2>
-
+<h2 id="obstacles---incomplete-es2015-module-support">Obstacles - Incomplete ES2015 Module Support</h2>
 <p>Fortunately, Google Closure compiler <a href="https://www.reddit.com/r/javascript/comments/3pb750/ecmascript_6_is_now_officially_supported_by/">officially supports ES2015</a>, but unfortunately it supports only a subset of the module syntax. For instance:</p>
-
 <p><strong>bar.js</strong></p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="k">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-</code></pre></div>
-<p><strong>index.js</strong></p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="o">*</span> <span class="nx">from</span> <span class="s1">&apos;./bar&apos;</span><span class="p">;</span>
-</code></pre></div>
-<p><strong>foo.js</strong></p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">bar</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;./index&apos;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">bar</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</code></pre></div><p><strong>index.js</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="o">*</span> <span class="nx">from</span> <span class="s1">&apos;./bar&apos;</span><span class="p">;</span>
+</code></pre></div><p><strong>foo.js</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span><span class="nx">bar</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;./index&apos;</span><span class="p">;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
-</code></pre></div>
-<p>&#x2026;is not supported by Closure Compiler because of <code>export * from ./bar</code>.</p>
-
-<h2 id="solution-goog-module">Solution - <code>goog.module</code></h2>
-
+</code></pre></div><p>&#x2026;is not supported by Closure Compiler because of <code>export * from ./bar</code>.</p>
+<h2 id="solution---googmodule">Solution - <code>goog.module</code></h2>
 <p>An alternative module syntax that works well with the compiler is <code>goog.module</code>. Unfortunately the TypeScript compiler doesn&#x2019;t support transpilation to <code>goog.module</code>s. For this purpose we have to use <code>tsc</code> combined with the tool <a href="https://github.com/angular/tsickle"><code>tsickle</code></a> which allows us to hook in the <code>ngc</code> compilation process and emit Closure-friendly ES2015 instead.</p>
-
 <p>In short, we need a custom build of Angular and all of its dependencies to <code>goog.module</code> modules. At this point this is achievable by going through a list of hacky solutions, however, soon the CLI and the <a href="https://github.com/mgechev/angular2-seed">Angular starters</a> will automate this process completely and will eliminate all the boilerplates.</p>
-
 <h2 id="results">Results</h2>
-
 <p><a href="https://github.com/alexeagle">Alex Eagle</a>, posted his experiment <a href="https://github.com/alexeagle/closure-compiler-angular-bundling">on GitHub</a> and shared all the details about the build process in <a href="https://docs.google.com/document/d/17m1GwzXraKgbCkCmH1JnY9IZzPy4cqlpCFVhvlZnOys/edit">this document</a>.</p>
-
 <p>Lets run the build script and see what the bundle size of our Angular application will be!</p>
-
 <p>Note that the build script below requires <code>brotli</code>. Brotli is a tool which implements the brotli general-purpose lossless compression algorithm. For further details visit <a href="https://github.com/google/brotli">Brotli&#x2019;s GitHub</a> repository.</p>
-<div class="highlight"><pre class="chroma">$ git clone https://github.com/mgechev/closure-compiler-angular-bundling
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ git clone https://github.com/mgechev/closure-compiler-angular-bundling
 $ cd closure-compiler-angular-bundling
 $ npm install
-$ npm run build</pre></div>
-<p>Now if we go to <code>dist</code> we&#x2019;ll find:</p>
-<div class="highlight"><pre class="chroma">$ cd dist
+$ npm run build
+</code></pre></div><p>Now if we go to <code>dist</code> we&#x2019;ll find:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ cd dist
 $ ls -lah
 total 344
 drwxr-xr-x   7 mgechev  staff   238B Jul 21 12:18 .
@@ -203,35 +178,20 @@ drwxr-xr-x  15 mgechev  staff   510B Jul 21 12:18 ..
 -rw-r--r--   1 mgechev  staff    20K Jul 21 12:18 bundle.js.brotli
 -rw-r--r--   1 mgechev  staff    23K Jul 21 12:18 bundle.js.gz
 -rw-r--r--   1 mgechev  staff   3.7K Jul 21 12:18 property_renaming_report
--rw-r--r--   1 mgechev  staff    32K Jul 21 12:18 variable_renaming_report</pre></div>
-<p>20K bundle! We have almost 150% improvement compared to our previous experiments!</p>
-
+-rw-r--r--   1 mgechev  staff    32K Jul 21 12:18 variable_renaming_report
+</code></pre></div><p>20K bundle! We have almost 150% improvement compared to our previous experiments!</p>
 <p>In order to make sure that the application works run:</p>
-<div class="highlight"><pre class="chroma">$ npm run serve</pre></div>
-<p>The code from above is hosted in my <a href="https://github.com/mgechev/closure-compiler-angular-bundling">GitHub account</a>.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ npm run serve
+</code></pre></div><p>The code from above is hosted in my <a href="https://github.com/mgechev/closure-compiler-angular-bundling">GitHub account</a>.</p>
 <h3 id="comparison">Comparison</h3>
-
 <p>On the diagram below you can find how the Google Closure Compiler + ngc bundle stays next to the other ones produced by the different bundling strategies explored in the <a href="https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">previous post</a>:</p>
-
-<p><a href="/images/ng2-build/ngc-closure-compiler-all.png">
-  <amp-img src="/images/ng2-build/ngc-closure-compiler-all.png" alt="ngc + Google Closure Compiler bundle comparison" width="500"></amp-img>
-</a></p>
-
+<!-- raw HTML omitted -->
 <p>Since the size amplitude above is huge, the diagram below illustrates how the bundle produced in this post compares to the other compressed bundles from the previous post:</p>
-
-<p><a href="/images/ng2-build/ngc-closure-compiler-smaller.png">
-  <amp-img src="/images/ng2-build/ngc-closure-compiler-smaller.png" alt="ngc + Google Closure Compiler bundle comparison" width="500"></amp-img>
-</a></p>
-
+<!-- raw HTML omitted -->
 <h2 id="conclusion">Conclusion</h2>
-
 <p>With the advanced compression of Google Closure Compiler we are able to drop the bundle size of a &#x201C;Hello world!&#x201D; application to 20K! However, this came with the price of a few hacks - custom build of Angular and its dependencies to <code>goog.module</code>s. However, in near future the entire process will be completely abstracted and automated. This will allow us to apply advanced build techniques such as offline compilation, tree-shaking, transpilation, compression and minification with only a single command!</p>
-
 <h2 id="references">References</h2>
-
 <p>For further reference take a look at the following resources:</p>
-
 <ul>
 <li><a href="https://github.com/angular/angular/issues/8550">Use Closure Compiler with offline template compiler</a></li>
 <li><a href="https://docs.google.com/document/d/17m1GwzXraKgbCkCmH1JnY9IZzPy4cqlpCFVhvlZnOys/edit">Closure compiler for ng2 optimisation</a></li>

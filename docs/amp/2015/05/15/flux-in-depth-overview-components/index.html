@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Flux in Depth. Overview and Components. - Minko Gechev\x27s blog",
+    "headline": "Flux in Depth. Overview and Components. - Minko Gechev\u0027s blog",
     "datePublished": "2015-05-15T00:00:00JST",
     "dateModified": "2015-05-15T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "This is the first blog post of the series \x26ldquo;Flux in Depth\x26rdquo;. Is this \x26ldquo;yet the another flux tutorial\x26rdquo;? What I have seen so far, while researching flux, were mostly \x26ldquo;how-to\x26rdquo; tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between them. This is definitely useful for getting a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration."
+    "description": "This is the first blog post of the series \u0026ldquo;Flux in Depth\u0026rdquo;. Is this \u0026ldquo;yet the another flux tutorial\u0026rdquo;? What I have seen so far, while researching flux, were mostly \u0026ldquo;how-to\u0026rdquo; tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between them. This is definitely useful for getting a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration."
   }
 </script>
 
@@ -130,89 +130,53 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>This is the first blog post of the series &#x201C;Flux in Depth&#x201D;. Is this &#x201C;yet the another flux tutorial&#x201D;? What I have seen so far, while researching flux, were mostly &#x201C;how-to&#x201D; tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between them. This is definitely useful for getting a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration. In this series of posts I will try to wire theory with practice and state <em>my own solutions</em> of problem I face on daily basis. Since these solutions might not be perfect, I&#x2019;d really appreciate giving your opinion in the comments section below.</p>
-
+  <div class="article-body"><p>This is the first blog post of the series &#x201C;Flux in Depth&#x201D;. Is this &#x201C;yet the another flux tutorial&#x201D;? What I have seen so far, while researching flux, were mostly &#x201C;how-to&#x201D; tutorials (usually with todo applications), which describe the main components of given flux application and the data flow between them. This is definitely useful for getting a high-level overview of how everything works but in reality there are plenty of other things, which should be taken under consideration. In this series of posts I will try to wire theory with practice and state <em>my own solutions</em> of problem I face on daily basis. Since these solutions might not be perfect, I&#x2019;d really appreciate giving your opinion in the comments section below.</p>
 <h2 id="introduction">Introduction</h2>
-
 <p>Flux is micro-architecture for software application development, which has unidirectional data flow. It sounds quite abstract but thats what it is. It is technology agnostic, which means that it doesn&#x2019;t depend on ReactJS, although it was initially introduced by facebook. It is not coupled to a specific place in the stack where it should be used - you can build isomorphic JavaScript applications with flux, like Reza Akhavan <a href="https://docs.google.com/presentation/d/1LdTKrxw0MdvH_VCkpWG2q5hS3pKvIA1IzbL3d3cZ1Ok/edit#slide=id.p">pointed out during one JavaScript breakfast</a>. Flux is not even coupled to JavaScript. It just solves a few problems, which are common for MVC.</p>
-
 <p>Lets take a look at a diagram, which illustrates the data flow in a flux application:</p>
-
 <h2 id="flux-high-level-overview">Flux High-Level Overview</h2>
-
 <p><amp-img src="/images/overview-components/flux-overview.png" alt="High-Level Overview"></amp-img></p>
-
 <p>Lets describe what the boxes and the arrows above mean and later we will dig into the data flow. If you&#x2019;re already familiar with flux, feel free to skip this section.</p>
-
 <h3 id="view">View</h3>
-
 <p>The view is simply <a href="https://en.wikipedia.org/wiki/Composite_pattern">composition of components</a>. They might be stateless or stateful. We will talk more about components in the next sections. How exactly we need to compose them and on what level of granularity they should be depends completely on the UI of our application. We have higher level components, which abstract lower level components by composing them. The data is passed from the root component to all its child components, which recursively pass the data used by their children and so on.</p>
-
 <h3 id="store">Store</h3>
-
 <p>The store is <em>not only</em> the model of our application. The store simply contains the <em>state</em> of the UI. When we use stateful components parts of the state could be stored in them but we need to be careful with that.</p>
-
 <p>What state could be kept in the store? We can think of two types of store:</p>
-
 <ul>
 <li>Model - domain specific data. For example, the todo items in our todo application.</li>
 <li>UI state - the state of our view, which is not relevant to the model. For example, which dialog is opened right now.</li>
 </ul>
-
 <p>One common thing between MVC and flux is that the store <em>should not be aware</em> of its representation and it is better to be unaware of the way our application communicates with the back-end services, although in flux the store and the view are more coupled (because of the UI state)! However, the store in flux is not equals to the model in MVC. Making the UI state external for the components help us create &#x201C;pure components&#x201D; (see below) and force the separation of concerns even further. Why this is so awesome? Well, our store is nothing more than a JavaScript object, which could be easily persisted! Imagine the world where you can make a &#x201C;snapshot&#x201D; of your UI and save it somewhere (database, localStorage, wherever). Later you can restore this &#x201C;snapshot&#x201D; quite easily! If we go on more philosophical level, we can distinguish the state and the model even further. We can have separate component, which represents our domain data and keep only the UI state in the store (which will be some kind of mix between the data stored in our model and the state of our components, like coordinates on the screen, flags whether the components are enabled or disabled, etc.).</p>
-
 <p>This separation will keep the structure of our model completely independent from the view but will bring more complexity because of the additional component.</p>
-
 <p>The store knows only of the existence of:</p>
-
 <h3 id="dispatcher">Dispatcher</h3>
-
 <p>A few years ago, Nicholas Zakas published his <a href="https://www.youtube.com/watch?v=vXjVFPosQHw">large scale application architecture</a>. In the core of the architecture there is a sandbox, which implements the publish/subscribe pattern. Publish/subscribe is nothing more than the <a href="https://en.wikipedia.org/wiki/Observer_pattern">observer pattern</a> but since in JavaScript we have first-class functions, we can use them instead of observers. We can think of the publish/subscribe object as an event bus (which could be considered more or less as <a href="https://en.wikipedia.org/wiki/Mediator_pattern">mediator</a>). The main difference between observer and publish/subscribe is that in the latest, it is not responsibility of the subject to keep list of observers, unlike in the classical observer pattern.</p>
-
 <p>Okay, so I said this only in order to tell you that the Dispatcher is simply an event bus. It is a singleton, which owns a map of key-value pairs. The keys in this map are event (action) names and the values are lists of callbacks. The dispatcher has a method called <code>dispatch</code>, which once called with an event name, iterates over all callbacks associated with it and invokes them. Thats it. The implementations may slightly vary but that is the general idea. You can take a look at sample <a href="https://github.com/facebook/flux/blob/master/src/Dispatcher.js">implementation here</a>. In my projects I usually use this implementation as base class for my custom Dispatcher. So far I haven&#x2019;t needed anything it doesn&#x2019;t provide.</p>
-
 <h3 id="action">Action</h3>
-
 <p>Actions are even simpler than the Dispatcher. What they do is to define methods, which will be called by the View. These methods accept arguments, which contain further instructions on how the View wants to change the Store. All these methods do is to delegate their calls to the Dispatcher&#x2019;s <code>dispatch</code> method. This might seems like unnecessary level of indirection. Why would we need to call action from the View, which action immediately delegates its call to the Dispatcher&#x2019;s <code>dispatch</code> method? Why not simply call the dispatch method from the view? The view only invokes methods of actions, which should be named semantically correctly. The action is responsible for translating these calls to a events, which are understandable by the Store. In this case the actions may combine a few calls at one event or fork given action to two or more different events.</p>
-
 <p>So from the diagram above we can notice that the arrows are in only a single direction. This is one of the &#x201C;selling points&#x201D; of flux:</p>
-
 <h3 id="unidirectional-data-flow">Unidirectional Data Flow</h3>
-
 <p>Building MVW applications help us to better structure our client-side code, make it more coherent and less coupled. We can easily isolate our business logic from the view, making our models independent from their representation. This decoupling is achieved using the <a href="https://en.wikipedia.org/wiki/Observer_pattern">observer pattern</a>, which is quite handy; it helps us dispatch events in both directions - view to model and vice versa.</p>
-
 <p>However, in complex single-page applications dispatching events in both directions may lead to cascading events, which introduces a tangled weave of data flow and unpredictable results. Flux helps us deal with the issues of MVW and allows us to build highly scalable single-page applications.</p>
-
 <p>It is much easier to follow the unidirectional data flow since we know exactly where the data comes from and to which components it needs to be redirected next. This definitely makes our applications easier for understanding but there is one more feature, which help us deal with complexity:</p>
-
 <h3 id="stateless-components">Stateless Components</h3>
-
 <p>In flux the user interface is a composition of <strong>stateless</strong> UI components (they may keep some component-specific state but we will talk about this in a bit). The components do not depend on any external mutable state. The user interface they render is entirely determined by the received input by their parent component. May be it seems like a brand new, innovative idea, however it is a well known concept, which comes from the world of functional programming.</p>
-
 <p>It is much easier to think of the functions as black boxes, which accept input and return output:</p>
-
 <p><amp-img src="/images/overview-components/pure-function.png" alt="Pure function"></amp-img></p>
-
 <p>Rather than as something, which does its job by depending on external mutable resources:</p>
-
 <p><amp-img src="/images/overview-components/impure-function.png" alt="Impure function"></amp-img></p>
-
 <p>According to Wikipedia a pure function is:</p>
-
 <blockquote>
-<p>In computer programming, a function may be described as a pure function if both these statements about the function hold:
-1. The function always evaluates the same result value given the same argument value(s). The function result value cannot depend on any hidden information or state that may change as program execution proceeds or between different executions of the program, nor can it depend on any external input from I/O devices (usually&#x2014;see below).
-2. Evaluation of the result does not cause any semantically observable side effect or output, such as mutation of mutable objects or output to I/O devices (usually&#x2014;see below).</p>
+<p>In computer programming, a function may be described as a pure function if both these statements about the function hold:</p>
+<ol>
+<li>The function always evaluates the same result value given the same argument value(s). The function result value cannot depend on any hidden information or state that may change as program execution proceeds or between different executions of the program, nor can it depend on any external input from I/O devices (usually&#x2014;see below).</li>
+<li>Evaluation of the result does not cause any semantically observable side effect or output, such as mutation of mutable objects or output to I/O devices (usually&#x2014;see below).</li>
+</ol>
 </blockquote>
-
 <p>How we can make our components pure? Definitely they should not use any global variables because their result (rendered UI), should not depend on anything else except the properties they accept. But that&#x2019;s not all. If the data passed to the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:</p>
-
 <p><amp-img src="/images/overview-components/component-tree.png" alt="Component tree"></amp-img></p>
-
 <p>And the following data applied to it:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
   <span class="nx">photoUrl</span><span class="o">:</span> <span class="s2">&quot;photo.png&quot;</span><span class="p">,</span>
   <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Foo&quot;</span><span class="p">,</span>
   <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Bar&quot;</span><span class="p">,</span>
@@ -228,105 +192,72 @@
     <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
   <span class="p">}]</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>If we call the object above <code>user</code>, in a flux-like architecture the data will be distributed across the components in the following way:</p>
-
+</code></pre></div><p>If we call the object above <code>user</code>, in a flux-like architecture the data will be distributed across the components in the following way:</p>
 <p><amp-img src="/images/overview-components/flux-like-data-distribution.png" alt="Flux data distribution"></amp-img></p>
-
 <p>If the <code>User</code> component needs to display the number of pending todo items, we may have the following snippet in its implementation:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">user</span><span class="p">.</span><span class="nx">todos</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">u</span> <span class="p">=&gt;</span> <span class="o">!</span><span class="nx">u</span><span class="p">.</span><span class="nx">completed</span><span class="p">);</span>
-</code></pre></div>
-<p>It definitely looks elegant, we&#x2019;re applying the high-order function <code>filter</code> over the user&#x2019;s todo items. However, this way we&#x2019;re creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in <code>user.todos</code> will introduce an issue - the <code>Todos</code> component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">user</span><span class="p">.</span><span class="nx">todos</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">u</span> <span class="p">=&gt;</span> <span class="o">!</span><span class="nx">u</span><span class="p">.</span><span class="nx">completed</span><span class="p">);</span>
+</code></pre></div><p>It definitely looks elegant, we&#x2019;re applying the high-order function <code>filter</code> over the user&#x2019;s todo items. However, this way we&#x2019;re creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in <code>user.todos</code> will introduce an issue - the <code>Todos</code> component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.</p>
 <h4 id="immutable-data">Immutable Data</h4>
-
 <p>How we can deal with such side effects? We can use something called immutable data, which according to Wikipedia is defined as:</p>
-
 <blockquote>
 <p>In object-oriented and functional programming, an immutable object is an object whose state cannot be modified after it is created.</p>
 </blockquote>
-
 <p>You can check out my talk on using immutable data in Angular <a href="https://www.youtube.com/watch?v=zeChCjj-tbY">here</a>.</p>
-
 <p>In order to introduce the immutability in our application we have three options:</p>
-
 <ul>
 <li>Use wrappers around the standard JavaScript primitives, which makes the data immutable (for example with library like <a href="https://facebook.github.io/immutable-js/">Immutable.js</a>)</li>
 <li>Use ES5 <code>Object.freeze</code></li>
 <li>Combination between both approaches</li>
 </ul>
-
 <p>Lets create an immutable list using Immutable.js:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{};</span>
 <span class="kd">let</span> <span class="nx">newList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2 ]
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">newList</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2, [object Object] ]
 </span><span class="c1"></span><span class="nx">newList</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nx">baz</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// 42
-</span></code></pre></div>
-<p>In the snippet above we can notice that:</p>
-
+</span></code></pre></div><p>In the snippet above we can notice that:</p>
 <ul>
 <li>Each operation, which will eventually mutate the data structure returns a new immutable object (list in this case), so <code>list !== newList</code></li>
 <li>The returned immutable object from the mutation operation is the same as the initial list but with the modification applied</li>
 <li>The list can contains heterogeneous data (numbers and objects)</li>
 <li>The list items are <em>not immutable</em>, we pushed the <code>foo</code> object inside the list and changed it right after that</li>
 </ul>
-
-<p>It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js&#x2019; list as a thin wrapper around the standard JavaScript array:</p>
-
+<p>It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js&apos; list as a thin wrapper around the standard JavaScript array:</p>
 <p><amp-img src="/images/overview-components/immutable-collection-mutable-items.png" alt="Immutable data structure with mutable items"></amp-img></p>
-
 <p>We can simply access any of the mutable items inside the immutable data structure&#x2026;:</p>
-
 <p><amp-img src="/images/overview-components/touch-mutable-item.png" alt="Access mutable item"></amp-img></p>
-
 <p>&#x2026;and change it:</p>
-
 <p><amp-img src="/images/overview-components/change-mutable-item.png" alt="Change mutable item"></amp-img></p>
-
 <p>Which is not cool. In order to fix this behavior we can use <code>Object.freeze</code>.</p>
-
 <p>If we use <code>Object.freeze</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{}</span> <span class="p">}</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{}</span> <span class="p">}</span>
 <span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
 <span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// undefined
 </span><span class="c1"></span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// &apos;foobar&apos;
-</span></code></pre></div>
-<p>Which means that <code>Object.freeze</code> doesn&#x2019;t do deep freeze of the objects.</p>
-
+</span></code></pre></div><p>Which means that <code>Object.freeze</code> doesn&#x2019;t do deep freeze of the objects.</p>
 <p>What we can do is to:</p>
-
 <ul>
 <li>Use Immutable.js for our data structures</li>
 <li>Deep freeze our data items</li>
 </ul>
-
 <p>Is it necessary to use immutable data? No. It may eventually lead to some performance slowdowns (<a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">or</a> <a href="https://facebook.github.io/react/docs/advanced-performance.html">not</a>) but it will make your debugging experience even easier since your components won&#x2019;t produce any side effects, in case you&#x2019;ve already stopped touching the global things! If you&#x2019;re using immutable data you will also make sure you&#x2019;ve put some boundaries in your project. If new team members join they will be forced to use immutable data structures and you won&#x2019;t find someone trying to take cross cuts by changing the mutable state.</p>
-
 <h4 id="stateful-vs-stateless">Stateful vs Stateless</h4>
-
 <p>It is recommended your flux components to be stateless, completely stateless! For example take look at the following mocks:</p>
-
-<p><amp-img src="/images/overview-components/page-chat.png" alt="Page Chat" style="float: left;"></amp-img>
-<amp-img src="/images/overview-components/page-profile.png" alt="Page Profile"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>This is front page of &#x201C;Stunning SPA inc.&#x201D;&#x2026;The user has four buttons in the left-hand side of the screen:</p>
-
 <ul>
 <li>Chat</li>
 <li>Profile</li>
 <li>Help</li>
 <li>Exit</li>
 </ul>
-
 <p>Once the chat button is pressed all opened dialogs should be closed and the chat dialog should be opened in the middle area of the page. Once the profile button is pressed all opened dialogs should be closed and the &#x201C;Edit profile dialog&#x201D; should be opened. Pretty straight forward scenario.</p>
-
 <p>Lets implement the <code>Dialog</code> component in ReactJS:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">Dialog</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{};</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hidden</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
@@ -354,9 +285,8 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>&#x2026;and we can use it like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">App</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</code></pre></div><p>&#x2026;and we can use it like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
 
   <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
@@ -383,9 +313,8 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user&#x2019;s profile, etc. In such case we should take advantage of the components&#x2019; composability and decompose our <code>App</code> into a few simple components. So our <code>App</code> component will look something like this:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">App</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</code></pre></div><p>This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user&#x2019;s profile, etc. In such case we should take advantage of the components&apos; composability and decompose our <code>App</code> into a few simple components. So our <code>App</code> component will look something like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">(</span>
       <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
@@ -399,9 +328,8 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>Okay&#x2026;but how will the <code>Navigation</code> component tell the <code>App</code> component when to open any of the dialogs? Remember our <code>ProfileManagement</code> component needs to be able to open the <code>profile</code> dialog as well&#x2026;? We can workaround this issue by passing callbacks:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">App</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</code></pre></div><p>Okay&#x2026;but how will the <code>Navigation</code> component tell the <code>App</code> component when to open any of the dialogs? Remember our <code>ProfileManagement</code> component needs to be able to open the <code>profile</code> dialog as well&#x2026;? We can workaround this issue by passing callbacks:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">d</span><span class="p">].</span><span class="nx">close</span><span class="p">();</span>
@@ -421,46 +349,32 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>Now inside the <code>Navigation</code> and <code>ProfileManagement</code> components we can invoke:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;chat&apos;</span><span class="p">);</span> <span class="c1">// open the chat dialog
+</code></pre></div><p>Now inside the <code>Navigation</code> and <code>ProfileManagement</code> components we can invoke:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;chat&apos;</span><span class="p">);</span> <span class="c1">// open the chat dialog
 </span><span class="c1"></span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;profile&apos;</span><span class="p">);</span> <span class="c1">// open the edit profile dialog
-</span></code></pre></div>
-<p>It started getting kind of messy, didn&#x2019;t it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component <code>E</code> needs to change the state of component <code>B</code>:</p>
-
+</span></code></pre></div><p>It started getting kind of messy, didn&#x2019;t it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component <code>E</code> needs to change the state of component <code>B</code>:</p>
 <p><amp-img src="/images/overview-components/sample-state-change.png" alt="Subtree state change"></amp-img></p>
-
 <p>This is not much different from our &#x201C;Stunning SPA inc&#x201D; app, where the <code>ProfileManagement</code> component needs to be able to change the state of the dialog components:</p>
-
 <p><amp-img src="/images/overview-components/example-real-life.png" alt="Real-life subtree state change"></amp-img></p>
-
 <p>We solved the issue there by passing callbacks, so in our example application it will look something like this:</p>
-
 <p><amp-img src="/images/overview-components/sample-state-change-callbacks.png" alt="Subtree state change callbacks"></amp-img></p>
-
-<p>Since we have data flow only from parent components to successors, we need to pass two callbacks here:
-- One to component <code>B</code>
-- One to component <code>E</code></p>
-
+<p>Since we have data flow only from parent components to successors, we need to pass two callbacks here:</p>
+<ul>
+<li>One to component <code>B</code></li>
+<li>One to component <code>E</code></li>
+</ul>
 <p>Once component <code>E</code> needs to change the state of component <code>B</code>, it will invoke the callback passed to it, which will invoke the callback passed to <code>B</code>, which will somehow change the component state. Yeah, it is confusing. It gets even messier if we need to have more components communicating between each other and their common ancestor is the root node. Imagine what an explosion of callbacks and tangled logic will be&#x2026;</p>
-
 <p>What else can we do? Can&#x2019;t we make <code>E</code> and <code>B</code> communicating directly? Yeah&#x2026;I guess&#x2026;:</p>
-
 <p><amp-img src="/images/overview-components/sample-state-change-events.png" alt="Subtree state change events"></amp-img></p>
-
 <p>We can use custom event system. Implementing the publish/subscribe pattern and allowing global access to our pubsub object will fix this issue. This is <a href="https://facebook.github.io/react/tips/communicate-between-components.html">actually the recommendation by facebook</a>. But do you see something wrong here? This violates everything we believe in&#x2026;we just buried all the positives we got from flux so far&#x2026;</p>
-
 <ul>
 <li>Pure components</li>
 <li>Unidirectional data flow</li>
 </ul>
-
 <p>All our components are going to have access to a global mutable object and through this object they are going to achieve bidirectional data flow&#x2026;plenty of dirty words in a single sentence! Did you see how only a second of inattention may cause you regrets during your entire life&#x2026;! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!</p>
-
 <h5 id="solution">Solution</h5>
-
 <p>We can handle this issue by using the &#x201C;flux way&#x201D;. We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">class</span> <span class="nx">Dialog</span> <span class="k">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">&apos;dialog&apos;</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">hidden</span><span class="p">)</span> <span class="p">{</span>
@@ -474,9 +388,7 @@
     <span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it&#x2019;s worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:</p>
-
+</code></pre></div><p>It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it&#x2019;s worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:</p>
 <ul>
 <li>The user clicks the &#x201C;Chat&#x201D; button</li>
 <li>The button <code>onClick</code> handler is being invoked</li>
@@ -486,15 +398,10 @@
 <li>The <code>Store</code> throws new change event</li>
 <li>The <code>App</code> component catches the change event and propagates the <code>Store</code> down through the tree</li>
 </ul>
-
 <p>This is how we took advantage of all our flux components! Yeah, it sounds complex, I believe, but you&#x2019;ll get used to it and you&#x2019;ll love it! All new ideas are hard to grasp initially but once you find value in them you just can&#x2019;t live without them!</p>
-
 <h5 id="but-what-about-stateful-components">&#x2026;but what about stateful components&#x2026;</h5>
-
 <p>We said that we may also have stateful components in some rare cases&#x2026;Here is an example - your dialogs are draggable, you can keep the component&#x2019;s coordinates in their state. People can argue with me about this and they will have their point. For example <a href="https://github.com/gaearon"><code>react-dnd</code></a> externalizes the component&#x2019;s coordinates in the <code>Store</code> as well. However, in most cases I think we can violate the rule about stateless components and just keep the component specific state inside itself. However, <em>if another component needs to change state of given component we should definitely externalize it</em> and apply flux (just like in the scenario above).</p>
-
 <p>But how we can keep such state persistent if we need to? A few weeks ago I wrote a mixin called <code>react-pstate</code>, which allows you to persist your component&#x2019;s state. You can take a look at the module <a href="https://github.com/mgechev/react-pstate">here</a>.</p>
-
 <p>For now we can stop our flux journey here and keep talking about store and communication with external services in the next post of the series.</p>
 </div>
 

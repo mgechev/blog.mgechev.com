@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Prefetching Heuristics &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -86,26 +86,17 @@
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>In this post, we&rsquo;re going to focus on web performance. In particular, we&rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.</p>
-
+                    <p>In this post, we&rsquo;re going to focus on web performance. In particular, we&rsquo;ll be discussing optimizing user experiences preemptively. When it comes down to speeding future actions up in Web UI development, we usually apply prefetching. With prefetching, we download and cache resources relying on assumptions for the user&rsquo;s behavior. This way, we proactively perform a slow operation that the user would eventually have to execute while interacting with the app.</p>
 <p>We can categorize different prefetching strategies based on three dimensions:</p>
-
 <ul>
 <li>Prefetching heuristic (or strategy) - when do we prefetch the resources?</li>
 <li>Resource types - what resources do we prefetch?</li>
 <li>Mechanism - what mechanism do we use for prefetching? For example, do we use an XHR, <code>link[rel=prefetch]</code>, a service worker, or HTTP/2 server push</li>
 </ul>
-
 <p>In this post, we&rsquo;ll focus on different prefetching heuristics. For simplicity, we&rsquo;ll discuss script prefetching, although most of the strategies are applicable for other resources as well. We&rsquo;ll also briefly discuss the advantages and disadvantages of different prefetching mechanisms.</p>
-
-<p><img src="/images/prefetching/prefetching.png" style="display: block; margin: auto;"></p>
-
+<!-- raw HTML omitted -->
 <h2 id="trade-offs">Trade-offs</h2>
-
 <p>Just like the solutions of any problem in software engineering, different prefetching heuristics have their trade-offs. A few dimensions we need to consider are:</p>
-
 <ul>
 <li>Accuracy</li>
 <li>Network usage</li>
@@ -113,245 +104,56 @@
 <li>Setup cost</li>
 <li>Implementation size</li>
 </ul>
-
 <h3 id="accuracy">Accuracy</h3>
-
-<p>We can define a heuristic accuracy by the ratio of the number of resources we provided to the user from the cache over the number of resources they requested. For example, if the user needed two scripts while interacting with the apps and had one of them in the cache, the accuracy is <sup>1</sup>&frasl;<sub>2</sub>.</p>
-
+<p>We can define a heuristic accuracy by the ratio of the number of resources we provided to the user from the cache over the number of resources they requested. For example, if the user needed two scripts while interacting with the apps and had one of them in the cache, the accuracy is 1/2.</p>
 <h3 id="network-usage">Network Usage</h3>
-
 <p>This dimension is pretty self-explanatory. The more aggressive a prefetching strategy is, the higher network usage it&rsquo;ll have. Often folks ignore network usage giving arguments such as &ldquo;Internet nowadays is fast and cheap!&rdquo; or &ldquo;Prefetching a few megabytes of scripts is not a big deal.&rdquo; These assumptions could be accurate in some situations (for example, internal dashboards), but I&rsquo;d argue that even in tech hubs such as Silicon Valley, high network usage can cause headaches.</p>
-
 <p>For example, <a href="https://fi.google.com/about/">Google Fi</a> charges $10 per gigabyte, which is ~1¢ per 10MBs. Knowing I&rsquo;ll spend 1¢ just by visiting a web page that will aggressively prefetch resources I&rsquo;d never need doesn&rsquo;t seem like fair use of my money. The average internet user in the US surfs 138.1 pages a day, meaning you could spend $1 and 30¢ a day just browsing the web and downloading resources you&rsquo;d never use.</p>
-
-<p><img src="/images/prefetching/consumption.png" style="display: block; margin: auto;">
-<div style="text-align: center; font-size: 0.9em; font-weight: bold;">High network usage</div></p>
-
+<!-- raw HTML omitted -->
 <h3 id="cpu-usage">CPU Usage</h3>
-
 <p>Some prefetching heuristics and mechanisms are more computationally intensive than others. For example, when you need to prefetch transitive dependencies of resources, you&rsquo;d often have to parse them. Parsing is not a cheap operation and can cause frame drops when executed at the wrong time and faster battery consumption.</p>
-
 <h3 id="setup">Setup</h3>
-
 <p>A prefetching heuristic could require a significant effort to set up. The setup effort does not only depend on the heuristic itself but also the underlying technologies. For example, Angular, Next.js, and Gatsby have static route declarations, which often allow a more straightforward setup for advanced prefetching strategies.</p>
-
 <h3 id="implementation-size">Implementation Size</h3>
-
 <p>The smaller our app is, the faster it&rsquo;ll load. Having a large prefetching algorithm that takes 500KB to 1MB might defeat its purpose in certain situations.</p>
-
 <h2 id="prefetching-heuristics">Prefetching Heuristics</h2>
-
 <p>In this section, I&rsquo;d want to introduce a few prefetching heuristics. The practices are mostly technology agnostic, so you should be able to apply them across the board. To make the article more practical, I&rsquo;ve applied links to implementations for different frameworks.</p>
-
-<div style="padding: 10px; background-color: #ff00001f; border-radius: 5px; margin-top: 10px; margin-bottom: 10px;">
-In the article below I'll be using the terms prefetching and preloading interchangeably. In the context of <code>link[rel=prefetch]</code> and <code>link[rel=preload]</code> they have <a href="https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf">different meanings</a>, but for the purpose of this article we won't need to go into prioritization.
-</div>
-
-<h3 id="tl-dr">TL;DR</h3>
-
+<!-- raw HTML omitted -->
+<h3 id="tldr">TL;DR</h3>
 <p>In this table you can find a summary how the prefetching strategies from below compare to one another given the trade-offs from above:</p>
-
-<style>
-.good {
-  background-color: #0080001f !important;
-}
-.medium {
-  background-color: #ffff001f !important;
-}
-.bad {
-  background-color: #ff00001f !important;
-}
-td,
-tr {
-  border: 1px solid #0000001f !important;
-}
-</style>
-
-<table>
-<thead>
-  <th>
-    Heuristic
-  </th>
-  <th>
-    Accuracy
-  </th>
-  <th>
-    Network
-  </th>
-  <th>
-    CPU
-  </th>
-  <th>
-    Setup
-  </th>
-  <th>
-    Size
-  </th>
-</thead>
-<tbody>
-  <tr>
-    <td>
-      Prefetch all
-    </td>
-    <td class="good">
-      High
-    </td>
-    <td class="bad">
-      High
-    </td>
-    <td class="bad">
-      High
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Precaching
-    </td>
-    <td class="good">
-      High
-    </td>
-    <td class="bad">
-      High
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Quicklink
-    </td>
-    <td class="good">
-      High
-    </td>
-    <td class="medium">
-      Medium
-    </td>
-    <td class="medium">
-      Medium
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="medium">
-      Low/Medium
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Hover
-    </td>
-    <td class="medium">
-      Medium
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="medium">
-      Low/Medium
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Predictive
-    </td>
-    <td class="good">
-      Medium/High
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="good">
-      Low
-    </td>
-    <td class="bad">
-      High
-    </td>
-    <td class="bad">
-      Medium/High
-    </td>
-  </tr>
-</tbody>
-</table>
-
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
 <h3 id="prefetch-all">Prefetch All</h3>
-
 <p>Prefetching all resources has the highest accuracy but also the highest network and CPU usage. Usually, you can implement it in just a few lines of code, so it&rsquo;ll not add up much to your bundles.</p>
-
 <p>Angular has a preloading strategy called <a href="https://angular.io/api/router/PreloadAllModules"><code>PreloadAllModules</code></a>. The router will prefetch all lazy-loaded modules and all of their children&rsquo;s routes using dynamic imports. The router needs to parse each preloaded module to discover its children&rsquo;s routes, making the strategy very inefficient from a network usage point of view and CPU cycles. Check the profile below:</p>
-
-<p><img src="/images/prefetching/preload-all.png" style="display: block; margin: auto;"></p>
-
+<!-- raw HTML omitted -->
 <p>It is from an <a href="https://github.com/mgechev/preload-all-stress-test">app</a> with 500 automatically generated routes, which uses <code>PreloadAllModules</code>. It&rsquo;s an artificial example but still shows accurately how inefficient this strategy could be in large apps.</p>
-
-<p>Does this mean that you should never be using <code>PreloadAllModules</code>? No. If your app has a dozen routes or so, preloading all routes will not significantly negatively impact your users&rsquo; experience. At the same time, the setup cost and maintenance will be very low.</p>
-
+<p>Does this mean that you should never be using <code>PreloadAllModules</code>? No. If your app has a dozen routes or so, preloading all routes will not significantly negatively impact your users' experience. At the same time, the setup cost and maintenance will be very low.</p>
 <h4 id="precaching">Precaching</h4>
-
 <p>An alternative approach is using precaching with a service worker. By default, you&rsquo;re getting this behavior from the <a href="https://angular.io/guide/service-worker-intro">Angular Service Worker</a>. At build time, the Angular CLI will generate a manifest file with all your static assets and associated hash sums that the service worker will download and parse. At runtime, the service worker will download all the resources from the manifest and cache them.</p>
-
 <p>This strategy is still costly in terms of network consumption, but it has a much lower impact on the CPU usage because it is not running in the main UI thread.</p>
-
-<p><img src="/images/prefetching/service-worker.svg" style="display: block; margin: auto;"></p>
-
+<!-- raw HTML omitted -->
 <h3 id="prefetch-visible-links">Prefetch Visible Links</h3>
-
 <p>People often refer to this heuristic as &ldquo;<a href="https://github.com/GoogleChromeLabs/quicklink">quicklink</a>.&rdquo; Instead of downloading all the app scripts, it relies on the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API"><code>IntersectionObserver</code></a> API to download only the scripts associated with links visible on the page.</p>
-
-<p><img src="/images/prefetching/quicklink.png" style="display: block; margin: auto;"></p>
-
+<!-- raw HTML omitted -->
 <p>There are implementations which work with <a href="https://getquick.link/">static pages</a> and <a href="https://www.npmjs.com/package/ngx-quicklink">Angular</a>.</p>
-
 <p>This strategy is often much cheaper than prefetching all the modules, but it could still have significant CPU and network usage for some apps. For example, imagine a Wikipedia-like app where developers can go to 100 different pages. Prefetching all of them could consume lots of data.</p>
-
 <p>I have another <a href="https://blog.mgechev.com/2018/12/24/quicklink-angular-prefetching-preloading-strategy/">post</a> which explains the Angular implementation and the trade-offs in depth.</p>
-
 <h3 id="prefetch-on-hover">Prefetch on Hover</h3>
-
 <p>With this heuristic, we start prefetching a page when the user hovers a corresponding link on the page. Usually, there is a 50-400ms delay before the user hovers the link and clicks it, which gives the browser enough time to start downloading the associated resources or at least initiate the chain of requests.</p>
-
 <p>There are popular solutions implemented for different technologies. One of the most popular ones is <a href="https://instant.page">instant.page</a>. I recently implemented such a <a href="https://www.npmjs.com/package/ngx-hover-preload">prefetching strategy for Angular</a>.</p>
-
 <p>This heuristic is relatively cheap in terms of network and CPU usage. I&rsquo;d say that the majority of applications would benefit from using it.</p>
-
 <h3 id="predictive-prefetching">Predictive Prefetching</h3>
-
 <p>Predictive prefetching is the most advanced heuristic. Based on user navigational patterns, we try to predict their subsequent action and download the resources we assume they need next. We can manually provide predictive prefetching instructions, hardcoding them in the source code, or use something like <a href="https://github.com/guess-js">Guess.js</a>.</p>
-
 <p>I&rsquo;ve written a lot about this strategy in the past in &ldquo;<a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling</a>&rdquo; and &ldquo;<a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a>&rdquo;.</p>
-
-<p><img src="/images/prefetching/guess-js.jpg" style="display: block; margin: auto;"></p>
-
-<p>Usually, the setup cost for this heuristic is higher. It requires integration with a data source that collects users&rsquo; journeys in the web app, and you need to plug it as part of the build process. Depending on the approach, predictive prefetching may also have a larger implementation size. Imagine you need to ship a TensorFlow model to predict user actions, for example. Guess.js takes a more straightforward approach, allowing it to send a distributed Markov chain that is relatively cheap and efficient, but it&rsquo;s also less accurate than a more advanced model.</p>
-
+<!-- raw HTML omitted -->
+<p>Usually, the setup cost for this heuristic is higher. It requires integration with a data source that collects users' journeys in the web app, and you need to plug it as part of the build process. Depending on the approach, predictive prefetching may also have a larger implementation size. Imagine you need to ship a TensorFlow model to predict user actions, for example. Guess.js takes a more straightforward approach, allowing it to send a distributed Markov chain that is relatively cheap and efficient, but it&rsquo;s also less accurate than a more advanced model.</p>
 <p>The apps which benefit from this prefetching heuristic are usually larger, with many pages where the navigation speed is critical. For example, e-commerce or content-heavy apps.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>Often prefetching is a micro-optimization and a significant investment in this space could be a bad use of your time. I&rsquo;d recommend using some of the off-the-shelf solutions already available for your technology. Going this way will provide low cost performance benefits.</p>
-
 <p>Hover and quicklink prefetching works for the vast majority of web apps. I&rsquo;d recommend starting with hover prefetching moving to quicklink approach if fast navigation is from a high-priority and you don&rsquo;t have many links.</p>
-
 <p>In case you&rsquo;re building a complex app with a lot of possible transitions to other pages, predictive prefetching is something you may want to explore.</p>
-
 <p>Hope you enjoyed this post! Until next time and happy coding!</p>
 
                 </section>
@@ -404,7 +206,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Design Patterns in Open Source Projects - Part II - Minko Gechev\x27s blog",
+    "headline": "Design Patterns in Open Source Projects - Part II - Minko Gechev\u0027s blog",
     "datePublished": "2021-01-24T00:00:00JST",
     "dateModified": "2021-01-24T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "This blog post introduces another design pattern into the context of ngrev. If you\x26rsquo;re not yet familiar with the project, I\x26rsquo;d strongly recommend taking 2 minutes to the introduction and \x26ldquo;Project Overview\x26rdquo; sections in the first part of the series.\nIf you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object."
+    "description": "This blog post introduces another design pattern into the context of ngrev. If you\u0026rsquo;re not yet familiar with the project, I\u0026rsquo;d strongly recommend taking 2 minutes to the introduction and \u0026ldquo;Project Overview\u0026rdquo; sections in the first part of the series.\nIf you did not take the time, ngrev is an Electron app that visualizes the structure of an Angular app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a state object."
   }
 </script>
 
@@ -130,53 +130,29 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>This blog post introduces another design pattern into the context of <a href="https://github.com/mgechev/ngrev">ngrev</a>. If you&#x2019;re not yet familiar with the project, I&#x2019;d strongly recommend taking 2 minutes to the introduction and &#x201C;Project Overview&#x201D; sections in the <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">first part</a> of the series.</p>
-
-<p><amp-img src="/images/oss-design-patterns-ii/hero.jpg" style="display: block; margin: auto;"></amp-img></p>
-
+  <div class="article-body"><p>This blog post introduces another design pattern into the context of <a href="https://github.com/mgechev/ngrev">ngrev</a>. If you&#x2019;re not yet familiar with the project, I&#x2019;d strongly recommend taking 2 minutes to the introduction and &#x201C;Project Overview&#x201D; sections in the <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">first part</a> of the series.</p>
+<!-- raw HTML omitted -->
 <p>If you did not take the time, <a href="https://github.com/mgechev/ngrev">ngrev</a> is an Electron app that visualizes the structure of an <a href="https://angular.io">Angular</a> app, showing the relationships between components, modules, and providers. The UI retrieves the data for each view using an instance of a <a href="https://en.wikipedia.org/wiki/State_pattern">state</a> object. You can read more about the state pattern and its application in <a href="https://github.com/mgechev/ngrev">ngrev</a> <a href="https://blog.mgechev.com/2021/01/18/design-pattens-in-open-source-projects-part-i/">here</a>.</p>
-
 <p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an Angular app developed with TypeScript. At the same time, however, <strong>the post is conceptual, so even if you&#x2019;re not familiar with Angular, TypeScript, or Web development, you should be able to extract value.</strong></p>
-
 <h2 id="composite-pattern">Composite Pattern</h2>
-
 <blockquote>
 <p>In software engineering, the composite pattern is a structural design pattern. The composite pattern describes a group of objects treated the same way as a single instance of the same type of object. A composite intends to &#x201C;compose&#x201D; objects into tree structures to represent part-whole hierarchies. Implementing the composite pattern lets clients treat individual objects and compositions uniformly.</p>
 </blockquote>
-
-<p><amp-img src="/images/oss-design-patterns-ii/composite.svg" style="display: block; margin: auto;"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>The composite pattern is arguably one of the most popular design patterns. You find its applications all over software engineering and computer science. For example, in file systems the leaves are the individual files and the composites are directories because they can contain other directories and files. In compiler design we can find the leaves being terminals and the composites being non-terminal <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a> nodes.</p>
-
 <p>In the case of <a href="https://github.com/mgechev/ngrev">ngrev</a>, both the composites and the leaves are instances of the state classes. The way we use the composite pattern here is attractive in at least two ways - the fact that we&#x2019;re using the pattern itself and the mechanism it interacts with the <a href="https://en.wikipedia.org/wiki/State_pattern">state design pattern</a>.</p>
-
 <p>To understand why the composite design pattern helps us in <a href="https://github.com/mgechev/ngrev">ngrev</a>, let us look at two of the views in the application:</p>
-
-<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Dependencies</div>
-<amp-img src="/images/oss-design-patterns-ii/module-dependencies.png" style="display: block; margin: auto;"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>Each <code>NgModule</code> in Angular can depend on 0 or more other modules. This view shows the dependencies of the <code>AnnounceBarModule</code>. <a href="https://github.com/mgechev/ngrev">ngrev</a> implements this functionality with the <code>ModuleTreeState</code> class.</p>
-
-<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">Module Declarations</div>
-<amp-img src="/images/oss-design-patterns-ii/module-declarations.png" style="display: block; margin: auto;"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>Additionally, each module could have many declarations; for example, the <code>SharedModule</code> from the second image declares and exports <code>SearchResultComponent</code> and <code>SelectComponent</code>. In <a href="https://github.com/mgechev/ngrev">ngrev</a>, we implement this functionality with the <code>ModuleState</code> class.</p>
-
 <p>Now let us look at the default view of <a href="https://github.com/mgechev/ngrev">ngrev</a>:</p>
-
-<p><div style="text-align: center; font-size: 0.9em; font-weight: bold;">App</div>
-<amp-img src="/images/oss-design-patterns-ii/app.png" style="display: block; margin: auto;"></amp-img></p>
-
+<!-- raw HTML omitted -->
 <p>This view shows a visualization of the dependencies between all the modules in our app and the declarations/exports for each one of them. Internally, <a href="https://github.com/mgechev/ngrev">ngrev</a> implements it with the <code>AppState</code> class.</p>
-
 <p>Even for a small apps like <a href="https://angular.io">angular.io</a> this could get quite messy; that&#x2019;s why we have the more specific views from above. But also notice that there&#x2019;s an overlap between the 3 visualizations - the application view is a composition of the views showing module dependencies and module declarations.</p>
-
 <p>What do I mean by composition? If we suppose that <code>ModuleState</code> and <code>ModuleTreeState</code> return sets of nodes and edges, their union will be a subset of the nodes and edges <code>AppState</code> returns.</p>
-
 <p>Having noticed this relation, we can express it with code in the following way:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="k">class</span> <span class="nx">AppState</span> <span class="k">extends</span> <span class="nx">State</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppState</span> <span class="kr">extends</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">states</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleStates</span><span class="p">(),</span>
     <span class="p">...</span><span class="k">this</span><span class="p">.</span><span class="nx">createModuleTreeStates</span><span class="p">()</span>
@@ -185,41 +161,30 @@
   <span class="c1">//...
 </span><span class="c1"></span>
   <span class="nx">getData</span><span class="p">()</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="k">const</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">{</span>
       <span class="nx">graph</span><span class="o">:</span> <span class="p">{</span>
         <span class="nx">nodes</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">(),</span>
         <span class="nx">edges</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Set</span><span class="p">()</span>
       <span class="p">}</span>
     <span class="p">};</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">state</span><span class="o">:</span> <span class="nx">State</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="k">const</span> <span class="p">{</span> <span class="nx">graph</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">getData</span><span class="p">();</span>
+      <span class="kr">const</span> <span class="p">{</span> <span class="nx">graph</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">getData</span><span class="p">();</span>
       <span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">node</span><span class="o">:</span> <span class="nx">Node</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">nodes</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">node</span><span class="p">));</span>
       <span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">edge</span><span class="o">:</span> <span class="nx">Edge</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">graph</span><span class="p">.</span><span class="nx">edges</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">edge</span><span class="p">));</span>
     <span class="p">});</span>
     <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>In the snippet above, we first create the collection of states. <code>createModuleStates</code> and <code>createModuleTreeStates</code> instantiate state objects for each of the application modules. I haven&#x2019;t showed their implementation for simplicity.</p>
-
+</code></pre></div><p>In the snippet above, we first create the collection of states. <code>createModuleStates</code> and <code>createModuleTreeStates</code> instantiate state objects for each of the application modules. I haven&#x2019;t showed their implementation for simplicity.</p>
 <p>After that, when the UI process requests the data for visualizing the application view, the background process will indirectly invoke <code>appState.getData()</code>. The method will invoke <code>getData</code> for each of the nested states in <code>states</code> and add the corresponding nodes and edges to the result sets.</p>
-
 <p>That&#x2019;s it! This is entirely how the composite pattern implementation in <a href="https://github.com/mgechev/ngrev">ngrev</a> works.</p>
-
 <h2 id="use-cases">Use Cases</h2>
-
 <p>The <a href="https://en.wikipedia.org/wiki/Design_Patterns">gang of four book</a> explains <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">MVC</a> as the interaction between the patterns <a href="https://en.wikipedia.org/wiki/Strategy_pattern">Strategy</a>, <a href="https://en.wikipedia.org/wiki/Observer_pattern">Observer</a>, and <a href="https://en.wikipedia.org/wiki/Composite_pattern">Composite</a>. MVC uses composite for the user interface.</p>
-
 <p>Applications developed with modern Web frameworks and libraries such as Angular and React are expressed as compositions of components. In Angular, you could often think of directives and components with bare HTML nodes as &#x201C;leaf&#x201D; classes and components using directives or other components as &#x201C;composite&#x201D; classes.</p>
-
 <p>The composite design pattern is also heavily used in compilers - especially during interpretation and source code generation. Each AST node is either a terminal (leaf) or a non-terminal (composite).</p>
-
 <p>I&#x2019;m spending most of my days thinking about developer tooling and frameworks, so that&#x2019;s why my examples probably look a bit niche. If you&#x2019;ve recently used the composite design pattern in other contexts, please leave a comment below.</p>
-
-<h2 id="what-s-next">What&#x2019;s Next?</h2>
-
+<h2 id="whats-next">What&#x2019;s Next?</h2>
 <p>It&#x2019;s great you decided to read this article, but this is just part of the story. To get a better idea of how the composite pattern works, I&#x2019;d encourage you to read the <a href="https://github.com/mgechev/ngrev/blob/master/src/electron/states/app.state.ts">source code</a> implementing it.</p>
-
 <p>I hope you enjoyed this article! Until next time and happy coding!</p>
 </div>
 

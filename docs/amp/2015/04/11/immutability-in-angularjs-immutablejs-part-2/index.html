@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Boost the Performance of an AngularJS Application Using Immutable Data - Part 2 - Minko Gechev\x27s blog",
+    "headline": "Boost the Performance of an AngularJS Application Using Immutable Data - Part 2 - Minko Gechev\u0027s blog",
     "datePublished": "2015-04-11T00:00:00JST",
     "dateModified": "2015-04-11T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "A few weeks ago I posted the article \x26ldquo;Boost the Performance of an AngularJS Application Using Immutable Data\x26rdquo;. It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from O(n) to O(1).\nIn the post I did simple profiling using the built-in Date but it didn\x26rsquo;t give enough information in exactly which cases it is more suitable to use immutable data and when you should bet on the standard collections."
+    "description": "A few weeks ago I posted the article \u0026ldquo;Boost the Performance of an AngularJS Application Using Immutable Data\u0026rdquo;. It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from O(n) to O(1).\nIn the post I did simple profiling using the built-in Date but it didn\u0026rsquo;t give enough information in exactly which cases it is more suitable to use immutable data and when you should bet on the standard collections."
   }
 </script>
 
@@ -130,44 +130,30 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>A few weeks ago I posted the article <a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">&#x201C;Boost the Performance of an AngularJS Application Using Immutable Data&#x201D;</a>. It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from <code>O(n)</code> to <code>O(1)</code>.</p>
-
+  <div class="article-body"><p>A few weeks ago I posted the article <a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">&#x201C;Boost the Performance of an AngularJS Application Using Immutable Data&#x201D;</a>. It shows how to speedup your AngularJS application when having a lot of bindings to big data collections. The idea behind the optimization is quite simple - create a new collection when the data changes. This way you can reduce the watchers execution from <code>O(n)</code> to <code>O(1)</code>.</p>
 <p>In the post I did simple profiling using the built-in <code>Date</code> but it didn&#x2019;t give enough information in exactly which cases it is more suitable to use immutable data and when you should bet on the standard collections. It also didn&#x2019;t include any information about the garbage collection, although we know that using immutable collections will eventually lead to highly intensive memory management. All the code for the benchmarks and the charts <a href="https://github.com/mgechev/benchpress-angularjs-immutable">generation is available in my GitHub account</a>.</p>
-
 <p>On ng-conf 2015, <a href="https://www.youtube.com/watch?v=x1PJn5qMUT4">Jeff Cross, gave a talk about Benchpress</a>, which fits perfectly in my profiling purposes. Basically, benchpress uses the <a href="http://www.seleniumhq.org/projects/webdriver/">WebDriver</a> for <a href="http://www.seleniumhq.org/">Selenium</a>, through <a href="https://github.com/angular/protractor"><code>protractor</code></a> to profile your application. It can run multiple samples of the code you want to profile in order to take the mean and give you a meaningful result. It also includes a few output values, most useful in our case are:</p>
-
 <ul>
 <li><code>scriptTime</code> - the execution time of your script</li>
 <li><code>gcTime</code> - time required for garbage collection of given sample</li>
 </ul>
-
 <p>Benchpress can render the output of the benchmarks as tables, printed onto the <code>stdout</code> or save it into json files.</p>
-
 <h2 id="benchmarks">Benchmarks</h2>
-
 <p>With every collection you can have the following primitive operations:</p>
-
 <ul>
 <li><strong>C</strong>reate collection</li>
 <li><strong>R</strong>ead collection</li>
 <li><strong>U</strong>pdate collection</li>
 <li><strong>D</strong>elete collection</li>
 </ul>
-
 <p>We can read given collection in JavaScript or render it inside a template. If we get a new collection each time we change (update) the current one, we have an immutable collection. This means that if we want to check if the collection have changed compared to the last time we&#x2019;ve seen it we simply need to compare the current reference of the collection with the previous one (before the change was made):</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 <span class="kd">let</span> <span class="nx">changed</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span> <span class="o">===</span> <span class="nx">changed</span><span class="p">);</span> <span class="c1">// false
 </span></code></pre></div>
-
 <h3 id="side-note">Side note</h3>
-
 <p>*But what if:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="kd">function</span> <span class="nx">changeA</span><span class="p">()</span> <span class="p">{</span>
   <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
 <span class="p">}</span>
@@ -176,12 +162,9 @@
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="nx">oldA</span><span class="p">);</span> <span class="c1">// false
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">angular</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">oldA</span><span class="p">));</span> <span class="c1">// true
 </span></code></pre></div>
-
 <p>So, if we strictly want to perform given action <strong>only</strong> when the structure of the collection or the data inside it have changed (not only the reference) we will need to loop over both collections (old one and new one) and check whether they contains the same data.*</p>
-
 <p>If we delete, update or create additional entries in the collection, this is considered as update. If we use immutable data, a new collection will be returned on each such manipulation:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
 
 <span class="c1">// update
 </span><span class="c1"></span><span class="kd">let</span> <span class="nx">list1</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
@@ -201,10 +184,8 @@
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3 ]
 </span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list3</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4 ]
 </span></code></pre></div>
-
 <p>That said, we can build a sample script, which will be used for profiling. Initially we will create a single collection and attach watchers to it. Once this is done, <code>protractor</code> will start clicking a button, which will update a random element of the collection. Here is our <code>SampleCtrl</code>, which is responsible for initialization and handling the update requests:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">benchmarks</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;benchmarks&apos;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&apos;immutable&apos;</span><span class="p">]);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">benchmarks</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&apos;benchmarks&apos;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&apos;immutable&apos;</span><span class="p">]);</span>
 
 <span class="kd">function</span> <span class="nx">SampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">)</span> <span class="p">{</span>
   <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
@@ -300,12 +281,9 @@
 <span class="p">}</span>
 
 <span class="nx">benchmarks</span>
-  <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;SampleCtrl&apos;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">)</span>
-</code></pre></div>
-
+  <span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;SampleCtrl&apos;</span><span class="p">,</span> <span class="nx">SampleCtrl</span><span class="p">)</span></code></pre></div>
 <p>And the template&#x2026;</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="p">&gt;</span>
@@ -337,118 +315,66 @@
 <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/js/app.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-
 <p>There are three main variables, which has the strongest impact over such benchmark in AngularJS:</p>
-
 <ul>
 <li>type of the collection (mutable, immutable)</li>
 <li>size of the collection</li>
 <li>count of the bindings added to the collection</li>
 </ul>
-
-<p>In order to get clear understanding of what bindings count and collection size should make us prefer <code>Immutable.js</code> over the standard collections, I run the benchmarks with the following collections&#x2019; sizes: <code>5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 100000</code> and bindings count: <code>5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100</code>.</p>
-
+<p>In order to get clear understanding of what bindings count and collection size should make us prefer <code>Immutable.js</code> over the standard collections, I run the benchmarks with the following collections&apos; sizes: <code>5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 100000</code> and bindings count: <code>5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100</code>.</p>
 <p><strong>Application with 100 bindings might sounds not realistic to you but keep in mind that AngularJS adds bindings for (almost) all directives in your templates (<code>ng-hide</code>, <code>ng-show</code>, <code>ng-bind</code>, <code>ng-repeat</code>, <code>ng-class</code>, <code>ng-model</code>, etc.). Each <code>$digest</code> loop will lead to traversal of your data structures. For more information on this topic review the AngularJS source code or watch <a href="https://www.youtube.com/watch?v=wbcJfg-d5nI">&#x201C;Sasqwatch is Real&#x201D; by William Scott Moss</a>.</strong></p>
-
 <h2 id="results-representation">Results Representation</h2>
-
 <p>So far so good. The only thing left is to configure benchpress but this is pretty much a straightforward process. You can find my configuration scripts <a href="https://github.com/mgechev/benchpress-angularjs-immutable/tree/master/benchmarks">here</a> and Jeff&#x2019;s <a href="https://github.com/jeffbcross/benchpress-tree">here</a>. Note that it is not required to use benchpress with Angular, you can use it with any other framework or even without one.</p>
-
 <p>After you&#x2019;ve successfully configured benchpress and start protractor you should see something like:</p>
-
 <p><amp-img src="/images/boost-angularjs-immutable-data/protractor-running.gif" alt=""></amp-img></p>
-
 <p>After we run the benchmarks and set the output directory, all the logs will be saved in there, in json format. What we can do is to aggregate the raw results (for example get the mean) and output them in another file or print them on the screen. This seems fine but visual representation is always better. For rendering the data as charts I used node.js with <a href="https://github.com/Automattic/node-canvas"><code>node-canvas</code></a>. Later I found that there&#x2019;s a <a href="https://www.npmjs.com/package/nchart">&#x201C;hacked&#x201D; version of Chart.js, which could be run in node</a>. The glue code for rendering benchpress logs onto Chart.js charts seems generic enough and it may get handy to anyone else, so next couple of weeks I may publish it as npm module.</p>
-
 <h2 id="exploring-the-results">Exploring the Results</h2>
-
 <p>The results contain the script running time and the garbage collection time, mostly because of the immutable data.</p>
-
 <h3 id="script-time">Script Time</h3>
-
 <p>This metric will have the strongest impact on the application&#x2019;s performance, since the script time is single threaded. On the charts below are illustrated the script metrics concerning the script running time of the benchmarks above. The horizontal axis (x-axis) shows the bindings count and the vertical axis (y-axis) illustrates the script running time (in ms).</p>
-
 <h4 id="5-entries">5 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-5.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-5.png" alt="5 entries"></amp-img></a></p>
-
 <p>When having a collection with 5 entries the running time of the script using immutable list is almost double the running time of a standard array. When the bindings counts get bigger there are no significant changes in the time required for running the scripts (both immutable and standard array).
 Basically when we have 100 bindings (+1 with the watcher added by <code>ng-repeat</code>) the AngularJS change detection mechanism needs to perform 5 * 100 iterations (in the worst case) in order to verify that the current value of the array is equals to the previous one for the standard array and a 100 comparisons (one for each binding using <code>===</code>) in order to detect changes in the immutable data. Since we have overhead caused by the creation of new immutable list on change, the running time of the script using immutable data is bigger.</p>
-
 <h4 id="20-entries">20 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-20.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-20.png" alt="20 entries"></amp-img></a></p>
-
 <p>There are no significant changes in the results of the benchmark, which runs script with array/list with 20 entries. The only noticeable difference here is that the running time of the script using standard array gets significantly bigger when we increase the bindings count. Again, when we have 100 bindings and 20 element array we get 20 * 100 iterations in order to detect change, compared to 20 * 5 with only 5 bindings.</p>
-
 <h4 id="50-entries">50 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-50.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-50.png" alt="50 entries"></amp-img></a></p>
-
 <p>This is the first benchmark, which results show better performance of the immutable list compared to the standard one. In case of 100 bindings the immutable list wins!</p>
-
 <h4 id="100-entries">100 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-100.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-100.png" alt="100 entries"></amp-img></a></p>
-
 <p>Here the competition gets ruthless! We see how much bigger the running time of the script using standard array gets when we have large amount of bindings. Anyway, still the standard array looks like the winner.</p>
-
 <h4 id="500-entries">500 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-500.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-500.png" alt="500 entries"></amp-img></a></p>
-
 <p>It looks like the supreme champion in this benchmark is the immutable array! You still have to watch out whether you have only a few bindings to the collection but definitely if you have more than 10 you should consider using immutable data.</p>
-
-<h4 id="10-000-entries">10,000 entries</h4>
-
+<h4 id="10000-entries">10,000 entries</h4>
 <p><a href="/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png"><amp-img src="/images/boost-angularjs-immutable-data/scripttime-data-size-10000.png" alt="10,000 entries"></amp-img></a></p>
-
 <p>After 20 bindings the running time of the script using standard array gets crazy big! You can see how it gets bigger and bigger with every next binding, although the running time of the script using immutable list stays constant. I&#x2019;d definitely recommend you to use immutable data with such big collections.</p>
-
 <h3 id="garbage-collection-time">Garbage Collection Time</h3>
-
 <p><amp-img src="/images/one-does-not-simply-profile-the-script-running-time.png" alt=""></amp-img></p>
-
 <p>This metric indicates the time required for garbage collection. I&#x2019;m exposing this metric as secondary one because the user may not notice directly the impact of the garbage collection time during her experience using our application.
 It is interesting that the information we got from the benchmarks doesn&#x2019;t imply any significant advantage of the standard array compared to the immutable list.</p>
-
 <p>I will not provide further explanation for the following sections because I think they are self explanatory. However, if you have any troubles understanding them or you think they deserve further discussions you&#x2019;re welcome to drop a line as a comment or reach me over e-mail (take a look at the <a href="https://blog.mgechev.com/about/">About</a> section above).</p>
-
 <h4 id="5-entries-1">5 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/gctime-data-size-5.png"><amp-img src="/images/boost-angularjs-immutable-data/gctime-data-size-5.png" alt="5 entries"></amp-img></a></p>
-
 <h4 id="50-entries-1">50 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/gctime-data-size-50.png"><amp-img src="/images/boost-angularjs-immutable-data/gctime-data-size-50.png" alt="50 entries"></amp-img></a></p>
-
 <h4 id="100-entries-1">100 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/gctime-data-size-100.png"><amp-img src="/images/boost-angularjs-immutable-data/gctime-data-size-100.png" alt="100 entries"></amp-img></a></p>
-
 <h4 id="500-entries-1">500 entries</h4>
-
 <p><a href="/images/boost-angularjs-immutable-data/gctime-data-size-500.png"><amp-img src="/images/boost-angularjs-immutable-data/gctime-data-size-500.png" alt="500 entries"></amp-img></a></p>
-
-<h4 id="1-0000-entries">1,0000 entries</h4>
-
+<h4 id="10000-entries-1">1,0000 entries</h4>
 <p><a href="/images/boost-angularjs-immutable-data/gctime-data-size-10000.png"><amp-img src="/images/boost-angularjs-immutable-data/gctime-data-size-10000.png" alt="1,000 entries"></amp-img></a></p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>Some of the ideas brought to us by the functional paradigm, such as: pure functions, referential transparency, immutable data, etc. constantly find broader and broader applications in building user interface. As we explored in details in the <a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">two parts of this blog post on using immutable data with AngularJS</a>, immutability could be quite helpful when we have a lot of bindings on a big data collection. However, in the general use case I&#x2019;d recommend usage of standard arrays.</p>
-
 <p>The immutable data helps us speedup the watchers from <code>O(n)</code> (looping over the whole data structure) to <code>O(1)</code> (comparing only references, since on change a new immutable data structure will be created) but it also has its drawbacks:</p>
-
 <ul>
 <li>overhead of the creation of the new data structure on change</li>
 <li>overhead of the performed garbage collection (which wasn&#x2019;t such a big deal, as show above)</li>
 </ul>
-
 <p>But can&#x2019;t we build something, which takes the best of both worlds? Can&#x2019;t we build a specialized data structure used for super fast data binding, which doesn&#x2019;t require creation of new instance on change but still allows <code>O(1)</code> check for change? This is what I&#x2019;m going to explore in the last blog post of this series.</p>
-
 <h2 id="parts-of-the-series">Parts of the series:</h2>
-
 <ul>
 <li><a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">Boost the Performance of an AngularJS Application Using Immutable Data - Part 1</a></li>
 <li><a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">Boost the Performance of an AngularJS Application Using Immutable Data - Part 2</a></li>
