@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "VNC client on 200 lines of JavaScript - Minko Gechev\x27s blog",
+    "headline": "VNC client on 200 lines of JavaScript - Minko Gechev\u0027s blog",
     "datePublished": "2013-08-30T00:00:00JST",
     "dateModified": "2013-08-30T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -133,68 +133,46 @@
   <div class="article-body"><p>In this quick blog post I&#x2019;ll show you how to create a simple VNC client in about 200 lines of JavaScript.
 For our goal we&#x2019;re going to use only HTML5 and JavaScript (client and server side).
 The end result will be something like this:</p>
-
 <p><a href="/images/legacy/uploads2013/08/js-vnc.png"><amp-img src="/images/legacy/uploads/2013/08/js-vnc-1024x946.png" alt="js-vnc" width="600" height="554" class="alignnone size-large wp-image-500"></amp-img></a></p>
-
 <p>So, let&#x2019;s begin!</p>
-
 <p>Our application will have very simple architecture &#x2013; a proxy server written in Node.js and a client in HTML5 and JavaScript. The Node.js server will stay between the browser and the VNC server. We need it because the client-side JavaScript does not supports TCP sockets so we can&#x2019;t connect directly to the VNC server. The HTML5 client will have a canvas on which we will draw the frames we receive from the server.
 For VNC server you can use the free version of <a href="http://www.realvnc.com/">RealVNC</a>.</p>
-
 <p>First lets start with the server. Make sure you have node.js installed. We will use four node modules: <a href="https://github.com/sidorares/node-rfb2">rfb2</a>, <a href="https://npmjs.org/package/connect">connect</a>, <a href="http://socket.io/">socket.io</a> and <a href="https://github.com/pkrumins/node-png">node-png</a>.</p>
-
 <p>Enter the following commands in your terminal:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ~
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ~
 mkdir js-vnc
 <span class="nb">cd</span> js-vnc
 npm init</code></pre></div>
-
 <p>Now you should have folder called &#x201C;js-vnc&#x201D; with file named &#x201C;package.json&#x201D; in it.
 Use the following line of code to install almost all the dependencies:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm install rfb2 connect socket.io --save</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install rfb2 connect socket.io --save</code></pre></div>
 <p>Unfortunately node-png is not in the npm registry and we have to build it from source.
 Use:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">sudo npm install -g node-gyp
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">sudo npm install -g node-gyp
 <span class="nb">cd</span> node_modules
 git clone git@github.com:pkrumins/node-png.git
 <span class="nb">cd</span> node-png
 node-gyp configure build</code></pre></div>
-
 <p>and that was all&#x2026;Now we can start creating our server.
 Let&#x2019;s include all the required modules and initialize an array which will contains all the connected clients. Create a file called &#x201C;server.js&#x201D; in your project base directory and add the following content in it:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">rfb</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;rfb2&apos;</span><span class="p">),</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">rfb</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;rfb2&apos;</span><span class="p">),</span>
     <span class="nx">socketio</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;socket.io&apos;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8091</span><span class="p">,</span> <span class="p">{</span> <span class="nx">log</span><span class="o">:</span> <span class="kc">false</span> <span class="p">}),</span>
     <span class="nx">Png</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;./node_modules/node-png/build/Release/png&apos;</span><span class="p">).</span><span class="nx">Png</span><span class="p">,</span>
     <span class="nx">connect</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;connect&apos;</span><span class="p">),</span>
-    <span class="nx">clients</span> <span class="o">=</span> <span class="p">[];</span>
-</code></pre></div>
-
+    <span class="nx">clients</span> <span class="o">=</span> <span class="p">[];</span></code></pre></div>
 <p>and now let&#x2019;s create a static directory for our static resources:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">mkdir static</code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mkdir static</code></pre></div>
 <p>now we can set the static directory of the connect server:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">//creating new HTTP server. It will serve static files from the directory <span class="s2">&quot;./static&quot;</span> and will listen on <span class="m">8090</span> port
-connect.createServer<span class="o">(</span>connect.static<span class="o">(</span><span class="s1">&apos;./static&apos;</span><span class="o">))</span>.listen<span class="o">(</span><span class="m">8090</span><span class="o">)</span><span class="p">;</span></code></pre></div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">//creating new HTTP server. It will serve static files from the directory <span class="s2">&quot;./static&quot;</span> and will listen on <span class="m">8090</span> port
+connect.createServer<span class="o">(</span>connect.static<span class="o">(</span><span class="s1">&apos;./static&apos;</span><span class="o">))</span>.listen<span class="o">(</span>8090<span class="o">)</span><span class="p">;</span></code></pre></div>
 <p>Now you can execute the following lines of code:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&quot;Hello, world!&quot;</span> &gt; ./static/index.html
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&quot;Hello, world!&quot;</span> &gt; ./static/index.html
 node server.js</code></pre></div>
-
 <p>Now open: <a href="http://localhost:8091/index.html">http://localhost:8091/index.html</a>. If everything went well you should see the text: &#x201C;Hello, world!&#x201D;.</p>
-
 <p>So far, so good! Now lets create a socket.io server.
 We want the client to connect to our proxy server and exchange data through socket.io with it. When the client is connected (i.e. the connection is established) it sends &#x201C;init&#x201D; message which contains the data required for the proxy server to connect to the VNC server &#x2013; host, port and password.
 So let&#x2019;s handle these events:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">socketio</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;connection&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">socketio</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;connection&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;init&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">createRfbConnection</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">socket</span><span class="p">);</span>
     <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;mouse&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">evnt</span><span class="p">)</span> <span class="p">{</span>
@@ -207,14 +185,10 @@ So let&#x2019;s handle these events:</p>
       <span class="nx">disconnectClient</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">});</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>We already listen for incoming connections with socket.io on port 8091 so now we just subscribe to the &#x201C;connection&#x201D; event. When the client connects to our socket.io server we subscribe the server to the &#x201C;init&#x201D; event. It&#x2019;s the message I told about earlier. Its parameters will contains data required for the proxy server to connect to the VNC server. In the callback associated with the &#x201C;init&#x201D; event we first create new RFB (remote framebuffer) connection. This method will return a RFB handler, we can use it to exchange data with the VNC server. After initialising the RFB connection we subscribe to three more events: &#x201C;mouse&#x201D;, &#x201C;keyboard&#x201D; and &#x201C;disconnect&#x201D;. The mouse event has parameter containing the position of the cursor and button state (1 for mouse down 0 for mouse up). For this demo we will support only the first mouse button. The keyboard event accepts as parameters the key code of the button which have triggered the event and flag which indicates whether the button is down or up. When the disconnect event happens we disconnect from the VNC server and release all the data for the current connection.</p>
-
 <p>Here is posted the function createRfbConnection:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">createRfbConnection</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">createRfbConnection</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">rfb</span><span class="p">.</span><span class="nx">createConnection</span><span class="p">({</span>
     <span class="nx">host</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span>
     <span class="nx">port</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span>
@@ -222,12 +196,9 @@ So let&#x2019;s handle these events:</p>
   <span class="p">});</span>
   <span class="nx">addEventHandlers</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">socket</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">r</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>In the method &#x201C;addEventHandlers&#x201D; we add event handlers to the RFB handler we received from the &#x201C;createConnection&#x201D; method:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">addEventHandlers</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">addEventHandlers</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">r</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;connect&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;init&apos;</span><span class="p">,</span> <span class="p">{</span>
       <span class="nx">width</span><span class="o">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
@@ -241,15 +212,11 @@ So let&#x2019;s handle these events:</p>
   <span class="nx">r</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;rect&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">rect</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">handleFrame</span><span class="p">(</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">rect</span><span class="p">,</span> <span class="nx">r</span><span class="p">);</span>
   <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>When the RFB connection is established we send &#x201C;init&#x201D; event to the client (our browser) with the size of the screen. For simplicity we won&#x2019;t scale the screen in the browser.
 After sending the &#x201C;init&#x201D; event to the browser we add the client to our connected clients and subscribe to the event &#x201C;rect&#x201D;. The &#x201C;rect&#x201D; event will trigger when there is a screen update. For extra simplicity we will use raw encoding.</p>
-
 <p>The last method from our Node.js proxy we will look at is the &#x201C;handleFrame&#x201D; method.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleFrame</span><span class="p">(</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">rect</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">handleFrame</span><span class="p">(</span><span class="nx">socket</span><span class="p">,</span> <span class="nx">rect</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">rgb</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Buffer</span><span class="p">(</span><span class="nx">rect</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">height</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&apos;binary&apos;</span><span class="p">),</span>
     <span class="nx">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
@@ -268,18 +235,12 @@ After sending the &#x201C;init&#x201D; event to the browser we add the client to
     <span class="nx">height</span><span class="o">:</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
     <span class="nx">image</span><span class="o">:</span> <span class="nx">image</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="s1">&apos;base64&apos;</span><span class="p">)</span>
   <span class="p">});</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>We create new binary buffer with size &#x201C;rect.width * rect.height * 3&#x201D; and process the received pixmap. After that we create new PNG image from it by specifying its width, height and format (rgb). We encode the image and emit the event &#x201C;frame&#x201D; with parameters the coordinates of the image, its size and the actual image in base64 format.</p>
-
 <p>And we&#x2019;re done with our server! There&#x2019;s one detail which I missed with purpose. In this version we don&#x2019;t use all the advantages of the RFB protocol. It has incremental frame transmitting which I&#x2019;ve omitted. RFB implementation with excluded incremental transmission can be downloaded from <a href="https://github.com/mgechev/node-rfb2">here</a>.</p>
-
 <p>And now our simple client!</p>
-
 <p>Edit the content of the file ./static/index.html with the following content:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
         <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;./css/bootstrap.min.css&quot;</span> <span class="p">/&gt;</span>
@@ -319,22 +280,16 @@ After sending the &#x201C;init&#x201D; event to the browser we add the client to
         <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;./js/Client.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
     <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-
 <p>We&#x2019;ve added simple bootstrap form and a canvas. Now create sub-directory of our project base directory: &#x201C;./static/js&#x201D; and create the file &#x201C;Client.js&#x201D; in it.</p>
-
 <p>We will wrap the whole code in an IIFE to omit any globals. Let&#x2019;s create a simple object which will hold our settings:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">Config</span> <span class="o">=</span> <span class="p">{</span>
     <span class="nx">URL</span><span class="o">:</span> <span class="s1">&apos;http://localhost:8091&apos;</span>
   <span class="p">};</span>
   <span class="c1">//..more code here
-</span><span class="c1"></span><span class="p">}());</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">}());</span></code></pre></div>
 <p>Now lets add some code for initialisation after the &#x201C;Config&#x201D; declaration:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;loginBtn&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;click&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;loginBtn&apos;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;click&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">screen</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Screen</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;screen&apos;</span><span class="p">)),</span>
       <span class="nx">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="nx">screen</span><span class="p">);</span>
 
@@ -346,14 +301,10 @@ After sending the &#x201C;init&#x201D; event to the browser we add the client to
         <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&apos;form-wrapper&apos;</span><span class="p">).</span><span class="nx">classList</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&apos;form-wrapper-hidden&apos;</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">});</span>
-  <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-</code></pre></div>
-
+  <span class="p">},</span> <span class="kc">false</span><span class="p">);</span></code></pre></div>
 <p>We simply add event handler on click of the button with id &#x201C;loginBtn&#x201D;. In the callback we initialise new &#x201C;Screen&#x201D; object with our canvas as argument of the constructor function and create new &#x201C;Client&#x201D; with the Screen object as parameter. We call the connect method of the client with the specified parameters - host, port, password and a callback which will be invoked when the client is being connected.</p>
-
 <p>This is the definition of the connect method:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Client</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">connect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Client</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">connect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">Config</span><span class="p">.</span><span class="nx">URL</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;init&apos;</span><span class="p">,</span> <span class="p">{</span>
@@ -363,20 +314,14 @@ After sending the &#x201C;init&#x201D; event to the browser we add the client to
     <span class="p">});</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_addHandlers</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">callback</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_initEventListeners</span><span class="p">();</span>
-  <span class="p">};</span>
-</code></pre></div>
-
+  <span class="p">};</span></code></pre></div>
 <p>It creates new socket.io connection with the server&#x2019;s socket.io server host name and port and emits the &#x201C;init&#x201D; event we already talked about (contains data required for connection to the VNC server). After that we add handlers which will listen for events coming from the server - the &#x201C;init&#x201D; and &#x201C;rect&#x201D; event. Since the &#x201C;rect&#x201D; event is a bit more interesting we will look in its handling:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">_socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;frame&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">_socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;frame&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">that</span><span class="p">.</span><span class="nx">_screen</span><span class="p">.</span><span class="nx">drawRect</span><span class="p">(</span><span class="nx">frame</span><span class="p">);</span>
-  <span class="p">});</span>
-</code></pre></div>
-
+  <span class="p">});</span></code></pre></div>
 <p>As you see we simply delegate the drawing to the screen and pass it the frame as argument.
 And here is the actual drawing on the canvas:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Screen</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">drawRect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">rect</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Screen</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">drawRect</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">rect</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">img</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Image</span><span class="p">(),</span>
       <span class="nx">that</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="nx">img</span><span class="p">.</span><span class="nx">width</span> <span class="o">=</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">width</span><span class="p">;</span>
@@ -385,15 +330,11 @@ And here is the actual drawing on the canvas:</p>
     <span class="nx">img</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
       <span class="nx">that</span><span class="p">.</span><span class="nx">_context</span><span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
     <span class="p">};</span>
-  <span class="p">};</span>
-</code></pre></div>
-
+  <span class="p">};</span></code></pre></div>
 <p>We create new image with the frame&#x2019;s width and height as dimensions and we set image&#x2019;s src to be equal to the frame&#x2019;s base64 image. After that, when the image is loaded we draw it onto the canvas.</p>
-
 <p>The last interesting moment is the handling of the mouse and keyboard events.
 Of course we delegate it to the screen object:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Client</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_initEventListeners</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Client</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_initEventListeners</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_screen</span><span class="p">.</span><span class="nx">addMouseHandler</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">button</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">self</span><span class="p">.</span><span class="nx">_socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&apos;mouse&apos;</span><span class="p">,</span> <span class="p">{</span>
@@ -408,15 +349,10 @@ Of course we delegate it to the screen object:</p>
         <span class="nx">isDown</span><span class="o">:</span> <span class="nx">isDown</span>
       <span class="p">});</span>
     <span class="p">});</span>
-  <span class="p">};</span>
-</code></pre></div>
-
+  <span class="p">};</span></code></pre></div>
 <p>As you see we add the mouse and keyboard event handlers and in the event callbacks we simply emit new socket.io events, respectively: &#x201C;mouse&#x201D; and &#x201C;keyboard&#x201D;, with their arguments. For simplicity our canvas is absolutely positioned and has coordinates (0, 0).</p>
-
 <p>And&#x2026;well&#x2026;thats all! We have ready to go VNC client in just few lines of JavaScript!</p>
-
 <p><span style="font-size: 1.2em;">The <strong><a href="https://github.com/mgechev/js-vnc-demo-project">source code</a></strong> from this article can be found in my <a href="https://github.com/mgechev/js-vnc-demo-project">GitHub account</a></span>.</p>
-
 <p>Quick video demo</p>
 </div>
 

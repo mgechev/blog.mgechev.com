@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Building an Angular Application for Production &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -88,67 +88,52 @@ In order to help developers take advantage of the technologies behind the PWA as
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p><a href="https://developers.google.com/web/progressive-web-apps/">Progressive Web Applications</a> help us build native-like web apps, thanks to amazing tools such as Service Workers, IndexDB, App Shell etc. Once the browser downloads all the static assets required by our app, the active Service Worker can cache them locally.</p>
-
+                    <p><a href="https://developers.google.com/web/progressive-web-apps/">Progressive Web Applications</a> help us build native-like web apps, thanks to amazing tools such as Service Workers, IndexDB, App Shell etc. Once the browser downloads all the static assets required by our app, the active Service Worker can cache them locally.</p>
 <p>This way the user may experience slowdown during the initial page load, but each next time she opens the application her experience will be instant!</p>
-
 <p>In order to help developers take advantage of the technologies behind the PWA as easy as possible, the Angular team is working on the Angular <a href="https://github.com/angular/mobile-toolkit">mobile-toolkit</a>. However, a big concern for developing high-performance Angular apps is the framework size itself. For instance, a simple <strong>non-optimized</strong> &ldquo;Hello world!&rdquo; Angular application, bundled with <a href="http://browserify.org/">browserify</a> is 1.4MB! This is suicidal when your users are supposed to download it via an unreliable 3G connection.</p>
-
-<p><img src="/images/ng2-build/not-optimized.png" alt="Non optimized app" /></p>
-
+<p><img src="/images/ng2-build/not-optimized.png" alt="Non optimized app"></p>
 <p>This is main reason Angular is (was) criticized for. During the keynote of <a href="http://ng-conf.org/">ng-conf</a>, <a href="https://twitter.com/bradlygreen">Brad Green</a> (manager of the Angular team) mentioned that the core team managed to drop the size of the &ldquo;Hello world!&rdquo; app to <strong>less than 50K</strong>!</p>
-
 <p>In this blog post we&rsquo;ll explain all the steps we need to go through in order to achieve such results!</p>
-
 <p>*The experiments from this blog posts are located here:<br></p>
-
 <ul>
 <li><a href="https://github.com/mgechev/angular2-simple-build">Simple build with minification</a>.<br></li>
 <li><a href="https://github.com/mgechev/angular2-rollup-build">Tree-shaking and minification</a>.<br></li>
 <li><a href="https://github.com/mgechev/angular2-ngc-rollup-build">ngc, tree-shaking and minification</a>.*</li>
 </ul>
-
 <h2 id="sample-application">Sample Application</h2>
-
 <p>In order to get a better understanding of the optimizations explained below, lets first describe the sample application that we&rsquo;re going to apply them on.</p>
-
 <p>Our app is going to consist the following three files:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// app.component.ts
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// app.component.ts
 </span><span class="c1"></span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;my-app&#39;</span><span class="p">,</span>
   <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;Hello world!&#39;</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// app.module.ts
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// app.module.ts
 </span><span class="c1"></span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">NgModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">BrowserModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">NgModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">BrowserModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser&#39;</span><span class="p">;</span>
 
-<span class="k">import</span> <span class="p">{</span> <span class="nx">AppComponent</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.component&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">AppComponent</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.component&#39;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">NgModule</span><span class="p">({</span>
   <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">BrowserModule</span><span class="p">],</span>
   <span class="nx">bootstrap</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppComponent</span><span class="p">],</span>
   <span class="nx">declarations</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppComponent</span><span class="p">],</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
-</code></pre></div>
-<p>..and</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// main.ts
-</span><span class="c1"></span><span class="k">import</span> <span class="p">{</span> <span class="nx">platformBrowserDynamic</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser-dynamic&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">AppModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.module&#39;</span><span class="p">;</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppModule</span> <span class="p">{}</span>
+</code></pre></div><p>..and</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// main.ts
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">platformBrowserDynamic</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser-dynamic&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">AppModule</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.module&#39;</span><span class="p">;</span>
 
 <span class="nx">platformBrowserDynamic</span><span class="p">().</span><span class="nx">bootstrapModule</span><span class="p">(</span><span class="nx">AppModule</span><span class="p">);</span>
-</code></pre></div>
-<p>In <code>app.component.ts</code> we have a single component with a template which is going to render the text <code>&quot;Hello world!&quot;</code>. <code>main.ts</code> is responsible for bootstrapping the application, using the <code>bootstrap</code> method exported by the <code>@angular/platform-browser-dynamic</code> package.</p>
-
+</code></pre></div><p>In <code>app.component.ts</code> we have a single component with a template which is going to render the text <code>&quot;Hello world!&quot;</code>. <code>main.ts</code> is responsible for bootstrapping the application, using the <code>bootstrap</code> method exported by the <code>@angular/platform-browser-dynamic</code> package.</p>
 <p>Our <code>index.html</code> page looks like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">&#34;UTF-8&#34;</span><span class="p">&gt;</span>
@@ -160,9 +145,9 @@ In order to help developers take advantage of the technologies behind the PWA as
   <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;/node_modules/reflect-metadata/Reflect.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;dist/bundle.js&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-<p>And here&rsquo;s the directory layout:</p>
-<div class="highlight"><pre class="chroma">.
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div><p>And here&rsquo;s the directory layout:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">.
 ├── app
 │   ├── app.component.ts
 │   ├── app.module.ts
@@ -171,117 +156,93 @@ In order to help developers take advantage of the technologies behind the PWA as
 ├── index.html
 ├── package.json
 ├── tsconfig.json
-└── node_modules</pre></div>
-<p><code>dist</code> is where the output is going to live (i.e. application bundles) and <code>app</code> is where our application is.</p>
-
-<h2 id="step-1-minification-and-compression">Step 1 - Minification and Compression</h2>
-
+└── node_modules
+</code></pre></div><p><code>dist</code> is where the output is going to live (i.e. application bundles) and <code>app</code> is where our application is.</p>
+<h2 id="step-1---minification-and-compression">Step 1 - Minification and Compression</h2>
 <p>The two most obvious optimizations that we can apply are minification and compression. You can find the example explained in this section <a href="https://github.com/mgechev/angular2-simple-build">in my GitHub profile</a>. I&rsquo;d recommend you to clone the repository and run:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm i</code></pre></div>
-<p>Now we can explore the build process by taking a look at <code>package.json</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm i
+</code></pre></div><p>Now we can explore the build process by taking a look at <code>package.json</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
   <span class="nt">&#34;clean&#34;</span><span class="p">:</span> <span class="s2">&#34;rm -rf dist&#34;</span><span class="p">,</span>
   <span class="nt">&#34;serve&#34;</span><span class="p">:</span> <span class="s2">&#34;http-server . -p 5556&#34;</span><span class="p">,</span>
   <span class="nt">&#34;build&#34;</span><span class="p">:</span> <span class="s2">&#34;npm run clean &amp;&amp; tsc&#34;</span><span class="p">,</span>
   <span class="nt">&#34;build_prod&#34;</span><span class="p">:</span> <span class="s2">&#34;npm run build &amp;&amp; browserify -s main dist/main.js &gt; dist/bundle.js &amp;&amp; npm run minify&#34;</span><span class="p">,</span>
   <span class="nt">&#34;minify&#34;</span><span class="p">:</span> <span class="s2">&#34;uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js&#34;</span>
-<span class="p">}</span></code></pre></div>
-<p>Our <code>build</code> script first cleans the <code>dist</code> directory and after that compiles our application by using the TypeScript compiler. This will produce three files - <code>main.js</code>, <code>app.module.js</code> and <code>app.component.js</code>, in the <code>dist</code> directory.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>Our <code>build</code> script first cleans the <code>dist</code> directory and after that compiles our application by using the TypeScript compiler. This will produce three files - <code>main.js</code>, <code>app.module.js</code> and <code>app.component.js</code>, in the <code>dist</code> directory.</p>
 <p>By using SystemJS we can already run them in the browser, but since we want to reduce the number of HTTP requests made by the browser in the process of loading the app, we can create a single bundle. This is what we do in <code>build_prod</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm run build <span class="o">&amp;&amp;</span> browserify -s main dist/main.js &gt; dist/bundle.js <span class="o">&amp;&amp;</span> npm run minify</code></pre></div>
-<p>In the script above, first we use the TypeScript compiler. Once the app has been compiled, all we need to do is to create a <a href="https://github.com/substack/node-browserify#usage">&ldquo;standalone&rdquo; bundle</a> with entry point the <code>dist/main.js</code> file, and output the bundles content to <code>bundle.js</code> within the <code>dist</code> directory.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm run build <span class="o">&amp;&amp;</span> browserify -s main dist/main.js &gt; dist/bundle.js <span class="o">&amp;&amp;</span> npm run minify
+</code></pre></div><p>In the script above, first we use the TypeScript compiler. Once the app has been compiled, all we need to do is to create a <a href="https://github.com/substack/node-browserify#usage">&ldquo;standalone&rdquo; bundle</a> with entry point the <code>dist/main.js</code> file, and output the bundles content to <code>bundle.js</code> within the <code>dist</code> directory.</p>
 <p>In order to try the app you can use:</p>
-<div class="highlight"><pre class="chroma">npm run build_prod
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">npm run build_prod
 npm run serve
-open http://localhost:5556</pre></div>
-<h3 id="size-analysis">Size Analysis</h3>
-
+open http://localhost:5556
+</code></pre></div><h3 id="size-analysis">Size Analysis</h3>
 <p>Now lets see what the bundle size is:</p>
-<div class="highlight"><pre class="chroma">$ ls -lah bundle.js
--rw-r--r--  1 mgechev  staff   1.4M Jun 26 12:01 bundle.js</pre></div>
-<p>Wow&hellip;so we reached the disastrous point we described above! However, the bundle contains a bunch of useless content such as:</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ ls -lah bundle.js
+-rw-r--r--  1 mgechev  staff   1.4M Jun 26 12:01 bundle.js
+</code></pre></div><p>Wow&hellip;so we reached the disastrous point we described above! However, the bundle contains a bunch of useless content such as:</p>
 <ul>
 <li>Unused functions, variables&hellip;</li>
 <li>A lot of whitespace.</li>
 <li>Comments.</li>
 <li>Non-mangled variables.</li>
 </ul>
-
 <p>In order to reduce the size of the bundle we can now use the <code>minify</code> script:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js</code></pre></div>
-<p>It takes the <code>bundle.js</code> file, and optimizes it. The output is now produced in <code>dist/bundle.min.js</code>, and its size is:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js
--rw-r--r--  <span class="m">1</span> mgechev  staff   524K Jun <span class="m">26</span> <span class="m">12</span>:01 bundle.min.js</code></pre></div>
-<p>So, we reduced the size of the bundle to 524K only by applying a simple minification!</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js
+</code></pre></div><p>It takes the <code>bundle.js</code> file, and optimizes it. The output is now produced in <code>dist/bundle.min.js</code>, and its size is:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js
+-rw-r--r--  <span class="m">1</span> mgechev  staff   524K Jun <span class="m">26</span> 12:01 bundle.min.js
+</code></pre></div><p>So, we reduced the size of the bundle to 524K only by applying a simple minification!</p>
 <h4 id="compression-of-the-application">Compression of the Application</h4>
-
 <p>Most HTTP servers support compression of the content, with gzip. The requested by the browser resources are compressed by the web server and sent through the network. Responsibility of the client is to decompress them.</p>
-
 <p>Lets find out what the size of the compressed bundle is:</p>
-<div class="highlight"><pre class="chroma">$ gzip bundle.min.js
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ gzip bundle.min.js
 $ ls -lah bundle.min.js.gz
--rw-r--r--   1 mgechev  staff   128K Jun 26 12:01 bundle.min.js.gz</pre></div>
-<p>We reduced the size of the bundle with another ~75% only by applying compression! But we can do even better!</p>
-
-<h2 id="step-2-tree-shaking">Step 2 - Tree-Shaking</h2>
-
+-rw-r--r--   1 mgechev  staff   128K Jun 26 12:01 bundle.min.js.gz
+</code></pre></div><p>We reduced the size of the bundle with another ~75% only by applying compression! But we can do even better!</p>
+<h2 id="step-2---tree-shaking">Step 2 - Tree-Shaking</h2>
 <p>In this section we&rsquo;ll use very important property of the ES2015 modules - they are tree-shakable!</p>
-
-<p><img src="/images/ng2-build/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
+<img src="/images/ng2-build/tree-shaking-frame.jpg" id="tree-img" style="cursor: pointer">
 <img src="/images/ng2-build/tree-shaking.gif" style="width: 0; height: 0; border: none;">
-<script src="/assets/js/shake/index.js"></script></p>
-
+<script src="/assets/js/shake/index.js"></script>
 <p>What does tree-shaking means:</p>
-
 <blockquote>
 <p>Tree-shaking is excluding unused exports from bundles.</p>
 </blockquote>
-
 <p>Because the ES2015 modules are static, by performing a static code analysis over them we can decide which exports are used and which are not used in our application. In contrast, CommonJS modules are not always tree-shakable because of the dynamic nature of their format.</p>
-
 <p>For instance:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">readline</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;readline&#39;</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">readline</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;readline&#39;</span><span class="p">);</span>
 
-<span class="k">const</span> <span class="nx">rl</span> <span class="o">=</span> <span class="nx">readline</span><span class="p">.</span><span class="nx">createInterface</span><span class="p">({</span>
+<span class="kr">const</span> <span class="nx">rl</span> <span class="o">=</span> <span class="nx">readline</span><span class="p">.</span><span class="nx">createInterface</span><span class="p">({</span>
   <span class="nx">input</span><span class="o">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">,</span>
   <span class="nx">output</span><span class="o">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span>
 <span class="p">});</span>
 
 <span class="nx">rl</span><span class="p">.</span><span class="nx">question</span><span class="p">(</span><span class="s1">&#39;Algorithm you want to use for sorting the numbers? &#39;</span><span class="p">,</span> <span class="nx">answer</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="nx">sort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="nx">answer</span><span class="p">);</span>
+  <span class="kr">const</span> <span class="nx">sort</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="nx">answer</span><span class="p">);</span>
   <span class="nx">sort</span><span class="p">([</span><span class="mi">42</span><span class="p">,</span> <span class="mf">1.618</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
 <span class="p">});</span>
-</code></pre></div>
-<p>It is impossible to guess which algorithm will be chosen by the user by performing a static code analysis.</p>
-
+</code></pre></div><p>It is impossible to guess which algorithm will be chosen by the user by performing a static code analysis.</p>
 <p>With ES2015 we can do something like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">Graphs</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./graphs&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span><span class="nx">Algorithms</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./algorithms&#39;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span><span class="nx">Graphs</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./graphs&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Algorithms</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./algorithms&#39;</span><span class="p">;</span>
 
-<span class="k">const</span> <span class="nx">rl</span> <span class="o">=</span> <span class="nx">readline</span><span class="p">.</span><span class="nx">createInterface</span><span class="p">({</span>
+<span class="kr">const</span> <span class="nx">rl</span> <span class="o">=</span> <span class="nx">readline</span><span class="p">.</span><span class="nx">createInterface</span><span class="p">({</span>
   <span class="nx">input</span><span class="o">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="p">,</span>
   <span class="nx">output</span><span class="o">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span>
 <span class="p">});</span>
 
 <span class="nx">rl</span><span class="p">.</span><span class="nx">question</span><span class="p">(</span><span class="s1">&#39;Algorithm you want to use for sorting the numbers? &#39;</span><span class="p">,</span> <span class="nx">answer</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="nx">sort</span> <span class="o">=</span> <span class="nx">Algorithms</span><span class="p">[</span><span class="nx">answer</span><span class="p">];</span>
+  <span class="kr">const</span> <span class="nx">sort</span> <span class="o">=</span> <span class="nx">Algorithms</span><span class="p">[</span><span class="nx">answer</span><span class="p">];</span>
   <span class="nx">sort</span><span class="p">([</span><span class="mi">42</span><span class="p">,</span> <span class="mf">1.618</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
 <span class="p">});</span>
-</code></pre></div>
-<p>In this way, we will be able to perform tree-shaking and remove the <code>./graphs</code> module from the final bundle since we&rsquo;re not using <code>Graphs</code> anywhere. On the other hand, we need to import all sorting algorithms because we have a level of non-determinism - we&rsquo;re not sure what the input of the user is going to be so we can&rsquo;t get rid of anything from <code>Algorithms</code>.</p>
-
+</code></pre></div><p>In this way, we will be able to perform tree-shaking and remove the <code>./graphs</code> module from the final bundle since we&rsquo;re not using <code>Graphs</code> anywhere. On the other hand, we need to import all sorting algorithms because we have a level of non-determinism - we&rsquo;re not sure what the input of the user is going to be so we can&rsquo;t get rid of anything from <code>Algorithms</code>.</p>
 <h3 id="applying-tree-shaking-with-rollup">Applying Tree-Shaking with Rollup</h3>
-
 <p>Rollup.js is a module bundler which is optimized for ES2015 modules. It is a new, extensible tool which allows us to perform tree-shaking over ES2015 and CommonJS (in most cases) by using a plugin.</p>
-
 <p>We&rsquo;re going to integrate Rollup in the example above, trying to achieve even smaller bundle size! The example from this section is <a href="https://github.com/mgechev/angular2-rollup-build">available here</a>.</p>
-
 <p>Now, lets take a look at the <code>scripts</code> section in our <code>package.json</code> in order to explore the build process:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
   <span class="nt">&#34;test&#34;</span><span class="p">:</span> <span class="s2">&#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;</span><span class="p">,</span>
   <span class="nt">&#34;clean&#34;</span><span class="p">:</span> <span class="s2">&#34;rm -rf dist&#34;</span><span class="p">,</span>
   <span class="nt">&#34;clean&#34;</span><span class="p">:</span> <span class="s2">&#34;rm -rf dist&#34;</span><span class="p">,</span>
@@ -291,17 +252,13 @@ $ ls -lah bundle.min.js.gz
   <span class="nt">&#34;es5&#34;</span><span class="p">:</span> <span class="s2">&#34;tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js&#34;</span><span class="p">,</span>
   <span class="nt">&#34;minify&#34;</span><span class="p">:</span> <span class="s2">&#34;uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js&#34;</span><span class="p">,</span>
   <span class="nt">&#34;build_prod&#34;</span><span class="p">:</span> <span class="s2">&#34;npm run clean &amp;&amp; npm run build &amp;&amp; npm run rollup &amp;&amp; npm run es5 &amp;&amp; npm run minify&#34;</span>
-<span class="p">}</span></code></pre></div>
-<p>We have the same <code>clean</code>, <code>serve</code>, <code>minify</code> and <code>build</code> scripts like above. The new things here are <code>rollup</code>, <code>es5</code>, <code>build_prod</code>.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>We have the same <code>clean</code>, <code>serve</code>, <code>minify</code> and <code>build</code> scripts like above. The new things here are <code>rollup</code>, <code>es5</code>, <code>build_prod</code>.</p>
 <p><code>rollup</code> is responsible for bundling our app and perform tree-shaking in the process.</p>
-
 <p>TypeScript supports ES2015 modules, which means that we can apply tree-shaking directly over our non-transpiled app. This is further simplified by the <a href="https://github.com/rollup/rollup-plugin-typescript">TypeScript plugin for Rollup</a> which allows us to perform the transpilation as the part of the bundling. This would work great if the dependencies of our application were distributed as TypeScript as well. However, Angular is distributed as ES5 and ES2015, and RxJS is distributed as ES5 and ES2015 (in the <code>rxjs-es</code> package).</p>
-
 <p>Since we can&rsquo;t apply tree-shaking directly over the original TypeScript files of our app, we&rsquo;ll first need to transpile it to ES2015, after that create an ES2015 bundle by using rollup, and in the end transpile it to ES5.</p>
-
 <p>Because of these changes in the flow of the build process, there&rsquo;s a very important difference between the <code>tsconfig.json</code> presented in the example above, and the one used in this section:</p>
-<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
   <span class="s2">&#34;compilerOptions&#34;</span><span class="o">:</span> <span class="p">{</span>
     <span class="s2">&#34;target&#34;</span><span class="o">:</span> <span class="s2">&#34;es2015&#34;</span><span class="p">,</span>
     <span class="s2">&#34;module&#34;</span><span class="o">:</span> <span class="s2">&#34;es2015&#34;</span><span class="p">,</span>
@@ -312,17 +269,14 @@ $ ls -lah bundle.min.js.gz
     <span class="s2">&#34;app/main.ts&#34;</span>
   <span class="p">]</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>Our target version here is <code>es2015</code> in order to transpile the TypeScript application to an ES2015 one, with ES2015 modules.</p>
-
+</code></pre></div><p>Our target version here is <code>es2015</code> in order to transpile the TypeScript application to an ES2015 one, with ES2015 modules.</p>
 <p>Now we can explore the <code>rollup</code> script:</p>
-<div class="highlight"><pre class="chroma">rollup -f iife -c -o dist/bundle.es2015.js</pre></div>
-<p>Above we tell <code>rollup</code> to bundle the modules as IIFE (Immediately-Invoked Function Expression), use the configuration file provided in the root of the project (<code>rollup.config.js</code>) and output the bundle as <code>bundle.es2015.js</code> in <code>dist</code>.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">rollup -f iife -c -o dist/bundle.es2015.js
+</code></pre></div><p>Above we tell <code>rollup</code> to bundle the modules as IIFE (Immediately-Invoked Function Expression), use the configuration file provided in the root of the project (<code>rollup.config.js</code>) and output the bundle as <code>bundle.es2015.js</code> in <code>dist</code>.</p>
 <p>Now lets take a look at the <code>rollup.config.js</code> file:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="nx">nodeResolve</span> <span class="nx">from</span> <span class="s1">&#39;rollup-plugin-node-resolve&#39;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="nx">nodeResolve</span> <span class="nx">from</span> <span class="s1">&#39;rollup-plugin-node-resolve&#39;</span><span class="p">;</span>
 
-<span class="k">class</span> <span class="nx">RollupNG2</span> <span class="p">{</span>
+<span class="kr">class</span> <span class="nx">RollupNG2</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">options</span><span class="p">){</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">options</span> <span class="o">=</span> <span class="nx">options</span><span class="p">;</span>
   <span class="p">}</span>
@@ -333,9 +287,9 @@ $ ls -lah bundle.min.js.gz
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="k">const</span> <span class="nx">rollupNG2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="nx">RollupNG2</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">rollupNG2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="k">new</span> <span class="nx">RollupNG2</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
 
-<span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="p">{</span>
   <span class="nx">entry</span><span class="o">:</span> <span class="s1">&#39;dist/main.js&#39;</span><span class="p">,</span>
   <span class="nx">sourceMap</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
   <span class="nx">moduleName</span><span class="o">:</span> <span class="s1">&#39;main&#39;</span><span class="p">,</span>
@@ -346,46 +300,33 @@ $ ls -lah bundle.min.js.gz
     <span class="p">})</span>
   <span class="p">]</span>
 <span class="p">};</span>
-</code></pre></div>
-<p>Great thing about this configuration file is that it is pure JavaScript! We export the configuration object, and declare inside of it the <code>entry</code> point of the application, the <code>module</code> name (required if we use IIFE bundling), we also declare that we want to have <code>sourceMap</code>s, and the set of plugins that we want to use.</p>
-
+</code></pre></div><p>Great thing about this configuration file is that it is pure JavaScript! We export the configuration object, and declare inside of it the <code>entry</code> point of the application, the <code>module</code> name (required if we use IIFE bundling), we also declare that we want to have <code>sourceMap</code>s, and the set of plugins that we want to use.</p>
 <p>We use the <code>nodeResovle</code> plugin for rollup in order to hint the bundler that we want to use node-like module resolution; this means that once the bundler finds import like <code>@angular/core</code>, for instance, it&rsquo;ll go to <code>node_modules/@angular/core</code> and read the <code>package.json</code> file there. Once it finds property called <code>main:jsnext</code>, the bundler will use the file set as its value. If such property is not found, the bundler will use the file pointed by <code>main</code>.</p>
-
 <p>A problem comes that RxJS is distributed as ES5 by default. In order to solve this problem, for bundling the required RxJS operators we&rsquo;ll use the package <code>rxjs-es</code>, which is already <a href="https://github.com/mgechev/angular2-rollup-build/blob/master/package.json#L39">available in <code>package.json</code></a>. After installing this module, we need to make sure that the module bundler will use <code>rxjs-es</code> instead of <code>rxjs</code> from <code>node_modules</code>. This is exactly what the purpose of the <code>rollupNG2</code> plugin is - to translate all the <code>rxjs/*</code> imports to <code>rxjs-es/*</code> ones.</p>
-
 <p>Alright, now if we run:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm run clean <span class="o">&amp;&amp;</span> npm run build <span class="o">&amp;&amp;</span> npm run rollup</code></pre></div>
-<p>We&rsquo;ll get the bundle <code>bundle.es2015.js</code>. Now lets transpile this bundle to ES5.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm run clean <span class="o">&amp;&amp;</span> npm run build <span class="o">&amp;&amp;</span> npm run rollup
+</code></pre></div><p>We&rsquo;ll get the bundle <code>bundle.es2015.js</code>. Now lets transpile this bundle to ES5.</p>
 <p>This can be easily achieved by using the <code>es5</code> script:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js</code></pre></div>
-<p>We use the TypeScript compiler and output the ES5 bundle to <code>dist/bundle.js</code>.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js
+</code></pre></div><p>We use the TypeScript compiler and output the ES5 bundle to <code>dist/bundle.js</code>.</p>
 <p>In order to get our final optimized, bundle we need to invoke <code>npm run minify</code>. To verify that the application still works use:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm run serve</code></pre></div>
-<h3 id="size-analysis-1">Size Analysis</h3>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm run serve
+</code></pre></div><h3 id="size-analysis-1">Size Analysis</h3>
 <p>Lets find out what the size of our ES5 bundle is:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.js
--rw-r--r--  <span class="m">1</span> mgechev  staff   <span class="m">1</span>.5M Jun <span class="m">26</span> <span class="m">13</span>:00 bundle.js</code></pre></div>
-<p>Great&hellip;it&rsquo;s bigger with 100K! Let&rsquo;s see how big the minified bundle is:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js
--rw-r--r--  <span class="m">1</span> mgechev  staff   502K Jun <span class="m">26</span> <span class="m">13</span>:01 bundle.min.js</code></pre></div>
-<p>524K to 502K&hellip;not bad at all. This may look like an anomaly; our rollup bundle was bigger than the browserify bundle, but the rollup minified bundled is smaller compared to the browserify bundle&hellip;all this means is that we were able to perform better dead-code elimination with <code>uglify</code>. After gzipping we get:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js.gz
--rw-r--r--  <span class="m">1</span> mgechev  staff   122K Jun <span class="m">26</span> <span class="m">13</span>:01 bundle.min.js.gz</code></pre></div>
-<p>Well, it&rsquo;s smaller but I&rsquo;m sure we can do even better!</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.js
+-rw-r--r--  <span class="m">1</span> mgechev  staff   1.5M Jun <span class="m">26</span> 13:00 bundle.js
+</code></pre></div><p>Great&hellip;it&rsquo;s bigger with 100K! Let&rsquo;s see how big the minified bundle is:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js
+-rw-r--r--  <span class="m">1</span> mgechev  staff   502K Jun <span class="m">26</span> 13:01 bundle.min.js
+</code></pre></div><p>524K to 502K&hellip;not bad at all. This may look like an anomaly; our rollup bundle was bigger than the browserify bundle, but the rollup minified bundled is smaller compared to the browserify bundle&hellip;all this means is that we were able to perform better dead-code elimination with <code>uglify</code>. After gzipping we get:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js.gz
+-rw-r--r--  <span class="m">1</span> mgechev  staff   122K Jun <span class="m">26</span> 13:01 bundle.min.js.gz
+</code></pre></div><p>Well, it&rsquo;s smaller but I&rsquo;m sure we can do even better!</p>
 <p><em>Credits: Igor Minar published similar experiments in the official Angular repository. They can be found <a href="https://github.com/angular/angular/tree/a01a54c180470610dc359f1ab8c4503e51e440fa/modules/rollup-test">here</a>.</em></p>
-
 <h2 id="using-ngc">Using ngc</h2>
-
 <p>As <a href="https://www.youtube.com/watch?v=bci-Z6nURgE">static code analysis enthusast</a>, I&rsquo;m following the progress around the Angular compiler (<strong>ngc</strong>).</p>
-
 <p>The core idea of ngc is to process the templates of the components in our applications and <a href="http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html">generate VM friendly</a>, tree-shakable code. The compilation can happen either run-time or build-time, but since in run-time (or Just-in-Time) compilation the application is already loaded in the browser we can&rsquo;t take advantage of tree-shaking. The project is <a href="https://github.com/angular/angular/tree/master/modules/%40angular/compiler-cli">located here</a>. In case we use ngc as part of our build process we call this type of compilation <strong>Ahead-of-Time compilation</strong> (or AoT).</p>
-
 <p>Although in the previous example we already applied decent tree-shaking we still can do better! Why? Well, having an HTML template rollup is not completely sure what parts of Angular we can get rid of from the final bundle since HTML is not something that rollup can analyze at all. That&rsquo;s why we can:</p>
-
 <ul>
 <li>Compile our application (including templates) to TypeScript with ngc.</li>
 <li>Perform tree-shaking with rollup (this way we will get <em>at least</em> as small bundle as above).</li>
@@ -393,11 +334,9 @@ $ ls -lah bundle.min.js.gz
 <li>Minify the bundle.</li>
 <li>Gzip it!</li>
 </ul>
-
 <p>Alright, lets begin! The code explained in the paragraphs below can be <a href="https://github.com/mgechev/angular2-ngc-rollup-build">found here</a>.</p>
-
 <p>Lets take a look at the scripts in <code>package.json</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="s2">&#34;scripts&#34;</span><span class="err">:</span> <span class="p">{</span>
   <span class="nt">&#34;clean&#34;</span><span class="p">:</span> <span class="s2">&#34;rm -rf dist &amp;&amp; rm -rf app/*.ngfactory.ts &amp;&amp; cd compiled &amp;&amp; find . ! -name &#39;main-prod.ts&#39; -type f -exec rm -f {} + &amp;&amp; cd ..&#34;</span><span class="p">,</span>
   <span class="nt">&#34;serve&#34;</span><span class="p">:</span> <span class="s2">&#34;http-server . -p 5557&#34;</span><span class="p">,</span>
   <span class="nt">&#34;ngc&#34;</span><span class="p">:</span> <span class="s2">&#34;ngc -p tsconfig.json &amp;&amp; cp app/* compiled&#34;</span><span class="p">,</span>
@@ -406,21 +345,20 @@ $ ls -lah bundle.min.js.gz
   <span class="nt">&#34;es5&#34;</span><span class="p">:</span> <span class="s2">&#34;tsc --target es5 --allowJs dist/bundle.es2015.js --out dist/bundle.js&#34;</span><span class="p">,</span>
   <span class="nt">&#34;minify&#34;</span><span class="p">:</span> <span class="s2">&#34;uglifyjs dist/bundle.js --screw-ie8 --compress --mangle --output dist/bundle.min.js&#34;</span><span class="p">,</span>
   <span class="nt">&#34;build_prod&#34;</span><span class="p">:</span> <span class="s2">&#34;npm run clean &amp;&amp; npm run ngc &amp;&amp; npm run build &amp;&amp; npm run rollup &amp;&amp; npm run es5 &amp;&amp; npm run minify&#34;</span>
-<span class="p">}</span></code></pre></div>
-<p><code>build_prod</code> just confirms the order into which the individual actions need to be performed. Lets take a look at the <code>clean</code> method, since it looks quite complicated this time:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">rm -rf dist <span class="o">&amp;&amp;</span> rm -rf app/*.ngfactory.ts <span class="o">&amp;&amp;</span> <span class="nb">cd</span> compiled <span class="o">&amp;&amp;</span> find . ! -name <span class="s1">&#39;main-prod.ts&#39;</span> -type f -exec rm -f <span class="o">{}</span> + <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ..</code></pre></div>
-<p>What we do here is to remove the <code>dist</code> directory, all files which match <code>app/*.ngfactory.ts</code> and also everything except <code>main-ngc.ts</code> from the <code>compiled</code> directory. <code>ngc</code> produces <code>*.ngfactory.ts</code> files. Since they are artifacts from the build process we&rsquo;d want to remove them before the next build. But why we remove everything except <code>main-ngc.ts</code> from the <code>compiled</code> directory? Lets take a look at the file&rsquo;s content:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">enableProdMode</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">platformBrowser</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p><code>build_prod</code> just confirms the order into which the individual actions need to be performed. Lets take a look at the <code>clean</code> method, since it looks quite complicated this time:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">rm -rf dist <span class="o">&amp;&amp;</span> rm -rf app/*.ngfactory.ts <span class="o">&amp;&amp;</span> <span class="nb">cd</span> compiled <span class="o">&amp;&amp;</span> find . ! -name <span class="s1">&#39;main-prod.ts&#39;</span> -type f -exec rm -f <span class="o">{}</span> + <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ..
+</code></pre></div><p>What we do here is to remove the <code>dist</code> directory, all files which match <code>app/*.ngfactory.ts</code> and also everything except <code>main-ngc.ts</code> from the <code>compiled</code> directory. <code>ngc</code> produces <code>*.ngfactory.ts</code> files. Since they are artifacts from the build process we&rsquo;d want to remove them before the next build. But why we remove everything except <code>main-ngc.ts</code> from the <code>compiled</code> directory? Lets take a look at the file&rsquo;s content:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">enableProdMode</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">platformBrowser</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/platform-browser&#39;</span><span class="p">;</span>
 
-<span class="k">import</span> <span class="p">{</span> <span class="nx">AppModuleNgFactory</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.module.ngfactory&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">AppModuleNgFactory</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./app.module.ngfactory&#39;</span><span class="p">;</span>
 
 <span class="nx">enableProdMode</span><span class="p">();</span>
 
 <span class="nx">platformBrowser</span><span class="p">().</span><span class="nx">bootstrapModuleFactory</span><span class="p">(</span><span class="nx">AppModuleNgFactory</span><span class="p">);</span>
-</code></pre></div>
-<p>This is what the process of bootstrapping a precompiled (AoT compiled) app with Angular final is. Notice that we bootstrap the app by using <code>AppComponentNgFactory</code>, and import it from <code>app.component.ngfactory</code>, i.e. a generated by <code>ngc</code> file. So, once we compile our app with <code>ngc</code>, we want to move everything in the <code>compiled</code> directory, and after that invoke the TypeScript compiler, in order to make it produce ES2015 code. That is why our <code>tsconfig.json</code> is slightly changed as well:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// tsconfig-tsc.json
+</code></pre></div><p>This is what the process of bootstrapping a precompiled (AoT compiled) app with Angular final is. Notice that we bootstrap the app by using <code>AppComponentNgFactory</code>, and import it from <code>app.component.ngfactory</code>, i.e. a generated by <code>ngc</code> file. So, once we compile our app with <code>ngc</code>, we want to move everything in the <code>compiled</code> directory, and after that invoke the TypeScript compiler, in order to make it produce ES2015 code. That is why our <code>tsconfig.json</code> is slightly changed as well:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// tsconfig-tsc.json
 </span><span class="c1"></span><span class="p">{</span>
   <span class="s2">&#34;compilerOptions&#34;</span><span class="o">:</span> <span class="p">{</span>
     <span class="s2">&#34;target&#34;</span><span class="o">:</span> <span class="s2">&#34;es2015&#34;</span><span class="p">,</span>
@@ -432,11 +370,9 @@ $ ls -lah bundle.min.js.gz
     <span class="s2">&#34;compiled/main-ngc.ts&#34;</span>
   <span class="p">]</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>We are using <code>compiled/main-ngc.ts</code> as entry file. Also notice that we have two <code>tsconfig</code> files: one for <code>ngc</code> and one for <code>tsc</code>.</p>
-
+</code></pre></div><p>We are using <code>compiled/main-ngc.ts</code> as entry file. Also notice that we have two <code>tsconfig</code> files: one for <code>ngc</code> and one for <code>tsc</code>.</p>
 <p>Alright&hellip;now lets run <code>npm run ngc</code>. Once the scripts completes its execution, here&rsquo;s the directory structure of the app:</p>
-<div class="highlight"><pre class="chroma">.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">.
 ├── README.md
 ├── app
 │   ├── app.component.ngfactory.ts
@@ -455,77 +391,61 @@ $ ls -lah bundle.min.js.gz
 ├── package.json
 ├── rollup.config.js
 ├── tsconfig-tsc.json
-└── tsconfig.json</pre></div>
-<p>Now we can transpile the application to ES2015:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm run build</code></pre></div>
-<p>At this point we already have the ES2015 version of our app located in <code>dist</code>. The only steps left are:</p>
-
+└── tsconfig.json
+</code></pre></div><p>Now we can transpile the application to ES2015:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm run build
+</code></pre></div><p>At this point we already have the ES2015 version of our app located in <code>dist</code>. The only steps left are:</p>
 <ul>
 <li>Tree-shaking.</li>
 <li>Transpilation from ES2015 to ES5.</li>
 <li>Minification.</li>
 <li>Gzipping.</li>
 </ul>
-
 <p>This is process we&rsquo;re already familiar with so lets invoke the individual scripts one by one without providing further explanation:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># Bundle the app</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># Bundle the app</span>
 npm run rollup
 
 <span class="c1"># Transpile to ES5</span>
 npm run es5
 
 <span class="c1"># Minify the app</span>
-npm run minify</code></pre></div>
-<p>In order to make sure that everything works you can use:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm run serve</code></pre></div>
-<h3 id="size-analysis-2">Size Analysis</h3>
-
+npm run minify
+</code></pre></div><p>In order to make sure that everything works you can use:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm run serve
+</code></pre></div><h3 id="size-analysis-2">Size Analysis</h3>
 <p>Lets see how big is our precompiled, tree-shaked app!</p>
-<div class="highlight"><pre class="chroma">$ ls -lah bundle.min.js
--rw-r--r--  1 mgechev  staff   201K Jun 26 14:22 bundle.min.js</pre></div>
-<p>The application got more that twice smaller that it was without <code>ngc</code>!</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ ls -lah bundle.min.js
+-rw-r--r--  1 mgechev  staff   201K Jun 26 14:22 bundle.min.js
+</code></pre></div><p>The application got more that twice smaller that it was without <code>ngc</code>!</p>
 <p>If we gzip it, we&rsquo;ll get the following results:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js.gz
--rw-r--r--  <span class="m">1</span> mgechev  staff    49K Jun <span class="m">26</span> <span class="m">14</span>:22 bundle.min.js.gz</code></pre></div>
-<p>The final result is 47K!</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.min.js.gz
+-rw-r--r--  <span class="m">1</span> mgechev  staff    49K Jun <span class="m">26</span> 14:22 bundle.min.js.gz
+</code></pre></div><p>The final result is 47K!</p>
 <p><em>Credits: Rob Wormald who did experiments with <a href="https://github.com/robwormald/ng2-compiler-test2">ngc here</a>.</em></p>
-
 <blockquote>
 <p><strong>Note that for large to medium size applications the bundle produced after performing AoT compilation will most likely be bigger</strong> compared to same application using JiT compilation. This is because the VM friendly JavaScript produced by <code>ngc</code> is more verbose compared to the HTML-like templates, and also includes dirty-checking logic. In case you want to drop the size of the app you can perform lazy loading which is supported natively by the Angular router!</p>
 </blockquote>
-
 <h4 id="using-brotli">Using Brotli</h4>
-
 <p>Brotli is a generic-purpose lossless compression algorithm. It is similar in speed with deflate but offers more dense compression. You can try it with:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">npm i -g brotli
-bro --force --quality <span class="m">10</span> --input bundle.min.js --output bundle.js.brotli</code></pre></div>
-<p>Now when we check the size again:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.js.brotli
--rw-------  <span class="m">1</span> mgechev  staff    39K Oct <span class="m">15</span> <span class="m">17</span>:05 bundle.js.brotli</code></pre></div>
-<p>Which reduces the size with 8K more! However, bare in mind that brotli is <a href="http://caniuse.com/#search=brotli">not widely supported yet</a>.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">npm i -g brotli
+bro --force --quality <span class="m">10</span> --input bundle.min.js --output bundle.js.brotli
+</code></pre></div><p>Now when we check the size again:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ ls -lah bundle.js.brotli
+-rw-------  <span class="m">1</span> mgechev  staff    39K Oct <span class="m">15</span> 17:05 bundle.js.brotli
+</code></pre></div><p>Which reduces the size with 8K more! However, bare in mind that brotli is <a href="http://caniuse.com/#search=brotli">not widely supported yet</a>.</p>
 <h2 id="conclusion">Conclusion</h2>
-
-<p><a href="/images/ng2-build/bundle-size-chart.png">
+<a href="/images/ng2-build/bundle-size-chart.png">
   <img src="/images/ng2-build/bundle-size-chart.png" alt="Application Bundle Size" width="400">
-</a></p>
-
+</a>
 <p>As we can see from the chart above, by applying a set of optimizations over our production bundle we can reduce the size of our application up to 36 times!</p>
-
 <p>This is thanks to a couple of techniques:</p>
-
 <ul>
 <li>Optimization by performing static-code analysis, more specifically tree-shaking.</li>
 <li>Minification (including mangling).</li>
 <li>Compression with gzip or brotli.</li>
 </ul>
-
 <p>Definitely there&rsquo;s some overhead at first, before being able to get all the things going on in this process. Luckily, in the end, all this is going to happen automatically with tools like <a href="https://github.com/angular/angular-cli"><code>angular-cli</code></a>, and <a href="https://github.com/mgechev/angular-seed">angular-seed</a>. For instance, angular-seed already allows AoT compilation of your applications which provide huge performance boost for the initial rendering of your app.</p>
-
 <p>As a matter of fact, we are already planning to add automated production build, which performs all the listed steps above in <a href="https://github.com/mgechev/angular-seed/issues/864"><code>angular-seed</code></a>. This is definitely going to happen in near future and we&rsquo;re already ready with most of the listed practices.</p>
-
 <p>By then, we can easily reduce the bundle size to ~140K only by applying AoT, minification and compression!</p>
 
                 </section>
@@ -578,7 +498,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
