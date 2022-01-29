@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Implementing the Missing &#34;resolve&#34; Feature of the Angular 2 Router &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -87,14 +87,22 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
                 </header>
                 
                 <section id="post-body">
-                    <p>For the last a couple of months I&rsquo;m working on an Angular 2 based <a href="https://developers.google.com/web/progressive-web-apps/">PWA</a>. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.</p>
+                    
+
+<p>For the last a couple of months I&rsquo;m working on an Angular 2 based <a href="https://developers.google.com/web/progressive-web-apps/">PWA</a>. The more complex the application gets, the more I appreciate that our choice was Angular! For routing we&rsquo;re using the initial Angular 2 router that is now deprecated. For sure we will migrate to the newest one once it gets stable but until then we have some problems to solve.</p>
+
 <p>One of the features that I miss most in both the new and the newest Angular 2 routes is the <code>resolve</code> functionality which the AngularJS 1.x router and the ui-router offer. In short, this functionality allows your application to load data on navigation events and render the routing component once the data has been successfully downloaded.</p>
+
 <p>With the <code>router-deprecated</code> module we can get similar behavior by using <code>@CanActivate</code> decorator, unfortunately we cannot take advantage of the dependency injection mechanism without <a href="https://stackoverflow.com/questions/33462532/using-resolve-in-angular2-routes">any dirty hacks</a>.</p>
+
 <p>In this article I&rsquo;ll explain what solution we use until the <code>resolve</code> functionality is supported. Demo of the final result can be found <a href="#demo">here</a>. The code associated to this article is at <a href="https://github.com/mgechev/ng2-router">my GitHub account</a>.</p>
+
 <div class="warning-box">
   <strong>Disclaimer</strong>: This article is mostly for learning purposes. It uses already deprecated Angular 2 module and offers a custom solution which most likely will not be supported in future.
 </div>
+
 <p>The article is structured in the following way:</p>
+
 <ol>
 <li>Background for the problem that we need to solve (and this section is already over :-)).</li>
 <li>Discussion of the API design of the solution.</li>
@@ -104,13 +112,19 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <li>A few words on how to use the router with the missing feature included.</li>
 <li>Conclusion.</li>
 </ol>
+
 <p>If you&rsquo;re not interested in implementation details I&rsquo;d recommend you to skip section 5.</p>
+
 <h3 id="demo">Demo</h3>
+
 <p>Here&rsquo;s demo of final result of our implementation:</p>
-<p><img src="/images/router-demo.gif" alt=""></p>
+
+<p><img src="/images/router-demo.gif" alt="" /></p>
+
 <h2 id="api-design">API Design</h2>
+
 <p>Using the deprecated router we can define our routing configuration by:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
 <span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
   <span class="p">{</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
@@ -123,10 +137,12 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
     <span class="nx">component</span><span class="o">:</span> <span class="nx">AboutComponent</span>
   <span class="p">}</span>
 <span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><p>Our goal is to be able to perform an asynchronous action on which given routing component depends before the component gets rendered. For instance, we may want to load the profile of the user associated with the <code>:name</code> parameter in the <code>About</code> route, before the <code>AboutComponent</code> gets rendered.</p>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+<p>Our goal is to be able to perform an asynchronous action on which given routing component depends before the component gets rendered. For instance, we may want to load the profile of the user associated with the <code>:name</code> parameter in the <code>About</code> route, before the <code>AboutComponent</code> gets rendered.</p>
+
 <p>This means that we need to alter additional configuration data to the route definition objects:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
 <span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
   <span class="p">{</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
@@ -142,10 +158,12 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><p>Once the user navigates to <code>/about/:joe</code>, for instance, we will load all the users by using the <code>loadUsers</code> static method of the <code>User</code> service. This solution isn&rsquo;t much better compared to <code>@CanActivate</code> because we&rsquo;re not taking advantage of the Angular 2&rsquo;s DI mechanism.</p>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+<p>Once the user navigates to <code>/about/:joe</code>, for instance, we will load all the users by using the <code>loadUsers</code> static method of the <code>User</code> service. This solution isn&rsquo;t much better compared to <code>@CanActivate</code> because we&rsquo;re not taking advantage of the Angular 2&rsquo;s DI mechanism.</p>
+
 <p>A better API will be:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
 <span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
   <span class="p">{</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
@@ -164,12 +182,16 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><p>Although the route definition above looks a bit more complex at first, it provides great flexibility! First - we have access to all the registered in our <code>Injector</code> dependencies, second - we have access to all the local dependencies associated with the given route (<code>RouteParams</code> in this case).</p>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+<p>Although the route definition above looks a bit more complex at first, it provides great flexibility! First - we have access to all the registered in our <code>Injector</code> dependencies, second - we have access to all the local dependencies associated with the given route (<code>RouteParams</code> in this case).</p>
+
 <p>Once the user navigates to <code>/about/:joe</code>, the <code>resolve</code> method of the <code>defer</code> object will be invoked, but before that, all the dependencies passed to the <code>deps</code> array will be instantiated in order to be passed to <code>resolve</code>. Based on the passed dependencies, the <code>resolve</code> method will call the <code>model</code>&rsquo;s <code>loadUser</code> method with <code>joe</code> as argument. Once the promise returned by the <code>loadUser</code> method gets resolved, the component <code>AboutComponent</code> will be rendered.</p>
+
 <p>Why to make the <code>resolve</code> method return a promise, why not observable instead? Observables will give us much greater flexibility (in case the <code>loadUser</code> method fails we can retry or we can just stop the request, etc, good discussion on this topic can be found <a href="https://github.com/angular/angular/issues/5876">here</a>) but provide more complex API.</p>
+
 <p>Now, in order to follow the API introduced by AngularJS 1.x more strictly and provide the entire functionality it has we can modify the interface of the <code>defer</code> property to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
 <span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
   <span class="p">{</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
@@ -196,20 +218,26 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><p>Later we will be able to inject the &ldquo;deferred&rdquo; parameters to our component&rsquo;s constructor like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
-<span class="kr">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+<p>Later we will be able to inject the &ldquo;deferred&rdquo; parameters to our component&rsquo;s constructor like:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="k">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span> <span class="nx">user</span><span class="o">:</span> <span class="nx">User</span><span class="p">,</span> <span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;auth&#39;</span><span class="p">)</span> <span class="nx">isAuthorized</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>  <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><p>Notice that the tokens of the dependencies are the keys associated to the specific deferred properties in the <code>defer</code> configuration object.</p>
+</code></pre></div>
+<p>Notice that the tokens of the dependencies are the keys associated to the specific deferred properties in the <code>defer</code> configuration object.</p>
+
 <p>Sweet!</p>
+
 <h2 id="simple-example">Simple example</h2>
+
 <p>In order to get a better idea of what we want to achieve, lets take a look at a specific example based on the <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a>. You can find the code for the demo <a href="https://github.com/mgechev/ng2-router/tree/demo">here</a>.</p>
+
 <p>Lets define our base component:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
 <span class="err">@</span><span class="nx">RouteConfig</span><span class="p">([</span>
   <span class="p">{</span>
     <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
@@ -232,23 +260,32 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
-</code></pre></div><p>Inside of it we define an <code>About</code> route which has a <code>defer</code> property. In the <code>resolve</code> function we return a promise which we resolve after two seconds with the value of the <code>name</code> routing parameter, gotten from the <code>RouteParams</code>&rsquo;s instance.</p>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AppComponent</span> <span class="p">{}</span>
+</code></pre></div>
+<p>Inside of it we define an <code>About</code> route which has a <code>defer</code> property. In the <code>resolve</code> function we return a promise which we resolve after two seconds with the value of the <code>name</code> routing parameter, gotten from the <code>RouteParams</code>&rsquo;s instance.</p>
+
 <p>In order to get the value that we resolved the promise with we can do the following:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">Inject</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">Inject</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">AboutComponent</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><p>Once the user navigates to <code>/about/:name</code> in 2 seconds we&rsquo;ll see the value of the <code>:name</code> parameter logged in the console. Notice that the value of the token we inject is the same as the key inside of the <code>defer</code> property in the route definition object.</p>
+</code></pre></div>
+<p>Once the user navigates to <code>/about/:name</code> in 2 seconds we&rsquo;ll see the value of the <code>:name</code> parameter logged in the console. Notice that the value of the token we inject is the same as the key inside of the <code>defer</code> property in the route definition object.</p>
+
 <p>For demo take a look <a href="#demo">here</a>.</p>
+
 <p>Now lets start our&hellip;implementation! But before that&hellip;</p>
+
 <h2 id="background">Background</h2>
+
 <p>In order to get a better understanding be the content below, lets make a quick introduction to how the Angular router works.</p>
-<p><img src="/images/ng2-routing.png" alt=""></p>
+
+<p><img src="/images/ng2-routing.png" alt="" /></p>
+
 <ul>
 <li>First the user declares her routing configuration in the <code>@RouteConfig</code> decorator.</li>
 <li>After that the input goes through normalization.</li>
@@ -256,22 +293,28 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <li>On navigation the router creates different navigation instructions.</li>
 <li>In the end the <code>router-outlet</code> renders the target component by using a specific sequence of instructions.</li>
 </ul>
+
 <p>This means that we need to go through the following steps:</p>
+
 <ul>
 <li>Allow the route definition objects to carry information about how we should perform the async actions.</li>
 <li>Keep this information in the route rules and instructions.</li>
 <li>Just before we render the component in the <code>router-outlet</code> we&rsquo;ll need to perform the async actions and get the result.</li>
 </ul>
+
 <h2 id="implementation">Implementation</h2>
+
 <h3 id="step-1">Step 1</h3>
+
 <p>As first step we will fork the <code>router-deprecated</code> module <a href="https://github.com/angular/angular/tree/master/modules/%40angular/router-deprecated">located here</a> and removed all <code>*.dart</code> files (sorry Dart&hellip;you complicate the things too much with all the facades required for you&hellip;).</p>
+
 <p>Since we want to provide slightly different APIs for routes definition we need to modify the <code>route_definition.ts</code> file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kr">interface</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
   <span class="c1">// All the properties we&#39;re familiar with...
 </span><span class="c1"></span>  <span class="nx">defer</span><span class="o">?:</span> <span class="nx">Defer</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Defer</span> <span class="p">{</span>
+<span class="k">export</span> <span class="kr">interface</span> <span class="nx">Defer</span> <span class="p">{</span>
   <span class="p">[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">DeferredFactory</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -281,22 +324,28 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 </span><span class="cm"> * @example
 </span><span class="cm"> * const baz: DeferredFactory = { resolve: () =&gt; Promise.resolve(), deps: [] };
 </span><span class="cm"> */</span>
-<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">DeferredFactory</span> <span class="p">{</span>
+<span class="k">export</span> <span class="kr">interface</span> <span class="nx">DeferredFactory</span> <span class="p">{</span>
   <span class="nx">resolve</span><span class="o">:</span> <span class="p">(...</span><span class="nx">deps</span><span class="o">:</span> <span class="nx">any</span><span class="p">[])</span> <span class="p">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
   <span class="nx">deps</span><span class="o">?:</span> <span class="nx">any</span><span class="p">[];</span>
 <span class="p">}</span>
-</code></pre></div><p>The only new property we introduced here is an optional one called <code>defer</code>. It must be an object having the &ldquo;shape&rdquo; defined by the <code>Defer</code> interface. On the other hand, the <code>Defer</code> interface defines a set of key-value pairs with strings as keys and objects of type <code>DeferredFactory</code> as values. We will be able to inject the values gotten from the resolved promises, returned by the <code>resolve</code> functions, by using the tokens associated with the <code>DeferredFactory</code> instance. Notice that we also have a <code>deps</code> property inside of the <code>DeferredFactory</code>. This array contains a list of tokens that we want to be injected inside of the <code>resolve</code> function.</p>
+</code></pre></div>
+<p>The only new property we introduced here is an optional one called <code>defer</code>. It must be an object having the &ldquo;shape&rdquo; defined by the <code>Defer</code> interface. On the other hand, the <code>Defer</code> interface defines a set of key-value pairs with strings as keys and objects of type <code>DeferredFactory</code> as values. We will be able to inject the values gotten from the resolved promises, returned by the <code>resolve</code> functions, by using the tokens associated with the <code>DeferredFactory</code> instance. Notice that we also have a <code>deps</code> property inside of the <code>DeferredFactory</code>. This array contains a list of tokens that we want to be injected inside of the <code>resolve</code> function.</p>
+
 <p>Doesn&rsquo;t the <code>DeferredFactory</code> interface look similar to a factory provider definition?</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">new</span> <span class="nx">Provider</span><span class="p">(</span><span class="nb">String</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useFactory</span><span class="o">:</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">&#34;Value: &#34;</span> <span class="o">+</span> <span class="nx">value</span><span class="p">;</span> <span class="p">},</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">new</span> <span class="nx">Provider</span><span class="p">(</span><span class="nb">String</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useFactory</span><span class="o">:</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">&#34;Value: &#34;</span> <span class="o">+</span> <span class="nx">value</span><span class="p">;</span> <span class="p">},</span>
                     <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="nb">Number</span><span class="p">]</span> <span class="p">})</span>
-</code></pre></div><p>Hell yeah! We are going to use a list of providers like this one once when we reach the point when we need to resolve all the deferred values. The benefits we get here:</p>
+</code></pre></div>
+<p>Hell yeah! We are going to use a list of providers like this one once when we reach the point when we need to resolve all the deferred values. The benefits we get here:</p>
+
 <ul>
 <li>We are able to inject dependencies associated to any token.</li>
 <li>After minification everything is going to work since we&rsquo;re passing tokens which are either direct references to the dependencies instances of which we want to invoke, or references to any other tokens which will not be influenced by minification.</li>
 </ul>
+
 <h3 id="step-2">Step 2</h3>
+
 <p>Notice that in the <code>RouteDefinition</code> the <code>deps</code> property is optional. This means that our router can break in case the user doesn&rsquo;t provide value for it, in any of the deferred factories. That is why we need to normalize the route definition in the <code>route_config_normalizer.ts</code> file. This module provides a method called <code>normalizeRouteConfig</code> which accepts a <code>RouteDefinition</code> object and normalizes it depending on the properties it has. What we&rsquo;d do here is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">normalizeRouteConfig</span><span class="p">(</span><span class="nx">config</span><span class="o">:</span> <span class="nx">RouteDefinition</span><span class="p">,</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kd">function</span> <span class="nx">normalizeRouteConfig</span><span class="p">(</span><span class="nx">config</span><span class="o">:</span> <span class="nx">RouteDefinition</span><span class="p">,</span>
                                      <span class="nx">registry</span><span class="o">:</span> <span class="nx">RouteRegistry</span><span class="p">)</span><span class="o">:</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="p">{};</span>
@@ -308,9 +357,11 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
   <span class="p">}</span>
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>Above we define a dummy <code>defer</code> object in case the user hasn&rsquo;t provided one. On the other hand, if we have definitions of deferred factories we loop over all of them and set the <code>deps</code> property to an empty array in case it is not defined or has a falsy value.</p>
+</code></pre></div>
+<p>Above we define a dummy <code>defer</code> object in case the user hasn&rsquo;t provided one. On the other hand, if we have definitions of deferred factories we loop over all of them and set the <code>deps</code> property to an empty array in case it is not defined or has a falsy value.</p>
+
 <p>The <code>normalizeRouteConfig</code> method is also responsible for creating different route definition objects such as <code>AsyncRoute</code>s and <code>Route</code>s. In order to not loose the <code>defer</code> property from our <code>RouteDefinition</code> we need to pass it to the constructors of any <code>RouteDefinition</code>-like class:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">...</span>
 <span class="k">if</span> <span class="p">(</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;constructor&#39;</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="k">new</span> <span class="nx">Route</span><span class="p">({</span>
     <span class="nx">path</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">path</span><span class="p">,</span>
@@ -334,10 +385,13 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
       <span class="sb">`Invalid component type &#34;</span><span class="si">${</span><span class="nx">componentDefinitionObject</span><span class="p">.</span><span class="nx">type</span><span class="si">}</span><span class="sb">&#34;. Valid types are &#34;constructor&#34; and &#34;loader&#34;.`</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="p">...</span>
-</code></pre></div><p>Everything so far works fine, except that the <code>Route</code> and <code>AsyncRoute</code>&rsquo;s constructors need to preserve/handle this <code>defer</code> property somehow.</p>
+</code></pre></div>
+<p>Everything so far works fine, except that the <code>Route</code> and <code>AsyncRoute</code>&rsquo;s constructors need to preserve/handle this <code>defer</code> property somehow.</p>
+
 <h3 id="step-3">Step 3</h3>
+
 <p>There&rsquo;s an abstract class called <code>AbstractRoute</code> which defines the base functionality for all the different route types. In order to make this class keep a reference to the <code>defer</code> value we need to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">AbstractRoute</span> <span class="kr">implements</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="kr">abstract</span> <span class="k">class</span> <span class="nx">AbstractRoute</span> <span class="kr">implements</span> <span class="nx">RouteDefinition</span> <span class="p">{</span>
   <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="nx">useAsDefault</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">;</span>
   <span class="nx">path</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
@@ -357,16 +411,21 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 </span><span class="c1"></span>    <span class="k">this</span><span class="p">.</span><span class="nx">defer</span> <span class="o">=</span> <span class="nx">defer</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><p>The only three differences from the original implementation here are:</p>
+</code></pre></div>
+<p>The only three differences from the original implementation here are:</p>
+
 <ul>
 <li>We declare one more property of the class called <code>defer</code>.</li>
 <li>In the destructuring in the <code>constructor</code> we get one more property from the passed object, called <code>defer</code>.</li>
 <li>We assign the value passed by the <code>defer</code> variable to the <code>defer</code> property of the route.</li>
 </ul>
+
 <p>The rest of the changes we need to make are in the <code>Route</code> and <code>AsyncRoute</code> classes, were we should to pass the <code>defer</code> property to the base constructor call.</p>
+
 <h3 id="step-4">Step 4</h3>
+
 <p>Now, first add a <code>_defer</code> property to the <code>RouteRule</code> class like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">RouteRule</span> <span class="kr">implements</span> <span class="nx">AbstractRule</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">export</span> <span class="k">class</span> <span class="nx">RouteRule</span> <span class="kr">implements</span> <span class="nx">AbstractRule</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span>  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">_routePath</span><span class="o">:</span> <span class="nx">RoutePath</span><span class="p">,</span> <span class="kr">public</span> <span class="nx">handler</span><span class="o">:</span> <span class="nx">RouteHandler</span><span class="p">,</span>
               <span class="kr">private</span> <span class="nx">_routeName</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="kr">private</span> <span class="nx">_defer</span><span class="o">:</span> <span class="nx">Defer</span><span class="p">)</span> <span class="p">{</span>
@@ -376,14 +435,18 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
   <span class="p">}</span>
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>We need to do the same for the <code>AsyncRoute</code>.</p>
+</code></pre></div>
+<p>We need to do the same for the <code>AsyncRoute</code>.</p>
+
 <p>From the diagram above we can notice that the route definition objects get translated to route rules. In order to preserve the <code>defer</code> definition object in the rules we need to do the following:</p>
+
 <p>In <code>rule_set.ts</code> include the route&rsquo;s <code>defer</code> property in the <code>RouteRule</code> instantiation process:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="kd">let</span> <span class="nx">newRule</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RouteRule</span><span class="p">(</span><span class="nx">routePath</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">defer</span><span class="p">);</span>
 <span class="c1">// ...
-</span></code></pre></div><p>The <code>RouteRule</code> class has a private <code>_getInstruction</code> method, which based on the state of the <code>RouteRule</code> instance and passed arguments returns an instruction. We need to update its implementation to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">private</span> <span class="nx">_getInstruction</span><span class="p">(</span><span class="nx">urlPath</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">urlParams</span><span class="o">:</span> <span class="nx">string</span><span class="p">[],</span>
+</span></code></pre></div>
+<p>The <code>RouteRule</code> class has a private <code>_getInstruction</code> method, which based on the state of the <code>RouteRule</code> instance and passed arguments returns an instruction. We need to update its implementation to:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">private</span> <span class="nx">_getInstruction</span><span class="p">(</span><span class="nx">urlPath</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">urlParams</span><span class="o">:</span> <span class="nx">string</span><span class="p">[],</span>
                         <span class="nx">params</span><span class="o">:</span> <span class="p">{[</span><span class="nx">key</span><span class="o">:</span> <span class="nx">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">any</span><span class="p">})</span><span class="o">:</span> <span class="nx">ComponentInstruction</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">isBlank</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nx">componentType</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">throw</span> <span class="k">new</span> <span class="nx">BaseException</span><span class="p">(</span><span class="sb">`Tried to get instruction before the type was loaded.`</span><span class="p">);</span>
@@ -398,10 +461,13 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
   <span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">hashKey</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">);</span>
   <span class="k">return</span> <span class="nx">instruction</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div><p>We&rsquo;re done with most of the work!</p>
+</code></pre></div>
+<p>We&rsquo;re done with most of the work!</p>
+
 <h3 id="step-5">Step 5</h3>
+
 <p>The final, and the most exciting step is this one! In order to render the routing component once the associated with it data is resolved, we need to update the <code>router-outlet</code> directive. Open the file <code>router_outlet.ts</code> and take a look at the <code>activate</code> method:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="nx">activate</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="o">:</span> <span class="nx">ComponentInstruction</span><span class="p">)</span><span class="o">:</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">previousInstruction</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_currentInstruction</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">_currentInstruction</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">;</span>
@@ -427,12 +493,16 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
   <span class="p">});</span>
 <span class="p">}</span>
 <span class="c1">// ...
-</span></code></pre></div><p>The <code>activate</code> method accepts an instruction and renders the component associated with it once it gets available (i.e. its template is loaded, etc.).</p>
+</span></code></pre></div>
+<p>The <code>activate</code> method accepts an instruction and renders the component associated with it once it gets available (i.e. its template is loaded, etc.).</p>
+
 <p>Notice that inside of the method is created a custom set of <code>providers</code> which include the <code>RouteData</code> associated with the given route, as well as <code>RouteParams</code> and the <code>Router</code>. After that the <code>activate</code> method loads the target component next to the <code>router-outlet</code> directive. It does this with the <code>DynamicComponentLoader</code> by taking all the defined above providers plus all the providers which reside in the <code>_viewContainerRef</code> (for a reference take a look <a href="https://github.com/angular/angular/blob/bb8976608db93b9ff90a71187608a4390cbd7a07/modules/%40angular/core/src/linker/dynamic_component_loader.ts#L137-L139">here</a>).</p>
+
 <p>Now we can use the <code>defer</code> property of the <code>nextInstruction</code> which is accessible via:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">const</span> <span class="nx">defer</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">defer</span><span class="p">;</span>
-</code></pre></div><p>In order to invoke the <code>resolve</code> method of the <code>defer</code> object in the context of the current injector (which includes providers for <code>RouteData</code> and <code>RouteParams</code>) we can:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">const</span> <span class="nx">defer</span> <span class="o">=</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">defer</span><span class="p">;</span>
+</code></pre></div>
+<p>In order to invoke the <code>resolve</code> method of the <code>defer</code> object in the context of the current injector (which includes providers for <code>RouteData</code> and <code>RouteParams</code>) we can:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="kd">var</span> <span class="nx">commonProviders</span> <span class="o">=</span> <span class="p">[</span>
   <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteData</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">routeData</span><span class="p">}),</span>
   <span class="nx">provide</span><span class="p">(</span><span class="nx">RouteParams</span><span class="p">,</span> <span class="p">{</span><span class="nx">useValue</span><span class="o">:</span> <span class="k">new</span> <span class="nx">RouteParams</span><span class="p">(</span><span class="nx">nextInstruction</span><span class="p">.</span><span class="nx">params</span><span class="p">)}),</span>
@@ -450,10 +520,12 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <span class="kd">var</span> <span class="nx">parentInjector</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_viewContainerRef</span><span class="p">.</span><span class="nx">parentInjector</span><span class="p">;</span>
 <span class="kd">var</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">fromResolvedProviders</span><span class="p">(</span><span class="nx">providers</span><span class="p">,</span> <span class="nx">parentInjector</span><span class="p">);</span>
 <span class="c1">// ...
-</span></code></pre></div><p>This way we create an injector which has all providers from the <code>_viewContainerRef</code> (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated with the keys in the <code>defer</code> object we can:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">deferPromises</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span>
-</code></pre></div><p>&hellip;which will return an array of promises. We can wait for all promises to be resolved by using <code>Promise.all</code>. Once the promise returned by <code>Promise.all</code> is resolved we are supposed to activate the component so in the end we&rsquo;ll have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span></code></pre></div>
+<p>This way we create an injector which has all providers from the <code>_viewContainerRef</code> (which are all the providers visible at this position of the component tree), as well as all the local ones. In order to instantiate all the providers associated with the keys in the <code>defer</code> object we can:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">deferPromises</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">token</span><span class="p">))</span>
+</code></pre></div>
+<p>&hellip;which will return an array of promises. We can wait for all promises to be resolved by using <code>Promise.all</code>. Once the promise returned by <code>Promise.all</code> is resolved we are supposed to activate the component so in the end we&rsquo;ll have:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="k">return</span> <span class="nx">deferPromises</span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">data</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="nx">localProviders</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">token</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">idx</span><span class="o">:</span> <span class="nx">number</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">provide</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="p">{</span>
@@ -476,13 +548,19 @@ One of the features that I miss most in both the new and the newest Angular 2 ro
 <span class="p">},</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
 <span class="p">});</span>
-</code></pre></div><p>If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the <code>loadNextToLocation</code> method with different set of providers. To the keys used in the <code>defer</code> object we associate values instead of factories. These are the values gotten from the resolved promises returned by the factories. We don&rsquo;t want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.</p>
+</code></pre></div>
+<p>If the promise gets rejected we throw the error gotten from it. An important thing to notice is that we invoke the <code>loadNextToLocation</code> method with different set of providers. To the keys used in the <code>defer</code> object we associate values instead of factories. These are the values gotten from the resolved promises returned by the factories. We don&rsquo;t want the users of our router to be able to inject the promises in the constructors of their components, but only the data that they were resolved to.</p>
+
 <h2 id="how-to-use">How to use?</h2>
+
 <p>You can install the modified router using:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i git://github.com/mgechev/ng2-router.git#dist
-</code></pre></div><p>For a project which uses the modified router take a look at the <a href="https://github.com/mgechev/ng2-router/tree/demo">following repository</a>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm i git://github.com/mgechev/ng2-router.git#dist</code></pre></div>
+<p>For a project which uses the modified router take a look at the <a href="https://github.com/mgechev/ng2-router/tree/demo">following repository</a>.</p>
+
 <h2 id="conclusion">Conclusion</h2>
+
 <p>This article was mostly for learning purposes.</p>
+
 <p>The provided solution is something that we use in our Angular 2 application but only until we get this feature implemented by the newest Angular 2 router itself. I would not recommend you to introduce this modified version of the deprecated Angular 2 router as dependency of your project.</p>
 
                 </section>
@@ -535,6 +613,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

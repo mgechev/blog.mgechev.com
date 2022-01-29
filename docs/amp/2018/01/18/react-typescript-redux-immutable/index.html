@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.55.5">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "3 Tricks For Using Redux and Immutable.js with TypeScript - Minko Gechev\u0027s blog",
+    "headline": "3 Tricks For Using Redux and Immutable.js with TypeScript - Minko Gechev\x27s blog",
     "datePublished": "2018-01-18T00:00:00JST",
     "dateModified": "2018-01-18T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\u0027s blog"
+      "name": "Minko Gechev\x27s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\u0027s blog",
+      "name": "Minko Gechev\x27s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "In this post, I\u0026rsquo;ll show you a few tricks which can make your life using Immutable.js and Redux with TypeScript easier. All the practices are inspired by my recent work on the project Rhyme.com.\nImmutable Statically Typed Records Let\u0026rsquo;s start with the definition of our store. For the purpose I prefer to use Immutable records because of two main reasons:\n Immutable stores make the mutation more explicit and well organized."
+    "description": "In this post, I\x26rsquo;ll show you a few tricks which can make your life using Immutable.js and Redux with TypeScript easier. All the practices are inspired by my recent work on the project Rhyme.com.\nImmutable Statically Typed Records Let\x26rsquo;s start with the definition of our store. For the purpose I prefer to use Immutable records because of two main reasons:\n Immutable stores make the mutation more explicit and well organized."
   }
 </script>
 
@@ -130,22 +130,28 @@
 </aside>
 
 
-  <div class="article-body"><p>In this post, I&#x2019;ll show you a few tricks which can make your life using Immutable.js and Redux with TypeScript easier. All the practices are inspired by my recent work on the project <a href="https://rhyme.com">Rhyme.com</a>.</p>
+  <div class="article-body">
+
+<p>In this post, I&#x2019;ll show you a few tricks which can make your life using Immutable.js and Redux with TypeScript easier. All the practices are inspired by my recent work on the project <a href="https://rhyme.com">Rhyme.com</a>.</p>
+
 <h1 id="immutable-statically-typed-records">Immutable Statically Typed Records</h1>
+
 <p>Let&#x2019;s start with the definition of our store. For the purpose I prefer to use Immutable <a href="https://facebook.github.io/immutable-js/docs/#/Record">records</a> because of two main reasons:</p>
+
 <ul>
 <li>Immutable stores make the mutation more explicit and well organized.</li>
 <li>Records allow convenient property access.</li>
 </ul>
+
 <p>Now let&#x2019;s suppose we have the domain object <code>VirtualMachine</code>. We can define a well-typed record using the following definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">IVirtualMachine</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">IVirtualMachine</span> <span class="p">{</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
   <span class="nx">state</span>: <span class="kt">VMState</span><span class="p">;</span>
   <span class="nx">connection</span>: <span class="kt">Connection</span><span class="p">;</span>
   <span class="nx">screenshot</span>: <span class="kt">string</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">const</span> <span class="nx">virtualMachine</span> <span class="o">=</span> <span class="nx">RecordFactory</span><span class="p">&lt;</span><span class="nt">IVirtualMachine</span><span class="p">&gt;({</span>
+<span class="kr">const</span> <span class="nx">virtualMachine</span> <span class="o">=</span> <span class="nx">RecordFactory</span><span class="o">&lt;</span><span class="nx">IVirtualMachine</span><span class="o">&gt;</span><span class="p">({</span>
   <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;&apos;</span><span class="p">,</span>
   <span class="nx">state</span>: <span class="kt">VMState.Pending</span><span class="p">,</span>
   <span class="nx">connection</span>: <span class="kt">new</span> <span class="nx">Connection</span><span class="p">({}),</span>
@@ -157,125 +163,140 @@
   <span class="nx">state</span>: <span class="kt">VMState</span><span class="p">;</span>
   <span class="nx">connection</span>: <span class="kt">Connection</span><span class="p">;</span>
   <span class="nx">screenshot</span>: <span class="kt">string</span><span class="p">;</span>
-  <span class="kr">constructor</span><span class="p">(</span><span class="nx">config</span>: <span class="kt">Partial</span><span class="p">&lt;</span><span class="nt">IVirtualMachine</span><span class="p">&gt;)</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="nx">config</span>: <span class="kt">Partial</span><span class="o">&lt;</span><span class="nx">IVirtualMachine</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
     <span class="kr">super</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Notice a few things:</p>
+<span class="p">}</span></code></pre></div>
+<p>Notice a few things:</p>
+
 <ul>
 <li>We define the interface <code>IVirtualMachine</code>.</li>
 <li>We define a <code>virtualMachine</code> record invoking <code>RecordFactory</code> with its type parameter set to <code>IVirtualMachine</code>.</li>
 <li>We define a class called <code>VirtualMachine</code> which extends the record and accepts a single property of type <code>Partial&lt;IVirtualMachine&gt;</code> in its constructor.</li>
 </ul>
+
 <p>Notice that we export <code>IVirtualMachine</code> and <code>VirtualMachine</code> but keep the <code>virtualMachine</code> record encapsulated inside the current module.</p>
+
 <p>This way we can already instantiate a new <code>VirtualMachine</code> object and configure it using an object literal:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VirtualMachine</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;123&apos;</span><span class="p">,</span> <span class="nx">state</span>: <span class="kt">VMState.Running</span> <span class="p">});</span>
-</code></pre></div><p>Since the <code>config</code> parameter of the constructor is of type <code>Partial&lt;IVirtualMachine&gt;</code> we do not have to set all the properties of the <code>IVirtualMachine</code> interface. Of course, the drawback of this approach is that by mistake we can skip a configuration property and get the default value instead, which might not be the intended behavior. In this specific case, I prefer convenience over security.</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VirtualMachine</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;123&apos;</span><span class="p">,</span> <span class="nx">state</span>: <span class="kt">VMState.Running</span> <span class="p">});</span></code></pre></div>
+<p>Since the <code>config</code> parameter of the constructor is of type <code>Partial&lt;IVirtualMachine&gt;</code> we do not have to set all the properties of the <code>IVirtualMachine</code> interface. Of course, the drawback of this approach is that by mistake we can skip a configuration property and get the default value instead, which might not be the intended behavior. In this specific case, I prefer convenience over security.</p>
+
 <p>In order to get a better idea of why the definition above is safer than a regular record, let&#x2019;s take a look at the <code>RecordFactory</code> function:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Constructable</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">Constructable</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="k">new</span> <span class="p">(...</span><span class="nx">args</span>: <span class="kt">any</span><span class="p">[])</span><span class="o">:</span> <span class="nx">T</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">interface</span> <span class="nx">StaticallyTypedRecord</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="kr">extends</span> <span class="nx">Constructable</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
-  <span class="kr">get</span><span class="p">&lt;</span><span class="nt">K</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="p">&gt;(</span><span class="nx">key</span>: <span class="kt">K</span><span class="p">)</span><span class="o">:</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K</span><span class="p">];</span>
-  <span class="kr">set</span><span class="p">&lt;</span><span class="nt">K</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">,</span> <span class="na">V</span> <span class="na">extends</span> <span class="na">T</span><span class="err">[</span><span class="na">K</span><span class="err">]</span><span class="p">&gt;(</span><span class="nx">key</span>: <span class="kt">K</span><span class="p">,</span> <span class="nx">value</span>: <span class="kt">V</span><span class="p">);</span>
-  <span class="nx">withMutations</span><span class="p">(</span><span class="nx">cb</span><span class="o">:</span> <span class="p">(</span><span class="nx">r</span>: <span class="kt">StaticallyTypedRecord</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;)</span> <span class="o">=&gt;</span> <span class="nx">StaticallyTypedRecord</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;);</span>
-  <span class="nx">setIn</span><span class="p">&lt;</span><span class="nt">K1</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">,</span> <span class="na">V</span> <span class="na">extends</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">]</span><span class="p">&gt;(</span><span class="nx">keys</span><span class="o">:</span> <span class="p">[</span><span class="nx">K1</span><span class="p">],</span> <span class="nx">val</span>: <span class="kt">V</span><span class="p">);</span>
-  <span class="nx">setIn</span><span class="p">&lt;</span><span class="nt">K1</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">,</span> <span class="na">K2</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">],</span> <span class="na">V</span> <span class="na">extends</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">][</span><span class="na">K2</span><span class="err">]</span><span class="p">&gt;(</span><span class="nx">keys</span><span class="o">:</span> <span class="p">[</span><span class="nx">K1</span><span class="p">,</span> <span class="nx">K2</span><span class="p">],</span> <span class="nx">val</span>: <span class="kt">V</span><span class="p">);</span>
-  <span class="nx">setIn</span><span class="p">&lt;</span><span class="nt">K1</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">,</span> <span class="na">K2</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">],</span> <span class="na">K3</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">][</span><span class="na">K2</span><span class="err">],</span> <span class="na">V</span> <span class="na">extends</span> <span class="na">T</span><span class="err">[</span><span class="na">K1</span><span class="err">][</span><span class="na">K2</span><span class="err">][</span><span class="na">K3</span><span class="err">]</span><span class="p">&gt;(</span>
+<span class="kr">interface</span> <span class="nx">StaticallyTypedRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="kr">extends</span> <span class="nx">Constructable</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nx">get</span><span class="o">&lt;</span><span class="nx">K</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span>: <span class="kt">K</span><span class="p">)</span><span class="o">:</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K</span><span class="p">];</span>
+  <span class="nx">set</span><span class="o">&lt;</span><span class="nx">K</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">V</span> <span class="kr">extends</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K</span><span class="p">]</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">key</span>: <span class="kt">K</span><span class="p">,</span> <span class="nx">value</span>: <span class="kt">V</span><span class="p">);</span>
+  <span class="nx">withMutations</span><span class="p">(</span><span class="nx">cb</span><span class="o">:</span> <span class="p">(</span><span class="nx">r</span>: <span class="kt">StaticallyTypedRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">StaticallyTypedRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">);</span>
+  <span class="nx">setIn</span><span class="o">&lt;</span><span class="nx">K1</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">V</span> <span class="kr">extends</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">]</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">keys</span><span class="o">:</span> <span class="p">[</span><span class="nx">K1</span><span class="p">],</span> <span class="nx">val</span>: <span class="kt">V</span><span class="p">);</span>
+  <span class="nx">setIn</span><span class="o">&lt;</span><span class="nx">K1</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">K2</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">],</span> <span class="nx">V</span> <span class="kr">extends</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">][</span><span class="nx">K2</span><span class="p">]</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">keys</span><span class="o">:</span> <span class="p">[</span><span class="nx">K1</span><span class="p">,</span> <span class="nx">K2</span><span class="p">],</span> <span class="nx">val</span>: <span class="kt">V</span><span class="p">);</span>
+  <span class="nx">setIn</span><span class="o">&lt;</span><span class="nx">K1</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">K2</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">],</span> <span class="nx">K3</span> <span class="kr">extends</span> <span class="nx">keyof</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">][</span><span class="nx">K2</span><span class="p">],</span> <span class="nx">V</span> <span class="kr">extends</span> <span class="nx">T</span><span class="p">[</span><span class="nx">K1</span><span class="p">][</span><span class="nx">K2</span><span class="p">][</span><span class="nx">K3</span><span class="p">]</span><span class="o">&gt;</span><span class="p">(</span>
     <span class="nx">keys</span><span class="o">:</span> <span class="p">[</span><span class="nx">K1</span><span class="p">,</span> <span class="nx">K2</span><span class="p">,</span> <span class="nx">K3</span><span class="p">],</span>
     <span class="nx">val</span>: <span class="kt">V</span>
   <span class="p">);</span>
   <span class="nx">toJS</span><span class="p">()</span><span class="o">:</span> <span class="nx">T</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">export</span> <span class="kr">const</span> <span class="nx">RecordFactory</span> <span class="o">=</span> <span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;(</span><span class="nx">seed</span>: <span class="kt">T</span><span class="p">)</span><span class="o">:</span> <span class="nx">StaticallyTypedRecord</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">(</span><span class="nx">Record</span><span class="p">(</span><span class="nx">seed</span><span class="p">)</span> <span class="kr">as</span> <span class="kt">any</span><span class="p">)</span> <span class="kr">as</span> <span class="nx">StaticallyTypedRecord</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;;</span>
-<span class="p">};</span>
-</code></pre></div><p>Here we have three definitions:</p>
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">RecordFactory</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">seed</span>: <span class="kt">T</span><span class="p">)</span><span class="o">:</span> <span class="nx">StaticallyTypedRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">Record</span><span class="p">(</span><span class="nx">seed</span><span class="p">)</span> <span class="kr">as</span> <span class="nx">any</span><span class="p">)</span> <span class="kr">as</span> <span class="nx">StaticallyTypedRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span></code></pre></div>
+<p>Here we have three definitions:</p>
+
 <ul>
 <li><code>Constructable&lt;T&gt;</code> is a generic interface which defines a type for a family of objects which can be instantiated with the operator <code>new</code>.</li>
 <li><code>StaticallyTypedRecord&lt;T&gt;</code> is another generic interface which extends the <code>Constructable&lt;T&gt;</code> interface and declares a bunch of methods. These are all methods in the prototype of the <code>Immutable.Record</code> abstraction.</li>
 <li><code>RecordFactory</code> is a generic function which accepts an object called <code>seed</code> of type <code>T</code>, passes it to <code>Immutable.Record(seed)</code> and ascribes the result to the type <code>StaticallyTypedRecord&lt;T&gt;</code>.</li>
 </ul>
+
 <p>What&#x2019;s the win here?</p>
+
 <p>Let&#x2019;s suppose we have our VM:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VirtualMachine</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;123&apos;</span><span class="p">,</span> <span class="nx">screenshot</span><span class="o">:</span> <span class="s1">&apos;...&apos;</span> <span class="p">});</span>
-</code></pre></div><p>Now if we want to access the VM properties we can:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">vm</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
-<span class="nx">vm</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="s1">&apos;id&apos;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">vm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VirtualMachine</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">&apos;123&apos;</span><span class="p">,</span> <span class="nx">screenshot</span><span class="o">:</span> <span class="s1">&apos;...&apos;</span> <span class="p">});</span></code></pre></div>
+<p>Now if we want to access the VM properties we can:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">vm</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+<span class="nx">vm</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;id&apos;</span><span class="p">);</span>
 
 <span class="c1">// [ts] Argument of type &apos;&quot;ID&quot;&apos; is not assignable to
 </span><span class="c1">// parameter of type &apos;&quot;id&quot; | &quot;state&quot; | &quot;connection&quot; | &quot;screenshot&quot; | &quot;templateId&quot;&apos;.
-</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="s1">&apos;ID&apos;</span><span class="p">);</span>
+</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;ID&apos;</span><span class="p">);</span>
 
 <span class="c1">// [ts] Property &apos;ID&apos; does not exist on type &apos;VirtualMachine&apos;. Did you mean &apos;id&apos;?
-</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">ID</span><span class="p">;</span>
-</code></pre></div><p>Notice how we got a compile-time error when we tried to access the <code>id</code> property with <code>vm.get(&apos;ID&apos;)</code> since such key doesn&#x2019;t exist in the record.</p>
+</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">ID</span><span class="p">;</span></code></pre></div>
+<p>Notice how we got a compile-time error when we tried to access the <code>id</code> property with <code>vm.get(&apos;ID&apos;)</code> since such key doesn&#x2019;t exist in the record.</p>
+
 <p>We are also going to get compile-time errors when trying to set a missing property:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// [ts] Argument of type &apos;&quot;scrnshot&quot;&apos; is not assignable to
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// [ts] Argument of type &apos;&quot;scrnshot&quot;&apos; is not assignable to
 </span><span class="c1">// parameter of type &apos;&quot;id&quot; | &quot;state&quot; | &quot;connection&quot; | &quot;screenshot&quot; | &quot;templateId&quot;&apos;.
-</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="s1">&apos;scrnshot&apos;</span><span class="p">);</span>
-</code></pre></div><p>This way we&#x2019;re able to catch mistakes caused by a misspelling of a property name much sooner - at compile-time!</p>
+</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&apos;scrnshot&apos;</span><span class="p">);</span></code></pre></div>
+<p>This way we&#x2019;re able to catch mistakes caused by a misspelling of a property name much sooner - at compile-time!</p>
+
 <p>Even further, now let&#x2019;s suppose the <code>Connection</code> abstraction has an <code>ipAddress</code> field of type <code>string</code>. If we want to set it using the <code>setIn</code> method of the <code>VirtualMachine</code> record and we misspell it we&#x2019;re going to get a compile-time error again!</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// [ts]
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// [ts]
 </span><span class="c1">// Argument of type &apos;[&quot;connection&quot;, &quot;ipaddress&quot;]&apos; is not assignable to parameter of type &apos;[&quot;connection&quot;, &quot;id&quot; | &quot;connectionId&quot; | &quot;type&quot; | &quot;get&quot; | &quot;set&quot; | &quot;withMu...&apos;.
 </span><span class="c1">//   Types of property &apos;1&apos; are incompatible.
 </span><span class="c1">//     Type &apos;&quot;ipaddress&quot;&apos; is not assignable to type &apos;&quot;id&quot; | &quot;connectionId&quot; | &quot;ipAddress&quot; | &quot;get&quot; | &quot;set&quot; | &quot;withMutations&quot; | &quot;set...&apos;.
-</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">setIn</span><span class="p">([</span><span class="s1">&apos;connection&apos;</span><span class="p">,</span> <span class="s1">&apos;ipaddress&apos;</span><span class="p">],</span> <span class="s1">&apos;192.168.0.102&apos;</span><span class="p">);</span>
-</code></pre></div><p>Notice that currently, we support no more than three levels of nesting with <code>setIn</code>, this is due to the explicit definition above. A random level of nesting will be possible once the <a href="https://github.com/Microsoft/TypeScript/issues/5453">variadic types</a> proposal gets introduced into TypeScript.</p>
+</span><span class="c1"></span><span class="nx">vm</span><span class="p">.</span><span class="nx">setIn</span><span class="p">([</span><span class="s1">&apos;connection&apos;</span><span class="p">,</span> <span class="s1">&apos;ipaddress&apos;</span><span class="p">],</span> <span class="s1">&apos;192.168.0.102&apos;</span><span class="p">);</span></code></pre></div>
+<p>Notice that currently, we support no more than three levels of nesting with <code>setIn</code>, this is due to the explicit definition above. A random level of nesting will be possible once the <a href="https://github.com/Microsoft/TypeScript/issues/5453">variadic types</a> proposal gets introduced into TypeScript.</p>
+
 <h1 id="action-creators">Action Creators</h1>
+
 <p>Alright, we now have a solid foundation for our store. Now, we can define the actions in the application. First, we can define an enum which contains all the action types:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">enum</span> <span class="nx">ActionType</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">enum</span> <span class="nx">ActionType</span> <span class="p">{</span>
   <span class="nx">AddVirtualMachine</span> <span class="o">=</span> <span class="s1">&apos;AddVM&apos;</span><span class="p">,</span>
   <span class="nx">RemoveVirtualMachine</span> <span class="o">=</span> <span class="s1">&apos;RemoveVM&apos;</span>
-<span class="p">}</span>
-</code></pre></div><p>As next step, we can define an interface for each action:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">AddVirtualMachine</span> <span class="p">{</span>
-  <span class="kr">type</span><span class="o">:</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">AddVirtualMachine</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>As next step, we can define an interface for each action:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">interface</span> <span class="nx">AddVirtualMachine</span> <span class="p">{</span>
+  <span class="nx">type</span>: <span class="kt">ActionType.AddVirtualMachine</span><span class="p">;</span>
   <span class="nx">vm</span>: <span class="kt">VirtualMachine</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="kr">interface</span> <span class="nx">RemoveVirtualMachine</span> <span class="p">{</span>
-  <span class="kr">type</span><span class="o">:</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">RemoveVirtualMachine</span><span class="p">;</span>
+  <span class="nx">type</span>: <span class="kt">ActionType.RemoveVirtualMachine</span><span class="p">;</span>
   <span class="nx">id</span>: <span class="kt">string</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">type</span> <span class="nx">Action</span> <span class="o">=</span> <span class="nx">AddVirtualMachine</span> <span class="o">|</span> <span class="nx">RemoveVirtualMachine</span><span class="p">;</span>
-</code></pre></div><p>Notice that in the end we also define the type <code>Action</code> as the intersection between the <code>AddVirtualMachine</code> and <code>RemoveVirtualMachine</code>. This allows us to have very convenient support from the type checker in our reducers:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">virtualMachinesReducer</span> <span class="o">=</span> <span class="p">(</span><span class="nx">action</span>: <span class="kt">Action</span><span class="p">,</span> <span class="nx">state</span>: <span class="kt">List</span><span class="p">&lt;</span><span class="nt">VirtualMachine</span><span class="p">&gt;</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">switch</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="kr">type</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">type</span> <span class="nx">Action</span> <span class="o">=</span> <span class="nx">AddVirtualMachine</span> <span class="o">|</span> <span class="nx">RemoveVirtualMachine</span><span class="p">;</span></code></pre></div>
+<p>Notice that in the end we also define the type <code>Action</code> as the intersection between the <code>AddVirtualMachine</code> and <code>RemoveVirtualMachine</code>. This allows us to have very convenient support from the type checker in our reducers:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">virtualMachinesReducer</span> <span class="o">=</span> <span class="p">(</span><span class="nx">action</span>: <span class="kt">Action</span><span class="p">,</span> <span class="nx">state</span>: <span class="kt">List</span><span class="o">&lt;</span><span class="nx">VirtualMachine</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">initialState</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">case</span> <span class="nx">ActionType.AddVirtualMachine</span>:
     <span class="kt">return</span> <span class="nx">state</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">vm</span><span class="p">);</span>
     <span class="k">case</span> <span class="nx">ActionType.RemoveVirtualMachine</span>:
     <span class="kt">return</span> <span class="nx">state</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">findIndex</span><span class="p">((</span><span class="nx">v</span>: <span class="kt">VirtualMachine</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">v</span><span class="p">.</span><span class="nx">id</span> <span class="o">===</span> <span class="nx">action</span><span class="p">.</span><span class="nx">id</span><span class="p">));</span>
     <span class="k">break</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>In this case, the type checker will know exactly what the type of the <code>action</code> argument will be in any of the branches of the <code>switch</code> statement, so we will get a great type checking support and auto-completion.</p>
+<span class="p">}</span></code></pre></div>
+<p>In this case, the type checker will know exactly what the type of the <code>action</code> argument will be in any of the branches of the <code>switch</code> statement, so we will get a great type checking support and auto-completion.</p>
+
 <h2 id="interface-vs-factory">Interface vs Factory</h2>
+
 <p>A typical pattern in redux is to use factories for creating the action objects. Another typical pattern in the Angular community (more specifically, this part of it using <code>ngrx</code>) is to use classes, for example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AddVirtualMachine</span> <span class="p">{</span>
-  <span class="kr">readonly</span> <span class="kr">type</span> <span class="o">=</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">AddVirtualMachine</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AddVirtualMachine</span> <span class="p">{</span>
+  <span class="nx">readonly</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">AddVirtualMachine</span><span class="p">;</span>
 
   <span class="kr">constructor</span><span class="p">(</span><span class="kr">public</span> <span class="nx">vm</span>: <span class="kt">VirtualMachine</span><span class="p">)</span> <span class="p">{}</span>
 <span class="p">}</span>
 
 <span class="kr">export</span> <span class="kr">class</span> <span class="nx">RemoveVirtualMachine</span> <span class="p">{</span>
-  <span class="kr">readonly</span> <span class="kr">type</span> <span class="o">=</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">RemoveVirtualMachine</span><span class="p">;</span>
+  <span class="nx">readonly</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">RemoveVirtualMachine</span><span class="p">;</span>
 
   <span class="kr">constructor</span><span class="p">(</span><span class="kr">public</span> <span class="nx">id</span>: <span class="kt">string</span><span class="p">)</span> <span class="p">{}</span>
-<span class="p">}</span>
-</code></pre></div><p>When using classes we get few benefits:</p>
+<span class="p">}</span></code></pre></div>
+<p>When using classes we get few benefits:</p>
+
 <ul>
 <li>Read-only action type because of the <code>readonly</code> modified in the property declaration.</li>
 <li>Convenient static typing when passing the arguments to the constructor.</li>
 </ul>
+
 <p>Let&#x2019;s compare two syntaxes for dispatching actions - one using classes and another just object literals:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">dispatch</span><span class="p">(</span><span class="k">new</span> <span class="nx">RemoveVirtualMachine</span><span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">id</span><span class="p">))</span>
-<span class="nx">dispatch</span><span class="p">({</span> <span class="kr">type</span><span class="o">:</span> <span class="nx">ActionType</span><span class="p">.</span><span class="nx">RemoveVirtualMachine</span><span class="p">,</span> <span class="nx">id</span>: <span class="kt">vm.id</span> <span class="p">})</span>
-</code></pre></div><p>We can clearly see that the second option is a bit longer and also couples the component with the action type. On the other hand, new need to introduce an additional middleware in redux because by default it accepts only &#x201C;plain&#x201D; objects:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">isPlainObject</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;lodash.isplainobject&apos;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">dispatch</span><span class="p">(</span><span class="k">new</span> <span class="nx">RemoveVirtualMachine</span><span class="p">(</span><span class="nx">vm</span><span class="p">.</span><span class="nx">id</span><span class="p">))</span>
+<span class="nx">dispatch</span><span class="p">({</span> <span class="nx">type</span>: <span class="kt">ActionType.RemoveVirtualMachine</span><span class="p">,</span> <span class="nx">id</span>: <span class="kt">vm.id</span> <span class="p">})</span></code></pre></div>
+<p>We can clearly see that the second option is a bit longer and also couples the component with the action type. On the other hand, new need to introduce an additional middleware in redux because by default it accepts only &#x201C;plain&#x201D; objects:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">isPlainObject</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;lodash.isplainobject&apos;</span><span class="p">);</span>
 
 <span class="c1">// Allows us have the privilege to create actions
 </span><span class="c1">// with classes instead of action creators.
@@ -291,58 +312,66 @@
 </span><span class="c1"></span>    <span class="nx">a</span> <span class="o">=</span> <span class="nx">result</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div><h1 id="improved-middleware-declaration">Improved Middleware Declaration</h1>
+<span class="p">};</span></code></pre></div>
+<h1 id="improved-middleware-declaration">Improved Middleware Declaration</h1>
+
 <p>By default the TypeScript&#x2019;s type definitions for redux come with the following middleware interface:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Middleware</span> <span class="p">{</span>
-  <span class="p">&lt;</span><span class="nt">S</span><span class="p">&gt;(</span><span class="nx">api</span>: <span class="kt">MiddlewareAPI</span><span class="p">&lt;</span><span class="nt">S</span><span class="p">&gt;)</span><span class="o">:</span> <span class="p">(</span><span class="nx">next</span>: <span class="kt">Dispatch</span><span class="p">&lt;</span><span class="nt">S</span><span class="p">&gt;)</span> <span class="o">=&gt;</span> <span class="nx">Dispatch</span><span class="p">&lt;</span><span class="nt">S</span><span class="p">&gt;;</span>
-<span class="p">}</span>
-</code></pre></div><p>This way when we want to declare a middleware, let&#x2019;s say:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Middleware</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;redux&apos;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Middleware</span> <span class="p">{</span>
+  <span class="o">&lt;</span><span class="nx">S</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">api</span>: <span class="kt">MiddlewareAPI</span><span class="o">&lt;</span><span class="nx">S</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="p">(</span><span class="nx">next</span>: <span class="kt">Dispatch</span><span class="o">&lt;</span><span class="nx">S</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Dispatch</span><span class="o">&lt;</span><span class="nx">S</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+<p>This way when we want to declare a middleware, let&#x2019;s say:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Middleware</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;redux&apos;</span><span class="p">;</span>
 
 <span class="kr">export</span> <span class="kr">const</span> <span class="nx">sampleMiddleware</span> <span class="o">=</span> <span class="p">()</span><span class="o">:</span> <span class="nx">Middleware</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">({</span> <span class="nx">getState</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">getState</span><span class="p">();</span>
     <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
   <span class="p">};</span>
-<span class="p">};</span>
-</code></pre></div><p>This snippet has few problems:</p>
+<span class="p">};</span></code></pre></div>
+<p>This snippet has few problems:</p>
+
 <ul>
 <li><code>getState</code> will have type <code>S</code> which in this case is completely meaningless to us.</li>
 <li><code>next</code> has type <code>Dispatch&lt;S&gt;</code>, completely meaningless as well.</li>
 <li><code>action</code> has type <code>any</code>, which doesn&#x2019;t bring any extra semantics.</li>
 </ul>
+
 <p>To have a well-typed middleware we can apply the following definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">sampleMiddleware</span> <span class="o">=</span> <span class="p">()</span><span class="o">:</span> <span class="nx">Middleware</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">({</span> <span class="nx">getState</span> <span class="p">}</span><span class="o">:</span> <span class="nx">MiddlewareAPI</span><span class="p">&lt;</span><span class="nt">IStore</span><span class="p">&gt;)</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="p">&lt;</span><span class="nt">A</span> <span class="na">extends</span> <span class="na">Action</span><span class="p">&gt;(</span><span class="nx">action</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">sampleMiddleware</span> <span class="o">=</span> <span class="p">()</span><span class="o">:</span> <span class="nx">Middleware</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">({</span> <span class="nx">getState</span> <span class="p">}</span><span class="o">:</span> <span class="nx">MiddlewareAPI</span><span class="o">&lt;</span><span class="nx">IStore</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">A</span> <span class="kr">extends</span> <span class="nx">Action</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">action</span>: <span class="kt">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="kr">const</span> <span class="nx">state</span> <span class="o">=</span> <span class="nx">getState</span><span class="p">();</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">state</span><span class="p">);</span>
     <span class="k">return</span> <span class="nx">next</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
   <span class="p">};</span>
-<span class="p">};</span>
-</code></pre></div><p>This brings several improvements:</p>
+<span class="p">};</span></code></pre></div>
+<p>This brings several improvements:</p>
+
 <ul>
 <li><code>getState</code> is well-typed because of <code>MiddlewareAPI&lt;IStore&gt;</code> type.</li>
 <li><code>next</code> has now type <code>Dispatch&lt;IStore&gt;</code>, thanks to the <code>MiddlewareAPI&lt;IStore&gt;</code> annotation.</li>
 <li><code>action</code> now brings some extra semantics, for instance, we can access its <code>type</code> property and in case of a conditional statement, we can use the provided by TypeScript control flow type inference.</li>
 </ul>
+
 <p><strong>Note</strong> that, depending on the version of the redux type definitions you use, you may need to take advantage of the open interfaces of TypeScript and improve the <code>Middleware</code> declaration:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">MiddlewareAPI</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;redux&apos;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">MiddlewareAPI</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;redux&apos;</span><span class="p">;</span>
 
 <span class="kr">declare</span> <span class="nx">module</span> <span class="s1">&apos;redux&apos;</span> <span class="p">{</span>
-  <span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Middleware</span><span class="p">&lt;</span><span class="nt">T</span> <span class="err">=</span> <span class="na">any</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="p">&lt;</span><span class="nt">U</span><span class="p">&gt;(</span><span class="nx">api</span>: <span class="kt">MiddlewareAPI</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;)</span><span class="o">:</span> <span class="p">(</span><span class="nx">next</span>: <span class="kt">Dispatch</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;)</span> <span class="o">=&gt;</span> <span class="nx">Dispatch</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;;</span>
+  <span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Middleware</span><span class="o">&lt;</span><span class="nx">T</span> <span class="o">=</span> <span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="o">&lt;</span><span class="nx">U</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">api</span>: <span class="kt">MiddlewareAPI</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="p">(</span><span class="nx">next</span>: <span class="kt">Dispatch</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Dispatch</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Otherwise, you may get the error:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">[</span><span class="nx">ts</span><span class="p">]</span>
-<span class="nx">Type</span> <span class="s1">&apos;&lt;S&gt;({ getState }: MiddlewareAPI&lt;IStore&gt;) =&gt; (next: Dispatch&lt;S&gt;) =&gt; &lt;A extends Action&gt;(action: A) ...&apos;</span> <span class="k">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="kr">type</span> <span class="s1">&apos;Middleware&apos;</span><span class="p">.</span>
-  <span class="nx">Types</span> <span class="k">of</span> <span class="nx">parameters</span> <span class="s1">&apos;__0&apos;</span> <span class="nx">and</span> <span class="s1">&apos;api&apos;</span> <span class="nx">are</span> <span class="nx">incompatible</span><span class="p">.</span>
-    <span class="nx">Type</span> <span class="s1">&apos;MiddlewareAPI&lt;S&gt;&apos;</span> <span class="k">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="kr">type</span> <span class="s1">&apos;MiddlewareAPI&lt;IStore&gt;&apos;</span><span class="p">.</span>
-      <span class="nx">Type</span> <span class="s1">&apos;S&apos;</span> <span class="k">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="kr">type</span> <span class="s1">&apos;IStore&apos;</span><span class="p">.</span>
-</code></pre></div><h1 id="conclusion">Conclusion</h1>
+<span class="p">}</span></code></pre></div>
+<p>Otherwise, you may get the error:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="p">[</span><span class="nx">ts</span><span class="p">]</span>
+<span class="nx">Type</span> <span class="s1">&apos;&lt;S&gt;({ getState }: MiddlewareAPI&lt;IStore&gt;) =&gt; (next: Dispatch&lt;S&gt;) =&gt; &lt;A extends Action&gt;(action: A) ...&apos;</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="nx">type</span> <span class="s1">&apos;Middleware&apos;</span><span class="p">.</span>
+  <span class="nx">Types</span> <span class="nx">of</span> <span class="nx">parameters</span> <span class="s1">&apos;__0&apos;</span> <span class="nx">and</span> <span class="s1">&apos;api&apos;</span> <span class="nx">are</span> <span class="nx">incompatible</span><span class="p">.</span>
+    <span class="nx">Type</span> <span class="s1">&apos;MiddlewareAPI&lt;S&gt;&apos;</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="nx">type</span> <span class="s1">&apos;MiddlewareAPI&lt;IStore&gt;&apos;</span><span class="p">.</span>
+      <span class="nx">Type</span> <span class="s1">&apos;S&apos;</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">assignable</span> <span class="nx">to</span> <span class="nx">type</span> <span class="s1">&apos;IStore&apos;</span><span class="p">.</span></code></pre></div>
+<h1 id="conclusion">Conclusion</h1>
+
 <p>Redux provides a lovely architectural pattern which allows us to isolate the side-effects and keep most of our codebase pure. This way, the state management of our application gets much more predictable.</p>
+
 <p>On top of this, using a statically typed language which fails early when the compiler finds a defect in our program brings significant improvements in our development process.</p>
+
 <p>Combining Redux and TypeScript is a great middle ground between purity and practicality.</p>
 </div>
 

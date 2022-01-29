@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -85,63 +85,92 @@ The code for this blog post is available at my GitHub account:" />
                 </header>
                 
                 <section id="post-body">
-                    <p>In this post, we&rsquo;ll focus on techniques from functional programming we can apply to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&rsquo;t read the first part of the &ldquo;Faster Angular Applications&rdquo; series, I&rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&rsquo;re optimizing.</p>
+                    
+
+<p>In this post, we&rsquo;ll focus on techniques from functional programming we can apply to improve the performance of our applications, more specifically pure pipes, memoization, and referential transparency. If you haven&rsquo;t read the first part of the &ldquo;Faster Angular Applications&rdquo; series, I&rsquo;d recommend you to take a look at it or at least get familiar with the structure of the business application that we&rsquo;re optimizing.</p>
+
 <p>The code for this blog post is available at my <a href="https://github.com/mgechev">GitHub account</a>:</p>
+
 <ul>
 <li><a href="https://github.com/mgechev/purely-fast">&ldquo;Purely Fast&rdquo;</a></li>
 <li><a href="https://github.com/mgechev/purely-fast-benchmarks">&ldquo;Purely Fast - Benchmarks&rdquo;</a></li>
 <li><a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">&ldquo;Faster Angular Applications - Part 1&rdquo;</a></li>
 </ul>
+
 <h1 id="goals-for-optimization">Goals for Optimization</h1>
+
 <p>In this section, we&rsquo;ll see how we can reduce the number of computations going on in the application even further! The three specific features that we&rsquo;re going to focus on are:</p>
+
 <ol>
 <li>Adding an employee to a department.</li>
 <li>Removing an employee from a department.</li>
 <li>Initial rendering performance.</li>
 </ol>
+
 <h2 id="optimizing-the-mutation-operations">Optimizing the Mutation Operations</h2>
+
 <p>There&rsquo;s something in common between the first two points above - they mutate the list of employees for a specific department. Since in the previous blog post we switched to <code>OnPush</code> change detection strategy with Immutable.js, now if we add or remove an employee from any of the lists we&rsquo;ll get a new immutable list. This will trigger the change detection for the <code>EmployeeListComponent</code> and its child components - <code>ListComponent</code> and <code>NameListComponent</code> which will require re-evaluation of all the expressions in the templates of these components.</p>
+
 <p>Let&rsquo;s see how this looks in practice. For the purpose, we can add a log statement in the <code>ListComponent</code>&rsquo;s calculate method to see when it gets invoked. Here&rsquo;s the final result:</p>
-<img src="/images/faster-ng-apps-2/slow-add.gif" style="border: 1px solid #ccc;">
+
+<p><img src="/images/faster-ng-apps-2/slow-add.gif" style="border: 1px solid #ccc;"></p>
+
 <p>From the GIF above we can see that while typing the change detection doesn&rsquo;t get invoked - cool! We did this optimization in the <a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">previous post from the series</a>.</p>
+
 <p>We can also notice that when the user adds a new employee the <code>calculate</code> method gets invoked 71 times. Given that we initially have 70 employees on the sales list, this means that on top of calculating the numeric value for the new employee we also recalculate it for all the already existing employees. This way we perform 70 useless calculations which in case of a computationally intensive business calculation can have some serious performance implications!</p>
+
 <p>What we&rsquo;d want to happen is:</p>
+
 <ul>
 <li>During the initial application rendering, we calculate the numeric values for all the employees and visualize them.</li>
 <li>When we add a new entry, we calculate the numeric value only for the newly added employee, without performing any redundant calculations for the already existing employees, since we have their numeric values from the rendering phase.</li>
 </ul>
+
 <p>To implement this behavior, let&rsquo;s take a look at our mocked business calculation - the function of Fibonacci:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div><p>It has two fundamental properties which are typical for all mathematical functions:</p>
+<span class="p">};</span></code></pre></div>
+<p>It has two fundamental properties which are typical for all mathematical functions:</p>
+
 <ul>
 <li><strong>It does not perform any side effects</strong> - when calculating the employee&rsquo;s numeric value, we don&rsquo;t send any network requests, touch local storage, log anything in the console, etc.</li>
 <li><strong>It returns the exact same result for the same set of arguments</strong> - <code>fibonacci(1)</code> is always 1, same for <code>fibonacci(n)</code> which always is going to return the same <code>k</code> where <code>n ∈ ℕ, k ∈ ℕ</code>.</li>
 </ul>
-<p>Such functions in the world of functional programming are called <strong>pure functions</strong>. All mathematical functions are pure, and for performing a meaningful business calculation for the employees' numeric value, we&rsquo;d most likely use a mathematical function.</p>
+
+<p>Such functions in the world of functional programming are called <strong>pure functions</strong>. All mathematical functions are pure, and for performing a meaningful business calculation for the employees&rsquo; numeric value, we&rsquo;d most likely use a mathematical function.</p>
+
 <h2 id="angular-pipes-and-pure-functions">Angular Pipes and Pure Functions</h2>
+
 <p>In Angular, on the other hand, we have pipes. Pipes are used for performing some kind of data processing, for instance, data formatting. There are two types of pipes:</p>
+
 <ul>
 <li><strong>Pure pipes</strong> - produce the same output when invoked with the same set of arguments. Such pipes hold the <strong><a href="https://wiki.haskell.org/Referential_transparency">referential transparency</a></strong> property.</li>
 <li><strong>Impure pipes</strong> - can hold state and respectively produce different output for the same set of arguments.</li>
 </ul>
+
 <p>Examples of pure pipes are the <code>DecimalPipe</code> and <code>DatePipe</code> pipes. Every time when we invoke the <code>DecimalPipe</code> with given number and formatting configuration, we&rsquo;ll always get the exact same string as a result.</p>
+
 <p>An example for impure pipe is the <code>async</code> pipe for instance, which holds internal state. More about pure and impure pipes you can find in my book <a href="https://www.packtpub.com/web-development/switching-angular-third-edition">&ldquo;Switching to Angular&rdquo;</a>.</p>
+
 <p>Alright, so we have pure and impure pipes but how does this matter for Angular? Well:</p>
+
 <blockquote>
 <p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
 </blockquote>
+
 <p>Angular is going to determine if the arguments of the pipe are different by performing an equality check. This means that, if we have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html">{{ 2.718281828459045 | number:&#39;3.1-5&#39; }}
-</code></pre></div><p><strong>Angular is going to evaluate the expression once</strong> and produce the string <code>2.718</code>. <strong>The next time when the change detection runs, Angular will get the last result from the evaluation since the arguments of the pure pipe haven&rsquo;t changed</strong>!</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html">{{ 2.718281828459045 | number:&#39;3.1-5&#39; }}</code></pre></div>
+<p><strong>Angular is going to evaluate the expression once</strong> and produce the string <code>2.718</code>. <strong>The next time when the change detection runs, Angular will get the last result from the evaluation since the arguments of the pure pipe haven&rsquo;t changed</strong>!</p>
+
 <h2 id="optimizing-expression-re-evaluation-with-pure-pipes">Optimizing Expression Re-Evaluation with Pure Pipes</h2>
+
 <p>Wait, isn&rsquo;t that exactly what we want to do in our application - do not re-evaluate the employee&rsquo;s numeric value unless it gets changed? This means that we can encapsulate our business calculation inside of a pure pipe and as a bonus get the caching that Angular provides.</p>
+
 <p>Here&rsquo;s how we can proceed:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Pipe</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Pipe</span><span class="p">({</span>
   <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;calculate&#39;</span><span class="p">,</span>
   <span class="nx">pure</span>: <span class="kt">true</span>
 <span class="p">})</span>
@@ -149,10 +178,11 @@ The code for this blog post is available at my GitHub account:" />
   <span class="nx">transform</span><span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>In fact, all pipes in Angular are pure by default so we can drop the <code>pure: true</code> property.</p>
+<span class="p">}</span></code></pre></div>
+<p>In fact, all pipes in Angular are pure by default so we can drop the <code>pure: true</code> property.</p>
+
 <p>Now we need to modify the template of the <code>ListComponent</code> a little bit to invoke the pipe instead of the <code>calculate</code> method defined inside of its controller:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
   <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
   <span class="nx">template</span><span class="o">:</span> <span class="sb">`
 </span><span class="sb">    ...
@@ -160,75 +190,112 @@ The code for this blog post is available at my GitHub account:" />
 </span><span class="sb">    ...
 </span><span class="sb">  `</span>
 <span class="p">})</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ListComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</code></pre></div><p>To verify if the last optimization improved the application&rsquo;s performance. I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress, I got the following results:</p>
-<img src="/images/faster-ng-apps-2/adding-removing.png" style="border: 1px solid #ccc;">
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ListComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span></code></pre></div>
+<p>To verify if the last optimization improved the application&rsquo;s performance. I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress, I got the following results:</p>
+
+<p><img src="/images/faster-ng-apps-2/adding-removing.png" style="border: 1px solid #ccc;"></p>
+
 <p>With the latest optimization, the time required for running the tests dropped from 394.53ms to 9.70ms! That is a huge improvement! We achieved it only by performing a small refactoring, without writing any custom code, just taking advantage of what Angular already provides for free!</p>
+
 <h2 id="initial-application-rendering">Initial Application Rendering</h2>
+
 <p>For this performance benchmark we&rsquo;ll increase the number of items from 140 to 1,000. Lets see how this is going to affect our application&rsquo;s rendering performance:</p>
-<img src="/images/faster-ng-apps-2/slow-initial-rendering.png" style="border: 1px solid #ccc;">
+
+<p><img src="/images/faster-ng-apps-2/slow-initial-rendering.png" style="border: 1px solid #ccc;"></p>
+
 <p>9.53s is quite a lot for initial rendering time. In fact&hellip;</p>
-<center>
+
+<p><center>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Waiting for slow web pages to load is as stressful as watching a horror movie: <a href="https://t.co/spwEC1P9ct">https://t.co/spwEC1P9ct</a> <a href="https://twitter.com/hashtag/perfmatters?src=hash&amp;ref_src=twsrc%5Etfw">#perfmatters</a> <a href="https://t.co/3JmcGPZij2">pic.twitter.com/3JmcGPZij2</a></p>&mdash; Addy Osmani (@addyosmani) <a href="https://twitter.com/addyosmani/status/711330814827569152?ref_src=twsrc%5Etfw">March 19, 2016</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</center>
+</center></p>
+
 <p>In our case we&rsquo;re even not waiting for the application to get loaded, we&rsquo;re waiting for it to get rendered. Let&rsquo;s suppose we have put a lot of effort into optimizing the network performance of the application and our bundle size is only 50KB, we download all the resources from the network for less than 100ms. This sounds great, right? Well, after that the user needs to wait another 9430ms in order see the application rendered.</p>
+
 <p>There are various techniques to fix this - we don&rsquo;t have to render all the 1,000 employees at once, we can, for instance, apply pagination or render the items lazily when the user scrolls. But there&rsquo;s also something else we can apply in this specific case. For this purpose, let&rsquo;s take a look at the numeric data for the employees:</p>
-<img src="/images/faster-ng-apps-2/duplicate-values.png" style="border: 1px solid #ccc;">
+
+<p><img src="/images/faster-ng-apps-2/duplicate-values.png" style="border: 1px solid #ccc;"></p>
+
 <p>We have a lot of employees with the same numeric values which produce the same output after going through the business calculation. We can conclude that in this case, we have samples in a small range. Lets for a second remember what optimization Angular performs with pure pipes:</p>
+
 <blockquote>
 <p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
 </blockquote>
+
 <p>This doesn&rsquo;t say anywhere that Angular is not going to evaluate two pipe expressions in different places in the component tree which have the same arguments. So, if we have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
   {{ &#39;Emily&#39; }}
   {{ 27 | calculate }}
 <span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
   {{ &#39;Dan&#39; }}
   {{ 27 | calculate }}
-<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
-</code></pre></div><p>Angular is going to evaluate <code>{{ 27 | calculate }}</code> twice! The optimization that the framework will perform is that it won&rsquo;t re-evaluate the expressions on the next tick of the change detection mechanism. This means that <strong>it&rsquo;ll cache the result for the last value for a specific place in the rendered (dynamic) component tree</strong>.</p>
+<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span></code></pre></div>
+<p>Angular is going to evaluate <code>{{ 27 | calculate }}</code> twice! The optimization that the framework will perform is that it won&rsquo;t re-evaluate the expressions on the next tick of the change detection mechanism. This means that <strong>it&rsquo;ll cache the result for the last value for a specific place in the rendered (dynamic) component tree</strong>.</p>
+
 <p>On the other hand, in functional programming for pure functions, we can apply an optimization called <strong>memoization</strong> which Wikipedia defines as:</p>
+
 <blockquote>
 <p>In computing, memoization or memoization is an optimization technique used primarily to speed up computer programs by storing the results of expensive function calls and returning the cached result when the same inputs occur again.</p>
 </blockquote>
+
 <p>In contrast to the caching that Angular performs, memoization uses a global cache used for <strong>all the invocations of given function</strong>. This means that in the context of the example above if we apply memoization to the <code>fibonacci</code> function, although <code>{{ 27 | calculate }}</code> will be evaluated twice, <code>fibonacci(27)</code> will be invoked only once, the next time we&rsquo;ll directly get the memoized result!</p>
+
 <p>We can apply memoization to <code>fibonacci</code> using <code>lodash.memoize</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">memoize</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;lodash.memoize&#39;</span><span class="p">);</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">memoize</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;lodash.memoize&#39;</span><span class="p">);</span>
 
 <span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">((</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></div><p>Now lets see how this affects our initial rendering:</p>
-<img src="/images/faster-ng-apps-2/memoization.png" style="border: 1px solid #ccc;">
+<span class="p">});</span></code></pre></div>
+<p>Now lets see how this affects our initial rendering:</p>
+
+<p><img src="/images/faster-ng-apps-2/memoization.png" style="border: 1px solid #ccc;"></p>
+
 <p>Not bad! By performing this optimization, we reduced the initial rendering with 30%!</p>
+
 <h1 id="memoization-pure-pipes-on-push-and-referential-transparency">Memoization, Pure Pipes, On Push and Referential Transparency</h1>
+
 <p>As we saw from the example above, we can think of pure pipes as pure functions. On the other hand, the optimization that Angular performs for pure pipes differs quite a lot compared to memoization. Angular treats expressions formed by pure pipes as referentially transparent expressions. Here&rsquo;s definition of the property of referential transparency:</p>
+
 <blockquote>
 <p>If all functions involved in the expression are pure functions, then the expression is referentially transparent. Also, some impure functions can be included in the expression if their values are discarded and their side effects are insignificant.</p>
 </blockquote>
+
 <p>To what degree we consider the side effect performed by a pure pipe &ldquo;insignificant&rdquo; depends on our own judgment. In case we decide that the side effect that our pure pipe performs is significant, we can declare the pipe as impure by setting the <code>pure</code> property of the object literal we pass to the <code>@Pipe</code> decorator to <code>false</code>.</p>
+
 <p>An interesting question to ask is, can we apply memoization to all pure pipes in order to get the performance benefit from the latest optimization we did? Here we can think of two cases:</p>
+
 <ul>
 <li>When the arguments of the pipe are primitive values.</li>
 <li>When the arguments of the pipe are non-primitive values.</li>
 </ul>
+
 <p>For primitive values, it makes sense to apply memoization since we can create a cache which maps the pipe&rsquo;s arguments to their results. Of course, this is only applicable in case the pure pipe performs no side effects or they are insignificant enough.</p>
-<p>On the other hand, if the pipe has non-primitive arguments the situation can get trickier. In such case, it&rsquo;ll be quite inconvenient to cache the result for the function based on its arguments' references. Very often two instances of a data structure which have different references can hold the same data. Should we return the cached result in such case or not? Probably we should. But how can we efficiently determine if the items in the two collections are the same? Maybe hashing? This is a topic of another discussion and there is <a href="http://repository.cmu.edu/cgi/viewcontent.cgi?article=3285&amp;context=compsci">a lot of research in this direction</a>.</p>
+
+<p>On the other hand, if the pipe has non-primitive arguments the situation can get trickier. In such case, it&rsquo;ll be quite inconvenient to cache the result for the function based on its arguments&rsquo; references. Very often two instances of a data structure which have different references can hold the same data. Should we return the cached result in such case or not? Probably we should. But how can we efficiently determine if the items in the two collections are the same? Maybe hashing? This is a topic of another discussion and there is <a href="http://repository.cmu.edu/cgi/viewcontent.cgi?article=3285&amp;context=compsci">a lot of research in this direction</a>.</p>
+
 <p>For components, we can think similarly. We can abstract them as functions and consider their inputs as arguments, and the UI that they render as the function&rsquo;s result. We think of the Angular templates as expressions and the components with <code>OnPush</code> change detection used in these templates as referentially transparent sub-expressions.</p>
+
 <p>That&rsquo;s how we found some patterns which are already well described by computer science in the face of pure functions, referential transparency, and memoization.</p>
+
 <h1 id="conclusion">Conclusion</h1>
+
 <p>This blog post was the second from the series &ldquo;Faster Angular Applications&rdquo;.</p>
+
 <p>In this part, we improved the operations for adding and removing employees from the lists by encapsulating the business computation inside of a pure pipe. After that we explained what optimizations Angular performs on pure pipes, treating the expressions that they form as referentially transparent.</p>
+
 <p>As the next step, to optimize the initial rendering of our application, we used memoization.</p>
+
 <p>Finally, we explained the theoretical foundation behind these APIs. It&rsquo;s definitely worth it to invest time in computer science to understand the underlying concepts behind everything we use on a daily basis. This way we can find agnostic patterns across technologies and reuse them in our projects.</p>
+
 <p>In conclusion, we can say that there&rsquo;s no silver bullet for optimizing the runtime performance of our Angular applications. There are several techniques we can apply in response to our deep understanding of:</p>
+
 <ul>
 <li>The component structure of our applications.</li>
 <li>The business data that our application processes and visualizes.</li>
 </ul>
+
 <p>On top of that, to conclude if the optimizations we do are meaningful, we should <strong>make application-specific benchmarks</strong>.</p>
 
                 </section>
@@ -281,6 +348,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

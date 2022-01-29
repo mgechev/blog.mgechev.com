@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.55.5">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Faster Angular Applications - Understanding Differs. Developing a Custom IterableDiffer - Minko Gechev\u0027s blog",
+    "headline": "Faster Angular Applications - Understanding Differs. Developing a Custom IterableDiffer - Minko Gechev\x27s blog",
     "datePublished": "2017-11-17T00:00:00JST",
     "dateModified": "2017-11-17T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\u0027s blog"
+      "name": "Minko Gechev\x27s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\u0027s blog",
+      "name": "Minko Gechev\x27s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "In this article we\u0026rsquo;ll take a look at another Angular abstraction - the differs and more specifically the IterableDiffer; we\u0026rsquo;ll explain what the differs are and how the framework uses them internally. After that, we\u0026rsquo;ll take a look at how NgForOf works and design a custom data structure optimized for the directive. Finally, we\u0026rsquo;ll develop a custom differ which will speed up the change detection mechanism of Angular when working with large collections."
+    "description": "In this article we\x26rsquo;ll take a look at another Angular abstraction - the differs and more specifically the IterableDiffer; we\x26rsquo;ll explain what the differs are and how the framework uses them internally. After that, we\x26rsquo;ll take a look at how NgForOf works and design a custom data structure optimized for the directive. Finally, we\x26rsquo;ll develop a custom differ which will speed up the change detection mechanism of Angular when working with large collections."
   }
 </script>
 
@@ -130,34 +130,49 @@
 </aside>
 
 
-  <div class="article-body"><p>In this article we&#x2019;ll take a look at another Angular abstraction - the <strong>differs</strong> and more specifically the <strong><code>IterableDiffer</code></strong>; we&#x2019;ll explain what the differs are and how the framework uses them internally. After that, we&#x2019;ll take a look at how <code>NgForOf</code> works and design a custom data structure optimized for the directive. Finally, we&#x2019;ll develop a custom differ which will speed up the change detection mechanism of Angular when working with large collections.</p>
+  <div class="article-body">
+
+<p>In this article we&#x2019;ll take a look at another Angular abstraction - the <strong>differs</strong> and more specifically the <strong><code>IterableDiffer</code></strong>; we&#x2019;ll explain what the differs are and how the framework uses them internally. After that, we&#x2019;ll take a look at how <code>NgForOf</code> works and design a custom data structure optimized for the directive. Finally, we&#x2019;ll develop a custom differ which will speed up the change detection mechanism of Angular when working with large collections.</p>
+
 <p>If you&#x2019;re interested on higher level performance practices you can take a look at:</p>
+
 <ul>
 <li><a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">&#x201C;Faster Angular Applications - Part 1&#x201D;</a></li>
 <li><a href="/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">&#x201C;Faster Angular Applications - Part 2&#x201D;</a></li>
 </ul>
+
 <p>The code from this article can be found at:</p>
+
 <ul>
 <li><a href="https://github.com/mgechev/purely-fast">&#x201C;Purely Fast&#x201D;</a></li>
 <li><a href="https://github.com/mgechev/purely-fast-benchmarks">&#x201C;Purely Fast - Benchmarks&#x201D;</a></li>
 </ul>
-<h1 id="angulars-change-detection">Angular&#x2019;s Change Detection</h1>
+
+<h1 id="angular-s-change-detection">Angular&#x2019;s Change Detection</h1>
+
 <p>There are a lot of articles written on this topic so we will just quickly provide some background which will help us understand how differs work and how the framework uses them internally.</p>
-<p>Angular uses <strong>dirty-checking mechanism</strong> in order to detect changes in the templates&apos; expressions. Lets suppose we have the following template:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+
+<p>Angular uses <strong>dirty-checking mechanism</strong> in order to detect changes in the templates&#x2019; expressions. Lets suppose we have the following template:</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">li</span> <span class="err">*</span><span class="na">ngFor</span><span class="o">=</span><span class="s">&quot;let item of items&quot;</span><span class="p">&gt;</span>
     {{ item }}
   <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-</code></pre></div><p>The snippet above will produce an unordered list of items. The list can change if the <code>items</code> collection we&#x2019;re iterating over changes. Once Angular has to render the template above for first time it&#x2019;ll simply get the <code>items</code> property from the controller of the component associated with this template and render the list items.</p>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span></code></pre></div>
+<p>The snippet above will produce an unordered list of items. The list can change if the <code>items</code> collection we&#x2019;re iterating over changes. Once Angular has to render the template above for first time it&#x2019;ll simply get the <code>items</code> property from the controller of the component associated with this template and render the list items.</p>
+
 <p>After that, <strong>on special events Angular will check whether the value of <code>items</code> property has changed</strong>. What are these special events? Well, basically almost any asynchronous event which happens in the browser. In fact, by default the framework is going to check if any of the bindings in any of the templates in any of the instances of any of the components in our application has changed. Although this sounds slow it&#x2019;s not because of the numerous optimizations that Angular performs. Although that&#x2019;s an interesting topic, it&#x2019;s part of another discussion. Check <a href="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/">this article</a> for more details.</p>
+
 <p>In short, <strong>by default, after each task from the queue, Angular is going to perform dirty checking, i.e. check whether the value of any of the expressions in the templates has changed and update the view</strong>.</p>
+
 <h2 id="life-cycle-hooks">Life-Cycle Hooks</h2>
+
 <p>On top of that when Angular performs change detection in the context of given component it will invoke its <code>ngDoCheck</code> life-cycle hook. This means that <code>ngDoCheck</code> is the perfect place to add custom piece of logic for detecting changes in the state of our components!</p>
-<amp-img src="/images/differs/lifecycle.jpg" alt="Life-Cycle" style="display: block; margin: auto;"></amp-img>
+
+<p><amp-img src="/images/differs/lifecycle.jpg" alt="Life-Cycle" style="display: block; margin: auto;"></amp-img></p>
+
 <p>Lets take a look at the implementation of <code>NgForOf</code> to see how this actually works:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Directive</span><span class="p">({</span><span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;[ngFor][ngForOf]&apos;</span><span class="p">})</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">NgForOf</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="kr">implements</span> <span class="nx">DoCheck</span><span class="p">,</span> <span class="nx">OnChanges</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Directive</span><span class="p">({</span><span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;[ngFor][ngForOf]&apos;</span><span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">NgForOf</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">DoCheck</span><span class="p">,</span> <span class="nx">OnChanges</span> <span class="p">{</span>
   <span class="nx">ngOnChanges</span><span class="p">(</span><span class="nx">changes</span>: <span class="kt">SimpleChanges</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="s1">&apos;ngForOf&apos;</span> <span class="k">in</span> <span class="nx">changes</span><span class="p">)</span> <span class="p">{</span>
       <span class="c1">// React on ngForOf changes only once all inputs have been initialized
@@ -177,21 +192,26 @@
     <span class="p">}</span>
   <span class="p">}</span>
 
-  <span class="kr">private</span> <span class="nx">_applyChanges</span><span class="p">(</span><span class="nx">changes</span>: <span class="kt">IterableChanges</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;)</span> <span class="p">{</span>
+  <span class="kr">private</span> <span class="nx">_applyChanges</span><span class="p">(</span><span class="nx">changes</span>: <span class="kt">IterableChanges</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>  <span class="p">}</span>
 
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>I have omitted parts of the implementation which are not essential for our discussion. There are three important points to discuss:</p>
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>I have omitted parts of the implementation which are not essential for our discussion. There are three important points to discuss:</p>
+
 <ul>
 <li><code>ngOnChanges</code> - <code>NgForOf</code> implements the <code>OnChanges</code> life-cycle hook which is going to be invoked when Angular detects changes in any of the bindings in the template for given component or directive. In the context of the code above, Angular will check if the <code>ngForOf</code> input has changed (i.e. the collection we iterate over). If it has changed, we get its <code>currentValue</code> and find an appropriate differ in case we haven&#x2019;t picked one yet. We&#x2019;ll explain what the purpose of the differ is and how we pick it later in this article.</li>
 <li><code>ngDoCheck</code> - <code>NgForOf</code> also implements the <code>DoCheck</code> life-cycle hook which is invoked once the change detection mechanism gets executed. In this life-cycle hook we check whether we have a differ assigned to the private <code>_differ</code> property and if we do, we invoke its <code>diff</code> method with the current value of <code>ngForOf</code> (i.e. the collection). <strong>The method <code>diff</code> of the differ is going to return a list of changes which have happened in the collection since the last check</strong>.</li>
 <li><code>_applyChanges</code> - once we have the list of changes, all we need to do is visualize them. That&#x2019;s what the purpose of <code>_applyChanges</code> is; it receives a list of changes and updates the collection by optionally applying animations.</li>
 </ul>
+
 <h1 id="the-iterablediffer">The <code>IterableDiffer</code></h1>
+
 <p>As the bullet points above mention, the <code>IterableDiffer</code> will be used to compare two collections and produce a list of changes in the form of <code>IterableChanges</code> collection. Later we pass this collection to <code>_applyChanges</code> in order to visualize the update. Why is it called <code>IterableDiffer</code>? It compares iterable collections - collections we can iterate over. This includes any collection which has an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators">iterator</a> associated with it.</p>
+
 <p>The <code>IterableChanges</code> interface allows us to iterate over the changes in different ways, for instance:</p>
+
 <ul>
 <li>Iterate over the added items.</li>
 <li>Iterate over the removed items.</li>
@@ -199,49 +219,60 @@
 <li>Iterate over all the changes.</li>
 <li>etc.</li>
 </ul>
+
 <p>For instance:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
-<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">];</span>
-</code></pre></div><p><code>IterableChanges</code> will contain the following list of updates:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">];</span></code></pre></div>
+<p><code>IterableChanges</code> will contain the following list of updates:</p>
+
 <ul>
 <li>The item with index <code>0</code> from <code>a</code> has changed it&#x2019;s position to index <code>1</code>.</li>
 <li>The item with index <code>1</code> from <code>a</code> has changed it&#x2019;s position to index <code>0</code>.</li>
 <li>The item with index <code>2</code> from <code>a</code> has been removed.</li>
 <li>There&#x2019;s a new item added to <code>a</code> with value <code>4</code> and index <code>2</code>.</li>
 </ul>
+
 <p>In recap, we can say that internally <code>NgForOf</code> uses the life-cycle hooks <code>ngOnChanges</code> and <code>ngDoCheck</code>. <code>ngOnChanges</code> the directive uses in order to pick a differ based on the type of the current collection using the <code>find</code> method of an instance of the <code>IterableDiffers</code> collection. <code>ngDoCheck</code> is used to apply the differ over the current value of the collection. The <strong>differ is going to compare the collection with its previous value and return the list of changes</strong>.</p>
+
 <p>It&#x2019;s interesting how the differ compares the individual values in the collection. In particular, what properties of the values it uses in order to distinguish them. For this purpose we need to take a look at the <code>TrackByFunction</code> interface:</p>
+
 <h2 id="the-trackbyfunction">The <code>TrackByFunction</code></h2>
+
 <p>Here&#x2019;s the interface of the function:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">TrackByFunction</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span><span class="o">:</span> <span class="kt">any</span><span class="p">;</span> <span class="p">}</span>
-</code></pre></div><p>By default, Angular is going to track the values by their identity with the following track-by function:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">trackByIdentity</span> <span class="o">=</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">;</span>
-</code></pre></div><p>The differ will use the result from the track-by function to compare the value from a specific index in the iterable collection with its previous value. So in the following example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
-<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
-</code></pre></div><p>The differ will compare <code>a</code> with <code>b</code> and find out that <code>1</code> and <code>2</code> has changed their positions because it&#x2019;ll check the items with equality check using <code>===</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">TrackByFunction</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span><span class="o">:</span> <span class="nx">any</span><span class="p">;</span> <span class="p">}</span></code></pre></div>
+<p>By default, Angular is going to track the values by their identity with the following track-by function:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">trackByIdentity</span> <span class="o">=</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">;</span></code></pre></div>
+<p>The differ will use the result from the track-by function to compare the value from a specific index in the iterable collection with its previous value. So in the following example:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span></code></pre></div>
+<p>The differ will compare <code>a</code> with <code>b</code> and find out that <code>1</code> and <code>2</code> has changed their positions because it&#x2019;ll check the items with equality check using <code>===</code>.</p>
+
 <p>In some cases, however, a simple equality check between the values is not enough. We may want to track the values between a specific feature they have instead of tracking them by their reference. Lets suppose we have two instances of given reference type which represent the same business entity:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">Employee1</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;Minko&apos;</span> <span class="p">};</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">Employee1</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;Minko&apos;</span> <span class="p">};</span>
 <span class="kr">const</span> <span class="nx">Employee2</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">id</span>: <span class="kt">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;Minko&apos;</span> <span class="p">};</span>
 <span class="kr">const</span> <span class="nx">Employee3</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">id</span>: <span class="kt">2</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;John&apos;</span> <span class="p">};</span>
 
 <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="nx">Employee1</span><span class="p">,</span> <span class="nx">Employee3</span><span class="p">];</span>
-<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="nx">Employee2</span><span class="p">,</span> <span class="nx">Employee3</span><span class="p">];</span>
-</code></pre></div><p>In this case, <code>Employee1</code> and <code>Employee2</code> represent the same business entity so we should consider the collections equivalent. However, if we use <code>IterableDiffer</code> with the default <code>TrackByFunction</code> we&#x2019;ll get a result of changes indicating that the first element from <code>a</code> has been removed and replaced with <code>Employee2</code>, which is incorrect. To get a correct result, we should provide the following <code>TrackByFunction</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">trackById</span> <span class="o">=</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
-</code></pre></div><p>Notice that comparing two items from the collections will always happen in <code>O(1)</code> time, independently from the <code>TrackByFunction</code>. <strong>For every two values returned by two invocations of the <code>TrackByFunction</code> Angular will always apply <code>===</code> check.</strong></p>
+<span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="p">[</span><span class="nx">Employee2</span><span class="p">,</span> <span class="nx">Employee3</span><span class="p">];</span></code></pre></div>
+<p>In this case, <code>Employee1</code> and <code>Employee2</code> represent the same business entity so we should consider the collections equivalent. However, if we use <code>IterableDiffer</code> with the default <code>TrackByFunction</code> we&#x2019;ll get a result of changes indicating that the first element from <code>a</code> has been removed and replaced with <code>Employee2</code>, which is incorrect. To get a correct result, we should provide the following <code>TrackByFunction</code>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">trackById</span> <span class="o">=</span> <span class="p">(</span><span class="nx">index</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span></code></pre></div>
+<p>Notice that comparing two items from the collections will always happen in <code>O(1)</code> time, independently from the <code>TrackByFunction</code>. <strong>For every two values returned by two invocations of the <code>TrackByFunction</code> Angular will always apply <code>===</code> check.</strong></p>
+
 <h1 id="encapsulation-versus-performance">Encapsulation versus Performance</h1>
+
 <p>Now we know what the purpose of the <code>IterableDiffer</code> is and how it compares the individual values from the collection. The only thing we&#x2019;re not familiar with is the comparison algorithm. In fact, it&#x2019;s not trivial at all since the Angular team tried to optimized as much as possible since <code>NgForOf</code> is frequently used directive and often it has to work with big data sets.</p>
-<amp-img src="/images/differs/encapsulation.jpg" alt="Life-Cycle" style="display: block; margin: auto;"></amp-img>
+
+<p><amp-img src="/images/differs/encapsulation.jpg" alt="Life-Cycle" style="display: block; margin: auto;"></amp-img></p>
+
 <p>Lets take a brief look at the <code>DefaultIterableDiffer</code>. It is a concrete implementation of the <code>IterableDiffer</code> interface which Angular uses by default for comparing iterable collections:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DefaultIterableDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;,</span> <span class="nx">IterableChanges</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DefaultIterableDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">IterableChanges</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span>
-  <span class="nx">diff</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;)</span><span class="o">:</span> <span class="nx">DefaultIterableDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span><span class="o">|</span><span class="kc">null</span> <span class="p">{</span>
+  <span class="nx">diff</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">DefaultIterableDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;|</span><span class="kc">null</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>  <span class="p">}</span>
 
-  <span class="nx">check</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;)</span><span class="o">:</span> <span class="kr">boolean</span> <span class="p">{</span>
+  <span class="nx">check</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="kr">boolean</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">collection</span><span class="p">))</span> <span class="p">{</span>
       <span class="p">(</span><span class="k">this</span> <span class="kr">as</span><span class="p">{</span><span class="nx">length</span>: <span class="kt">number</span><span class="p">}).</span><span class="nx">length</span> <span class="o">=</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
 
@@ -257,41 +288,54 @@
   <span class="p">}</span>
 
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>That&#x2019;s pretty much enough in order to find out potential ways to improve the differ. It&#x2019;s interesting that the <code>DefaultIterableDiffer</code> implements two interfaces <code>IterableDiffer</code> and <code>IterableChanges</code>. We already took a look at both abstractions - the first one implements a differ for collections we can iterate over and the <code>IterableChanges</code> encapsulates the changes which the differ has found.</p>
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>That&#x2019;s pretty much enough in order to find out potential ways to improve the differ. It&#x2019;s interesting that the <code>DefaultIterableDiffer</code> implements two interfaces <code>IterableDiffer</code> and <code>IterableChanges</code>. We already took a look at both abstractions - the first one implements a differ for collections we can iterate over and the <code>IterableChanges</code> encapsulates the changes which the differ has found.</p>
+
 <p>Obviously this abstraction violates the <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">SRP</a> but why? For efficiency. Keeping the state of <code>IterableChanges</code> and the functionality of <code>IterableDiffer</code> in one place we can have both - well encapsulated and efficient abstraction. The differ can reuse the internal state of the <code>IterableChanges</code> without having to specify a contract for accessing it and/or using inefficient calls to do so.</p>
+
 <p>Now take a look at the <code>check</code> method. We can clearly see that the <code>DefaultIterableDiffer</code> iterates over the collection in order to check what has changed inside of its state compared to the last check. Treating the collection as a black box automatically introduces <code>O(n)</code> time complexity.</p>
+
 <p>This has pros and cons. The pros is that the differ is just a consumer of the collection so it relies that the collection is an array or has iterator implementation. This makes the <code>DefaultIterableDiffer</code> reusable since it&#x2019;ll work with most built-in collections and external libraries. The cons is that we need to iterate over the entire collection in order to find whether and what has changed inside of it.</p>
+
 <h2 id="putting-everything-together">Putting Everything Together</h2>
+
 <p>On the following diagram you can see how everything fits together:</p>
-<amp-img src="/images/differs/differs.png" style="border: 1px solid #ccc;"></amp-img>
+
+<p><amp-img src="/images/differs/differs.png" style="border: 1px solid #ccc;"></amp-img></p>
+
 <p>Notice how <code>NgForOf</code> uses the <code>IterableDiffers</code> in order to get an <code>IterableDiffer</code> which supports the collection we&#x2019;re iterating over. Internally, the <code>IterableDiffers</code> will check whether there&#x2019;s any <code>IterableDifferFactory</code> which knows how to instantiate a differ which can handle the given collection.</p>
+
 <p>Finally, <code>NgForOf</code> sets the <code>TrackByFn</code> by calling the <code>create</code> method of the selected by <code>IterableDiffers</code> factory.</p>
+
 <h1 id="improving-the-performance-of-iterablediffer">Improving the Performance of <code>IterableDiffer</code></h1>
+
 <p>Although the <code>IterableDiffer</code> can find whether given collection has changed, the collection knows this best. A possible way to optimize the change detection is to move the logic for keeping track of the changes that have happened in given collection to the collection itself. This way detecting a change will give us <code>O(1)</code> complexity same as getting all the changes that have happened in some specific interval of time. This however, is only possible if we can afford to use a custom data structure in our application.</p>
+
 <h2 id="introducing-differablelist">Introducing <code>DifferableList</code></h2>
+
 <p>In computer science there&#x2019;s the concept of <strong>persistent data structures</strong>. The instances of these data structures allow us to preserve their previous versions when modified. Fully persistent data structures allow us to do some fancy time travelling, forking of universes and other crazy stuff.</p>
+
 <p>I got inspired by this concept in order to develop a collection optimized for the Angular&#x2019;s change detection mechanism which I called <code>DifferableList</code>. It decorates the <code>List</code> from <a href="https://facebook.github.io/immutable-js/">immutable.js</a> and provides a way to keep track of the changes happening inside of it by using a linked list. Here are few pieces of its implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableList</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableList</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="cm">/** @internal */</span>
-  <span class="nx">changes</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LinkedList</span><span class="p">&lt;</span><span class="nt">IterableChangeRecord</span><span class="err">&lt;</span><span class="na">T</span><span class="p">&gt;</span><span class="o">&gt;</span><span class="p">();</span>
+  <span class="nx">changes</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LinkedList</span><span class="o">&lt;</span><span class="nx">IterableChangeRecord</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;&gt;</span><span class="p">();</span>
 
-  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">List</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;([]))</span> <span class="p">{}</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">List</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">([]))</span> <span class="p">{}</span>
 
-  <span class="nx">pop</span><span class="p">()</span><span class="o">:</span> <span class="nx">DifferableList</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+  <span class="nx">pop</span><span class="p">()</span><span class="o">:</span> <span class="nx">DifferableList</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>  <span class="p">}</span>
 
-  <span class="kr">set</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">set</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...
 </span><span class="c1"></span>  <span class="p">}</span>
 
-  <span class="kr">get</span> <span class="nx">size() {</span>
+  <span class="nx">get</span> <span class="nx">size() {</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">size</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="kr">get</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">idx</span><span class="p">);</span>
+  <span class="nx">get</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">idx</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="nx">indexOf</span><span class="p">(</span><span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span> <span class="p">{</span>
@@ -299,20 +343,20 @@
   <span class="p">}</span>
 
   <span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nx">DifferableListIterator</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;(</span><span class="k">this</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">DifferableListIterator</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>This is a classical implementation of the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator design pattern</a> where the decorated component is the immutable <code>List</code>. Lets take a look at the <code>set</code> method&#x2019;s implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableList</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>This is a classical implementation of the <a href="https://en.wikipedia.org/wiki/Decorator_pattern">decorator design pattern</a> where the decorated component is the immutable <code>List</code>. Lets take a look at the <code>set</code> method&#x2019;s implementation:</p>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableList</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span>
-  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">List</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;([]))</span> <span class="p">{}</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">List</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">([]))</span> <span class="p">{}</span>
 
-  <span class="kr">set</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">prev</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">idx</span><span class="p">);</span>
-    <span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DifferableList</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;(</span><span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">item</span><span class="p">));</span>
+  <span class="nx">set</span><span class="p">(</span><span class="nx">idx</span>: <span class="kt">number</span><span class="p">,</span> <span class="nx">item</span>: <span class="kt">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">prev</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">idx</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DifferableList</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">item</span><span class="p">));</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">prev</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">result</span><span class="p">.</span><span class="nx">changes</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
         <span class="nx">currentIndex</span>: <span class="kt">null</span><span class="p">,</span>
@@ -331,18 +375,22 @@
   <span class="p">}</span>
 
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p>In the constructor of the <code>DifferableList</code> we create a new instance of the immutable <code>List</code> if a value of the first argument is not set. Right after that, in the <code>set</code> method we get the current value associated with index <code>idx</code>. We create a new instance of the <code>DifferableList</code> way by passing an argument to the constructor - the immutable list with the <code>set</code> operation applied to it. In case we have value for the index <code>idx</code> in the initial list we push a change - removed value from index <code>idx</code> with previous value equal to <code>prev</code>. Right after that we push another change to the list - a value <code>item</code> has been added to index <code>idx</code>.</p>
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p>In the constructor of the <code>DifferableList</code> we create a new instance of the immutable <code>List</code> if a value of the first argument is not set. Right after that, in the <code>set</code> method we get the current value associated with index <code>idx</code>. We create a new instance of the <code>DifferableList</code> way by passing an argument to the constructor - the immutable list with the <code>set</code> operation applied to it. In case we have value for the index <code>idx</code> in the initial list we push a change - removed value from index <code>idx</code> with previous value equal to <code>prev</code>. Right after that we push another change to the list - a value <code>item</code> has been added to index <code>idx</code>.</p>
+
 <p>This way with constant complexity we can keep track of all the modifications which has happened in the list in given period of time!</p>
+
 <p>Notice also that in order to make the <code>DifferableList</code> play well with JavaScript and respectively <code>NgForOf</code> we need to implement the <a href="https://en.wikipedia.org/wiki/Iterator_pattern">iterator design pattern</a> for it (i.e. make the collection iterable).</p>
+
 <h2 id="implementing-an-iterator">Implementing an Iterator</h2>
+
 <p>The iterator itself is quite simple:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">class</span> <span class="nx">DifferableListIterator</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="kr">implements</span> <span class="nx">Iterator</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">class</span> <span class="nx">DifferableListIterator</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">Iterator</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">current</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 
-  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">collection</span>: <span class="kt">DifferableList</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;)</span> <span class="p">{}</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">collection</span>: <span class="kt">DifferableList</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{}</span>
 
-  <span class="nx">next</span><span class="p">()</span><span class="o">:</span> <span class="nx">IteratorResult</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+  <span class="nx">next</span><span class="p">()</span><span class="o">:</span> <span class="nx">IteratorResult</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">current</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">size</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">return</span> <span class="p">{</span>
         <span class="nx">done</span>: <span class="kt">false</span><span class="p">,</span>
@@ -352,19 +400,25 @@
       <span class="k">return</span> <span class="p">{</span> <span class="nx">done</span>: <span class="kt">true</span><span class="p">,</span> <span class="nx">value</span>: <span class="kt">null</span> <span class="p">};</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>We keep track of the index we&#x2019;re currently in and return objects containing the values:</p>
+<span class="p">}</span></code></pre></div>
+<p>We keep track of the index we&#x2019;re currently in and return objects containing the values:</p>
+
 <ul>
 <li><code>done</code> - indicating whether we&#x2019;ve reached the end of the collection.</li>
 <li><code>value</code> - the current value for the given index.</li>
 </ul>
+
 <p>Notice how for the purpose we use only the public interface of the collection so we don&#x2019;t have leak of any implementation details.</p>
+
 <h2 id="implementing-a-custom-iterablediffer">Implementing a custom <code>IterableDiffer</code></h2>
+
 <p>Although this collection will work with the <code>DefaultIterableDiffer</code> if we use it we&#x2019;ll loose all the optimizations we did so far since the differ will iterate over items in instances of the <code>DifferableList</code> to compare them instead of just accessing their <code>changes</code> property.</p>
+
 <p>In order to boost the performance of our application we can introduce a <code>DifferableListDiffer</code> (yes, <a href="https://martinfowler.com/bliki/TwoHardThings.html">sounds silly</a>).</p>
+
 <p>Here are the basics of the implementation of the <code>DefaultIterableDiffer</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableListDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;,</span> <span class="nx">IterableChanges</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="p">{</span>
-  <span class="nx">forEachAddedItem</span><span class="p">(</span><span class="nx">fn</span><span class="o">:</span> <span class="p">(</span><span class="nx">record</span>: <span class="kt">IterableChangeRecord</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableListDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">IterableChanges</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="nx">forEachAddedItem</span><span class="p">(</span><span class="nx">fn</span><span class="o">:</span> <span class="p">(</span><span class="nx">record</span>: <span class="kt">IterableChangeRecord</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">let</span> <span class="nx">fst</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_changes</span><span class="p">.</span><span class="nx">firstNode</span><span class="p">;</span>
     <span class="k">while</span> <span class="p">(</span><span class="nx">fst</span><span class="p">)</span> <span class="p">{</span>
       <span class="kr">const</span> <span class="nx">record</span> <span class="o">=</span> <span class="nx">fst</span><span class="p">.</span><span class="nx">element</span><span class="p">;</span>
@@ -377,57 +431,74 @@
 
   <span class="c1">// ...
 </span><span class="c1"></span>
-  <span class="nx">diff</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;)</span><span class="o">:</span> <span class="nx">DifferableListDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="o">|</span> <span class="kc">null</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_data</span> <span class="o">=</span> <span class="nx">collection</span> <span class="kr">as</span> <span class="nx">DifferableList</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;;</span>
+  <span class="nx">diff</span><span class="p">(</span><span class="nx">collection</span>: <span class="kt">NgIterable</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">DifferableListDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="o">|</span> <span class="kc">null</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_data</span> <span class="o">=</span> <span class="nx">collection</span> <span class="kr">as</span> <span class="nx">DifferableList</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">;</span>
     <span class="kr">const</span> <span class="nx">changes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">.</span><span class="nx">changes</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_changes</span> <span class="o">=</span> <span class="nx">changes</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">changes</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">.</span><span class="nx">changes</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LinkedList</span><span class="p">&lt;</span><span class="nt">IterableChangeRecord</span><span class="err">&lt;</span><span class="na">V</span><span class="p">&gt;</span><span class="o">&gt;</span><span class="p">();</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">.</span><span class="nx">changes</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LinkedList</span><span class="o">&lt;</span><span class="nx">IterableChangeRecord</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;&gt;</span><span class="p">();</span>
       <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
       <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Notice how in <code>diff</code> we just get the current collection, access its <code>changes</code> property and based on its size we either preserve its value, set it to an empty list and return the current instance, or return <code>null</code>. We return the current instance of the <code>DifferableListDiffer</code> because it implements the <code>IterableChanges</code> interface which the <code>_applyChanges</code> method of <code>NgForOf</code> uses.</p>
+<span class="p">}</span></code></pre></div>
+<p>Notice how in <code>diff</code> we just get the current collection, access its <code>changes</code> property and based on its size we either preserve its value, set it to an empty list and return the current instance, or return <code>null</code>. We return the current instance of the <code>DifferableListDiffer</code> because it implements the <code>IterableChanges</code> interface which the <code>_applyChanges</code> method of <code>NgForOf</code> uses.</p>
+
 <h2 id="implementing-iterabledifferfactory">Implementing <code>IterableDifferFactory</code></h2>
+
 <p>Finally, we just need to plug our custom iterable differ in order to let Angular choose it for diffing <code>DifferableList</code>s. For the purpose we need to implement an <code>IterableDifferFactory</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Injectable</span><span class="p">()</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableListDifferFactory</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDifferFactory</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Injectable</span><span class="p">()</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">DifferableListDifferFactory</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="kr">implements</span> <span class="nx">IterableDifferFactory</span> <span class="p">{</span>
   <span class="nx">supports</span><span class="p">(</span><span class="nx">objects</span>: <span class="kt">any</span><span class="p">)</span><span class="o">:</span> <span class="kr">boolean</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">objects</span> <span class="k">instanceof</span> <span class="nx">DifferableList</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="nx">create</span><span class="p">(</span><span class="nx">trackByFn?</span>: <span class="kt">TrackByFunction</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;)</span><span class="o">:</span> <span class="nx">IterableDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nx">DifferableListDiffer</span><span class="p">&lt;</span><span class="nt">V</span><span class="p">&gt;();</span>
+  <span class="nx">create</span><span class="p">(</span><span class="nx">trackByFn?</span>: <span class="kt">TrackByFunction</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">)</span><span class="o">:</span> <span class="nx">IterableDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">DifferableListDiffer</span><span class="o">&lt;</span><span class="nx">V</span><span class="o">&gt;</span><span class="p">();</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>That&#x2019;s pretty much all. We have two methods:</p>
+<span class="p">}</span></code></pre></div>
+<p>That&#x2019;s pretty much all. We have two methods:</p>
+
 <ul>
 <li><code>supports</code> - check whether the differ instantiated with this factory supports given collection.</li>
 <li><code>create</code> - instantiates the differ.</li>
 </ul>
+
 <p>Now we need to plug our factory as a provider:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
   <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">IterableDiffers</span><span class="p">.</span><span class="nx">extend</span><span class="p">([</span><span class="k">new</span> <span class="nx">DifferableListDifferFactory</span><span class="p">()])],</span>
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">})</span>
 <span class="kr">export</span> <span class="kr">class</span> <span class="nx">EmployeeListComponent</span> <span class="p">{</span>
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><p><code>IterableDiffers</code> will pick the correct differ for given collection; if we have multiple differs which support the collection the <code>IterableDiffers</code> will invoke the <code>create</code> method of the factory for the first match.</p>
+</span><span class="c1"></span><span class="p">}</span></code></pre></div>
+<p><code>IterableDiffers</code> will pick the correct differ for given collection; if we have multiple differs which support the collection the <code>IterableDiffers</code> will invoke the <code>create</code> method of the factory for the first match.</p>
+
 <h2 id="performance-benchmarks">Performance Benchmarks</h2>
+
 <p>On top of the <a href="https://github.com/mgechev/purely-fast">application &#x201C;Purely Fast&#x201D;</a> I run few benchmarks showing what performance boost do I get when removing and adding items to a collection and iterating over it with <code>NgForOf</code>. Here are the results:</p>
-<amp-img src="/images/differs/custom-differ.png" style="border: 1px solid #ccc;"></amp-img>
+
+<p><amp-img src="/images/differs/custom-differ.png" style="border: 1px solid #ccc;"></amp-img></p>
+
 <p>With 1k items the time for adding and removing an item dropped from 33.03ms to 19.9ms which is a significant improvement!</p>
+
 <p>The e2e test and the benchmarks can be found <a href="https://github.com/mgechev/purely-fast-benchmarks">here</a>.</p>
+
 <h1 id="conclusion">Conclusion</h1>
+
 <p>In this article we explained the basics of how Angular&#x2019;s change detection works. We covered details of how <code>NgForOf</code> uses implementations of the <code>IterableDiffer</code> abstraction in order to find all the changes which has happened between two consecutive ticks of the change detection.</p>
+
 <p>This was followed by explaining in details how the differs use functions subtypes of the <code>TrackByFunction</code> interface.</p>
+
 <p>After that we discussed how the <code>DefaultIterableDiffer</code> works and the pros and cons for the violation of the SRP in its implementation.</p>
+
 <p>Inspired by the section &#x201C;Encapsulation versus Performance&#x201D; and persistent data structures we implemented a data structure optimized for Angular which keeps track of its changes. In order to take advantage it we built a simple <code>IterableDiffer</code> and a factory for it. After that we explained how the <code>IterableDiffers</code> will pick the right differ for given collection.</p>
+
 <p>Finally, we looked at benchmarks which show the performance boost we got from the optimization.</p>
+
 <h1 id="resources">Resources</h1>
+
 <ul>
 <li><a href="/2017/11/11/faster-angular-applications-onpush-change-detection-immutable-part-1/">&#x201C;Faster Angular Applications - Part 1&#x201D;</a></li>
 <li><a href="/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">&#x201C;Faster Angular Applications - Part 2&#x201D;</a></li>

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Design Patterns in Open Source Projects - Part I &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -88,53 +88,80 @@ Now let&rsquo;s focus on the first point. It&rsquo;s not easy to understand desi
                 </header>
                 
                 <section id="post-body">
-                    <p>I see two common frustrations around design patterns:</p>
+                    
+
+<p>I see two common frustrations around design patterns:</p>
+
 <ol>
 <li>It&rsquo;s easy to memorize patterns but hard to figure out where and how to use them</li>
 <li>OOP is lame, and design patterns suck</li>
 </ol>
+
 <p>If the second bullet point resonates with you, this blog post is probably not a good use of your time.</p>
+
 <p>Now let&rsquo;s focus on the first point. It&rsquo;s not easy to understand design patterns just by reading the <a href="https://www.amazon.com/Design-Patterns-Object-Oriented-Addison-Wesley-Professional-ebook/dp/B000SEIBB8">gang of four book</a> or dummy examples on Wikipedia. That&rsquo;s why I want to share a couple of real-world applications in open source projects that you can see and run yourself.</p>
+
 <p>I plan to start the series with content for how <a href="https://github.com/mgechev/ngrev">ngrev</a> uses State, Composite, and Memento. Today we&rsquo;re going to focus on the State pattern.</p>
-<img src="/images/oss-design-patterns-i/hero.png" style="display: block; margin: auto;">
+
+<p><img src="/images/oss-design-patterns-i/hero.png" style="display: block; margin: auto;"></p>
+
 <h2 id="project-overview">Project Overview</h2>
+
 <p><a href="https://github.com/mgechev/ngrev">ngrev</a> is an open-source application for reverse engineering of Angular apps. I developed it originally for my talk &ldquo;<a href="https://www.youtube.com/watch?v=tBV4IQwPssU">Mad Science with the Angular Compiler</a>&rdquo; for ng-conf 2017, but kept maintaining it over the years. Later on, the Angular team released Ivy and introduced a brand new compiler, which broke the parsing infrastructure of ngrev. Recently, however, <a href="https://github.com/GrandSchtroumpf">François</a> and <a href="https://github.com/vik-13">Viktor</a> helped me to revive the project.</p>
+
 <p>To get a better idea of the features of ngrev, I&rsquo;d recommend you to have a look at this short video:</p>
+
 <div style="display: block; margin: auto; width: 640px; height: 320px; padding-bottom:56.25%"><iframe width="640" height="360" src="https://www.youtube.com/embed/vmdVRErKot4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+
 <h3 id="high-level-architecture">High-Level Architecture</h3>
+
 <p>ngrev is an Electron app, so it has its main process, referenced as User Interface (UI) on the diagram below, and Render Process. Additionally, the Render Process also starts a Background Process used for heavy computations to keep the Render Process responsive to the UI queries.</p>
-<img src="/images/oss-design-patterns-i/ngrev-architecture.svg" style="display: block; margin: auto;">
+
+<p><img src="/images/oss-design-patterns-i/ngrev-architecture.svg" style="display: block; margin: auto;"></p>
+
 <p>All the communication within the processes of the application is happening via IPC (Inter-Process Communication) via <a href="https://en.wikipedia.org/wiki/Message_passing">message passing</a>.</p>
+
 <h3 id="implementation-overview">Implementation Overview</h3>
+
 <p>Let us look at how the app works, to get a better idea of where the state pattern fits in the picture.</p>
+
 <p>When you open ngrev, the UI sends a message to the Render Process to return the current theme. After that the UI applies it and allows the user to select a project. In the meantime, the Render Process creates the Background child Process and establishes a communication channel.</p>
+
 <p>Once the user selects a project, the UI sends a message to the Render Process, which forwards it to the Background Process. The Background Process uses <a href="https://github.com/ng-ast/ngast">ngast</a>, a wrapper around the Angular compiler, to parse the specified application and return the project symbols to the Render Process. From there, the Render Process returns them to the UI, which shows them as a graph.</p>
+
 <p>It gets interesting when folks navigate from one node to another - for example, when the user double clicks on a module to explore its declaration graph. Such action will trigger a message to the Render Process, which will talk to the stateful Background Process. The Background Process will use the Angular incremental compiler to parse the module&rsquo;s declaration graph and return it to the UI. Finally, the UI will transition to the new view.</p>
+
 <p>Here comes the first design pattern we&rsquo;ll talk about - <a href="https://en.wikipedia.org/wiki/State_pattern">the State pattern</a>.</p>
+
 <h2 id="the-state-pattern">The State Pattern</h2>
+
 <blockquote>
 <p>The state pattern is a behavioral software design pattern that allows an object to alter its behavior when its internal state changes. This pattern is close to the concept of finite-state machines. The state pattern can be interpreted as a strategy pattern, which is able to switch a strategy through invocations of methods defined in the pattern&rsquo;s interface.</p>
 </blockquote>
-<img src="/images/oss-design-patterns-i/state.svg" style="display: block; margin: auto;">
+
+<p><img src="/images/oss-design-patterns-i/state.svg" style="display: block; margin: auto;"></p>
+
 <p>The Background Process represents each view with an instance of a concrete implementation of the <code>State</code> class:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">export</span> <span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">State</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="k">export</span> <span class="kr">abstract</span> <span class="k">class</span> <span class="nx">State</span> <span class="p">{</span>
   <span class="kr">abstract</span> <span class="nx">getData</span><span class="p">()</span><span class="o">:</span> <span class="nx">VisualizationConfig</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="p">;</span>
   <span class="kr">abstract</span> <span class="nx">getMetadata</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">Metadata</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
   <span class="kr">abstract</span> <span class="nx">nextState</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">State</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
   <span class="nx">destroy</span><span class="p">()</span><span class="o">:</span> <span class="k">void</span> <span class="p">{}</span>
 <span class="p">}</span>
-</code></pre></div><p>The <code>State</code>&rsquo;s interface allows you to:</p>
-<ul>
-<li>Get data for a particular view (<code>getData</code>). This method will return all the nodes and their relationships. The <code>VisualizationConfig</code> has a list of nodes and a list of edges, where each edge contains the nodes it connects and the direction of their relationship</li>
-<li>Get metadata for a particular symbol. For example, if the state object represents a template view, the <code>getMetadata</code> will return metadata for the specified node of the template (its attributes, associated directives, and references)</li>
-<li>Transition to a new state. That&rsquo;s the essence of the state pattern - it implements a <a href="https://en.wikipedia.org/wiki/Finite-state_machine">state machine</a>, so you can transition from one state to another. The method accepts a symbol ID. The ID could be the identifier of any component, directive, etc., which has a node associated with it in the current state object. After that, the <code>nextState</code> method will check the identifier&rsquo;s type and perform the state transition</li>
-<li>Finally, we can also destroy a state. Imagine the state object allocated memory or set event listeners. The destroy method allows us to perform a cleanup</li>
-</ul>
+</code></pre></div>
+<p>The <code>State</code>&rsquo;s interface allows you to:
+- Get data for a particular view (<code>getData</code>). This method will return all the nodes and their relationships. The <code>VisualizationConfig</code> has a list of nodes and a list of edges, where each edge contains the nodes it connects and the direction of their relationship
+- Get metadata for a particular symbol. For example, if the state object represents a template view, the <code>getMetadata</code> will return metadata for the specified node of the template (its attributes, associated directives, and references)
+- Transition to a new state. That&rsquo;s the essence of the state pattern - it implements a <a href="https://en.wikipedia.org/wiki/Finite-state_machine">state machine</a>, so you can transition from one state to another. The method accepts a symbol ID. The ID could be the identifier of any component, directive, etc., which has a node associated with it in the current state object. After that, the <code>nextState</code> method will check the identifier&rsquo;s type and perform the state transition
+- Finally, we can also destroy a state. Imagine the state object allocated memory or set event listeners. The destroy method allows us to perform a cleanup</p>
+
 <h3 id="using-states">Using States</h3>
+
 <p>Let us now look at how ngrev uses states! On the UML class diagram above, the consumer of the state object is the <code>Context</code> class. In ngrev the context is the Background Process.</p>
-<p>If we look into the Background Process' implementation we&rsquo;ll find where it responds to state transition messages:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="k">this</span><span class="p">.</span><span class="nx">parentProcess</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">Message</span><span class="p">.</span><span class="nx">DirectStateTransition</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="o">:</span> <span class="nx">DirectStateTransitionRequest</span><span class="p">,</span> <span class="nx">responder</span><span class="o">:</span> <span class="nx">Responder</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="kr">const</span> <span class="nx">nextState</span><span class="o">:</span> <span class="nx">State</span> <span class="o">|</span> <span class="kc">null</span> <span class="o">=</span> <span class="nx">lastState</span><span class="p">.</span><span class="nx">nextState</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+
+<p>If we look into the Background Process&rsquo; implementation we&rsquo;ll find where it responds to state transition messages:</p>
+<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="k">this</span><span class="p">.</span><span class="nx">parentProcess</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">Message</span><span class="p">.</span><span class="nx">DirectStateTransition</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="o">:</span> <span class="nx">DirectStateTransitionRequest</span><span class="p">,</span> <span class="nx">responder</span><span class="o">:</span> <span class="nx">Responder</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="nx">nextState</span><span class="o">:</span> <span class="nx">State</span> <span class="o">|</span> <span class="kc">null</span> <span class="o">=</span> <span class="nx">lastState</span><span class="p">.</span><span class="nx">nextState</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">nextState</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">nextState</span><span class="p">);</span>
     <span class="nx">responder</span><span class="p">({</span>
@@ -148,13 +175,15 @@ Now let&rsquo;s focus on the first point. It&rsquo;s not easy to understand desi
     <span class="nx">available</span><span class="o">:</span> <span class="kc">false</span>
   <span class="p">});</span>
 <span class="p">});</span>
-</code></pre></div><p>This is a bit simplified implementation, but it should give us a good idea how to perform state transitions. First, we get the current state (<code>lastState</code>) and after that invoke its <code>nextState</code> method, passing the symbol we want to navigate to. As an example, <code>lastState</code> could be representing the module declarations view and the <code>data.id</code> could be an identifier of a component symbol. When we call <code>nextState</code> passing this identifier, we&rsquo;ll get a new <code>ComponentState</code> object.</p>
+</code></pre></div>
+<p>This is a bit simplified implementation, but it should give us a good idea how to perform state transitions. First, we get the current state (<code>lastState</code>) and after that invoke its <code>nextState</code> method, passing the symbol we want to navigate to. As an example, <code>lastState</code> could be representing the module declarations view and the <code>data.id</code> could be an identifier of a component symbol. When we call <code>nextState</code> passing this identifier, we&rsquo;ll get a new <code>ComponentState</code> object.</p>
+
 <p>Let us track the instantiation of the next state! For the purpose, let us explore the <code>nextState</code> implementation of the <code>TemplateState</code> class:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="nx">nextState</span><span class="p">(</span><span class="nx">nodeId</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">State</span> <span class="o">|</span> <span class="kc">null</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-js" data-lang="js"><span class="nx">nextState</span><span class="p">(</span><span class="nx">nodeId</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">State</span> <span class="o">|</span> <span class="kc">null</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">nodeId</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">symbolId</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">symbols</span><span class="p">[</span><span class="nx">nodeId</span><span class="p">].</span><span class="nx">data</span><span class="p">;</span>
+  <span class="k">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">symbols</span><span class="p">[</span><span class="nx">nodeId</span><span class="p">].</span><span class="nx">data</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">}</span>
@@ -167,14 +196,23 @@ Now let&rsquo;s focus on the first point. It&rsquo;s not easy to understand desi
   <span class="p">}</span>
   <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div><p>We first check if we&rsquo;re trying to navigate to the same symbol or a non-existing one. If we hit any of these branches, we directly return <code>null</code> without performing a state transition.</p>
+</code></pre></div>
+<p>We first check if we&rsquo;re trying to navigate to the same symbol or a non-existing one. If we hit any of these branches, we directly return <code>null</code> without performing a state transition.</p>
+
 <p>If the user has selected a directive or a component we navigate to the <code>DirectiveState</code>. ngrev uses the <code>DirectiveState</code> class for both components and directives because they have a lot of shared logic. We do the same for providers and pipes respectively.</p>
+
 <h2 id="use-cases">Use Cases</h2>
+
 <p>Generally, when you notice a patterns in your app that remind you of a state machine, there might be a good use case for the state design pattern.</p>
+
 <p>Over the years, I found the state pattern to be a very convenient way for managing stateful transitions. Often we have different data visualizations that share similar interfaces or shapes, and we can navigate from one such visualization to another. The state pattern is a clean way to manage this process.</p>
+
 <p>It&rsquo;s important to not force using state if there&rsquo;s a more simple solution. Especially when first learning object-oriented design, developers often try to fit patterns everywhere. This mindset leads to over engineered solutions which don&rsquo;t scale well nor respond to changing business requirements.</p>
-<h2 id="whats-next">What&rsquo;s Next?</h2>
+
+<h2 id="what-s-next">What&rsquo;s Next?</h2>
+
 <p>As the next step I&rsquo;d recommend you to clone <a href="https://github.com/mgechev/ngrev">ngrev</a> and try to make sense of everything we talked about.</p>
+
 <p>Reading about code is an important part of the story, but practice is where you find how all ideas fit together.</p>
 
                 </section>
@@ -227,6 +265,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

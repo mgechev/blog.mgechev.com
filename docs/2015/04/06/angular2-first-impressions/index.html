@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Angular2 - First Impressions &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -25,7 +25,7 @@
 		
 
 		<meta property="og:title" content="Angular2 - First Impressions" />
-		<meta property="og:description" content="On 18th of September 2014 was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS&#39; 2.0 website and gave a couple of talks on ng-conf about their new router, change detection, templating, etc. I&rsquo;m passionate about AngularJS since its early versions so I decided give it a try using the quick start. In the meantime I and also created an angular2-seed project for my test, dummy projects." />
+		<meta property="og:description" content="On 18th of September 2014 was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS&rsquo; 2.0 website and gave a couple of talks on ng-conf about their new router, change detection, templating, etc. I&rsquo;m passionate about AngularJS since its early versions so I decided give it a try using the quick start. In the meantime I and also created an angular2-seed project for my test, dummy projects." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2015/04/06/angular2-first-impressions/" />
 		
@@ -86,41 +86,57 @@
                 </header>
                 
                 <section id="post-body">
-                    <p><a href="https://github.com/angular/angular/commits/master?page=24">On 18th of September 2014</a> was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS' 2.0 <a href="https://angular.io/">website</a> and gave a couple of talks on <a href="https://www.youtube.com/watch?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7&amp;v=QHulaj5ZxbI">ng-conf</a> about their new router, change detection, templating, etc. I&rsquo;m passionate about AngularJS since its early versions so I decided give it a try using the <a href="https://angular.io/docs/js/latest/quickstart.html">quick start</a>. In the meantime I and also created an <a href="https://github.com/mgechev/angular2-seed">angular2-seed project</a> for my test, dummy projects. In order to have a better understanding of what is going on (and handle the lack of documentation) I dug inside their source code. I had great time doing this, what I saw was one of the most well written and smartest pieces of software I&rsquo;ve ever read. Soon I&rsquo;m planning to expand my paper <a href="https://github.com/mgechev/angularjs-in-patterns">&ldquo;AngularJS in Patterns&rdquo;</a> with design patterns used inside Angular2.</p>
+                    
+
+<p><a href="https://github.com/angular/angular/commits/master?page=24">On 18th of September 2014</a> was pushed the initial commit of version 2.0 of the AngularJS framework. A few weeks ago the core team at Google, published AngularJS&rsquo; 2.0 <a href="https://angular.io/">website</a> and gave a couple of talks on <a href="https://www.youtube.com/watch?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7&amp;v=QHulaj5ZxbI">ng-conf</a> about their new router, change detection, templating, etc. I&rsquo;m passionate about AngularJS since its early versions so I decided give it a try using the <a href="https://angular.io/docs/js/latest/quickstart.html">quick start</a>. In the meantime I and also created an <a href="https://github.com/mgechev/angular2-seed">angular2-seed project</a> for my test, dummy projects. In order to have a better understanding of what is going on (and handle the lack of documentation) I dug inside their source code. I had great time doing this, what I saw was one of the most well written and smartest pieces of software I&rsquo;ve ever read. Soon I&rsquo;m planning to expand my paper <a href="https://github.com/mgechev/angularjs-in-patterns">&ldquo;AngularJS in Patterns&rdquo;</a> with design patterns used inside Angular2.</p>
+
 <p>In this blog post I&rsquo;ll share my first impressions of the framework and I&rsquo;ll try to keep them as objective as possible, despite my affinity to AngularJS. I&rsquo;ll start with the general changes and after that keep going into details.</p>
+
 <h2 id="written-in-typescript">Written in TypeScript</h2>
+
 <p>As Microsoft already published, <a href="http://blogs.msdn.com/b/typescript/archive/2015/03/05/angular-2-0-built-on-typescript.aspx">Angular2 is written in TypeScript</a>. There are a couple of advantages using strongly typed language and a couple of more advantages using TypeScript specifically. By &ldquo;extended version of TypeScript&rdquo; I mean, TypeScript with added <strike>annotations</strike>decorators (its syntax looks similar to the annotations in Java).</p>
-<p><img src="/images/js-dialects-ven.png" alt="JavaScript Dialects"></p>
+
+<p><img src="/images/js-dialects-ven.png" alt="JavaScript Dialects" /></p>
+
 <p>And here are some of the main advantages using TypeScript as statically typed language:</p>
+
 <ul>
 <li>Using statically typed language:
+
 <ul>
 <li>You get type errors <strong>compile-time</strong> and runtime (traceur transpiles the source code to one with runtime type assertions with rtts (runtime type system), see below the sample <code>gulp-traceur</code> config) . This way it&rsquo;ll be easier to debug your code and you will be more secure that what you&rsquo;ve developed (in this case Angular2) actually works. When it happens to develop a single-page application, bigger than 10k lines of code, the lack of compile-time checking leads to quite painful experience, even with big test coverage of your code.</li>
 <li>You get better auto-completion by the text editors and IDEs. <a href="https://www.jetbrains.com/webstorm/whatsnew/">WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules</a>. For vim you can use the <a href="https://github.com/clausreinke/typescript-tools">typescript-tools</a>, which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each AngularJS method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it&rsquo;ll be much less tricky).</li>
 <li>The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better runtime optimizations (<a href="https://github.com/sq/JSIL/wiki/Optimizing-dynamic-JavaScript-with-inline-caches">for instance</a>).</li>
-</ul>
-</li>
+</ul></li>
 <li>About TypeScript:
+
 <ul>
 <li>TypeScript is superset of ES6, which is superset of ES5 (ES5 ⊆ ES6 ⊆ TypeScript). Angular2 production build is being transpiled to ES5 in order to be executable by the modern browsers. You also can chose whether you want to write your code in ES5, ES6, TypeScript (of course if you chose ES6, TypeScript your code should go through a process of compilation in order to be transpiled).</li>
 <li>TypeScript is being one of the best languages, which are being transpiled to JavaScript, which has allows optional type checking.</li>
 <li>TypeScript is developed and supported by Microsoft, which gives us stability that it is unlikely the support to be dropped unexpectedly.</li>
+</ul></li>
 </ul>
-</li>
-</ul>
+
 <p>In the past I&rsquo;ve actively considered using a language with static type system, for building my single-page apps. I was thinking mostly about Dart, the fact that the types there are optional wasn&rsquo;t a concern, because in the critical areas of your code you would be able to use them and you&rsquo;ll get all the benefits a statically typed language provides. TypeScript seemed like a nice language but I never thought would shine the way it does now. Anyway, TypeScript seems like a better option because of its syntax - much easier to learn given it is superset of ES6.</p>
+
 <h3 id="quick-faq">Quick FAQ:</h3>
+
 <p><em>Does the runtime type checking lead to slower execution of your application?</em><br>
 Probably yes, but you can disable it when you plan to deploy your app in production.</p>
+
 <p><em>Shold I use TypeScript for my Angular2 application?</em><br>
 It is not necessary but I&rsquo;d recommend you do, because of all the benefits I mentioned above. Actually you even don&rsquo;t have to use ES6, but I&rsquo;d even more strongly recommend you do.</p>
+
 <p><em>Alright, if I do use TypeScript&hellip;how can I debug it when my browser supports only ES5? Should I debug the generated code?</em><br>
 Traceur will create source maps for you. You will debug the code you&rsquo;ve already written, not the ES5 generated by the transpilation process.</p>
-<p><img src="/images/surcemaps-typescript.png" alt="TypeScript source maps"></p>
+
+<p><img src="/images/surcemaps-typescript.png" alt="TypeScript source maps" /></p>
+
 <p><em>How can I take advantage of it? Should I use Visual Studio or something?</em><br>
 No. You can use the <a href="https://github.com/google/traceur-compiler">traceur compiler</a> and a task runner, like gulp or grunt, with the corresponding plugins (<a href="https://github.com/sindresorhus/gulp-traceur">here</a> and <a href="https://github.com/aaronfrost/grunt-traceur">here</a>). The actual type checking should be implemented inside external &ldquo;assertion&rdquo; library. For example, Angular2 uses the <a href="https://www.npmjs.com/package/rtts_assert">rtts_assert module</a>.</p>
+
 <p>Here is a sample configuration of <code>gulp-traceur</code>, using type assertion:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">gulp</span><span class="p">.</span><span class="nx">task</span><span class="p">(</span><span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;copy&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">gulp</span><span class="p">.</span><span class="nx">task</span><span class="p">(</span><span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;copy&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">gulp</span><span class="p">.</span><span class="nx">src</span><span class="p">([</span>
       <span class="c1">// some files here
@@ -138,88 +154,128 @@ No. You can use the <a href="https://github.com/google/traceur-compiler">traceur
     <span class="p">}))</span>
     <span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">gulp</span><span class="p">.</span><span class="nx">dest</span><span class="p">(</span><span class="s1">&#39;./dist/&#39;</span><span class="p">));</span>
 <span class="p">});</span>
-</code></pre></div><p><em>What is this thing called AtScript I&rsquo;ve heard of?</em><br></p>
-<blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+</code></pre></div>
+<p><em>What is this thing called AtScript I&rsquo;ve heard of?</em><br></p>
+
+<p><blockquote class="twitter-tweet" lang="en"><p>AtScript is Typescript <a href="https://twitter.com/hashtag/ngconf?src=hash">#ngconf</a></p>&mdash; ng-conf (@ngconf) <a href="https://twitter.com/ngconf/status/573521849780305920">March 5, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
 <h3 id="further-reading">Further reading</h3>
+
 <p>You can read more details about the language constructs added in TypeScript (previously called AtScript because of some missing syntax in TypeScript that time) <a href="https://docs.google.com/document/d/11YUzC-1d0V1-Q3V0fQ7KSit97HnZoKVygDxpWzEYW0U/edit">here</a>.</p>
+
 <h2 id="angular2-has-no-controllers">Angular2 has no Controllers</h2>
+
 <p>It seems it got modern for the JavaScript MVW frameworks to drop controllers from their components (starting from Backbone.js). Instead of using controllers, Angular2 bet on component-based UI, similar to ReactJS. The core team dropped controllers but added components and kept the directives.</p>
-<h2 id="strikethree-different-types-of-directivesstrike"><strike>three different types of directives:</strike></h2>
-<span style="color: #ccc">
-*out of date*
-> - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
->   - Only one component can be present per DOM element.
->   - Component's CSS selectors usually trigger on element names. (Best practice)
->   - Component has its own shadow view which is attached to the element as a Shadow DOM.
->   - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
-> - Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
->   - Viewports can only be placed on &lt;template&gt; elements (or the short hand version which uses &lt;element template&gt; attribute.)
->   - Only one viewport can be present per DOM template element.
->   - The viewport is created over the template element. This is known as the ViewContainer.
-> Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
-> - Decorator. According to the AngularJS docs (still incomplete) decorators are the simplest kind of directive is a decorator. Directives are usefull for encapsulating behavior.
->   - Multiple decorators can be placed on a single element.
->   - Decorators do not introduce new evaluation context.
->   - Decorators are registered through the @Decorator meta-data annotation.
-</span>
+
+<h2 id="strike-three-different-types-of-directives-strike"><strike>three different types of directives:</strike></h2>
+
+<p><span style="color: #ccc">
+<em>out of date</em>
+&gt; - Component is a directive which uses shadow DOM to create encapsulate visual behavior. Components are typically used to create UI widgets or to break up the application into smaller components.
+&gt;   - Only one component can be present per DOM element.
+&gt;   - Component&rsquo;s CSS selectors usually trigger on element names. (Best practice)
+&gt;   - Component has its own shadow view which is attached to the element as a Shadow DOM.
+&gt;   - Shadow view context is the component instance. (i.e. template expressions are evaluated against the component instance.)
+&gt; - Viewport. According to the AngularJS docs, viewport is a directive which can control instantiation of child views which are then inserted into the DOM. (Examples are if and for.)
+&gt;   - Viewports can only be placed on &lt;template&gt; elements (or the short hand version which uses &lt;element template&gt; attribute.)
+&gt;   - Only one viewport can be present per DOM template element.
+&gt;   - The viewport is created over the template element. This is known as the ViewContainer.
+&gt; Viewport can insert child views into the ViewContainer. The child views show up as siblings of the Viewport in the DOM.
+&gt; - Decorator. According to the AngularJS docs (still incomplete) decorators are the simplest kind of directive is a decorator. Directives are usefull for encapsulating behavior.
+&gt;   - Multiple decorators can be placed on a single element.
+&gt;   - Decorators do not introduce new evaluation context.
+&gt;   - Decorators are registered through the @Decorator meta-data annotation.
+</span></p>
+
 <h3 id="quick-faq-1">Quick FAQ:</h3>
+
 <p><em>Doesn&rsquo;t removal of the controllers violates the separation of concerns principle advocated by AngularJS?</em><br>
 Great question, Minko, thanks for asking! How given AngularJS application looks like? We have a view (a template), which is a composition of directives. These directives should handle the <strong>whole</strong> DOM logic. We also have services - they are responsible for encapsulating all the business logic. And we have controllers. The controllers are mostly user input handlers, they also add some properties to the scope. The best practices state that we need to keep the controllers as lean as possible. Let&rsquo;s think of what we will lose if we move the user input handling and adding properties to the scope to our directive instead to the controllers. Can we reduce the code reuse? If we don&rsquo;t create highly coherent directives - probably, if we couple the directives with the business logic this may happen (i.e. use domain specific service inside our dialog directive, for example). But what if we create a higher level directive, which is one or a fewer levels of abstraction above the primitives, which form our template? This way we handle the user input independently from our primitive UI components, so they are still completely reusable but we also remove one more component, which only makes the framework harder for learning.</p>
+
 <p><em>Similar to React? Does that mean that we have to inline our markup inside the directives we define?</em><br>
 You can but you don&rsquo;t have to. You can use inline templates or external files (just like using <code>template</code> and <code>templateUrl</code> in AngularJS 1.x).</p>
+
 <p><em>Does that mean that I need to change the design of the whole app, i.e. turn each controller into a directive of type component?</em><br>
 No, you don&rsquo;t have to change the design of your app. In order to make the transition even smoother you can use the <a href="http://jaysoo.ca/2015/03/30/container-component-pattern-in-angular-1/">&ldquo;container component pattern&rdquo;</a> but also keep in mind that the new router.</p>
+
 <p><em>Do I have to rewrite everything I already have?</em><br>
 Very likely to rewrite big parts of your application, but if you&rsquo;ve structured your application properly (i.e. followed my style guide), you&rsquo;d be able to completely reuse at least your services.</p>
+
 <h2 id="no-two-way-data-binding">No Two-Way data-binding</h2>
+
 <p>One of the things AngularJS 1.x was loved about was the two-way data-binding using <code>ng-model</code>. Well, it is dropped from v2.0. Initially it might seems a bit weird, crazy and frustrating but it is actually a really good thing, do not be heartbroken. Removing the two-way data-binding leads to:</p>
+
 <ul>
 <li>More explicit data-flow</li>
 <li>No circular dependencies between bindings (so no TTL of the <code>$digest</code>)</li>
 <li>Better performance
+
 <ul>
 <li>The digest loop could be run only once</li>
 <li>We can create apps, which are friendly to immutable/observable models, which allows us to make further optimizations (for more information about immutable data take a look at <a href="http://www.ng-vegas.org/">my talk at <code>ng-vegas</code></a> or this great <a href="http://victorsavkin.com/post/110170125256/change-detection-in-angular-2">post by Victor Savkin</a>, a core member of the AngularJS team)</li>
+</ul></li>
 </ul>
-</li>
-</ul>
+
 <h3 id="quick-faq-2">Quick FAQ:</h3>
+
 <p><em>Does that mean that we&rsquo;ll do a lot of manual work building forms?</em><br>
 No. Angular2 has a great <a href="http://angularjs.blogspot.com/2015/03/forms-in-angular-2.html">forms module</a>.</p>
+
 <p><em>Single directional data flow&hellip;We can use Flux then?</em><br>
 Yes you can! I&rsquo;d even recommend to use Flux! Here is one more <a href="http://victorsavkin.com/post/99998937651/building-angular-apps-using-flux-architecture">great post by Victor Savkin about using Flux with AngularJS</a>.</p>
+
 <p><em>So Angular2 is basically ReactJS implemented by Google?</em><br>
 No. The binding mechanism is completely different. It provides wider functionality than React (Angular2 is lighter compared to AngularJS 1.x but still provides built-in directives, dependency injection, different components, etc.). This does not mean that you should give up using React and wait for Angular2, both frameworks have unidirectional data flow, which makes them suitable for the flux architecture. You might be able to make a smooth transition from React to Angular2 if you haven&rsquo;t coupled the rest of your flux components (stores, actions, dispatcher) with your UI components.</p>
+
 <h2 id="webcomponents">WebComponents</h2>
-<blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn't seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-<p>What exactly is framework and what is a library? Lets take a look at AngularJS' docs:</p>
+
+<p><blockquote class="twitter-tweet" lang="en"><p>Angular v2 doesn&rsquo;t seem like a &quot;framework&quot;, but more like a library that sits on top of the web standards. And this my friends, is awesome.</p>&mdash; Adam Bradley (@adamdbradley) <a href="https://twitter.com/adamdbradley/status/565518739056373763">February 11, 2015</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>What exactly is framework and what is a library? Lets take a look at AngularJS&rsquo; docs:</p>
+
 <blockquote>
 <p>The impedance mismatch between dynamic applications and static documents is often solved with:
 a library - a collection of functions which are useful when writing web apps. Your code is in charge and it calls into the library when it sees fit. E.g., jQuery.
 frameworks - a particular implementation of a web application, where your code fills in the details. The framework is in charge and it calls into your code when it needs something app specific. E.g., durandal, ember, etc.</p>
 </blockquote>
+
 <p>I wouldn&rsquo;t call Angular2 a library but it is much closer to library rather than AngularJS 1.x. Anyway, what matters mostly is that it is on top of web standards. It uses shadow DOM for better encapsulation of the directives, takes advantage custom elements, etc.</p>
+
 <h3 id="quick-faq-3">Quick FAQ:</h3>
+
 <p><em>So I can&rsquo;t use Angular2 in IE and any other browser which doesn&rsquo;t support Web Components?</em><br>
 You can. There are a lot of <a href="http://webcomponents.org/polyfills/">polyfills</a>, which handle the lack of support.</p>
+
 <h2 id="new-router">New Router</h2>
+
 <p><a href="https://www.youtube.com/watch?v=vecg70fPDFw">Brian Ford gave a talk about the new router of AngularJS</a>. I&rsquo;m not saying &ldquo;the new router of Angular2&rdquo; because it could be used in AngularJS 1.x apps as well, which will make your transition smoother. What is that great about the new router? It is more feature rich than the old <code>ngRoute</code> and with Angular2 in mind unlike <code>uiRouter</code>. Probably it is the only component, which got more complex to use (given the increased amount of features it has) but most likely it won&rsquo;t be part of the core of the framework (similarly to <code>ngRoute</code>), given it is hosted in different repo.</p>
+
 <p>You can use the new router inside your AngularJS 1.x app if you &ldquo;emulate&rdquo; the Angular2 component directive with the legacy controllers and templates.</p>
+
 <h3 id="quick-faq-4">Quick FAQ:</h3>
+
 <p><em>How I can try the new router?</em><br>
 You can use <a href="https://github.com/angular/router">this repo</a>.</p>
+
 <p><em>Should I start my new project with the old router or the new one instead?</em><br>
 <a href="https://youtu.be/vecg70fPDFw?t=12m9s">Use the new router.</a></p>
+
 <h2 id="real-modules">Real Modules</h2>
+
 <p>During the AngularJS classes I led I had troubles explaining why AngularJS has modules, which must be loaded explicitly but there&rsquo;s no way to load them asynchronously, without hacky solutions. Well, Angular2 uses the ES6 modules. Since they are not supported by the browsers yet, you can fallback to <a href="https://github.com/systemjs/systemjs">SystemJS</a> and <a href="https://github.com/ModuleLoader/es6-module-loader/">ES6-module loader</a>, or transpile them to AMD, CommonJS or whatever you find <a href="https://github.com/google/traceur-compiler/wiki/Options-for-Compiling#options-for-modules">suitable for yourself</a>.</p>
+
 <p>This allows creating bundles with the modules, which are required during the initial page load and loading all others on demand, asynchronously. That&rsquo;s one of the things I&rsquo;ve always dreamed of and I&rsquo;m kind of disappointed it is added at this late stage.</p>
+
 <p><strong>PS</strong>: <a href="https://github.com/angular/angular.js/issues/11015">Here is a proposal concerning AngularJS 1.5</a>, which allows asynchronously loading of components.</p>
+
 <h2 id="no-more-scope">No more $scope</h2>
+
 <p>There are a lot of statements the <code>$scope</code> was a tricky for explanation concept to the AngularJS beginners. Well, I had harder times explaining the module system, anyway, there&rsquo;s no such thing as <code>$scope</code> in Angular2! Again, there is no scope. Instead of binding to properties in the scope inside our templates, we directly bind to properties of our &ldquo;components&rdquo;.</p>
+
 <p>For example, the component below has selector <code>sample-app</code> (i.e. we can use it as <code>&lt;sample-app&gt;&lt;/sample-app&gt;</code>) and template located inside <code>./templates/sample-app.html</code> (you can find the whole source code at my <a href="https://github.com/mgechev/angular2-seed">GitHub repository</a>).</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;sample-app&#39;</span><span class="p">,</span>
   <span class="nx">componentServices</span><span class="o">:</span> <span class="p">[</span>
     <span class="nx">NameList</span>
@@ -229,7 +285,7 @@ You can use <a href="https://github.com/angular/router">this repo</a>.</p>
   <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;./templates/sample-app.html&#39;</span><span class="p">,</span>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">Foreach</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="kr">class</span> <span class="nx">SampleApp</span> <span class="p">{</span>
+<span class="k">class</span> <span class="nx">SampleApp</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="nx">NameList</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">newName</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
@@ -239,18 +295,24 @@ You can use <a href="https://github.com/angular/router">this repo</a>.</p>
     <span class="nx">newname</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><p>We can directly bind to <code>this.names</code> inside our template, like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html">...
+</code></pre></div>
+<p>We can directly bind to <code>this.names</code> inside our template, like this:</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html">...
 <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">li</span> <span class="err">*</span><span class="na">foreach</span><span class="o">=</span><span class="s">&#34;#name in names&#34;</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-...
-</code></pre></div><p>No scope at all! Awesome, isn&rsquo;t it? So far, so good. We do not have scope. But remember, we used to use <code>$scope.$apply</code> in order to force execution of the <code>$digest</code> loop and perform dirty checking? How are we going to do this now? Well, we cant.</p>
+...</code></pre></div>
+<p>No scope at all! Awesome, isn&rsquo;t it? So far, so good. We do not have scope. But remember, we used to use <code>$scope.$apply</code> in order to force execution of the <code>$digest</code> loop and perform dirty checking? How are we going to do this now? Well, we cant.</p>
+
 <h3 id="quick-faq-5">Quick FAQ:</h3>
+
 <p><em>I like the scope, I was able to explicitly state what I want to expose to my templates. Are there any advantages removing the scope except of &ldquo;hard to explain to beginners&rdquo;?</em><br>
 Some of the biggest memory leaks I&rsquo;ve ever had were caused by forgetting to destroy the <code>$scope</code> of given directive. Removing scope leads to less AngularJS components, so less bugs, lower complexity. A lot of people were doing things which sometimes looked like workarounds, when inheriting the scope (thinking they&rsquo;ve inherited the controller), doing complex publish/subscribe messaging between parent and child scopes etc. All these things will not be required anymore.</p>
-<h2 id="no-more-scopeapply">No more $scope.$apply</h2>
+
+<h2 id="no-more-scope-apply">No more $scope.$apply</h2>
+
 <p>But how then AngularJS knows that anything outside it&rsquo;s execution context has taken a place? Lets think where the changes might come from:</p>
+
 <ul>
 <li><code>setTimeout</code></li>
 <li><code>setInterval</code></li>
@@ -259,55 +321,87 @@ Some of the biggest memory leaks I&rsquo;ve ever had were caused by forgetting t
 <li><code>WebSockets</code></li>
 <li>&hellip;</li>
 </ul>
-<p><img src="/images/monkey-patch-all-the-things.png" alt="All The Things"></p>
-<p>Basically a lot of browsers' APIs. How we can be notified when the user invokes method from any of these APIs? <strong>Well&hellip;we can monkey patch all of them!</strong> That&rsquo;s what Brian Ford explained in his <a href="https://www.youtube.com/watch?v=3IqtmUscE_U">talk about <code>Zone.js</code> in ng-conf 2014</a>.</p>
+
+<p><img src="/images/monkey-patch-all-the-things.png" alt="All The Things" /></p>
+
+<p>Basically a lot of browsers&rsquo; APIs. How we can be notified when the user invokes method from any of these APIs? <strong>Well&hellip;we can monkey patch all of them!</strong> That&rsquo;s what Brian Ford explained in his <a href="https://www.youtube.com/watch?v=3IqtmUscE_U">talk about <code>Zone.js</code> in ng-conf 2014</a>.</p>
+
 <p>I bet now you&rsquo;re thinking - &ldquo;Oh God! Why I&rsquo;d use something, which monkey patches all the browser APIs? This is just not right!&rdquo;. Why it isn&rsquo;t?</p>
+
 <h3 id="quick-faq-6">Quick FAQ:</h3>
+
 <p><em>Will patching the browser&rsquo;s APIs lead to huge amount of bugs?</em><br>
 Very smart people, who know what they are doing, work on making Zone.js patch the APIs without any issues. It also has <a href="https://github.com/angular/zone.js/tree/master/test">solid amount of tests</a>.</p>
+
 <p><em>Will using Zone.js slowdown the method executions?</em><br>
 According to the talk about <a href="https://www.youtube.com/watch?v=3IqtmUscE_U">Zone.js</a>, this is not the case.</p>
+
 <h2 id="errors-in-the-template-expressions">Errors in the Template Expressions</h2>
+
 <p>Another thing I didn&rsquo;t really like in AngularJS 1.x was the lack of errors when you had a mistake inside an expression used in a template. The errors, which you were supposed to get were omitted and you weren&rsquo;t aware that your code actually doesn&rsquo;t work. Well, in Angular2 you will get runtime errors in such cases.</p>
+
 <h2 id="i18n">i18n</h2>
+
 <p><code>angular-translate</code> was the default choice when it used to came to internationalization in AngularJS 1.x. It is a great tool, which allows you to define the different strings used inside your AngularJS application in json files and include them on the correct places using filters and directives. You are able to define different translations of these strings, using multiple json files for the languages you need. The language files are usually loaded on demand.</p>
+
 <p>Since the AngularJS team has slightly broader vision for the way the i18n should be implemented they will add it as a project supported by Google. They will allow building the AngularJS templates with the correct strings embedded inside them. This will speedup the load time since you won&rsquo;t need to load external files. AngularJS 1.4 has support for plurals and gender (which may ease the transition from 1.x to 2.0), in Angular2 will be implemented the string interpolation. For further information on the topic take a look at this video:</p>
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/iBBkCA1M-mc?list=PLOETEcp3DkCoNnlhE-7fovYvqwVPrRiY7" frameborder="0" allowfullscreen></iframe>
+
 <h3 id="quick-faq-7">Quick FAQ:</h3>
+
 <p><em>Will <code>angular-translate</code> be still compatible with Angular2?</em><br>
 Most likely, no. I&rsquo;m not aware whether the <code>angular-translate</code> team have plans to port it to the new version of the framework.</p>
+
 <h2 id="ultra-fast-change-detection">Ultra Fast Change Detection</h2>
+
 <p><strong>There is still no final version of the change detection. The underlaying implementation should not concern us, the AngularJS team will do the best based on huge amount of benchmarks, on different devices in different environment. This section is only for fun, exploring some design decisions.</strong></p>
-<p>Another completely innovative idea I found, digging inside AngularJS' source code was inside the <code>JITChangeDetector</code>. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">oldValue</span><span class="p">;</span>
-</code></pre></div><p>The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look <a href="http://jsperf.com/object-observe-polyfill-sandbox">at these benchmarks</a>). How does it work? According to my quick research:</p>
+
+<p>Another completely innovative idea I found, digging inside AngularJS&rsquo; source code was inside the <code>JITChangeDetector</code>. Mostly because of the inline-caches, the JavaScript VMs are capable of doing smarter optimizations in expressions like:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">oldValue</span><span class="p">;</span>
+</code></pre></div>
+<p>The AngularJS team decided that they can generate JavaScript classes, which implement this change detection mechanism, instead of using method calls (take a look <a href="http://jsperf.com/object-observe-polyfill-sandbox">at these benchmarks</a>). How does it work? According to my quick research:</p>
+
 <ul>
 <li>AngularJS tokenizes the registered (&ldquo;watched&rdquo;) expressions</li>
 <li>AngularJS builds <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a></li>
-<li>Using the <a href="https://en.wikipedia.org/wiki/Visitor_pattern">visitor pattern</a> AngularJS' creates the so-called &ldquo;ProtoRecords&rdquo; list.</li>
+<li>Using the <a href="https://en.wikipedia.org/wiki/Visitor_pattern">visitor pattern</a> AngularJS&rsquo; creates the so-called &ldquo;ProtoRecords&rdquo; list.</li>
 <li><a href="https://github.com/angular/angular/blob/master/modules/angular2/src/change_detection/change_detection_jit_generator.es6">Based on a template</a> and the ProtoRecords, AngularJS implements the &ldquo;dummy&rdquo; change detection for a specific component.</li>
 </ul>
+
 <h3 id="quick-faq-8">Quick FAQ:</h3>
+
 <p><em>Does it mean that the generation of source code will slowdown the execution of my app?</em><br>
 It is done when the bindings change, lazily. Probably it will perform better in most scenarios.</p>
+
 <p><em>Is it going to be hard for debugging?</em><br>
 We trust AngularJS that it is going to be implemented well and we won&rsquo;t need to touch it!</p>
+
 <p><em>Will it lead to any debugging complications (for example entering the change detection, generated class because of a breakpoint we&rsquo;re in)?</em><br>
 If you use your debugger properly you should not have any issues. Take a look at the <a href="https://speakerdeck.com/addyosmani/devtools-state-of-the-union-2015?slide=109">slides of Addy Osmani on the state of DevTools, 2015, jQueryUK</a>.</p>
+
 <h3 id="further-reading-1">Further reading</h3>
-<p>For more information you can take a look at the design docs (<a href="https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web">here</a> and <a href="https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web">here</a>) and the <a href="https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection">AngularJS' source code</a>.</p>
+
+<p>For more information you can take a look at the design docs (<a href="https://docs.google.com/document/d/1QKTbyVNPyRW-otJJVauON4TFMHpl0zNBPkJcTcfPJWg/edit?usp=drive_web">here</a> and <a href="https://docs.google.com/document/d/10W46qDNO8Dl0Uye3QX0oUDPYAwaPl0qNy73TVLjd1WI/edit?usp=drive_web">here</a>) and the <a href="https://github.com/angular/angular/tree/master/modules/angular2/src/change_detection">AngularJS&rsquo; source code</a>.</p>
+
 <h2 id="it-is-not-production-ready">It is not production ready</h2>
+
 <p>The API of Angular2 is still under development. There are a lot of things, which are still not clarified (like change detection, best API, forms API, etc.). You can play with the framework using the <a href="https://angular.io/docs/js/latest/quickstart.html">quick start</a> or <a href="https://github.com/mgechev/angular2-seed">my seed project</a></p>
+
 <h2 id="what-else-we-have-left">What else we have left?</h2>
+
 <h3 id="filters">Filters</h3>
+
 <p>According to the documentation, Angular2 will have <strike>formatters</strike> pipes, which are equivalent (a bit more powerful, since allow enhancement of the change detection) to the filters, well known from version 1.x.</p>
+
 <h3 id="improved-di">Improved DI</h3>
+
 <p>The dependency injection mechanism will be used with the decorators syntax provided by TypeScript. You can take a look at the source code <a href="https://github.com/angular/di.js">here</a>. Since it is implemented as external library, you can use it inside your project. Here is a simple example from the git repo of <code>di.js</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;di&#39;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="p">{</span><span class="nx">Electricity</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./electricity&#39;</span><span class="p">;</span>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;di&#39;</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span><span class="nx">Electricity</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./electricity&#39;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Inject</span><span class="p">(</span><span class="nx">Electricity</span><span class="p">)</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Fridge</span> <span class="p">{</span>
+<span class="k">export</span> <span class="k">class</span> <span class="nx">Fridge</span> <span class="p">{</span>
   <span class="nx">constructor</span><span class="p">(</span><span class="nx">electricity</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">electricity</span> <span class="o">=</span> <span class="nx">electricity</span><span class="p">;</span>
   <span class="p">}</span>
@@ -316,11 +410,17 @@ If you use your debugger properly you should not have any issues. Take a look at
     <span class="k">return</span> <span class="s1">&#39;3 eggs&#39;</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div><h2 id="conclusion">Conclusion</h2>
-<p>Angular2 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don&rsquo;t have to use it if you don&rsquo;t want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the <a href="https://facebook.github.io/react/docs/flux-overview.html">flux architecture</a>. It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components' APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).</p>
+</code></pre></div>
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Angular2 will be a brand new framework, which is not backward compatible with AngularJS 1.x. It is implemented in TypeScript but you don&rsquo;t have to use it if you don&rsquo;t want to. It implements some of the ideas from ReactJS, mostly the unidirectional data flow, which makes it work great with the <a href="https://facebook.github.io/react/docs/flux-overview.html">flux architecture</a>. It is on top of web standards (which is a big bonus compared to ReactJS) and takes advantage of some of the web components&rsquo; APIs. It will be much faster and lighter compared to AngularJS 1.x and will be supported by the modern browsers with polyfills for older ones (as far as I know the support for IE7 and IE8 will be dropped).</p>
+
 <p>You can use some of the libraries used for the development of Angular2 (like <a href="https://github.com/angular/di.js">DI</a>, <a href="https://www.npmjs.com/package/rtts_assert">rtts_assert</a>, <a href="https://github.com/angular/router">router</a>, <a href="https://www.npmjs.com/package/benchpress">benchpress</a>) in your current AngularJS and non-AngularJS projects.</p>
+
 <p>Should I use it in production now? <strong>No</strong>, but you can experiment with it. If you are planning to start a new project with AngularJS, better use AngularJS 1.x instead. Following some practices mentioned above will make your transition easier.</p>
+
 <h2 id="resources">Resources</h2>
+
 <ul>
 <li><a href="http://angular.io">Official Website</a></li>
 <li><a href="https://github.com/angular/angular">The official Angular2 repository</a></li>
@@ -381,6 +481,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

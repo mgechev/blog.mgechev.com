@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Ajax without jQuery for beginners &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -26,7 +26,7 @@
 
 		<meta property="og:title" content="Ajax without jQuery for beginners" />
 		<meta property="og:description" content="Before years I was writing all the code by my own, without additional libraries (including jQuery). For beginner developer it’s a good strategy. When you use $.ajax it’s all that easy:
-$.ajax({ url: &#34;any/url/for/the/request&#34;, type: &#34;get&#34;, success: function(data){ alert(data); } }); But you can’t get the main idea.
+$.ajax({ url: &#34;any/url/for/the/request&#34;, type: &#34;get&#34;, success: function(data){ alert(data); } });  But you can’t get the main idea.
 Many developers don’t have an idea how to write this without a library. In their opinion AJAX without library a hard, near impossible task." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2011/07/21/ajax-jquery-beginners/" />
@@ -89,16 +89,20 @@ Many developers don’t have an idea how to write this without a library. In the
                 
                 <section id="post-body">
                     <p>Before years I was writing all the code by my own, without additional libraries (including jQuery). For beginner developer it’s a good strategy. When you use <strong>$.ajax</strong> it’s all that easy:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
   <span class="nx">url</span><span class="o">:</span> <span class="s2">&#34;any/url/for/the/request&#34;</span><span class="p">,</span>
   <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;get&#34;</span><span class="p">,</span>
   <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
     <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-<p>But you can’t get the main idea.<br>
+<span class="p">});</span>
+</code></pre></div>
+
+<p>But you can’t get the main idea.<br />
 Many developers don’t have an idea how to write this without a library. In their opinion AJAX without library a hard, near impossible task. Well the truth is that it’s not so hard&hellip;there are just some incompatibilities between the different browsers but you can deal with all of them in few lines of code. First for creating the HTTP request you have to create new XMLHttpRequest (for most browsers). Of course, in Internet Explorer you have to do something slightly different&hellip;In Internet Explorer under version 7 you have to create special kind of ActiveX Object which has different versions – MSXML2.XMLHttp.5.0, MSXML2.XMLHttp.4.0, MSXML2.XMLHttp.3.0, MSXML2.XMLHttp, Microsoft.XMLHttp. For our goals we want to use the newest version of the XMLHttp object. Here is a function which creates object which we can use for out request:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">createXMLHttp</span><span class="p">()</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">createXMLHttp</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">//If XMLHttpRequest is available then using it
 </span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">XMLHttpRequest</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
@@ -116,12 +120,15 @@ Many developers don’t have an idea how to write this without a library. In the
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-<p>Actually function similar to this one was published by <strong>Nicholas C. Zakas, Jeremy McPeak, Joe Fawcett</strong> (<a href="http://www.amazon.com/Professional-Ajax-2nd-Programmer/dp/0470109491" title="link to Amazon">link to Amazon</a>).<br>
-And we&rsquo;re done with the first step.<br>
-Now we have to send the request and process the result.<br>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Actually function similar to this one was published by <strong>Nicholas C. Zakas, Jeremy McPeak, Joe Fawcett</strong> (<a href="http://www.amazon.com/Professional-Ajax-2nd-Programmer/dp/0470109491" title="link to Amazon">link to Amazon</a>).<br />
+And we&rsquo;re done with the first step.<br />
+Now we have to send the request and process the result.<br />
 Here we&rsquo;re going to make a simple &ldquo;get&rdquo; request:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">xmlHttp</span> <span class="o">=</span> <span class="nx">createXMLHttp</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
   <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;http://localhost/ajaxTest.txt&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
   <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
@@ -136,16 +143,28 @@ Here we&rsquo;re going to make a simple &ldquo;get&rdquo; request:</p>
       <span class="c1">//still processing
 </span><span class="c1"></span>    <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">}</span></code></pre></div>
-<p>I think that this is even simpler. Firstly we get the xmlhttp object. After that start a request. In this situation the request was with method &lsquo;get&rsquo; and the url was &lsquo;http://localhost/ajaxTest.txt&rsquo;. The third parameter indicates if the request is going to be synchronous or asynchronous. If it&rsquo;s synchronous then the browser is going to freeze until the request is ready. If it&rsquo;s asynchronous then the request is gong to be executed in background.<br>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>I think that this is even simpler. Firstly we get the xmlhttp object. After that start a request. In this situation the request was with method &lsquo;get&rsquo; and the url was &lsquo;<a href="http://localhost/ajaxTest.txt'">http://localhost/ajaxTest.txt'</a>. The third parameter indicates if the request is going to be synchronous or asynchronous. If it&rsquo;s synchronous then the browser is going to freeze until the request is ready. If it&rsquo;s asynchronous then the request is gong to be executed in background.<br />
 When you use &lsquo;post&rsquo; you&rsquo;ve to add this line:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">,</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">,</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">);</span>
+</code></pre></div>
+
 <p>And you&rsquo;ve to change this line:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</code></pre></div>
+
 <p>to this one:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</code></pre></div>
+
 <p>This data have to be structured like url. You can the function below:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">)</span> <span class="p">{</span>
    <span class="kd">var</span> <span class="nx">dataArray</span> <span class="o">=</span> <span class="p">[];</span>
    <span class="c1">//Getting the data from all elements in the form
 </span><span class="c1"></span>   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
@@ -155,11 +174,17 @@ When you use &lsquo;post&rsquo; you&rsquo;ve to add this line:</p>
      <span class="nx">dataArray</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">ProM</span><span class="p">);</span>
    <span class="p">}</span>
    <span class="k">return</span> <span class="nx">dataArray</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&#34;&amp;&#34;</span><span class="p">);</span>
- <span class="p">}</span></code></pre></div>
+ <span class="p">}</span>
+</code></pre></div>
+
 <p>And just:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">form</span><span class="p">);</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">form</span><span class="p">);</span>
+</code></pre></div>
+
 <p>Of course using jQuery&rsquo;s $.ajax is shorter, easier, well tested, optimised but with this article I think that you saw that the &ldquo;native&rdquo; way of using Ajax is&rsquo;t that hard too. May be this post will be your first step of creating your own library.</p>
-<p>Greetings!<br>
+
+<p>Greetings!<br />
 Minko.</p>
 
                 </section>
@@ -212,6 +237,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

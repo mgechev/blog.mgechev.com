@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.55.5">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Fast, extensible, configurable, and beautiful linter for Go - Minko Gechev\u0027s blog",
+    "headline": "Fast, extensible, configurable, and beautiful linter for Go - Minko Gechev\x27s blog",
     "datePublished": "2018-05-28T00:00:00JST",
     "dateModified": "2018-05-28T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\u0027s blog"
+      "name": "Minko Gechev\x27s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\u0027s blog",
+      "name": "Minko Gechev\x27s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn\u0026rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it\u0026hellip;for analyzing programs written in it?\nYou can find revive on GitHub at github."
+    "description": "About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn\x26rsquo;t use enough. What a better way to brush up your skills in a programming language other than building tools with it\x26hellip;for analyzing programs written in it?\nYou can find revive on GitHub at github."
   }
 </script>
 
@@ -130,56 +130,80 @@
 </aside>
 
 
-  <div class="article-body"><p>About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&#x2019;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&#x2026;for analyzing programs written in it?</p>
+  <div class="article-body">
+
+<p>About a year ago I decided to polish my Go skills. Although the language is pretty small compared to most others that I use on a daily basis, it still has some useful syntax constructs that I didn&#x2019;t use enough. What a better way to brush up your skills in a programming language other than building tools with it&#x2026;for analyzing programs written in it?</p>
+
 <div style="background-color: rgba(33, 150, 243, 0.1); padding: 20px; margin-bottom: 10px;">
 You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mgechev/revive">github.com/mgechev/revive</a>.
 </div>
-<amp-img src="/images/revive/demo.svg" alt="Revive demo" style="width: 100%; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/demo.svg" alt="Revive demo" style="width: 100%; display: block; margin: auto"></amp-img></p>
+
 <h1 id="introducing-revive">Introducing Revive</h1>
+
 <p>When I started using Go, a few years ago, I noticed how opinionated the ecosystem was. First, the syntax of the language is very minimalistic. Such property reduces the expressiveness but also makes the code much easier to read, compared to languages such as Perl and Ruby.</p>
-<amp-img src="/images/revive/gopher.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/gopher.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img></p>
+
 <p>Second, the &#x201C;tabs vs. spaces&#x201D; debate is not relevant in the Go world. We all use tabs. That&#x2019;s it. Do I prefer tabs over spaces? It doesn&#x2019;t matter - <code>gofmt</code> already picked tabs for me. I also noticed that there&#x2019;s <code>golint</code>. It&#x2019;s a tool which enforces semantical &amp; syntactical practices. There are few things in <code>golint</code> different from most linters, I&#x2019;ve used in the past:</p>
+
 <ul>
 <li>It&#x2019;s not extensible. You can&#x2019;t include/exclude rules, and the project is not wide open for new rules.</li>
 <li>It doesn&#x2019;t let us disable rules for specific files or a range of lines in a file.</li>
 <li>In <code>golint</code> failures have a level of confidence. Sometimes failures are false negatives.</li>
 </ul>
+
 <p>The Go team is keeping the tool opinionated and minimalistic. It follows the Go philosophy, and I respect that. The closed scope of the project has few interesting implications:</p>
+
 <ul>
 <li>Development of many small tools which perform commonly needed analysis (<a href="https://github.com/tsenart/deadcode"><code>deadcode</code></a>, <a href="https://github.com/alecthomas/gocyclo"><code>gocyclo</code></a>, <a href="https://github.com/opennota/check"><code>check</code></a>, <a href="https://github.com/kisielk/errcheck"><code>errcheck</code></a>, <a href="https://github.com/dominikh/go-tools/tree/master/cmd/megacheck"><code>megacheck</code></a>, <a href="https://github.com/mibk/dupl"><code>dupl</code></a>, <a href="https://github.com/gordonklaus/ineffassign"><code>ineffassign</code></a>, <a href="https://github.com/mvdan/interfacer"><code>interfacer</code></a>, <a href="https://github.com/mdempsky/unconvert"><code>unconvert</code></a>, <a href="https://github.com/jgautheron/goconst"><code>goconst</code></a>, etc)</li>
 <li><a href="https://github.com/golang/lint/blob/85993ffd0a6cd043291f3f63d45d656d97b165bd/lint.go#L123-L134">Hacky solutions</a> for ignoring files</li>
 <li>Development of <a href="https://github.com/alecthomas/gometalinter"><code>gometalinter</code></a> which wraps most existing tools by invoking them internally and consuming their output. The tool provides a way to filter the produced reports</li>
 </ul>
-<amp-img src="/images/revive/revive.png" alt="Logo of Revive" style="width: 350px; display: block; margin: auto"></amp-img>
-<div style="margin-top: 20px; font-size: 12px; text-align: center">The logo of revive by <a href="https://github.com/hawkgs">Georgi Serev</a></div>
+
+<p><amp-img src="/images/revive/revive.png" alt="Logo of Revive" style="width: 350px; display: block; margin: auto"></amp-img>
+<div style="margin-top: 20px; font-size: 12px; text-align: center">The logo of revive by <a href="https://github.com/hawkgs">Georgi Serev</a></div></p>
+
 <p>That&#x2019;s why I decided to make my toy linter project public and share it with the community. <strong><code>Revive</code> implements all the rules which <code>golint</code> has and the failures have the same concept of &#x201C;confidence&#x201D; that <code>golint</code> introduced</strong>. In fact, invoking <code>revive</code> with no flags has the same behavior as <code>golint</code>, with the difference that it runs faster. <code>Revive</code> builds on top of <code>golint</code> by:</p>
+
 <ul>
 <li>Allowing us to enable or disable rules using a configuration file.</li>
 <li>Allowing us to configure the linting rules with a TOML file.</li>
 <li>Providing functionality for disabling a specific rule or the entire linter for a file or a range of lines.
+
 <ul>
 <li><code>golint</code> allows this only for generated files.</li>
-</ul>
-</li>
+</ul></li>
 <li>Providing multiple formatters which let us customize the output.</li>
 <li>Allowing us to customize the return code for the entire linter or based on the failure of only some rules.</li>
 <li><em>Everyone can extend it easily with custom rules or formatters.</em></li>
 <li><code>Revive</code> provides more rules compared to <code>golint</code>.</li>
 <li><code>Revive</code> runs faster. It runs the rules over each file in a separate goroutine.</li>
 </ul>
+
 <p><strong>I love the opinionated culture in the Go community. I believe that this is the right direction which lets us focus on the important things instead of losing time in discussions on trivial matters. That&#x2019;s why with <code>revive</code>, we can make even more syntax-related arguments irrelevant by defining more opinionated rules and providing stricter presets.</strong></p>
+
 <p>Later, I&#x2019;ll explain how we can quickly develop more rules for <code>revive</code> but before that, let me share a few instructions on how you can use the linter!</p>
+
 <h2 id="usage">Usage</h2>
+
 <p>Install <code>revive</code> with:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">go get github.com/mgechev/revive
-</code></pre></div><p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">go get github.com/mgechev/revive</code></pre></div>
+<p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
+
 <p>Using the tool with no flags has the same behavior as <code>golint</code>. The magic happens when we add the <code>-formatter</code> flag:</p>
-<amp-img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto"></amp-img></p>
+
 <p>From the image above, we can see that we got 31 warnings for the <code>&quot;exported&quot;</code> rule. This rule is port of a built-in rule from <code>golint</code> which enforces practices for exported symbols (find the full set of rules <a href="https://github.com/mgechev/revive#available-rules">here</a>).</p>
+
 <p>If we prefer to ignore these warnings for the entire project, we can use a config file in TOML format:</p>
-<amp-img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto"></amp-img></p>
+
 <p>What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
 
 <span class="c1">//revive:disable
 </span><span class="c1"></span>
@@ -190,9 +214,9 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">//revive:enable
-</span></code></pre></div><p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
+<span class="o">//</span><span class="nx">revive</span><span class="p">:</span><span class="nx">enable</span></code></pre></div>
+<p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
 
 <span class="c1">//revive:disable:exported
 </span><span class="c1"></span>
@@ -203,15 +227,17 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
     <span class="nx">IsWriter</span>   <span class="kt">bool</span>
     <span class="nx">Underlying</span> <span class="kt">string</span>
 <span class="p">}</span>
-<span class="c1">//revive:enable:exported
-</span></code></pre></div><p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
+<span class="o">//</span><span class="nx">revive</span><span class="p">:</span><span class="nx">enable</span><span class="p">:</span><span class="nx">exported</span></code></pre></div>
+<p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
+
 <p>Finally, if we want to ignore all files from a directory, we can use the <code>-exclude</code> flag:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... ./...
-</code></pre></div><p>The command above will lint all files from the current directory, excluding all files in <code>tests</code>, recursively. If we want to exclude more than one directory use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... -exclude utils/... ./...
-</code></pre></div><h3 id="configurability">Configurability</h3>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... ./...</code></pre></div>
+<p>The command above will lint all files from the current directory, excluding all files in <code>tests</code>, recursively. If we want to exclude more than one directory use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... -exclude utils/... ./...</code></pre></div>
+<h3 id="configurability">Configurability</h3>
+
 <p>In an image in the last section, we saw that by using a config file in TOML format, we could configure the execution of <code>revive</code>. Here&#x2019;s an example config file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"># Ignores files with &quot;GENERATED&quot; header, similar to golint
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text"># Ignores files with &quot;GENERATED&quot; header, similar to golint
 ignoreGeneratedHeader = true
 
 # Sets the default severity to &quot;warning&quot;
@@ -234,52 +260,67 @@ warningCode = 0
 
 # Sets the severity of the `package-comments` rule to &quot;error&quot;.
 [rule.package-comments]
-  severity = &quot;error&quot;
-</code></pre></div><p>Let&#x2019;s quickly go over the individual properties.</p>
+  severity = &quot;error&quot;</code></pre></div>
+<p>Let&#x2019;s quickly go over the individual properties.</p>
+
 <ul>
 <li><code>ignoreGeneratedHeader</code> - <code>golint</code> ignores files which have header <code>GENERATED</code>. To disable this behavior, set the flag to <code>false</code>.</li>
 <li><code>severity</code> - <code>revive</code> has two types of severity - <code>warning</code> and <code>error</code>. This way we can distinguish between critical failures with high confidence level and such with lower.</li>
 <li><code>confidence</code> - similarly to <code>golint</code>, <code>revive</code> lets us assign a confidence level to rules which may return false negatives. The <code>confidence</code> property lets us filter failures below given confidence level.</li>
 <li><code>errorCode</code> and <code>warningCode</code> - these two properties let us have different return codes for the different severities. We may want your errors to fail the CI but our warnings not to.</li>
 </ul>
+
 <p>The remaining lines are related to rule configuration. <strong>Each rule can be configured</strong> by setting its arguments and its severity. For example, the rule for cyclomatic complexity above, fails if in our codebase there&#x2019;s a construction which exceeds the cyclomatic complexity of 10.</p>
-<amp-img src="/images/revive/looking-upwards.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/looking-upwards.jpg" alt="Gopher" style="width: 350px; display: block; margin: auto"></amp-img></p>
+
 <h2 id="extensibility-and-contributions">Extensibility and Contributions</h2>
+
 <p>Initially, I wanted to let developers use be able to create external plugins which later could be referenced by the configuration file and loaded dynamically. Unfortunately, <code>-buildmode=plugin</code> has very <a href="https://golang.org/pkg/plugin/">limited support with known issues</a>.</p>
+
 <p>Ignoring this limitation, there are other two easy ways to add new rules and run them against your code:</p>
+
 <ul>
 <li>Contribute to the project - <code>revive</code> is open for external contributions. If a rule makes sense and passes its unit tests, it&#x2019;s more than welcome to become part of <code>revive</code>! On top of that, creating a new rule is just a matter of implementing this simple interface:</li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
     <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
     <span class="nf">Apply</span><span class="p">(</span><span class="o">*</span><span class="nx">File</span><span class="p">,</span> <span class="nx">Arguments</span><span class="p">)</span> <span class="p">[]</span><span class="nx">Failure</span>
-<span class="p">}</span>
-</code></pre></div><ul>
+<span class="p">}</span></code></pre></div>
+<ul>
 <li>Fork the project and push the rules there. If you think your rules won&#x2019;t apply to others (although the chances are that they will), you can fork <code>revive</code> and not push them upstream. Just make sure that you sync your code with upstream once in a while to get all the new features and bug fixes from there!</li>
 </ul>
+
 <p>Keep in mind that to create a rule you don&#x2019;t have to be familiar with the entire codebase. All rules are well encapsulated into visitors with simple interface. A sample implementation of <code>arguments-limit</code> could be found <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/rule/argument-limit.go">here</a>.</p>
+
 <p><strong>What about formatters?</strong></p>
+
 <p>Well, creating a new formatter is as simple as creating a new rule. Just implement the following interface:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
     <span class="nf">Format</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">Failure</span><span class="p">,</span> <span class="nx">RulesConfig</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
     <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
-<span class="p">}</span>
-</code></pre></div><p>Here you can find a sample implementation of a <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/formatter/json.go">JSON formatter</a>.</p>
+<span class="p">}</span></code></pre></div>
+<p>Here you can find a sample implementation of a <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/formatter/json.go">JSON formatter</a>.</p>
+
 <h2 id="performance">Performance</h2>
+
 <p>I run some basic benchmarks to compare the performance of <code>golint</code> and <code>revive</code>. Here&#x2019;s what I found out after running both linters against <code>kubernetes</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> golint be/&#x2026;
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> golint be/&#x2026;
 real    0m25.389s
 user    0m29.221s
-sys     0m3.065s
-</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> revive be/&#x2026;
+sys     0m3.065s</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> revive be/&#x2026;
 real    0m6.524s
 user    0m22.882s
-sys     0m1.114s
-</code></pre></div><p>Since <strong><code>revive</code></strong> lints the individual files in separate goroutines, it <strong>outperforms <code>golint</code> about 4 times</strong>.</p>
+sys     0m1.114s</code></pre></div>
+<p>Since <strong><code>revive</code></strong> lints the individual files in separate goroutines, it <strong>outperforms <code>golint</code> about 4 times</strong>.</p>
+
 <h2 id="conclusion">Conclusion</h2>
+
 <p><code>Revive</code> is a simple, fast, configurable, extensible, flexible, and beautiful linter for Go. It runs the linting rules on top of each file in a separate goroutine which improves the performance significantly. <code>Revive</code> lets us configure the individual rules and disable them for the entire project, individual files, or range of lines within a file. Last but not least, <code>revive</code> lets us use a set of built-in formatters which output the failures in a digestible, accessible, and easy to consume format.</p>
+
 <p>The project is continuously evolving and open for new contributions in the form of new rules, formatters, or bug fixes! If you want to create an even stricter linting preset, cut the coding style discussions in your team to the minimum, and focus on the essential things, <code>revive</code> may help.</p>
-<amp-img src="/images/revive/gopher.png" alt="Drop mic" style="width: 350px; display: block; margin: auto"></amp-img>
+
+<p><amp-img src="/images/revive/gopher.png" alt="Drop mic" style="width: 350px; display: block; margin: auto"></amp-img></p>
 </div>
 
   <aside class="p-share">

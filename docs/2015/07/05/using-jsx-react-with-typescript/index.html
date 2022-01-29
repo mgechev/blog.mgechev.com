@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.55.5" />
 		<title>Using JSX with TypeScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -87,94 +87,121 @@ Once you have code base above 10-15k lines of code and you decide to do some ref
                 </header>
                 
                 <section id="post-body">
-                    <p>JavaScript is a weird language although, we love it the way it is. However, I&rsquo;ve had quite a painful experience working on big JavaScript projects. It was painful in the same way it gets painful working on huge Ruby, Python, PHP projects.</p>
+                    
+
+<p>JavaScript is a weird language although, we love it the way it is. However, I&rsquo;ve had quite a painful experience working on big JavaScript projects. It was painful in the same way it gets painful working on huge Ruby, Python, PHP projects.</p>
+
 <p>Once you have code base above 10-15k lines of code and you decide to do some refactoring&hellip;well it gets messy. Although <code>grep</code> and <code>sed</code> are powerful tools for text manipulation, when you start replacing code with them, you&rsquo;re missing the semantics (or the context) of the snippets you substitute.</p>
+
 <p>Another common problem - you simply misspell a variable or property name and once in a while your code breaks telling you: <code>undefined is not a function</code> (alright, we <a href="https://twitter.com/addyosmani/status/569157136137134081">passed these days</a>&hellip;)</p>
+
 <p>How we can deal with these problems using our favorite language? Well, writing a lot of tests may help. Testing everything is good but testing everything in order to make our refactoring process slightly smoother and staying away from typos&hellip;seems kind of unpractical and workaround.</p>
+
 <h2 id="typescript">TypeScript</h2>
+
 <p>What we can do is change the language we&rsquo;re using. Replace it with something more powerful - TypeScript. TypeScript is JavaScript superset. Using TypeScript gives us a couple of benefits:</p>
+
 <ul>
 <li>You get type errors compile-time and runtime (since version 1.5 TypeScript has run-time type checking). This way it&rsquo;ll be easier to debug your code and you will be more secure that what you&rsquo;ve developed actually works.</li>
 <li>You get better auto-completion by the text editors and IDEs. WebStorm 10 supports TypeScript 1.5 + decorators and ES6 modules. For vim you can use the typescript-tools, which could be integrated with emacs and SublimeText. You will get hints for method names, parameters, parameters types by your editor/IDE for each method (yes, with Tern.js or Flow you can get the same experience but based on JSDoc or some very sophisticated decisions made using the AST of your code, now it&rsquo;ll be much less tricky).</li>
 <li>The JavaScript VM is able to make better code optimizations. Since when we define that given property/variable has specific type we sign some kind of contract with the JavaScript VM, this way it is much easier for it to reason about the types of the variables, which are being used and to do better runtime optimizations (for instance).</li>
 </ul>
+
 <p>So you get smoother refactoring experience (yey!), faster code and a compiler, which can slap your hands if you misspell a property or a variable name. And the static typing - it is optional. If you don&rsquo;t want to, you don&rsquo;t need to provide type information (however, I&rsquo;d recommend you to be consistent in most cases). You can learn more about TypeScript <a href="http://www.typescriptlang.org/Tutorial">here</a>.</p>
+
 <h2 id="the-problem">The Problem</h2>
+
 <p>However, famous frameworks and libraries, like React, AngularJS 1, Backbone, jQuery, etc. are not written in TypeScript so we don&rsquo;t gain any benefits like auto-completion and type checking when using them.</p>
+
 <p>On top of this React has this weird extension of JavaScript called JSX, which allows us to embed markup inside our JavaScript&hellip;</p>
+
 <h2 id="the-solution">The Solution</h2>
+
 <p>The guys from Microsoft, designing TypeScript, were quite smart and took the first problem under consideration. From the first version of the language were introduced the ambient type definitions. Basically, you can provide definition of the interface of an external library and include reference to it inside the files where you use it. This way you get type checking and text editors auto-completion support. How awesome is that?</p>
+
 <p>In <a href="https://github.com/borisyankov/DefinitelyTyped">DefinitelyTyped</a> you can find up-to-date type definitions for most libraries you may want to use. Once you got, lets say the React type definition, you can simply add a reference to it inside the files you use React like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">/// &lt;reference path=&#34;react.d.ts&#34; /&gt;
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">/// &lt;reference path=&#34;react.d.ts&#34; /&gt;
 </span><span class="c1"></span>
 <span class="c1">// ... your awesome code here
-</span></code></pre></div><p>Alright, TypeScript introduced these ambient type definitions. Cool. However, this doesn&rsquo;t solve our JSX problem. What if we want to use JSX inside our TypeScript &amp; React project? Well, for a couple of weeks, I&rsquo;m following <a href="https://github.com/Microsoft/TypeScript/issues/3203">this GitHub issue</a>, which aims decoupling of TypeScript from JSX. A few days ago a patch was merged into the master branch of TypeScript, which allows to transform your TypeScript to JavaScript and keep your JSX markup or transpile it to React calls instead!</p>
+</span></code></pre></div>
+<p>Alright, TypeScript introduced these ambient type definitions. Cool. However, this doesn&rsquo;t solve our JSX problem. What if we want to use JSX inside our TypeScript &amp; React project? Well, for a couple of weeks, I&rsquo;m following <a href="https://github.com/Microsoft/TypeScript/issues/3203">this GitHub issue</a>, which aims decoupling of TypeScript from JSX. A few days ago a patch was merged into the master branch of TypeScript, which allows to transform your TypeScript to JavaScript and keep your JSX markup or transpile it to React calls instead!</p>
+
 <h2 id="how-to-do-that">How to do That?</h2>
+
 <p>Install TypeScript and react via npm:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm init
-npm install typescript react
-</code></pre></div><p>In order to verify that you&rsquo;ve installed proper TypeScript version use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">./node_modules/typescript/bin/tsc --version
-</code></pre></div><p>You should see output similar to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">message TS6029: Version 1.6.2
-</code></pre></div><p>If npm have installed older version of TypeScript on any reason use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install typescript@1.6.2
-</code></pre></div><p>If you want have the TypeScript&rsquo;s compiler as global executable (<code>tsc</code>) use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm install -g typescript
-</code></pre></div><h3 id="developing-a-component-in-tsx-file">Developing a Component in TSX file</h3>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm init
+npm install typescript react</code></pre></div>
+<p>In order to verify that you&rsquo;ve installed proper TypeScript version use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">./node_modules/typescript/bin/tsc --version</code></pre></div>
+<p>You should see output similar to:</p>
+<div class="highlight"><pre class="chroma">message TS6029: Version 1.6.2</pre></div>
+<p>If npm have installed older version of TypeScript on any reason use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm install typescript@1.6.2</code></pre></div>
+<p>If you want have the TypeScript&rsquo;s compiler as global executable (<code>tsc</code>) use:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">npm install -g typescript</code></pre></div>
+<h3 id="developing-a-component-in-tsx-file">Developing a Component in TSX file</h3>
+
 <p>Now create an <code>app</code> directory and enter it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mkdir app
-<span class="nb">cd</span> app
-</code></pre></div><p>Create a sample file called <code>test.tsx</code> (notice the extension <strong>tsx</strong>, it is mandatory) and add the following content:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">/// &lt;reference path=&#34;../typing/react.d.ts&#34; /&gt;
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">mkdir app
+<span class="nb">cd</span> app</code></pre></div>
+<p>Create a sample file called <code>test.tsx</code> (notice the extension <strong>tsx</strong>, it is mandatory) and add the following content:</p>
+<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">/// &lt;reference path=&#34;../typing/react.d.ts&#34; /&gt;
 </span><span class="c1"></span>
-<span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
 
 <span class="kr">class</span> <span class="nx">DemoProps</span> <span class="p">{</span>
   <span class="kr">public</span> <span class="nx">name</span>:<span class="kt">string</span><span class="p">;</span>
   <span class="kr">public</span> <span class="nx">age</span>:<span class="kt">number</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kr">class</span> <span class="nx">Demo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">&lt;</span><span class="nt">DemoProps</span><span class="err">,</span> <span class="na">any</span><span class="p">&gt;</span> <span class="p">{</span>
+<span class="kr">class</span> <span class="nx">Demo</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="o">&lt;</span><span class="nx">DemoProps</span><span class="p">,</span> <span class="nx">any</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="kr">private</span> <span class="nx">foo</span>:<span class="kt">number</span><span class="p">;</span>
   <span class="kr">constructor</span><span class="p">(</span><span class="nx">props</span>:<span class="kt">DemoProps</span><span class="p">)</span> <span class="p">{</span>
     <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="nx">render() {</span>
-    <span class="k">return</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span><span class="nx">Hello</span> <span class="nx">world</span><span class="o">!</span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span><span class="nx">Hello</span> <span class="nx">world</span><span class="o">!&lt;</span><span class="err">/div&gt;</span>
   <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>In the code above we defined a component called <code>Demo</code>. It accepts properties, which are instances of the class <code>DemoProps</code> and state, which could be of any kind.</p>
+<span class="p">}</span></code></pre></div>
+<p>In the code above we defined a component called <code>Demo</code>. It accepts properties, which are instances of the class <code>DemoProps</code> and state, which could be of any kind.</p>
+
 <p>Alright, we&rsquo;re almost there!</p>
+
 <p>Create a directory called <code>typing</code> inside the root of your project:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ..
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ..
 mkdir typing
-<span class="nb">cd</span> typing
-</code></pre></div><p>Now take the React&rsquo;s ambient type declaration from <a href="https://github.com/borisyankov/DefinitelyTyped/blob/master/react/react.d.ts">here</a> and save it inside <code>typing</code>. Make sure the file is called <code>react.d.ts</code>. This will prevent us from getting any compile-time errors.</p>
+<span class="nb">cd</span> typing</code></pre></div>
+<p>Now take the React&rsquo;s ambient type declaration from <a href="https://github.com/borisyankov/DefinitelyTyped/blob/master/react/react.d.ts">here</a> and save it inside <code>typing</code>. Make sure the file is called <code>react.d.ts</code>. This will prevent us from getting any compile-time errors.</p>
+
 <p>Now the directory structure should look like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">.
+<div class="highlight"><pre class="chroma">.
 ├── app
 │   └── test.tsx
 ├── typings
 │   └── react.d.ts
 ├── package.json
-└── node_modules
-</code></pre></div><p>The last step is to compile the <code>test.tsx</code> file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ..
+└── node_modules</pre></div>
+<p>The last step is to compile the <code>test.tsx</code> file:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ..
 <span class="c1"># This line will run the typescript compiler over your `test.tsx` file and</span>
 <span class="c1"># output the transpiler content in `./app/test.js`</span>
-./node_modules/typescript/bin/tsc --jsx react --module commonjs ./app/test.tsx
-</code></pre></div><p>Thats it. Now you can check out the content of <code>./app/test.js</code>. There you should find the transpiled content.
+./node_modules/typescript/bin/tsc --jsx react --module commonjs ./app/test.tsx</code></pre></div>
+<p>Thats it. Now you can check out the content of <code>./app/test.js</code>. There you should find the transpiled content.
 Did you notice the <code>--jsx</code> option of the TypeScript compiler? It may accepts two different values:</p>
+
 <ul>
 <li><code>react</code> - Transpiles JSX to React calls</li>
 <li><code>preserve</code> - Preserves the JSX the way it was defined in the source file</li>
 </ul>
+
 <p>The JSX support in TypeScript is part of the <a href="https://github.com/Microsoft/TypeScript/wiki/Roadmap#16">roadmap for version 1.6</a>. This means that in the next a couple of weeks you won&rsquo;t have to build TypeScript from scratch but use it with the standard build tools you&rsquo;re used to.</p>
+
 <h2 id="results">Results</h2>
+
 <p>This is how you can use TypeScript with React and JSX for projects that scale. Support for <code>tsx</code> files is already implemented in <code>atom-typescript</code>. If you use Atom, you&rsquo;ll see something like this:</p>
-<p><img src="/images/jsx-typescript.png" alt="JSX + TypeScript"></p>
+
+<p><img src="/images/jsx-typescript.png" alt="JSX + TypeScript" /></p>
 
                 </section>
             </article>
@@ -226,6 +253,7 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
+
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.55.5">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Singleton in JavaScript - Minko Gechev\u0027s blog",
+    "headline": "Singleton in JavaScript - Minko Gechev\x27s blog",
     "datePublished": "2014-04-16T00:00:00JST",
     "dateModified": "2014-04-16T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\u0027s blog"
+      "name": "Minko Gechev\x27s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\u0027s blog",
+      "name": "Minko Gechev\x27s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -131,27 +131,38 @@
 
 
   <div class="article-body"><p>Wikipedia describes the singleton design pattern as:</p>
+
 <blockquote>
 <p>The singleton pattern is a design pattern that restricts the instantiation of a class to one object. This is useful when exactly one object is needed to coordinate actions across the system. The concept is sometimes generalized to systems that operate more efficiently when only one object exists, or that restrict the instantiation to a certain number of objects. The term comes from the mathematical concept of a singleton.</p>
 </blockquote>
+
 <div id="attachment_708" style="width: 231px" class="wp-caption aligncenter">
   <a href="/images/legacy/uploads2014/04/singleton.png"><amp-img src="/images/legacy/uploads2014/04/singleton-221x300.png" alt="Singleton" width="221" height="300" class="size-medium wp-image-708"></amp-img></a><p class="wp-caption-text">
     Singleton
   </p>
 </div>
+
 <p>Singleton is one of the most well known and also hated design patterns, all the time. It is very easy to implement a basic version of the singleton pattern so that&#x2019;s the reason it is that well known. But if we look deeper into different details, there are plenty of problems, which may happen because of poor implementation:</p>
+
 <ul>
 <li>Instantiating multiple singletons because of concurrent access to the <code>getInstance</code> method of the singleton.</li>
 <li>Instantiating multiple singletons because of serialization/deserialization</li>
 <li>Inheriting from a singleton object</li>
 <li>etc&#x2026;</li>
 </ul>
+
 <p>Thanks God we don&#x2019;t have to consider all these corner cases in JavaScript.</p>
+
 <p>The simplest singleton implementation in JavaScript is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Singleton</span> <span class="o">=</span> <span class="p">{};</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Singleton</span> <span class="o">=</span> <span class="p">{};</span>
+</code></pre></div>
+
 <p>And yes &#x2013; this is singleton!</p>
+
 <p>Addy Osmani suggests the following implementation at his book <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">&#x201C;Learning JavaScript Design Patterns&#x201D;</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">mySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">mySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="c1">// Instance stores a reference to the Singleton
 </span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
   <span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
@@ -183,17 +194,24 @@
       <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">})();</span></code></pre></div>
+<span class="p">})();</span>
+</code></pre></div>
+
 <p>This implementation is based on the module pattern. The module pattern is applied two times &#x2013; the first application aims to provide the actual singleton and keeps the private data/behavior inside a closure. The second usage of the module pattern aims to provide the public interface used for getting the singleton object, which is kept inside a closure.</p>
+
 <p>It is absolutely valid and useful implementation:</p>
+
 <ul>
 <li>It instantiates only a single object</li>
 <li>It is safe &#x2013; it keeps the reference to the singleton inside a variable, which lives inside a lexical closure, so it is not accessible by the outside world</li>
 <li>It allows privacy &#x2013; you can define all private methods of your singleton inside the lexical closure of the first module pattern</li>
 </ul>
+
 <p>As drawback I can point the lack of specific &#x201C;type&#x201D; of the singleton (i.e. more specific than object), which won&#x2019;t allow you to use the operator <code>instanceof</code>. I can argue that the definition of the <code>private</code> members can lead to poor unit testing, but if they are private, they are not intended for testing anyway.</p>
+
 <p>Another implementation of singleton, which I found in the network is <a href="http://stackoverflow.com/a/6733919/1106382">&#x201C;The best Singleton pattern&#x201D;</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
   <span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">MySingletonClass</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 
@@ -212,16 +230,24 @@
 <span class="c1">//a === b
 </span><span class="c1"></span><span class="nx">global</span><span class="p">.</span><span class="nx">MySingleton</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span> <span class="c1">//or b
 </span><span class="c1"></span>
-<span class="p">}(</span><span class="nb">window</span><span class="p">));</span></code></pre></div>
+<span class="p">}(</span><span class="nb">window</span><span class="p">));</span>
+</code></pre></div>
+
 <p>Here are the main advantages of this implementation:</p>
+
 <ul>
 <li>It instantiates only a single object</li>
 <li>You can use the <code>instanceof</code> operator</li>
 </ul>
+
 <p>As drawback I can state the fact that you can easy change the prototype property <code>_singletonInstance</code> of your singleton. This way, when <code>MySingleton</code> is called once again, it will create a new object:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">MySingleton</span><span class="p">).</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span></code></pre></div>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">MySingleton</span><span class="p">).</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+</code></pre></div>
+
 <p>Implementation I use is formed by combining both approaches from above:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">MySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">MySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
 
   <span class="kd">var</span> <span class="nx">INSTANCE</span><span class="p">;</span>
 
@@ -250,16 +276,22 @@
     <span class="p">}</span>
   <span class="p">};</span>
 
-<span class="p">}());</span></code></pre></div>
+<span class="p">}());</span>
+</code></pre></div>
+
 <p>In this example we use the module pattern once again, in order to enclose the singleton implementation into a lexical closure and provide a public interface for getting its instance.</p>
+
 <p>Sometimes you need to pass arguments when initializing a singleton for first time. This is easy achieved using the method <code>init</code>. The <code>init</code> method is not aware of the arguments required by the singleton &#x2013; all it does is to forward the call to the internal <code>MySingleton</code> function with context <code>null</code>. Inside the implementation of the <code>MySingleton</code> constructor function we make a check whether the current context &#x2013; <code>this</code> is of type <code>MySingleton</code>, if it isn&#x2019;t, then this means that <code>MySingleton</code> is not called with the <code>new</code> operator, so we recursively call <code>new MySingleton</code> with the required parameters.</p>
+
 <p>What are the benefits we get from this implementation:</p>
+
 <ul>
 <li>It instantiates only a single object</li>
 <li>It is safe &#x2013; it keeps the reference to the singleton inside a variable, which lives inside a lexical closure and is not accessible by the outside world</li>
 <li>It allows you to initialize the singleton with some arguments. The module pattern, which wraps the singleton is not aware of the initialization arguments &#x2013; it simply forwards the call with <code>apply</code></li>
 <li>You can use the <code>instanceof</code> operator</li>
 </ul>
+
 <p>As drawback, I can state that I feel unnatural for this implementation to use &#x201C;private&#x201D; data/behavior &#x2013; but yes, it is possible if you define them in the lexical closure of the module pattern.</p>
 </div>
 
