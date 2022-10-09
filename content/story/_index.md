@@ -7,7 +7,7 @@ layout: page
 
 <div id="timeline" class="timeline">
   <p class="story-header">
-    Below I've focused on the positive side. I've filtered a non-exhaustive list of achievements. They are primarily intended for personal consumption as my private "cookie jar".
+    
   </p>
   <section class="timeline-period">
     <header class="timeline-header">2022</header>
