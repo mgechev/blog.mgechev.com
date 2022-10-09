@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Faster Angular Applications - Part 1. On Push Change Detection and Immutability - Minko Gechev\x27s blog",
+    "headline": "Faster Angular Applications - Part 1. On Push Change Detection and Immutability - Minko Gechev\u0027s blog",
     "datePublished": "2017-11-11T00:00:00JST",
     "dateModified": "2017-11-11T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "On AngularConnect 2017 in London, I gave a talk called \x26ldquo;Purely Fast.\x26rdquo; In the presentation, I showed how step by step we can improve the performance of a business application. In the example, I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation, I got great feedback for the content, so I decided to write a series of blog posts which aim to explain the content from \x26ldquo;Purely Fast\x26rdquo; in details."
+    "description": "On AngularConnect 2017 in London, I gave a talk called \u0026ldquo;Purely Fast.\u0026rdquo; In the presentation, I showed how step by step we can improve the performance of a business application. In the example, I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation, I got great feedback for the content, so I decided to write a series of blog posts which aim to explain the content from \u0026ldquo;Purely Fast\u0026rdquo; in details."
   }
 </script>
 
@@ -130,53 +130,34 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>On AngularConnect 2017 in London, I gave a talk called &#x201C;Purely Fast.&#x201D; In the presentation, I showed how step by step we can improve the performance of a business application. In the example, I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation, I got great feedback for the content, so I decided to write a series of blog posts which aim to explain the content from &#x201C;Purely Fast&#x201D; in details.</p>
-
+  <div class="article-body"><p>On AngularConnect 2017 in London, I gave a talk called &#x201C;Purely Fast.&#x201D; In the presentation, I showed how step by step we can improve the performance of a business application. In the example, I incorporated as many performance issues as possible which I faced over the past a couple of years developing enterprise Angular and AngularJS applications. After the presentation, I got great feedback for the content, so I decided to write a series of blog posts which aim to explain the content from &#x201C;Purely Fast&#x201D; in details.</p>
 <p>In this part, we will focus on immutable data structures and <code>OnPush</code> change detection.</p>
-
 <p>The code for this blog post is available at my <a href="https://github.com/mgechev">GitHub account</a>:</p>
-
 <ul>
 <li><a href="https://github.com/mgechev/purely-fast">&#x201C;Purely Fast&#x201D;</a></li>
 <li><a href="https://github.com/mgechev/purely-fast-benchmarks">&#x201C;Purely Fast - Benchmarks&#x201D;</a></li>
 <li><a href="/2017/11/12/faster-angular-applications-pure-pipes-memoization-pure-functions-part-2/">&#x201C;Faster Angular Applications - Part 2&#x201D;</a></li>
 </ul>
-
 <h1 id="why-runtime-performance">Why runtime performance</h1>
-
 <p>A big issue in the modern single-page applications is reducing the initial load time. This includes reducing the number of bytes transferred over the network and minimizing the number of network requests. Last year I wrote a few articles related to reducing the bundle size (you can find them <a href="https://blog.mgechev.com/2016/06/26/tree-shaking-angular2-production-build-rollup-javascript/">here</a> and <a href="https://blog.mgechev.com/2016/07/21/even-smaller-angular2-applications-closure-tree-shaking/">here</a>). Although it&#x2019;s always a good idea to invest time in exploring the bundles of our apps in details with tools like <a href="https://www.npmjs.com/package/source-map-explorer">source-map-explorer</a> and reducing its size, there are many folks working in this direction.</p>
-
 <p>For instance, the Google Closure Compiler team is continuously trying to provide the most optimal minification and dead code elimination, same for the webpack team. On top of that, we have the Angular CLI team which combines the best from both worlds by allowing us to have the most efficient and well-encapsulated build possible.</p>
-
 <p>In the end, all we can do is either combine effort with any of these teams to improve the minification that their tools provide or apply some application-specific optimizations such as lazy-loading.</p>
-
 <p>On the other hand, the runtime performance of our applications is entirely in our own hands. Before going any further, lets put the practices that we&#x2019;re going to look at into the context of a simplified business application.</p>
-
 <h1 id="introducing-a-sample-business-application">Introducing a Sample Business Application</h1>
-
 <p>We&#x2019;re going to put all the practices for performance improvement into the context of this sample business application.</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/app.gif" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/app.gif" style="border: 1px solid #ccc;"></amp-img>
 <p>On the GIF above you can see the business application that we&#x2019;re going to optimize. On the screen we have:</p>
-
 <ul>
 <li>Two lists of the employees in two different departments - Sales and R&amp;D.</li>
 <li>Each employee has a name and a numeric value associated with them. The numeric value is represented in a material design chip component and goes through some business computation (for instance, standard deviation or any other meaningful calculation). The value we see in the material design chip component is the resulted number.</li>
 <li>Right next to each employee we have a button for deleting it.</li>
 <li>Each of the department lists has a text input where we can enter the name of a new employee. When we add a new item, we get the employees numeric value somehow (in our case we&#x2019;ll generate it), process it with our business calculation and visualize it on the screen.</li>
 </ul>
-
 <p>That&#x2019;s pretty much all we have! Let&#x2019;s take a brief look at the component structure of the application.</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/structure.png"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/structure.png"></amp-img>
 <p>The image above shows the component structure of the application. We have a component called <code>AppComponent</code> which wraps the entire application, and two instances of the <code>EmployeeListComponent</code> which show the employees from the individual departments.</p>
-
 <p>Now lets take a look at the template of the <code>EmployeeListComponent</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;Department&quot;</span><span class="p">&gt;</span>{{ department }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;Department&quot;</span><span class="p">&gt;</span>{{ department }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
 <span class="p">&lt;</span><span class="nt">mat-form-field</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">input</span> <span class="na">placeholder</span><span class="o">=</span><span class="s">&quot;Enter name here&quot;</span> <span class="na">matInput</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&quot;</span><span class="na">label</span><span class="err">&quot;</span> <span class="err">(</span><span class="na">keydown</span><span class="err">)=&quot;</span><span class="na">handleKey</span><span class="err">($</span><span class="na">event</span><span class="err">)&quot;</span><span class="p">&gt;</span>
@@ -194,11 +175,10 @@
     <span class="p">&lt;/</span><span class="nt">mat-chip-list</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">i</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;Delete&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fa fa-trash-o&quot;</span> <span class="na">aria-hidden</span><span class="o">=</span><span class="s">&quot;true&quot;</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">remove</span><span class="err">.</span><span class="na">emit</span><span class="err">(</span><span class="na">item</span><span class="err">)&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">mat-list-item</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">mat-list</span><span class="p">&gt;</span></code></pre></div>
-<p>Firstly, we print the department name. After that, we declare a material design form field where with <code>ngModel</code> we create two-way data-binding between the <code>label</code> property declared inside of the <code>EmployeeListComponent</code>&#x2019;s controller and the text input.</p>
-
+<span class="p">&lt;/</span><span class="nt">mat-list</span><span class="p">&gt;</span>
+</code></pre></div><p>Firstly, we print the department name. After that, we declare a material design form field where with <code>ngModel</code> we create two-way data-binding between the <code>label</code> property declared inside of the <code>EmployeeListComponent</code>&#x2019;s controller and the text input.</p>
 <p>Right after that, we declare a list of items, and we iterate over the individual employees, show their name and calculate the numeric value associated with them. We directly invoke the <code>calculate</code> method inside the template. The <code>calculate</code> method is defined inside the controller of <code>EmployeeListComponent</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
@@ -210,8 +190,8 @@
   <span class="kd">@Input</span><span class="p">()</span> <span class="nx">data</span>: <span class="kt">EmployeeData</span><span class="p">[];</span>
   <span class="kd">@Input</span><span class="p">()</span> <span class="nx">department</span>: <span class="kt">string</span><span class="p">;</span>
 
-  <span class="kd">@Output</span><span class="p">()</span> <span class="nx">remove</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="nx">EmployeeData</span><span class="o">&gt;</span><span class="p">();</span>
-  <span class="kd">@Output</span><span class="p">()</span> <span class="nx">add</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="o">&lt;</span><span class="kt">string</span><span class="o">&gt;</span><span class="p">();</span>
+  <span class="kd">@Output</span><span class="p">()</span> <span class="nx">remove</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="p">&lt;</span><span class="nt">EmployeeData</span><span class="p">&gt;();</span>
+  <span class="kd">@Output</span><span class="p">()</span> <span class="nx">add</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventEmitter</span><span class="p">&lt;</span><span class="nt">string</span><span class="p">&gt;();</span>
 
   <span class="nx">label</span>: <span class="kt">string</span><span class="p">;</span>
 
@@ -225,81 +205,55 @@
   <span class="nx">calculate</span><span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-<p>The definition of the <code>EmployeeListComponent</code> is quite simple:</p>
-
+<span class="p">}</span>
+</code></pre></div><p>The definition of the <code>EmployeeListComponent</code> is quite simple:</p>
 <ul>
 <li>It has two inputs:
-
 <ul>
 <li><code>data</code> - a list of the employees from the specific department.</li>
 <li><code>department</code> - the name of the department.</li>
-</ul></li>
+</ul>
+</li>
 <li>&#x2026;and two outputs:
-
 <ul>
 <li><code>remove</code> - triggered when we remove an employee from the list.</li>
 <li><code>add</code> - triggered when we add a new employee to the list.</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>The inputs are going to be passed from the <code>AppComponent</code> to its child <code>EmployeeListComponent</code> instances.</p>
-
 <h2 id="business-calculation">Business Calculation</h2>
-
 <p>Notice that we&#x2019;re mocking the business calculation with a function which calculates the number of Fibonacci from the employee&#x2019;s numeric value. This way instead of introducing a complicated business calculation we can focus entirely on the performance optimizations that we&#x2019;re going to perform. The Fibonacci function defined above has the same properties as any other mathematical function which we may use for calculating some meaningful value for the employee.</p>
-
 <p>You might have also noticed that we&#x2019;re calculating the <code>n</code><sup>th</sup> number of Fibonacci by performing an extremely inefficient calculation:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/fibonacci.png" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/fibonacci.png" style="border: 1px solid #ccc;"></amp-img>
 <p>We do that to slow down our application artificially and simulate as precisely as possible a computationally intensive business calculation.</p>
-
 <h2 id="application-structure-recap">Application Structure Recap</h2>
-
 <ul>
 <li>We have an application root component with two children components.</li>
 <li>Each children component is an instance of the <code>EmployeeListComponent</code> which has some list items.</li>
 <li>For each list item, we have a computationally intensive calculation.</li>
 </ul>
-
 <h1 id="typing-speed">Typing Speed</h1>
-
 <p>On the image below you can see what the typing experience is when both lists have in total of 140 items. No, unfortunately, it does not look slow because of the frame rate of the GIF.</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/slow-typing.gif" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/slow-typing.gif" style="border: 1px solid #ccc;"></amp-img>
 <p>There&#x2019;s obviously something going on. In order to debug it, we can turn to <code>Chrome DevTools &gt; Performance</code>:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/script-time.png" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/script-time.png" style="border: 1px solid #ccc;"></amp-img>
 <p>As we can see from this screenshot, as expected, most of the slowdowns happen because of a heavy computations happening in the main thread. If we switch to the <code>Bottom-Up</code> tab we can see the following:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/fibonacci-slow.png" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/fibonacci-slow.png" style="border: 1px solid #ccc;"></amp-img>
 <p>We can see that the <code>fibonacci</code> function takes most of the script time. Lets see how often it gets invoked by adding a log statement inside of the <code>calculate</code> method defined in <code>EmployeeListComponent</code>:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/why-slow.gif" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/why-slow.gif" style="border: 1px solid #ccc;"></amp-img>
 <p>The image above shows that the <code>fibonacci</code> function gets invoked multiple times for each entry in both lists. In fact, it gets invoked at least twice for each item in the list when we type a single character:</p>
-
 <ul>
 <li>Once after the callbacks associated with the <code>mousedown</code> event of the input.</li>
 <li>Once after the callbacks associated with the <code>mouseup</code> event of the input.</li>
 </ul>
-
 <p>Although we have calculated the numeric values for all the employees in the list and we have visualized them we&#x2019;re recomputing them again, multiple times. This happens because the Angular&#x2019;s change detection gets triggered after each of the listed events above. Once the change detection gets triggered, it&#x2019;ll re-evaluate all the expressions in the templates and compare them with their previous values. If there&#x2019;s a change, the Angular&#x2019;s change detection will update the DOM most efficiently. This means that <strong>each change detection tick will re-evaluate all the expressions in the templates of the components.</strong> Based on this, very important advice that I included in the <a href="https://github.com/mgechev/angular-performance-checklist">&#x201C;Angular Performance Checklist&#x201D;</a> is - <strong>do not perform heavy computations in templates</strong>.</p>
-
 <p>Well, in our case we&#x2019;re 100% sure that the numeric values for the two lists of employees haven&#x2019;t changed, which means that Angular will not find any reason to update the DOM. The question is - how to tell Angular to not recompute the numeric values for the employees unless it gets new lists for the two departments?</p>
-
 <h1 id="on-push-change-detection-strategy">On Push Change Detection Strategy</h1>
-
 <p>The answer to this question is to use a custom change detection strategy. In fact, the <code>OnPush</code> change detection strategy is exactly what we&#x2019;re looking for. By <strong>setting the change detection</strong> of <code>EmployeeListComponent</code> <strong>to <code>OnPush</code></strong> we <strong>will hint Angular that it should not run its change detection mechanism for this component unless it receives a new value for any of its inputs</strong>. Keep in mind that Angular will use equality check in order to verify that!</p>
-
 <h2 id="components-as-functions">Components as Functions</h2>
-
 <p>In order to explain this, let&#x2019;s suppose for a second that <code>EmployeeListComponent</code> is a function. Let&#x2019;s also suppose that the function&#x2019;s arguments are the inputs of the <code>EmployeeListComponent</code> and the result that the function returns is the DOM rendered on the screen. So:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">function</span> <span class="nx">runChangeDetection() {</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">function</span> <span class="nx">runChangeDetection() {</span>
   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;Detecting for changes&apos;</span><span class="p">);</span>
 <span class="p">}</span>
 
@@ -318,35 +272,32 @@
 <span class="p">}</span>
 
 <span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">EmployeeListComponent</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="nx">e1</span><span class="p">];</span></code></pre></div>
-<p>In the snippet above <strong>we&#x2019;ve modeled</strong> the <code>EmployeeListComponent</code> as a function. We have three important things going on there:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">shouldRun</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">args</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="nx">e1</span><span class="p">];</span>
+</code></pre></div><p>In the snippet above <strong>we&#x2019;ve modeled</strong> the <code>EmployeeListComponent</code> as a function. We have three important things going on there:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">shouldRun</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">args</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">a</span> <span class="o">||</span> <span class="nx">args</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">!==</span> <span class="nx">EmployeeListComponent</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-<span class="p">},</span> <span class="kc">false</span><span class="p">);</span></code></pre></div>
-<p>Will return <code>true</code> if any of the values of the object literal <code>args</code> we passed differs from the values associated with the same keys in the <code>EmployeeListComponent</code>. This check is algorithmically similar to the check that Angular is going to perform to decide if the change detection for a component with <code>OnPush</code> change detection strategy should be invoked.</p>
-
+<span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
+</code></pre></div><p>Will return <code>true</code> if any of the values of the object literal <code>args</code> we passed differs from the values associated with the same keys in the <code>EmployeeListComponent</code>. This check is algorithmically similar to the check that Angular is going to perform to decide if the change detection for a component with <code>OnPush</code> change detection strategy should be invoked.</p>
 <p>After that we have:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">args</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">i</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">args</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">i</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">EmployeeListComponent</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">args</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-<span class="p">});</span></code></pre></div>
-<p>This simply sets the &#x201C;inputs.&#x201D; Finally, we have:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="k">if</span> <span class="p">(</span><span class="nx">shouldRun</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div><p>This simply sets the &#x201C;inputs.&#x201D; Finally, we have:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="k">if</span> <span class="p">(</span><span class="nx">shouldRun</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">runChangeDetection</span><span class="p">();</span>
-<span class="p">}</span></code></pre></div>
-<p>Which runs the change detection.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>Which runs the change detection.</p>
 <p>Now, <code>f</code> is our <code>EmployeeListComponent</code> and <code>data</code> is the list of employees which initially contains only a single item - <code>e1</code>. If we invoke <code>f</code> and pass <code>data</code> as an argument (in the language of Angular, as an input):</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// will invoke `runChangeDetection`.
-</span><span class="c1"></span><span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data</span> <span class="p">});</span></code></pre></div>
-<p>&#x2026;the change detection will be triggered since the initial value of the input <code>data</code> was <code>undefined</code>. This will be the behavior in Angular as well if we pass an input with a different value. However, if run:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">e2</span><span class="p">);</span>
-<span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data</span> <span class="p">});</span></code></pre></div>
-<p>Although we pass <code>data</code> as an argument (or input) again, the change detection will not be invoked because after performing an equality check we will determine that the previous value of the input <code>data</code> has the same reference. On the other hand, if we:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data.slice</span><span class="p">()</span> <span class="p">});</span></code></pre></div>
-<p>We will trigger its change detection because we&#x2019;d have passed a new reference for the <code>data</code> input. That&#x2019;s pretty much how the things will happen in Angular as well.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// will invoke `runChangeDetection`.
+</span><span class="c1"></span><span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data</span> <span class="p">});</span>
+</code></pre></div><p>&#x2026;the change detection will be triggered since the initial value of the input <code>data</code> was <code>undefined</code>. This will be the behavior in Angular as well if we pass an input with a different value. However, if run:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">e2</span><span class="p">);</span>
+<span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data</span> <span class="p">});</span>
+</code></pre></div><p>Although we pass <code>data</code> as an argument (or input) again, the change detection will not be invoked because after performing an equality check we will determine that the previous value of the input <code>data</code> has the same reference. On the other hand, if we:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="nx">f</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">data.slice</span><span class="p">()</span> <span class="p">});</span>
+</code></pre></div><p>We will trigger its change detection because we&#x2019;d have passed a new reference for the <code>data</code> input. That&#x2019;s pretty much how the things will happen in Angular as well.</p>
 <p>This means that we can update <code>EmployeeListComponent</code> to the following:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
   <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
   <span class="p">...</span>
 <span class="p">})</span>
@@ -361,9 +312,9 @@
     <span class="p">}</span>
   <span class="p">}</span>
   <span class="p">...</span>
-<span class="p">}</span></code></pre></div>
-<p>&#x2026;and <code>AppComponent</code> to:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
+<span class="p">}</span>
+</code></pre></div><p>&#x2026;and <code>AppComponent</code> to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
   <span class="nx">template</span><span class="o">:</span> <span class="sb">`
 </span><span class="sb">    &lt;sd-employee-list [data]=&quot;salesList&quot; department=&quot;Sales&quot; (add)=&quot;addToSales($event)&quot;&gt;
 </span><span class="sb">  `</span>
@@ -377,31 +328,23 @@
       <span class="p">.</span><span class="nx">slice</span><span class="p">();</span>
   <span class="p">}</span>
   <span class="p">...</span>
-<span class="p">}</span></code></pre></div>
-<p>This way, each time when the user presses &#x201C;Enter&#x201D; we will emit the value of the <code>label</code> using the <code>add</code> output. <code>AppComponent</code> will handle the output with its <code>addToSales</code> method which will push a new employee to the <code>salesList</code>, copy the entire list and set the returned new reference as the value of the <code>salesList</code>.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>This way, each time when the user presses &#x201C;Enter&#x201D; we will emit the value of the <code>label</code> using the <code>add</code> output. <code>AppComponent</code> will handle the output with its <code>addToSales</code> method which will push a new employee to the <code>salesList</code>, copy the entire list and set the returned new reference as the value of the <code>salesList</code>.</p>
 <p>All right, this will work; however, we introduce two issues:</p>
-
 <ul>
 <li>It&#x2019;ll be slow. Every time we add an employee we need to copy the entire list. The garbage collector should also run to clean the unused memory.</li>
 <li>It&#x2019;ll require a lot of memory. Well, the memory we allocated for the new list could be a lot depending on the size of the list.</li>
 </ul>
-
 <p>To handle these two issues we can use efficiently implemented immutable data structures such as Immutable.js.</p>
-
-<h2 id="introducing-immutable-js">Introducing Immutable.js</h2>
-
+<h2 id="introducing-immutablejs">Introducing Immutable.js</h2>
 <p>I&#x2019;ve written a lot about immutable.js in the past (<a href="https://blog.mgechev.com/2015/03/02/immutability-in-angularjs-immutablejs/">here</a> and <a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">here</a>), so now I&#x2019;ll make a very brief introduction.</p>
-
 <p>Immutable.js provides a collection of immutable data structures. All of them have two essential properties:</p>
-
 <ol>
 <li>They are immutable (apparently), so when we aim to apply an operation which will mutate an instance of any of these data structures, we will get a new instance (which respectively has a new reference).</li>
 <li>To produce a new data structure based on the applied operation with mutation immutable.js won&#x2019;t copy the entire data structure; instead it&#x2019;ll reuse as much as it can from the original one.</li>
 </ol>
-
 <p>Here&#x2019;s an example of the first point:</p>
-<div class="highlight"><pre class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">import</span> <span class="p">{</span> <span class="nx">List</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;immutable&apos;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">import</span> <span class="p">{</span> <span class="nx">List</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;immutable&apos;</span><span class="p">;</span>
 
 <span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">List</span><span class="p">([</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">]);</span>
 
@@ -410,64 +353,37 @@
 <span class="kr">const</span> <span class="nx">appended</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [a, b, c]
-</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">appended</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="err">// [a, b, c, d]</span></code></pre></div>
-<p>As we can see from the snippet above, when we invoke the <code>push</code> method of the <code>List</code> instance we get a new list which has the mutation applied. On top of that, the list we applied the mutation to stays unchanged.</p>
-
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">appended</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [a, b, c, d]
+</span></code></pre></div><p>As we can see from the snippet above, when we invoke the <code>push</code> method of the <code>List</code> instance we get a new list which has the mutation applied. On top of that, the list we applied the mutation to stays unchanged.</p>
 <p>Based on the second property we can conclude that the immutable data structures from immutable.js will be much more efficient compared to what we did in the example above - copying the entire data structure on change.</p>
-
-<h2 id="on-push-and-immutable-js">On Push and Immutable.js</h2>
-
+<h2 id="on-push-and-immutablejs">On Push and Immutable.js</h2>
 <p>In order to see what are going to be the performance implications of using <code>OnPush</code> with immutable.js, I developed an e2e test with protractor which types a number of characters in the text input for the sales department. On top of that, I run <a href="https://www.npmjs.com/package/@angular/benchpress">benchpress</a> on top of it which by using APIs provided by Google Chrome can measure the time required for this operation to be completed.</p>
-
 <p>The e2e test I run for both - the optimized version of the application (<code>OnPush</code> &amp; Immutable.js) and the non-optimized one. Here are the results:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/onpush-vs-non-optimized.png" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/onpush-vs-non-optimized.png" style="border: 1px solid #ccc;"></amp-img>
 <p>It looks like we have a decent optimization. We&#x2019;re about 3x faster! Based on the benchmarks it looks like typing the string &#x201C;AngularConnect&#x201D; in the sales department&#x2019;s input took 13124.81ms for the non-optimized version and 5804.12ms for the optimized one.</p>
-
 <p>Lets see the typing speed again:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/slow-on-push.gif" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/slow-on-push.gif" style="border: 1px solid #ccc;"></amp-img>
 <p>All right, so we&#x2019;re still quite slow. As we can see, the <code>calculate</code> method gets executed less frequently but still gets invoked quite a lot. If we take a more careful look, we can notice that this time we recalculate only the numeric values for all the employees in the sales department. So, <code>OnPush</code> optimization <em>almost worked</em>.</p>
-
 <p>While typing, we&#x2019;re not getting new instances of the <code>salesList</code> since we&#x2019;re not applying any operations which are mutating it. Why we&#x2019;re getting the change detection for the sales department triggered?</p>
-
 <p>The answer lies in the way <code>OnPush</code> works. Using <code>OnPush</code> change detection strategy the change detection for a given component will be triggered when we pass a new value to any of its inputs <strong>or when an event inside of the component happens</strong>. The second part is not completely obvious from the documentation, but it can be seen in <strong><a href="https://github.com/angular/angular/blob/56238fe94e5022f2a4c450ba9a23022bfff81eb9/packages/core/test/linker/integration_spec.ts#L641-L677">this e2e test</a></strong> in the Angular&#x2019;s core repository.</p>
-
 <h2 id="enforcing-separation-of-concerns">Enforcing Separation of Concerns</h2>
-
 <p>To fix this, we need to do some refactoring. This will help us not only to eliminate the unnecessary change detection invocations but also enforce better separation of concerns in our application.</p>
-
 <p>For this purpose, we will decompose the <code>EmployeeListComponent</code> to:</p>
-
 <ul>
 <li><code>NameInputComponent</code> - responsible for holding the new name of the employee we want to add to the list.</li>
 <li><code>ListComponent</code> - will list the individual employees and calculate their numeric values:</li>
 </ul>
-
-<p><amp-img src="/images/faster-ng-apps-1/enforce-separation-of-concerns.png"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/enforce-separation-of-concerns.png"></amp-img>
 <p>Now lets run the e2e tests again and see what we got:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/fast-typing.png" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/fast-typing.png" style="border: 1px solid #ccc;"></amp-img>
 <p>It may look like there&#x2019;s a glitch in the chart. No there isn&#x2019;t, we&#x2019;re just hundreds of times faster - 13124.81ms vs. 10.45ms for typing the string &#x201C;AngularConnect.&#x201D;</p>
-
 <p>And here&#x2019;s the user experience when typing in the text input for the optimized version:</p>
-
-<p><amp-img src="/images/faster-ng-apps-1/fast-typing.gif" style="border: 1px solid #ccc;"></amp-img></p>
-
+<amp-img src="/images/faster-ng-apps-1/fast-typing.gif" style="border: 1px solid #ccc;"></amp-img>
 <h1 id="conclusion">Conclusion</h1>
-
 <p>In this part of the series &#x201C;Faster Angular Applications,&#x201D; we covered how we can optimize an Angular application regarding runtime performance by using immutable data structures and a custom change detection strategy.</p>
-
 <p>We started by introducing a sample business application which lists two departments of employees and using a heavy computation calculates a numeric value for each of them.</p>
-
 <p>There were some apparent slowdowns in the app caused by the two-way data-binding that we&#x2019;re using - the typing experience for entering a new employee was extremely slow. To reduce the number of computations going on we used <code>OnPush</code> change detection strategy and immutable data structures.</p>
-
 <p>Although <code>OnPush</code> introduced a significant improvement we missed a very important detail - it causes Angular to detect for changes when an event inside of the given component gets triggered. We fixed this issue by decomposing the <code>EmployeeListComponent</code> and enforcing better separation of concerns.</p>
-
 <p>In the next blog post from the series, we&#x2019;ll take a look at pure pipes. We&#x2019;ll also illustrate how pure pipes and <code>OnPush</code> change detection relate to functional programming and more precisely pure functions &amp; memoization.</p>
 </div>
 

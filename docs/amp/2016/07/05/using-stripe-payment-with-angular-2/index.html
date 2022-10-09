@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Using Stripe with Angular (Deprecated) - Minko Gechev\x27s blog",
+    "headline": "Using Stripe with Angular (Deprecated) - Minko Gechev\u0027s blog",
     "datePublished": "2016-07-05T00:00:00JST",
     "dateModified": "2016-07-05T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "The content in this post uses deprecated APIs To learn about the latest version of the Stripe APIs check out their documentation page.  #post-body { color: #bbb; } .deprecation-notice { color: black; }  Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you\x26rsquo;re offering using Stripe as a mediator."
+    "description": "The content in this post uses deprecated APIs To learn about the latest version of the Stripe APIs check out their documentation page.  #post-body { color: #bbb; } .deprecation-notice { color: black; }  Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you\u0026rsquo;re offering using Stripe as a mediator."
   }
 </script>
 
@@ -130,14 +130,10 @@
 </aside>
 
 
-  <div class="article-body">
-
-<h2 id="the-content-in-this-post-uses-deprecated-apis">The content in this post uses deprecated APIs</h2>
-
+  <div class="article-body"><h2 id="the-content-in-this-post-uses-deprecated-apis">The content in this post uses deprecated APIs</h2>
 <p><strong class="deprecation-notice">To learn about the latest version of the Stripe APIs check out their <a href="https://stripe.com/docs">documentation page</a></strong>.
 <br>
 <br></p>
-
 <style>
 #post-body {
   color: #bbb;
@@ -147,46 +143,31 @@
   color: black;
 }
 </style>
-
 <p>Stripe offer a set of APIs which allow businesses and individuals to easily accept and manage payments online. In a typical scenario you want your users to pay for a service that you&#x2019;re offering using Stripe as a mediator.</p>
-
-<p><amp-img src="/images/stripe/angular-and-stripe.png" alt="Angular &amp; Stripe" style="display: block; margin: auto"></amp-img></p>
-
+<amp-img src="/images/stripe/angular-and-stripe.png" alt="Angular &amp; Stripe" style="display: block; margin: auto"></amp-img>
 <p>On the other hand, Angular is gathering more and more popularity. A lot of developers are including the framework as part of their production applications.</p>
-
 <p>In this blog post we will briefly describe what problems you may face using the Stripe APIs with Angular and how you can solve them.</p>
-
 <p>So lets begin!</p>
-
 <h2 id="sample-application">Sample Application</h2>
-
 <p><amp-img src="/images/stripe/stripe-demo.gif" alt="App Demo"></amp-img></p>
-
 <p>This app is based on the <a href="https://github.com/mgechev/angular2-seed">angular2-seed</a> project. The complete demo is <a href="https://github.com/mgechev/angular2-stripe-demo">located here</a>.</p>
-
 <p>Above you can see two views:</p>
-
 <ul>
 <li>Default Stripe Form.</li>
 <li>Custom Stripe Form.</li>
 </ul>
-
 <p>The first one demonstrates the default Stripe checkout mechanism and the second one gets the token for the entered credit card by using a custom form.</p>
-
 <h2 id="stripe-checkout">Stripe Checkout</h2>
-
 <p>Our end goal here is to add a button which triggers the default stripe checkout mechanism and visualizes a form for entering credit card information.</p>
+<p>First, we need to add the checkout script which will expose the global variable <code>StripeCheckout</code>. Open <code>index.html</code> (notice <strong>do not add this script to any of your components&apos; templates because Angular will <a href="https://angular.io/docs/ts/latest/guide/security.html#!#sts=Sanitization%20and%20security%20contexts">remove it</a></strong>), and add the following line:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://checkout.stripe.com/checkout.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div><p>As next step we need to add a button to our component&#x2019;s template:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Default Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
-<p>First, we need to add the checkout script which will expose the global variable <code>StripeCheckout</code>. Open <code>index.html</code> (notice <strong>do not add this script to any of your components&#x2019; templates because Angular will <a href="https://angular.io/docs/ts/latest/guide/security.html#!#sts=Sanitization%20and%20security%20contexts">remove it</a></strong>), and add the following line:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://checkout.stripe.com/checkout.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-<p>As next step we need to add a button to our component&#x2019;s template:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Default Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-
-<span class="p">&lt;</span><span class="nt">button</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">openCheckout</span><span class="err">()&quot;</span><span class="p">&gt;</span>Purchase<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span></code></pre></div>
-<p>Notice that we also added a click handler to the button. Once the user clicks on the button, the <code>openCheckout</code> method defined in the component&#x2019;s controller will be invoked.</p>
-
+<span class="p">&lt;</span><span class="nt">button</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">openCheckout</span><span class="err">()&quot;</span><span class="p">&gt;</span>Purchase<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</code></pre></div><p>Notice that we also added a click handler to the button. Once the user clicks on the button, the <code>openCheckout</code> method defined in the component&#x2019;s controller will be invoked.</p>
 <p>Now lets take a look at the component&#x2019;s controller implementation:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
@@ -194,7 +175,7 @@
   <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;stripe-form.component.html&apos;</span><span class="p">,</span>
   <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;stripe-form.component.css&apos;</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">StripeFormComponent</span> <span class="p">{</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">StripeFormComponent</span> <span class="p">{</span>
 
   <span class="nx">openCheckout</span><span class="p">()</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">handler</span> <span class="o">=</span> <span class="p">(</span><span class="o">&lt;</span><span class="nx">any</span><span class="o">&gt;</span><span class="nb">window</span><span class="p">).</span><span class="nx">StripeCheckout</span><span class="p">.</span><span class="nx">configure</span><span class="p">({</span>
@@ -215,24 +196,19 @@
   <span class="p">}</span>
 
 <span class="p">}</span>
-</code></pre></div>
-<p>Once the user clicks on the button and the <code>openCheckout</code> method is invoked, we create a new Stripe handle. To the handle we pass <a href="https://stripe.com/docs/checkout#integration-custom">configuration object</a>, and right after that we invoke the <code>open</code> method of the handle! This will open our stripe checkout pop-up.</p>
-
+</code></pre></div><p>Once the user clicks on the button and the <code>openCheckout</code> method is invoked, we create a new Stripe handle. To the handle we pass <a href="https://stripe.com/docs/checkout#integration-custom">configuration object</a>, and right after that we invoke the <code>open</code> method of the handle! This will open our stripe checkout pop-up.</p>
 <p>So far so good! The <code>token</code> callback that we pass with the handle&#x2019;s configuration object will return the id of the token associated with the user&#x2019;s card. This token can be used, for instance, server-side. You may experience some issues using it because of the way stripe sends requests to their APIs.</p>
-
 <p>So now lets go to the next section and see what the issues with the <code>token</code> callback are and how we can deal with them.</p>
-
 <h2 id="custom-stripe-form">Custom Stripe Form</h2>
-
 <p>The first step of the custom form integration is to add the following script in your <code>index.html</code> file:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://js.stripe.com/v2/&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-<p>Right after that we need to set your Stripe public key:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://js.stripe.com/v2/&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div><p>Right after that we need to set your Stripe public key:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text/javascript&quot;</span><span class="p">&gt;</span>
   <span class="nx">Stripe</span><span class="p">.</span><span class="nx">setPublishableKey</span><span class="p">(</span><span class="s1">&apos;pk_test_oi0sKPJYLGjdvOXOM8tE8cMa&apos;</span><span class="p">);</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
-<p>As next step lets take a look at the custom Stripe form. It is encapsulated in the <code>CustomFormComponent</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/forms&apos;</span><span class="p">;</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div><p>As next step lets take a look at the custom Stripe form. It is encapsulated in the <code>CustomFormComponent</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/forms&apos;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
@@ -241,10 +217,9 @@
   <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;custom-form.component.css&apos;</span><span class="p">],</span>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">REACTIVE_FORM_DIRECTIVES</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{...}</span>
-</code></pre></div>
-<p>&#x2026;with the following template:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Custom Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{...}</span>
+</code></pre></div><p>&#x2026;with the following template:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Custom Stripe Form<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
 <span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;payment-form&quot;</span> <span class="err">(</span><span class="na">submit</span><span class="err">)=&quot;</span><span class="na">getToken</span><span class="err">()&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;payment-message&quot;</span><span class="p">&gt;</span>{{message}}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
@@ -273,12 +248,11 @@
   <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 
   <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Submit Payment&quot;</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span></code></pre></div>
-<p>Notice that in our form we bind to the properties <code>cardNumber</code>, <code>expiryMonth</code>, <code>expiryYear</code>, <code>cvc</code>. Once the user fills the form, she can click on the <code>Submit Payment</code> button and the method <code>getToken()</code> will be invoked. Notice that in order to use <code>[(ngModel)]</code> each input should have a name.</p>
-
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div><p>Notice that in our form we bind to the properties <code>cardNumber</code>, <code>expiryMonth</code>, <code>expiryYear</code>, <code>cvc</code>. Once the user fills the form, she can click on the <code>Submit Payment</code> button and the method <code>getToken()</code> will be invoked. Notice that in order to use <code>[(ngModel)]</code> each input should have a name.</p>
 <p>As next step, lets take a look at the <code>CustomFormComponent</code> class. The most straightforward implementation looks like:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/forms&apos;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/core&apos;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">REACTIVE_FORM_DIRECTIVES</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;@angular/forms&apos;</span><span class="p">;</span>
 
 <span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">moduleId</span><span class="o">:</span> <span class="nx">module</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
@@ -287,7 +261,7 @@
   <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;custom-form.component.css&apos;</span><span class="p">],</span>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">REACTIVE_FORM_DIRECTIVES</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
   <span class="nx">cardNumber</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="nx">expiryMonth</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
   <span class="nx">expiryYear</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
@@ -312,30 +286,21 @@
     <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<p><amp-img src="/images/stripe/stripe-bug.gif" alt="Change detection not performing"></amp-img></p>
-
+</code></pre></div><p><amp-img src="/images/stripe/stripe-bug.gif" alt="Change detection not performing"></amp-img></p>
 <p>As can be seen from the video above, the form behaves weirdly. Once we submit the credit card only the <code>Loading...</code> label shows and after that we need to change value in the form in order to see the response gotten from Stripe, once the request completes.</p>
-
 <p>What actually happens is that:</p>
-
 <ul>
 <li>We send request to Stripe and respectively update the <code>message</code> to value <code>Loading...</code>.</li>
 <li>The request gets processed and we receive a response.</li>
 <li>Once we change an input value, we trigger the change detection mechanism which renders the response on the screen.</li>
 </ul>
-
 <p>But why the change detection doesn&#x2019;t get triggered after we get the response?</p>
-
 <h4 id="in-the-zones">In the Zones&#x2026;</h4>
-
 <p>The Angular Zones are monkey patching (almost) all asynchronous APIs! Zones intercept async events and triggering the change detection on special events. Zones take care of <code>XMLHttpRequests</code>, <code>fetch</code>, <code>setTimeout</code>, etc. However, Stripe uses hidden <code>iframe</code> for establishing requests to its API, instead of the APIs that zone.js takes care of:</p>
-
 <p><amp-img src="/images/stripe/stripe-hidden-iframe.png" alt="Hidden iframe"></amp-img></p>
-
 <p>In order to workaround this issue, we need to run the callback in the context of the Angular Zone (or <code>NgZone</code>). In order to do this we need to inject <code>NgZone</code> in the <code>CustomFormComponent</code> and slightly change <code>getToken</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
-<span class="k">export</span> <span class="k">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">(...)</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CustomFormComponent</span> <span class="p">{</span>
 
   <span class="c1">// Same properties declaration
 </span><span class="c1"></span>
@@ -362,13 +327,11 @@
     <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre></div>
-<h2 id="conclusion">Conclusion</h2>
 
+</code></pre></div><h2 id="conclusion">Conclusion</h2>
 <p>In this short blog post we described how we can easily use Stripe with Angular. We went through the default Stripe checkout and after that we built a custom form!</p>
-
-<p>The only tricky thing that we found in the first part of our experiment was the sanitization of the components&#x2019; templates by Angular. It prevents us from using:</p>
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/charge&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span><span class="p">&gt;</span>
+<p>The only tricky thing that we found in the first part of our experiment was the sanitization of the components&apos; templates by Angular. It prevents us from using:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/charge&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">script</span>
     <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://checkout.stripe.com/checkout.js&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;stripe-button&quot;</span>
     <span class="na">data-key</span><span class="o">=</span><span class="s">&quot;pk_test_oi0sKPJYLGjdvOXOM8tE8cMa&quot;</span>
@@ -378,11 +341,9 @@
     <span class="na">data-image</span><span class="o">=</span><span class="s">&quot;/img/documentation/checkout/marketplace.png&quot;</span>
     <span class="na">data-locale</span><span class="o">=</span><span class="s">&quot;auto&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span></code></pre></div>
-<p>and instead makes to be a bit more creative :-).</p>
-
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div><p>and instead makes to be a bit more creative :-).</p>
 <p>With the custom form we faced another issue related to not triggering the Angular change detection once we get the card token. We discovered that this is due the uncommon way Stripe performs the Ajax request for registering the user&#x2019;s card.</p>
-
 <p>We solved the issue simply by wrapping the callback inside of a <code>zone.run(() =&gt; {...})</code> call!</p>
 </div>
 

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Playing Mortal Kombat with TensorFlow.js. Transfer learning and data augmentation &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -25,7 +25,8 @@
 		
 
 		<meta property="og:title" content="Playing Mortal Kombat with TensorFlow.js. Transfer learning and data augmentation" />
-		<meta property="og:description" content="While experimenting with enhancements of the prediction model of Guess.js, I started looking at deep learning. I&rsquo;ve focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their &ldquo;unreasonable effectiveness&rdquo; in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection." />
+		<meta property="og:description" content="While experimenting with enhancements of the prediction model of Guess.js, I started looking at deep learning. I&rsquo;ve focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their &ldquo;unreasonable effectiveness&rdquo; in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.
+Controlling MK." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2018/10/20/transfer-learning-tensorflow-js-data-augmentation-mobile-net/" />
 		
@@ -92,23 +93,16 @@
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p><link rel="stylesheet" href="/assets/css/tfjs/ui.css"></p>
-
+                    <link rel="stylesheet" href="/assets/css/tfjs/ui.css">
 <p>While experimenting with enhancements of the prediction model of <a href="https://github.com/guess-js/guess">Guess.js</a>, I started looking at deep learning. I&rsquo;ve focused mainly on recurrent neural networks (RNNs), specifically LSTM because of their <a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/">&ldquo;unreasonable effectiveness&rdquo;</a> in the domain of Guess.js. In the same time, I started playing with convolutional neural networks (CNNs), which although less traditionally, are also often used for time series. CNNs are usually used for image classification, recognition, and detection.</p>
-
-<p><img src="/images/tfjs-cnn/cover.png" alt="MK.js with TensorFlow.js" style="display: block; width: 100%; max-width: 450px; margin-bottom: 0;">
+<img src="/images/tfjs-cnn/cover.png" alt="MK.js with TensorFlow.js" style="display: block; width: 100%; max-width: 450px; margin-bottom: 0;">
 <div style="text-align: center; display: block; margin: auto; font-size: 0.8em; margin-bottom: 20px;">
 Controlling <a href="https://github.com/mgechev/mk.js">MK.js</a> with TensorFlow.js
-</div></p>
-
+</div>
 <section style="background: #eff7ff; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
 You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">this article</a> and <a href="https://github.com/mgechev/mk.js">MK.js</a> in my <a href="https://github.com/mgechev">GitHub account</a>. I haven't shared the dataset that I used for training but feel free to collect your own and train the model as described below! Also, to get an idea of how everything works together, feel free to play around with the widgets below.
 </section>
-
 <p>After playing around with CNNs, I remembered an <a href="https://www.youtube.com/watch?v=0_yfU_iNUYo">experiment I did</a> a few years ago, when the browser vendors introduced the <code>getUserMedia</code> API. In this experiment, I used the user&rsquo;s camera as a controller for playing a small JavaScript clone of Mortal Kombat 3. You can find the game at my <a href="https://github.com/mgechev/mk.js">GitHub account</a>. As part of the experiment, I implemented a basic posture detection algorithm which classifies an image into the following classes:</p>
-
 <ul>
 <li>Upper punch with the left and right hands</li>
 <li>Kick with the left and right legs</li>
@@ -116,25 +110,16 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
 <li>Squatting</li>
 <li>None of the above</li>
 </ul>
-
 <p>The algorithm is so simple that I&rsquo;d be able to explain it in a few sentences:</p>
-
 <blockquote>
 <p>The algorithm takes a snapshot of the background behind the user. Once the user enters the scene, the algorithm was finding the difference between the original, background frame, and the current frame with the user inside of it. This way, it&rsquo;s able to detect where the user&rsquo;s body is. As a next step, the algorithm renders the user&rsquo;s body with white on a black canvas. After that, it builds a vertical and horizontal histogram summing the values for each pixel. Based on the aggregated calculation, the algorithm detects what the current user posture is.</p>
 </blockquote>
-
 <p>You can find demo of the implementation in the video below. The source code is at my <a href="https://github.com/mgechev/movement.js">GitHub account</a>.</p>
-
 <iframe style="width: 100%; height: 400px;" src="https://www.youtube.com/embed/0_yfU_iNUYo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-
 <p>Although I had success with controlling my tiny MK clone, the algorithm was far from perfect. It requires a frame with the background behind the user. For the detection procedure to work correctly, the background frame needs to be with the same color throughout the execution of the program. Such restriction means that changes in the light, shadows, etc., would introduce disturbance and inaccurate results. Finally, the algorithm does not recognize actions - based on a background frame; it classifies another frame as a posture from a predefined set.</p>
-
 <p>Now, given the advancements in the Web platform APIs, and more specifically WebGL, I decided to give the problem another shot by using TensorFlow.js.</p>
-
 <h2 id="introduction">Introduction</h2>
-
 <p>In this blog post, I&rsquo;ll share my experience of building a posture classification algorithm using TensorFlow.js and MobileNet. In the process, we&rsquo;ll look at the following topics:</p>
-
 <ul>
 <li>Collecting training data for image classification</li>
 <li>Performing data augmentation using <a href="https://github.com/aleju/imgaug">imgaug</a></li>
@@ -143,53 +128,33 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
 <li>Training an image classification TensorFlow.js model in Node.js and using it in the browser</li>
 <li>Few words on using action classification with LSTM</li>
 </ul>
-
 <p>For this article, we&rsquo;ll relax the problem to posture detection based on a single frame, in contrast to recognizing an action from a sequence of frames. We&rsquo;ll develop a <strong>supervised deep learning model</strong>, which based on an image from the user&rsquo;s laptop camera, indicates if on this image the user is punching, kicking, or not doing the first two.</p>
-
 <p>By the end of the article, we&rsquo;d be able to build a model for playing <a href="https://github.com/mgechev/mk.js">MK.js</a>:</p>
-
-<p><img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;"></p>
-
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 <p><strong>To get most of this article, the reader should have a familiarity with fundamental concepts from software engineering and JavaScript. Basic understanding of deep learning would be helpful but not strictly required.</strong></p>
-
 <h2 id="collecting-data">Collecting Data</h2>
-
 <p>The accuracy of a deep learning model depends to a very great extent on the quality of the training data. We should aim for a rich training set similar to the inputs that we&rsquo;ll get in the production system.</p>
-
 <p>Our model should be able to recognize punches and kicks. This means that we should collect images from three different categories:</p>
-
 <ul>
 <li>Punches</li>
 <li>Kicks</li>
 <li>Others</li>
 </ul>
-
 <p>For this experiment, I collected photos with the help of two volunteers (<a href="https://twitter.com/lili_vs">@lili_vs</a> and <a href="https://twitter.com/gsamokovarov">@gsamokovarov</a>). We recorded 5 videos with QuickTime on my MacBook Pro, each of which contains 2-4 punches and 2-4 kicks.</p>
-
 <p>Now, since we need images but instead we have <code>mov</code> videos, we can use <code>ffmpeg</code>, to extract the individual frames and store them as <code>jpg</code> pictures:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">ffmpeg -i video.mov <span class="nv">$filename</span>%03d.jpg</code></pre></div>
-<p>To run the above command, you may first need to <a href="https://www.ffmpeg.org/download.html">install</a> <code>ffmpeg</code> on your computer.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">ffmpeg -i video.mov <span class="nv">$filename</span>%03d.jpg
+</code></pre></div><p>To run the above command, you may first need to <a href="https://www.ffmpeg.org/download.html">install</a> <code>ffmpeg</code> on your computer.</p>
 <p>If we want to train the model, we have to provide inputs and their corresponding outputs, but at this step, we have a bunch of images of three people taking different poses. To structure our data, we have to categorize the frames from the videos that we extracted in the three categories above - punches, kicks, others. For each category, we can create a separate directory and move all the corresponding images there.</p>
-
 <p>This way, in each directory we should have roughly about 200 images, similar to the ones below:</p>
-
-<p><img src="/images/tfjs-cnn/all.jpg" alt="Image samples" /></p>
-
+<p><img src="/images/tfjs-cnn/all.jpg" alt="Image samples"></p>
 <p>Note that in the directory &ldquo;Others&rdquo; we may have many more images because there are fewer photos of punches and kick then ones of people walking, turning around, or managing the video recording. If we have too many images from one class and we train the model on all of them, we risk making it biased towards this specific class. So, even if we try to classify an image of a person punching, the neural network is likely going to output the class &ldquo;Others.&rdquo; To reduce this bias, we can delete some of the photos from the &ldquo;Others&rdquo; directory and train the model with an equal number of images from each category.</p>
-
 <p>For convenience, we&rsquo;ll name the images in the individual directories after the numbers from <code>1</code> to <code>190</code>, so the first image would be <code>1.jpg</code>, the second <code>2.jpg</code>, etc.</p>
-
 <p>If we train the model with only 600 photos taken in the same environment, with the same people, we&rsquo;ll not be able to achieve a very high level of accuracy. To extract as much value as possible from our data, we can generate some extra samples by using <strong>data augmentation</strong>.</p>
-
 <h3 id="data-augmentation">Data Augmentation</h3>
-
 <p>Data augmentation is a technique which allows us to increase the number of data points by synthesizing new ones from the existing dataset. Usually, we use data augmentation for increasing the size and the variety of our training set. We&rsquo;d pass the original images to a pipeline of transformations which produce new images. We should not be too aggressive with the transformations - applying them on an image classified as a punch, should produce other images classifiable as punches.</p>
-
 <p>Valid transformations over our images would be a rotation, inverting the colors, blurring the images, etc. There are great open source tools for image data augmentation available online. At the moment of writing, there are no rich alternatives in JavaScript, so I used a library implemented in Python - <a href="https://github.com/aleju/imgaug">imgaug</a>. It contains a set of augmenters that can be applied probabilistically.</p>
-
 <p>Here&rsquo;s the data augmentation logic that I applied in this experiment:</p>
-<div class="highlight"><pre class="chroma"><code class="language-python3" data-lang="python3"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">44</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python3" data-lang="python3"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">44</span><span class="p">)</span>
 <span class="n">ia</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">44</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
@@ -260,41 +225,24 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
         <span class="n">im</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span>
 
     <span class="k">for</span> <span class="n">im</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="p">)):</span>
-        <span class="n">misc</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">aug_path</span> <span class="o">+</span> <span class="s2">&#34;/&#34;</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&#34;_&#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">im</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;.jpg&#34;</span><span class="p">,</span> <span class="n">grid</span><span class="p">[</span><span class="n">im</span><span class="p">])</span></code></pre></div>
-<p>The script above has a <code>main</code> method which has three <code>for</code> loops - one for each image category. In each iteration, in each of the loops, we invoke the method <code>draw_single_sequential_images</code> with the image name as the first argument, the path to the image as the second, and third argument the directory where the function should store the augmented images.</p>
-
+        <span class="n">misc</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">aug_path</span> <span class="o">+</span> <span class="s2">&#34;/&#34;</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&#34;_&#34;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">im</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;.jpg&#34;</span><span class="p">,</span> <span class="n">grid</span><span class="p">[</span><span class="n">im</span><span class="p">])</span>
+</code></pre></div><p>The script above has a <code>main</code> method which has three <code>for</code> loops - one for each image category. In each iteration, in each of the loops, we invoke the method <code>draw_single_sequential_images</code> with the image name as the first argument, the path to the image as the second, and third argument the directory where the function should store the augmented images.</p>
 <p>After that, we read the image from the disk and apply a set of transformations to it. I&rsquo;ve documented most of the transformations in the snippet above, so we&rsquo;ll not stop on them here.</p>
-
 <p>For each image in the existing data set, the transformations produce 16 other images. Here&rsquo;s an example of how the augmented images would look like:</p>
-
-<p><a href="/images/tfjs-cnn/aug.jpg"><img src="/images/tfjs-cnn/aug.jpg" alt="Grid with augmented images" /></a></p>
-
+<p><a href="/images/tfjs-cnn/aug.jpg"><img src="/images/tfjs-cnn/aug.jpg" alt="Grid with augmented images"></a></p>
 <p>Notice that in the script above, we scale the images to <code>100x56</code> pixel. We do this to reduce the amount of data, and respectively the amount of computations which our model would have to perform during training and evaluation.</p>
-
 <h2 id="building-the-model">Building the Model</h2>
-
 <p>Now let&rsquo;s build the classification model!</p>
-
 <p>Since we&rsquo;re dealing with images, we&rsquo;re going to use a convolutional neural network (CNN). This network architecture is known to be suitable for image recognition, object detection, and classification.</p>
-
 <h3 id="transfer-learning">Transfer Learning</h3>
-
 <p>The figure below shows VGG-16, a popular CNN which is used for classification of images.</p>
-
-<p><img src="/images/tfjs-cnn/vgg-16.svg" style="display: block;"></p>
-
+<img src="/images/tfjs-cnn/vgg-16.svg" style="display: block;">
 <p>The VGG-16 network recognizes 1000 classes of images. It has 16 layers (we don&rsquo;t count the output and the pooling layers). Such a multilayer network would be hard to train in practice. It&rsquo;ll require a large dataset and many hours of training.</p>
-
 <p>The hidden layers in a trained CNN recognize different features of the images from its training set starting from edges, going to more advanced features, such as shapes, individual objects, and so on. A trained CNN, similar to VGG-16, which recognizes a large set of images would have hidden layers that have discovered many features from its training set. Such features would be in common between most images, and respectively, reusable across different tasks.</p>
-
 <p><strong>Transfer learning</strong> allows us to reuse an already existing and trained network. We can take the output from any of the layers of the existing network and feed it as an input to a new neural network. This way, by training the newly created neural network, over time it can be taught to recognize new higher level features and correctly classify images from classes that the source model has never seen before.</p>
-
-<p><img src="/images/tfjs-cnn/transfer.svg" style="display: block"></p>
-
+<img src="/images/tfjs-cnn/transfer.svg" style="display: block">
 <p>For our purposes, we&rsquo;ll use the <strong>MobileNet neural network</strong>, from the <a href="https://www.npmjs.com/package/@tensorflow-models/mobilenet">@tensorflow-models/mobilenet</a> package. MobileNet is as powerful as VGG-16, but it&rsquo;s also much smaller which makes its forward propagation faster and reduces its load time in the browser. MobileNet has been trained on the <a href="http://www.image-net.org/challenges/LSVRC/2012/">ILSVRC-2012-CLS</a> image classification dataset.</p>
-
 <p>You can give MobileNet a try in the widget below. Feel free to select an image from your file system or use your camera as an input:</p>
-
 <div class="image-widget" id="mobile-net">
   <div class="prediction"></div>
   <div class="tab" id="mobile-net-tab">
@@ -317,22 +265,16 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
     </div>
   </div>
 </div>
-
 <p>Two of the choices that we have when we develop a model using transfer learning are:</p>
-
 <ol>
 <li>The output from which layer of the source model are we going to use as an input for the target model</li>
 <li>How many layers from the target model do we want to train, if any</li>
 </ol>
-
 <p>The first point is quite essential. Depending on the layer we choose, we&rsquo;re going to get features on lower or higher level of abstraction, as input to our neural network.</p>
-
 <p>For our purposes, we&rsquo;re not going to train any layers from MobileNet. We&rsquo;re going to pick the output from <code>global_average_pooling2d_1</code> and pass it as an input to our tiny model. Why did I pick this specific layer? Empirically. I did a few tests, and this layer was performing reasonably well.</p>
-
 <h3 id="defining-the-model">Defining the Model</h3>
-
 <p>The original problem was to categorize an image in three classes - punch, kick, and other. Let us first solve a smaller problem - detect if the user is punching on a frame or not. This task is a typical binary classification problem. For the purpose, we can define the following model:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">tf</span> <span class="nx">from</span> <span class="s1">&#39;@tensorflow/tfjs&#39;</span><span class="p">;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">tf</span> <span class="kr">from</span> <span class="s1">&#39;@tensorflow/tfjs&#39;</span><span class="p">;</span>
 
 <span class="kr">const</span> <span class="nx">model</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">sequential</span><span class="p">();</span>
 <span class="nx">model</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">inputLayer</span><span class="p">({</span> <span class="nx">inputShape</span><span class="o">:</span> <span class="p">[</span><span class="mi">1024</span><span class="p">]</span> <span class="p">}));</span>
@@ -342,33 +284,29 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
   <span class="nx">optimizer</span>: <span class="kt">tf.train.adam</span><span class="p">(</span><span class="mi">1</span><span class="nx">e</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span>
   <span class="nx">loss</span>: <span class="kt">tf.losses.sigmoidCrossEntropy</span><span class="p">,</span>
   <span class="nx">metrics</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
-<span class="p">});</span></code></pre></div>
-<p>The snippet above defines a simple model with a layer with <code>1024</code> units and <code>ReLU</code> activation, and one output unit which goes through a <code>sigmoid</code> activation function. The <code>sigmoid</code> would produce a number between <code>0</code> and <code>1</code>, depending on the probability the user to be punching at the given frame.</p>
-
+<span class="p">});</span>
+</code></pre></div><p>The snippet above defines a simple model with a layer with <code>1024</code> units and <code>ReLU</code> activation, and one output unit which goes through a <code>sigmoid</code> activation function. The <code>sigmoid</code> would produce a number between <code>0</code> and <code>1</code>, depending on the probability the user to be punching at the given frame.</p>
 <p>Why did I pick <code>1024</code> units for the second layer and <code>1e-6</code> learning rate? Well, I tried a couple of different options and saw that <code>1024</code> and <code>1e-6</code> work best. &ldquo;Trying and seeing what&rdquo; may don&rsquo;t sound like the best approach but that&rsquo;s pretty much how the tunning of hyperparameters in deep learning works - based on our understanding of the model we use our intuition to update orthogonal parameters and empirically check if the model performs well.</p>
-
 <p>The <code>compile</code> method, compiles the layers together, preparing the model for training and evaluation. Here we declare that we want to use <code>adam</code> as an optimization algorithm. We also declare that we want to compute the loss with sigmoid cross entropy and we specify that we want to evaluate the model&rsquo;s accuracy. TensorFlow.js calculates the accuracy with the formula:</p>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Accuracy = (True Positives + True Negatives) / (Positives + Negatives)</code></pre></div>
-<p>If we want to apply transfer learning with MobileNet as a source model, we&rsquo;ll first need to load it. Because it wouldn&rsquo;t be practical to train our model with over 3k images in the browser, we&rsquo;ll use Node.js and load the network from a file.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">Accuracy = (True Positives + True Negatives) / (Positives + Negatives)
+</code></pre></div><p>If we want to apply transfer learning with MobileNet as a source model, we&rsquo;ll first need to load it. Because it wouldn&rsquo;t be practical to train our model with over 3k images in the browser, we&rsquo;ll use Node.js and load the network from a file.</p>
 <p>You can download MobileNet from <a href="https://github.com/mgechev/mk-tfjs/tree/master/mobile-net">here</a>. In the directory, you can find <code>model.json</code> file, which contains the architecture of the model - layers, activations, etc. The rest of the files contain the model&rsquo;s parameters. You can load the model from the file using:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">loadModel</span> <span class="o">=</span> <span class="nx">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">loadModel</span> <span class="o">=</span> <span class="kr">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">mn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">mobilenet</span><span class="p">.</span><span class="nx">MobileNet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
   <span class="nx">mn</span><span class="p">.</span><span class="nx">path</span> <span class="o">=</span> <span class="sb">`file://PATH/TO/model.json`</span><span class="p">;</span>
-  <span class="nx">await</span> <span class="nx">mn</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
+  <span class="k">await</span> <span class="nx">mn</span><span class="p">.</span><span class="nx">load</span><span class="p">();</span>
   <span class="k">return</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span><span class="o">:</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor1D</span> <span class="o">=&gt;</span>
-      <span class="nx">mn</span><span class="p">.</span><span class="nx">infer</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="s1">&#39;global_average_pooling2d_1&#39;</span><span class="p">)</span>
+      <span class="nx">mn</span><span class="p">.</span><span class="k">infer</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="s1">&#39;global_average_pooling2d_1&#39;</span><span class="p">)</span>
         <span class="p">.</span><span class="nx">reshape</span><span class="p">([</span><span class="mi">1024</span><span class="p">]);</span>
-<span class="p">};</span></code></pre></div>
-<p>Notice that in the <code>loadModel</code> method we return a function, which accepts a single dimensional tensor as an input and returns <code>mn.infer(input, Layer)</code>. The <code>infer</code> method of MobileNet accepts as an argument input tensor and a layer. The layer specifies from which hidden layer we&rsquo;d want to get the output from. If you open <a href="https://github.com/mgechev/mk-tfjs/blob/master/mobile-net/model.json"><code>model.json</code></a> and search for <code>global_average_pooling2d_1</code> you&rsquo;ll find it as the name of one of the layers.</p>
-
+<span class="p">};</span>
+</code></pre></div><p>Notice that in the <code>loadModel</code> method we return a function, which accepts a single dimensional tensor as an input and returns <code>mn.infer(input, Layer)</code>. The <code>infer</code> method of MobileNet accepts as an argument input tensor and a layer. The layer specifies from which hidden layer we&rsquo;d want to get the output from. If you open <a href="https://github.com/mgechev/mk-tfjs/blob/master/mobile-net/model.json"><code>model.json</code></a> and search for <code>global_average_pooling2d_1</code> you&rsquo;ll find it as the name of one of the layers.</p>
 <p>Now, to train this model, we&rsquo;ll have to create our training set. For the purpose, we&rsquo;ll have to pass each one of our images through the <code>infer</code> method of MobileNet and associate a label with it - <code>1</code> for images which contain a punch, and <code>0</code> for images without a punch:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">punches</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">punches</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">Punches</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">))</span>
   <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="sb">`</span><span class="si">${</span><span class="nx">Punches</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">f</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 
-<span class="kr">const</span> <span class="nx">others</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">others</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">Others</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">))</span>
   <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="sb">`</span><span class="si">${</span><span class="nx">Others</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">f</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
@@ -381,11 +319,10 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
   <span class="nx">punches</span>
     <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobileNet</span><span class="p">(</span><span class="nx">readInput</span><span class="p">(</span><span class="nx">path</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">others</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobileNet</span><span class="p">(</span><span class="nx">readInput</span><span class="p">(</span><span class="nx">path</span><span class="p">))))</span>
-<span class="p">)</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor2D</span><span class="p">;</span></code></pre></div>
-<p>In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other images. After that, we define a one-dimensional tensor which contains the output labels. If we have <em><code>n</code></em> images with a punch and <em><code>m</code></em> other images, the tensor would have <em><code>n</code></em> elements with value <code>1</code> and <em><code>m</code></em> elements with value <code>0</code>.</p>
-
+<span class="p">)</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor2D</span><span class="p">;</span>
+</code></pre></div><p>In the snippet above, first we read the files in the directory containing pictures of punches, and the one with other images. After that, we define a one-dimensional tensor which contains the output labels. If we have <em><code>n</code></em> images with a punch and <em><code>m</code></em> other images, the tensor would have <em><code>n</code></em> elements with value <code>1</code> and <em><code>m</code></em> elements with value <code>0</code>.</p>
 <p>In <code>xs</code> we stack the results from the invocation of the <code>infer</code> method of MobileNet for the individual images. Notice that for each image we invoke the <code>readInput</code> method. Let us take a look at its implementation:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">readInput</span> <span class="o">=</span> <span class="nx">img</span> <span class="o">=&gt;</span> <span class="nx">imageToInput</span><span class="p">(</span><span class="nx">readImage</span><span class="p">(</span><span class="nx">img</span><span class="p">),</span> <span class="nx">TotalChannels</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">readInput</span> <span class="o">=</span> <span class="nx">img</span> <span class="o">=&gt;</span> <span class="nx">imageToInput</span><span class="p">(</span><span class="nx">readImage</span><span class="p">(</span><span class="nx">img</span><span class="p">),</span> <span class="nx">TotalChannels</span><span class="p">);</span>
 
 <span class="kr">const</span> <span class="nx">readImage</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">=&gt;</span> <span class="nx">jpeg</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">path</span><span class="p">),</span> <span class="kc">true</span><span class="p">);</span>
 
@@ -403,30 +340,25 @@ You can find the source code for <a href="https://github.com/mgechev/mk-tfjs">th
     <span class="nx">result</span><span class="p">[</span><span class="nx">i</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">image</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">2</span><span class="p">];</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-<span class="p">};</span></code></pre></div>
-<p><code>readInput</code> first invokes the function <code>readImage</code> and after that delegates its invocation to <code>imageToInput</code>. <code>readImage</code> reads the image from the disk and after that decodes the buffer as a jpg image using the <a href="https://www.npmjs.com/package/jpeg-js"><code>jpeg-js</code></a> package. In <code>imageToInput</code> we transform the image into a three-dimensional tensor.</p>
-
+<span class="p">};</span>
+</code></pre></div><p><code>readInput</code> first invokes the function <code>readImage</code> and after that delegates its invocation to <code>imageToInput</code>. <code>readImage</code> reads the image from the disk and after that decodes the buffer as a jpg image using the <a href="https://www.npmjs.com/package/jpeg-js"><code>jpeg-js</code></a> package. In <code>imageToInput</code> we transform the image into a three-dimensional tensor.</p>
 <p>In the end, for each <code>i</code> from <code>0</code> to <code>TotalImages</code>, we should have <code>ys[i]</code> is <code>1</code> if <code>xs[i]</code> corresponds to an image with a punch, and <code>0</code> otherwise.</p>
-
 <h2 id="training-the-model">Training the Model</h2>
-
 <p>Now we are ready to train the model! For the purpose, invoke the method <code>fit</code> of the model&rsquo;s instance:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">await</span> <span class="nx">model</span><span class="p">.</span><span class="nx">fit</span><span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">ys</span><span class="p">,</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="k">await</span> <span class="nx">model</span><span class="p">.</span><span class="nx">fit</span><span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">ys</span><span class="p">,</span> <span class="p">{</span>
   <span class="nx">epochs</span>: <span class="kt">Epochs</span><span class="p">,</span>
   <span class="nx">batchSize</span>: <span class="kt">parseInt</span><span class="p">(((</span><span class="nx">punches</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="nx">others</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">*</span> <span class="nx">BatchSize</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
   <span class="nx">callbacks</span><span class="o">:</span> <span class="p">{</span>
     <span class="nx">onBatchEnd</span>: <span class="kt">async</span> <span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">logs</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Cost: %s, accuracy: %s&#39;</span><span class="p">,</span> <span class="nx">logs</span><span class="p">.</span><span class="nx">loss</span><span class="p">.</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="nx">logs</span><span class="p">.</span><span class="nx">acc</span><span class="p">.</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-      <span class="nx">await</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">nextFrame</span><span class="p">();</span>
+      <span class="k">await</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">nextFrame</span><span class="p">();</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-<p>The code above invokes <code>fit</code> with three arguments - <code>xs</code>, <code>ys</code>, and a configuration object. In the configuration object, we&rsquo;ve set for how many epochs we want to train the model, we&rsquo;ve provided a batch size, and a callback which TensorFlow.js would invoke after each batch.</p>
-
+<span class="p">});</span>
+</code></pre></div><p>The code above invokes <code>fit</code> with three arguments - <code>xs</code>, <code>ys</code>, and a configuration object. In the configuration object, we&rsquo;ve set for how many epochs we want to train the model, we&rsquo;ve provided a batch size, and a callback which TensorFlow.js would invoke after each batch.</p>
 <p>The batch size determines with how large subsets of <code>xs</code> and <code>ys</code> we&rsquo;ll train our model within one epoch. For each epoch, TensorFlow.js would pick a subset of <code>xs</code> and the corresponding elements from <code>ys</code>, it&rsquo;ll perform forward propagation, get the output from the layer with <code>sigmoid</code> activation and after that, based on the loss, it&rsquo;ll perform optimization using the <code>adam</code> algorithm.</p>
-
 <p>Once you run the training script, you should see output similar to the one below:</p>
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">Cost: 0.84212, accuracy: 1.00000
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">Cost: 0.84212, accuracy: 1.00000
 eta=0.3 &gt;---------- acc=1.00 loss=0.84 Cost: 0.79740, accuracy: 1.00000
 eta=0.2 =&gt;--------- acc=1.00 loss=0.80 Cost: 0.81533, accuracy: 1.00000
 eta=0.2 ==&gt;-------- acc=1.00 loss=0.82 Cost: 0.64303, accuracy: 0.50000
@@ -450,13 +382,10 @@ eta=0.1 ======&gt;---- acc=0.50 loss=0.68 Cost: 0.62621, accuracy: 0.50000
 eta=0.1 =======&gt;--- acc=0.50 loss=0.63 Cost: 0.46077, accuracy: 1.00000
 eta=0.1 ========&gt;-- acc=1.00 loss=0.46 Cost: 0.62076, accuracy: 1.00000
 eta=0.0 ==========&gt;
-304ms 15221us/step - acc=0.85 loss=0.63</code></pre></div>
-<p>Notice how over time the accuracy increases and the loss decreases.</p>
-
+304ms 15221us/step - acc=0.85 loss=0.63
+</code></pre></div><p>Notice how over time the accuracy increases and the loss decreases.</p>
 <p>With my dataset, after the model&rsquo;s training completed I reached 92% accuracy. Below, you can find a widget where you can play with the pre-trained model. You can select an image from your computer, or take one with your camera and classify it as a punch or not.</p>
-
 <p>Keep in mind that the accuracy might not be very high because of the small training set that I had available.</p>
-
 <div class="image-widget" id="binary-class">
   <div class="prediction">
   </div>
@@ -480,13 +409,11 @@ eta=0.0 ==========&gt;
     </div>
   </div>
 </div>
-
 <h2 id="running-the-model-in-the-browser">Running the Model in the Browser</h2>
-
 <p>In the last section, we trained a model for a binary classification. Now let us run it in the browser and wire it up together with <a href="https://github.com/mgechev/mk.js">MK.js</a>!</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">video</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;cam&#39;</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">video</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;cam&#39;</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">Layer</span> <span class="o">=</span> <span class="s1">&#39;global_average_pooling2d_1&#39;</span><span class="p">;</span>
-<span class="kr">const</span> <span class="nx">mobilenetInfer</span> <span class="o">=</span> <span class="nx">m</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="o">:</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor</span><span class="o">&lt;</span><span class="nx">tf</span><span class="p">.</span><span class="nx">Rank</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">infer</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">Layer</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">mobilenetInfer</span> <span class="o">=</span> <span class="nx">m</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="o">:</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor</span><span class="p">&lt;</span><span class="nt">tf.Rank</span><span class="p">&gt;</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="k">infer</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">Layer</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;canvas&#39;</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">scale</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;crop&#39;</span><span class="p">);</span>
 
@@ -502,9 +429,8 @@ eta=0.0 ==========&gt;
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">stream</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">video</span><span class="p">.</span><span class="nx">srcObject</span> <span class="o">=</span> <span class="nx">stream</span><span class="p">;</span>
-  <span class="p">});</span></code></pre></div>
-<p>In the snippet above, we have few declarations:</p>
-
+  <span class="p">});</span>
+</code></pre></div><p>In the snippet above, we have few declarations:</p>
 <ul>
 <li><code>video</code> - contains a reference to the HTML5 video element on the page</li>
 <li><code>Layer</code> - contains the name of the layer from MobileNet that we want to get the output from and pass it as an input to our model</li>
@@ -512,31 +438,29 @@ eta=0.0 ==========&gt;
 <li><code>canvas</code> - points to an HTML5 canvas element that we&rsquo;ll use to extract frames from the video</li>
 <li><code>scale</code> - is another canvas that we&rsquo;ll use to scale the individual frames</li>
 </ul>
-
 <p>After that, we get a video stream from the user&rsquo;s camera and set it as a source of the video element.</p>
-
 <p>As next step, we&rsquo;ll implement a grayscale filter which accepts a canvas and transforms its content:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">grayscale</span> <span class="o">=</span> <span class="p">(</span><span class="nx">canvas</span>: <span class="kt">HTMLCanvasElement</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">grayscale</span> <span class="o">=</span> <span class="p">(</span><span class="nx">canvas</span>: <span class="kt">HTMLCanvasElement</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="nx">imageData</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">).</span><span class="nx">getImageData</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
   <span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">imageData</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
   <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">const</span> <span class="nx">avg</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span> <span class="err">/ 3;</span>
+    <span class="kr">const</span> <span class="nx">avg</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mi">3</span><span class="p">;</span>
     <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">avg</span><span class="p">;</span>
     <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">avg</span><span class="p">;</span>
     <span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">avg</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">).</span><span class="nx">putImageData</span><span class="p">(</span><span class="nx">imageData</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
-<p>As a next step, let us wire the model together with MK.js:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">mobilenet</span><span class="o">:</span> <span class="p">(</span><span class="nx">p</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor</span><span class="o">&lt;</span><span class="nx">tf</span><span class="p">.</span><span class="nx">Rank</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div><p>As a next step, let us wire the model together with MK.js:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">mobilenet</span><span class="o">:</span> <span class="p">(</span><span class="nx">p</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor</span><span class="p">&lt;</span><span class="nt">tf.Rank</span><span class="p">&gt;;</span>
 <span class="nx">tf</span><span class="p">.</span><span class="nx">loadModel</span><span class="p">(</span><span class="s1">&#39;http://localhost:5000/model.json&#39;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">model</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">mobileNet</span>
     <span class="p">.</span><span class="nx">load</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">mn</span>: <span class="kt">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobilenet</span> <span class="o">=</span> <span class="nx">mobilenetInfer</span><span class="p">(</span><span class="nx">mn</span><span class="p">))</span>
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">startInterval</span><span class="p">(</span><span class="nx">mobilenet</span><span class="p">,</span> <span class="nx">model</span><span class="p">));</span>
-<span class="p">});</span></code></pre></div>
-<p>In the code above, first, we load the model that we trained above and after that load MobileNet. We pass MobileNet to the <code>mobilenetInfer</code> method so that we can get a shortcut for calculating the output from the hidden layer of the network. After that, we invoke the <code>startInterval</code> method with the two networks as arguments.</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">startInterval</span> <span class="o">=</span> <span class="p">(</span><span class="nx">mobilenet</span><span class="p">,</span> <span class="nx">model</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="p">});</span>
+</code></pre></div><p>In the code above, first, we load the model that we trained above and after that load MobileNet. We pass MobileNet to the <code>mobilenetInfer</code> method so that we can get a shortcut for calculating the output from the hidden layer of the network. After that, we invoke the <code>startInterval</code> method with the two networks as arguments.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">startInterval</span> <span class="o">=</span> <span class="p">(</span><span class="nx">mobilenet</span><span class="p">,</span> <span class="nx">model</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">).</span><span class="nx">drawImage</span><span class="p">(</span><span class="nx">video</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 
@@ -544,43 +468,37 @@ eta=0.0 ==========&gt;
       <span class="p">.</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">drawImage</span><span class="p">(</span>
         <span class="nx">canvas</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span>
-        <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="sr">/ (ImageSize.Width /</span> <span class="nx">ImageSize</span><span class="p">.</span><span class="nx">Height</span><span class="p">),</span>
+        <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span> <span class="o">/</span> <span class="p">(</span><span class="nx">ImageSize</span><span class="p">.</span><span class="nx">Width</span> <span class="o">/</span> <span class="nx">ImageSize</span><span class="p">.</span><span class="nx">Height</span><span class="p">),</span>
         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">ImageSize</span><span class="p">.</span><span class="nx">Width</span><span class="p">,</span> <span class="nx">ImageSize</span><span class="p">.</span><span class="nx">Height</span>
       <span class="p">));</span>
 
-    <span class="kr">const</span> <span class="p">[</span><span class="nx">punching</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">from</span><span class="p">((</span>
+    <span class="kr">const</span> <span class="p">[</span><span class="nx">punching</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="kr">from</span><span class="p">((</span>
       <span class="nx">model</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span><span class="nx">mobilenet</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">fromPixels</span><span class="p">(</span><span class="nx">scale</span><span class="p">)))</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor1D</span><span class="p">)</span>
     <span class="p">.</span><span class="nx">dataSync</span><span class="p">()</span> <span class="kr">as</span> <span class="nx">Float32Array</span><span class="p">);</span>
 
-    <span class="kr">const</span> <span class="nx">detect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">window</span> <span class="kr">as</span> <span class="nx">any</span><span class="p">).</span><span class="nx">Detect</span><span class="p">;</span>
+    <span class="kr">const</span> <span class="nx">detect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">window</span> <span class="kr">as</span> <span class="kt">any</span><span class="p">).</span><span class="nx">Detect</span><span class="p">;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">punching</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">)</span> <span class="nx">detect</span> <span class="o">&amp;&amp;</span> <span class="nx">detect</span><span class="p">.</span><span class="nx">onPunch</span><span class="p">();</span>
 
   <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
-<p><code>startInterval</code> is where the fun happens! First, we start an interval, where every <code>100ms</code> we invoke an anonymous function. In this function, we first render the video on top of the canvas which contains our current frame. After that, we scale down the frame to <code>100x56</code> and apply a grayscale filter to it.</p>
-
+<span class="p">};</span>
+</code></pre></div><p><code>startInterval</code> is where the fun happens! First, we start an interval, where every <code>100ms</code> we invoke an anonymous function. In this function, we first render the video on top of the canvas which contains our current frame. After that, we scale down the frame to <code>100x56</code> and apply a grayscale filter to it.</p>
 <p>As a next step, we pass the scaled frame to MobileNet, we get the output from the desired hidden layer and pass it as an input to the <code>predict</code> method of our model. The <code>predict</code> method of our model returns a tensor with a single element. By using <code>dataSync</code> we get the value from the tensor and set assign it to the constant <code>punching</code>.</p>
-
 <p>Finally, we check if the probability for the user to be punching on this frame is over <code>0.4</code> and depending on this, we invoke the <code>onPunch</code> method of the global object <code>Detect</code>. MK.js exposes a global object with three methods: <code>onKick</code>, <code>onPunch</code>, and <code>onStand</code>, which we can use to control one of the characters.</p>
-
 <p>That&rsquo;s it! 🎉 Here&rsquo;s the result!</p>
-
-<p><img src="/images/tfjs-cnn/punching.gif" alt="MK.js with TensorFlow.js" style="display: block;"></p>
-
+<img src="/images/tfjs-cnn/punching.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 <h2 id="recognizing-kicks-and-punches-with-n-ary-classification">Recognizing Kicks and Punches with N-ary Classification</h2>
-
 <p>In the next section of this blog post, we&rsquo;ll make a smarter model - we&rsquo;ll develop a neural network which recognizes punches, kicks, and other images. Let us this time start with the process of preparing the training set:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">punches</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">punches</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">Punches</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">))</span>
   <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="sb">`</span><span class="si">${</span><span class="nx">Punches</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">f</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 
-<span class="kr">const</span> <span class="nx">kicks</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">kicks</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">Kicks</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">))</span>
   <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="sb">`</span><span class="si">${</span><span class="nx">Kicks</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">f</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
 
-<span class="kr">const</span> <span class="nx">others</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">others</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">Others</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">))</span>
   <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="sb">`</span><span class="si">${</span><span class="nx">Others</span><span class="si">}</span><span class="sb">/</span><span class="si">${</span><span class="nx">f</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
@@ -598,65 +516,51 @@ eta=0.0 ==========&gt;
     <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobileNet</span><span class="p">(</span><span class="nx">readInput</span><span class="p">(</span><span class="nx">path</span><span class="p">)))</span>
     <span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">kicks</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobileNet</span><span class="p">(</span><span class="nx">readInput</span><span class="p">(</span><span class="nx">path</span><span class="p">))))</span>
     <span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">others</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">path</span>: <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">mobileNet</span><span class="p">(</span><span class="nx">readInput</span><span class="p">(</span><span class="nx">path</span><span class="p">))))</span>
-<span class="p">)</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor2D</span><span class="p">;</span></code></pre></div>
-<p>Just like before, first we read the directories containing punches, kicks, and other images. After that, compared to the previous section, we form the expected output as a two-dimensional tensor, instead of one-dimensional. If we have <em><code>n</code></em> images of punches, <em><code>m</code></em> images of kicks, and <em><code>k</code></em> other images, the <code>ys</code> tensor would have <em><code>n</code></em> elements with value <code>[1, 0, 0]</code>, <em><code>m</code></em> elements with value <code>[0, 1, 0]</code>, and <em><code>k</code></em> elements with value <code>[0, 0, 1]</code>. With the images corresponding to a punch we associate the vector <code>[1, 0, 0]</code>, with the images corresponding to a kick we associate the vector <code>[0, 1, 0]</code>, and finally, with the other images we associate the vector <code>[0, 0, 1]</code>.</p>
-
+<span class="p">)</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor2D</span><span class="p">;</span>
+</code></pre></div><p>Just like before, first we read the directories containing punches, kicks, and other images. After that, compared to the previous section, we form the expected output as a two-dimensional tensor, instead of one-dimensional. If we have <em><code>n</code></em> images of punches, <em><code>m</code></em> images of kicks, and <em><code>k</code></em> other images, the <code>ys</code> tensor would have <em><code>n</code></em> elements with value <code>[1, 0, 0]</code>, <em><code>m</code></em> elements with value <code>[0, 1, 0]</code>, and <em><code>k</code></em> elements with value <code>[0, 0, 1]</code>. With the images corresponding to a punch we associate the vector <code>[1, 0, 0]</code>, with the images corresponding to a kick we associate the vector <code>[0, 1, 0]</code>, and finally, with the other images we associate the vector <code>[0, 0, 1]</code>.</p>
 <p>A vector with <code>n</code> elements, which has <code>n - 1</code> elements with value <code>0</code> and <code>1</code> element with value <code>1</code>, we call a one-hot vector.</p>
-
 <p>After that, we form the input tensor <code>xs</code> by stacking the outputs for each image from MobileNet.</p>
-
 <p>For the purpose, we&rsquo;ll have to update the model definition:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">model</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">sequential</span><span class="p">();</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">model</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">sequential</span><span class="p">();</span>
 <span class="nx">model</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">inputLayer</span><span class="p">({</span> <span class="nx">inputShape</span><span class="o">:</span> <span class="p">[</span><span class="mi">1024</span><span class="p">]</span> <span class="p">}));</span>
 <span class="nx">model</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">dense</span><span class="p">({</span> <span class="nx">units</span>: <span class="kt">1024</span><span class="p">,</span> <span class="nx">activation</span><span class="o">:</span> <span class="s1">&#39;relu&#39;</span> <span class="p">}));</span>
 <span class="nx">model</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">layers</span><span class="p">.</span><span class="nx">dense</span><span class="p">({</span> <span class="nx">units</span>: <span class="kt">3</span><span class="p">,</span> <span class="nx">activation</span><span class="o">:</span> <span class="s1">&#39;softmax&#39;</span> <span class="p">}));</span>
-<span class="nx">await</span> <span class="nx">model</span><span class="p">.</span><span class="nx">compile</span><span class="p">({</span>
+<span class="k">await</span> <span class="nx">model</span><span class="p">.</span><span class="nx">compile</span><span class="p">({</span>
   <span class="nx">optimizer</span>: <span class="kt">tf.train.adam</span><span class="p">(</span><span class="mi">1</span><span class="nx">e</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span>
   <span class="nx">loss</span>: <span class="kt">tf.losses.sigmoidCrossEntropy</span><span class="p">,</span>
   <span class="nx">metrics</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
-<span class="p">});</span></code></pre></div>
-<p>The only two differences from the previous model are:</p>
-
+<span class="p">});</span>
+</code></pre></div><p>The only two differences from the previous model are:</p>
 <ul>
 <li>Number of units in the output layer</li>
 <li>Activation in the output layer</li>
 </ul>
-
 <p>The reason why we have <code>3</code> units in the output layer is that we have three different categories of images:</p>
-
 <ul>
 <li>Punching</li>
 <li>Kicking</li>
 <li>Others</li>
 </ul>
-
 <p>The softmax activation invoked on top of these <code>3</code> units transforms their parameters to a tensor with <code>3</code> values. Why do we have <code>3</code> units in the output layer? We know that we can represent <code>3</code> values (one for each of our <code>3</code> classes) with 2 bits - <code>00</code>, <code>01</code>, <code>10</code>. The sum of the values of the tensor produced by <code>softmax</code> equals <code>1</code>, which means that we&rsquo;ll never get <code>00</code>, so we&rsquo;ll never be able to classify images from one of the classes.</p>
-
 <p>After I trained the model for <code>500</code> epochs, I achieved about <code>92%</code> accuracy! That&rsquo;s not bad, but don&rsquo;t forget that the training was on top of a small dataset.</p>
-
 <p>The next step is to run the model in the browser! Since the logic for this is quite similar to running the model for binary classification, let us take a look at the last step, where we pick an action based on the model&rsquo;s output:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="p">[</span><span class="nx">punch</span><span class="p">,</span> <span class="nx">kick</span><span class="p">,</span> <span class="nx">nothing</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">from</span><span class="p">((</span><span class="nx">model</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="p">[</span><span class="nx">punch</span><span class="p">,</span> <span class="nx">kick</span><span class="p">,</span> <span class="nx">nothing</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="kr">from</span><span class="p">((</span><span class="nx">model</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span>
   <span class="nx">mobilenet</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">fromPixels</span><span class="p">(</span><span class="nx">scaled</span><span class="p">))</span>
 <span class="p">)</span> <span class="kr">as</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">Tensor1D</span><span class="p">).</span><span class="nx">dataSync</span><span class="p">()</span> <span class="kr">as</span> <span class="nx">Float32Array</span><span class="p">);</span>
 
-<span class="kr">const</span> <span class="nx">detect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">window</span> <span class="kr">as</span> <span class="nx">any</span><span class="p">).</span><span class="nx">Detect</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">detect</span> <span class="o">=</span> <span class="p">(</span><span class="nb">window</span> <span class="kr">as</span> <span class="kt">any</span><span class="p">).</span><span class="nx">Detect</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span><span class="nx">nothing</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="nx">kick</span> <span class="o">&gt;</span> <span class="nx">punch</span> <span class="o">&amp;&amp;</span> <span class="nx">kick</span> <span class="o">&gt;=</span> <span class="mf">0.35</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">detect</span><span class="p">.</span><span class="nx">onKick</span><span class="p">();</span>
   <span class="k">return</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">punch</span> <span class="o">&gt;</span> <span class="nx">kick</span> <span class="o">&amp;&amp;</span> <span class="nx">punch</span> <span class="o">&gt;=</span> <span class="mf">0.35</span><span class="p">)</span> <span class="nx">detect</span><span class="p">.</span><span class="nx">onPunch</span><span class="p">();</span></code></pre></div>
-<p>Initially, we invoke MobileNet with the scaled, grayscaled canvas, after that we pass the output to our trained model. The model returns a one-dimensional tensor that we convert to <code>Float32Array</code> with <code>dataSync</code>. As a next step, by using <code>Array.from</code> we cast the typed array to a JavaScript array, and we extract the probabilities the pose on the frame to be a punch, kick, or none the last two.</p>
-
+<span class="k">if</span> <span class="p">(</span><span class="nx">punch</span> <span class="o">&gt;</span> <span class="nx">kick</span> <span class="o">&amp;&amp;</span> <span class="nx">punch</span> <span class="o">&gt;=</span> <span class="mf">0.35</span><span class="p">)</span> <span class="nx">detect</span><span class="p">.</span><span class="nx">onPunch</span><span class="p">();</span>
+</code></pre></div><p>Initially, we invoke MobileNet with the scaled, grayscaled canvas, after that we pass the output to our trained model. The model returns a one-dimensional tensor that we convert to <code>Float32Array</code> with <code>dataSync</code>. As a next step, by using <code>Array.from</code> we cast the typed array to a JavaScript array, and we extract the probabilities the pose on the frame to be a punch, kick, or none the last two.</p>
 <p>If the probability the pose of being neither a kick nor a punch is higher than <code>0.4</code> we return. Otherwise, if we have a higher probability for the frame to show a kick, and this probability is higher than <code>0.32</code> we emit a kick command to MK.js. If the probability of a punch is over <code>0.32</code> and is higher than the probability for a kick, then we emit a punch action.</p>
-
 <p>That&rsquo;s pretty much all of it! You can now see the result below:</p>
-
-<p><img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;"></p>
-
+<img src="/images/tfjs-cnn/demo.gif" alt="MK.js with TensorFlow.js" style="display: block;">
 <p>Now you can play with the subsequent widget which uses the trained model over input from a file you selected, or a snapshot from your camera. Try it out with an image of you punching or kicking!</p>
-
 <div class="image-widget" id="n-ary-class">
   <div class="prediction">
   </div>
@@ -680,54 +584,33 @@ eta=0.0 ==========&gt;
     </div>
   </div>
 </div>
-
 <h2 id="action-recognition">Action Recognition</h2>
-
 <p>If we collect a large and diverse dataset of people punching and kicking, we&rsquo;ll be able to build a model which performs excellently on individual frames. However, is this enough? What if we want to go one step further and distinguish two different types of kicks - roundhouse kick from a back kick.</p>
-
 <p>As we can see from the snapshots below, both kicks would look similar at given point in time, from a certain angle:</p>
-
 <div class="image-wrapper">
 <img src="/images/tfjs-cnn/roundhouse.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
 <img src="/images/tfjs-cnn/back.png" alt="Roundhouse kick" style="width: 48%; display: inline-block;">
 </div>
-
 <p>But if we look at the execution, the movements are quite different:</p>
-
-<p><img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block;"></p>
-
+<img src="/images/tfjs-cnn/back-kick.gif" alt="Back kick vs Side kick" style="display: block;">
 <p>So, how do we teach our neural network to look into a sequence of frames, instead of a single one?</p>
-
 <p>For the purpose, we can explore a different class of neural networks called Recurrent Neural Networks (RNNs). RNNs are excellent for dealing with time series, for example:</p>
-
 <ul>
 <li>Natural language processing (NLP) where one word depends on the ones before and after</li>
 <li>Predicting which page the user would visit next based on their navigation history</li>
 <li>Recognizing an action from a sequence of frames</li>
 </ul>
-
 <p>Implementing such a model is out of the scope of this article but let us take a look at a sample architecture so we can get an intuition for how everything would work together!</p>
-
 <h3 id="the-power-of-rnns">The Power of RNNs</h3>
-
 <p>On the image below, you can find a diagram which shows a model for action recognition:</p>
-
 <p><a href="/images/tfjs-cnn/cnn-rnn.svg"><img src="/images/tfjs-cnn/cnn-rnn.svg" alt="RNN & CNN" style="display: block"></a></p>
-
 <p>We take the last <em><code>n</code></em> frames from a video and pass them to a CNN. The output of the CNN for each frame, we pass as input to the RNN. The recurrent neural network would figure out the dependencies between the individual frames and recognize what action they encode.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>In this article, we developed a model for image classification. For the purpose, we collected a dataset by extracting video frames and by hand, dividing them among three separate categories. As a next step, we generated additional data using image augmentation with <a href="https://github.com/aleju/imgaug">imgaug</a>.</p>
-
 <p>After that, we explained what&rsquo;s transfer learning and how we can take advantage of it by reusing the trained model MobileNet from the package <a href="https://www.npmjs.com/package/@tensorflow-models/mobilenet"><code>@tensorflow-models/mobilenet</code></a>. We loaded MobileNet from a file in a Node.js process and trained an additional dense layer which we fed with the output from a hidden layer of MobileNet. After going through the training process, we achieved over 90% accuracy!</p>
-
 <p>To use the model we developed in the browser, we loaded it together with MobileNet and started categorizing frames from the user&rsquo;s camera every <code>100ms</code>. We connected the model with the game <a href="https://github.com/mgechev/mk.js">MK.js</a> and used the output of the model to control one of the characters.</p>
-
 <p>Finally, we looked at how we can improve our model even further by combining it with a recurrent neural network for action recognition.</p>
-
 <p>I hope you enjoyed this tiny project as much as I did! 🙇🏼‍</p>
-
 <script src="/assets/js/tfjs/ui.js" async></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.11.7"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@0.1.1" async></script>
@@ -782,7 +665,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

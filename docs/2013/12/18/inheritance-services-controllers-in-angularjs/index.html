@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>AngularJS Inheritance Patterns &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -85,15 +85,10 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>Since AngularJS does not provide any built-in features for using inheritance, in this blog post I’ll describe how the general JavaScript inheritance patterns can be applied to AngularJS components.</p>
-
+                    <p>Since AngularJS does not provide any built-in features for using inheritance, in this blog post I’ll describe how the general JavaScript inheritance patterns can be applied to AngularJS components.</p>
 <h2 id="controllers-inheritance">Controllers inheritance</h2>
-
 <p>First, lets talk about controllers. Actually it is very unlikely to inherit from parent controller (except when you&rsquo;re using the controller as syntax, see below). This is the case because by implementation the scope in the child controller will inherit prototypically from its parent scope. So when you need to reuse functionality from the parent controller, all you need to do is add the required methods to the parent scope. By doing this the child controller will have access to all these methods through the prototype of its scope i.e.:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ParentCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ParentCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">parentMethod</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="c1">//body...
 </span><span class="c1"></span>  <span class="p">};</span>
@@ -101,12 +96,9 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
 
 <span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">parentMethod</span><span class="p">();</span> <span class="c1">//it&#39;ll work
-</span><span class="c1"></span><span class="p">});</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">});</span></code></pre></div>
 <p>Of course, the inheritance creates very strong coupling but only in a single direction (i.e. the child is strongly coupled to its parent), so you can’t directly call children methods from your parent controller. For doing this you need to use event dispatching:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ParentCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ParentCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">$broadcast</span><span class="p">(</span><span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&#39;event-response&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
   <span class="p">});</span>
@@ -118,14 +110,10 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
     <span class="c1">//body...
 </span><span class="c1"></span>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&#39;event-response&#39;</span><span class="p">,</span> <span class="nx">result</span><span class="p">);</span>
   <span class="p">});</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>I’m providing this snippet with only informative purpose, if you need to call children methods from your parent controller, you might be doing something wrong.</p>
-
 <p>OK, but now let’s imagine you have two pages with almost the same functionality, lets say the intersection between the functionality of the pages is more than 50%. They might have totally different views but the logic behind these views could be quite similar. In such case you can create a base controller which encapsulates the common logic, and two children controllers which inherit from it. The base controller is not necessary to be implemented as AngularJS controller component you can use simple constructor function:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">BaseCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">BaseCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">commonScopeMethod</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="c1">//body
 </span><span class="c1"></span>  <span class="p">};</span>
@@ -136,12 +124,9 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
 </span><span class="c1"></span><span class="p">};</span>
 <span class="nx">BaseCtrl</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">commonMethod2</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="c1">//body
-</span><span class="c1"></span><span class="p">};</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">};</span></code></pre></div>
 <p>Now the children controllers can easily inherit from the base controller by:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">ChildCtrl1</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">ChildCtrl1</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
   <span class="nx">BaseCtrl</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="p">...);</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">childScopeMethod</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">commonMethod2</span><span class="p">();</span>
@@ -155,33 +140,23 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
 <span class="p">};</span>
 
 <span class="c1">//Register ChildCtrl1 as AngularJS controller
-</span><span class="c1"></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl1&#39;</span><span class="p">,</span> <span class="nx">ChildCtrl1</span><span class="p">);</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl1&#39;</span><span class="p">,</span> <span class="nx">ChildCtrl1</span><span class="p">);</span></code></pre></div>
 <p>As you can see we directly apply the “Klassical” inheritance pattern. We can do the same for the second child controller. You can check example <a href="http://jsbin.com/oLawajuL/2/edit">right here</a>.</p>
-
 <h3 id="controller-as-syntax">Controller as syntax</h3>
-
 <p>AngularJS 1.2 added the controller as syntax. Basically it allows us to create aliases for our controllers, for example using the <code>ng-controller</code> directive we can:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;MainCtrl as main&#34;</span><span class="p">&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;MainCtrl as main&#34;</span><span class="p">&gt;</span>
   {{ main.name }}
   <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&#34;main.clicked()&#34;</span><span class="p">&gt;</span>Click<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
-
 <p>with the following controller:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foobar&#39;</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="nx">MainCtrl</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">clicked</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;You clicked me!&#39;</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>There are <a href="https://github.com/mgechev/angularjs-style-guide#controllers">number of benefits, which come along with this syntax</a> one of them is the way we can take advantage of the &ldquo;klassical&rdquo; JavaScript inheritance:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">BaseCtrl</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">BaseCtrl</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;foobar&#39;</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="nx">BaseCtrl</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">parentMethod</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -199,38 +174,26 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
 </span><span class="c1"></span><span class="p">};</span>
 
 <span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;BaseCtrl&#39;</span><span class="p">,</span> <span class="nx">BaseCtrl</span><span class="p">);</span>
-<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl&#39;</span><span class="p">,</span> <span class="nx">ChildCtrl</span><span class="p">);</span>
-</code></pre></div>
-
+<span class="nx">app</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChildCtrl&#39;</span><span class="p">,</span> <span class="nx">ChildCtrl</span><span class="p">);</span></code></pre></div>
 <p>which can be used with the following markup:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;BaseCtrl as base&#34;</span><span class="p">&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;BaseCtrl as base&#34;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&#34;base.method()&#34;</span><span class="p">&gt;</span>Invoke parent<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&#34;ChildCtrl as child&#34;</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&#34;child.childMethod()&#34;</span><span class="p">&gt;</span>Invoke child<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
-
 <p>When the user press the button with label &ldquo;Invoke parent&rdquo; the <code>parentMethod</code> defined in <code>BaseCtrl</code> will be invoked. If the user press &ldquo;Invoke child&rdquo; the <code>childMethod</code> will be invoked. Notice that in its body it invokes <code>parentMethod</code> as well.</p>
-
 <h2 id="services-inheritance">Services inheritance</h2>
-
 <p>As you know there are two ways to create injectable (through DI) AngularJS services:</p>
-
 <ul>
 <li>module.factory(name, factoryFn)</li>
 <li>module.service(name, factoryFn)</li>
 </ul>
-
-<h3 id="module-factory">module.factory</h3>
-
+<h3 id="modulefactory">module.factory</h3>
 <p>In <code>module.factory</code> the <code>factoryFn</code> returns object literal which is the actual service. Behind the scene AngularJS calls the <code>factory</code> function inside the <a href="https://github.com/angular/angular.js/blob/v1.4.0-rc.0/src/auto/injector.js#L686-L690">injector definition</a></p>
-
 <p>If you need inheritance in services which are instantiated through <code>module.factory</code> the prototype inheritance pattern through <code>Object.create</code> fits just great!</p>
-
 <p>Lets create the base service:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">BaseService</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">BaseService</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">privateVar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">someAwesomeStuff</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -240,35 +203,24 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
       <span class="nx">privateVar</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">};</span>
   <span class="p">};</span>
-<span class="p">}());</span>
-</code></pre></div>
-
+<span class="p">}());</span></code></pre></div>
 <p>and here is the child service:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ChildService</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">BaseService</span><span class="p">);</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ChildService</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">BaseService</span><span class="p">);</span>
 <span class="nx">ChildService</span><span class="p">.</span><span class="nx">someMoreAwesomeStuff</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="c1">//body...
 </span><span class="c1"></span><span class="p">};</span>
 
 <span class="nx">module</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;ChildService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">ChildService</span><span class="p">;</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>Now you can inject <code>ChildService</code> in different component and reuse the inherited from <code>BaseService</code> functionality.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MyCtrl</span><span class="p">(</span><span class="nx">ChildService</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MyCtrl</span><span class="p">(</span><span class="nx">ChildService</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">ChildService</span><span class="p">.</span><span class="nx">someAwesomeStuff</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>You can find an example <a href="http://jsbin.com/idIVAWO/2/edit">right here</a>.</p>
-
 <h4 id="inject-the-parent">Inject the parent</h4>
-
 <p>One more pattern for inheritance with services is injecting the parent through dependency injection and creating new object, which inherits from the parent prototypically:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;ParentService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;ParentService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="c1">//public API
 </span><span class="c1"></span>  <span class="p">};</span>
@@ -280,20 +232,13 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
     <span class="c1">//extending the parent
 </span><span class="c1"></span>  <span class="p">};</span>
   <span class="k">return</span> <span class="nx">child</span><span class="p">;</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>This pattern is definitely much more useful when you need to inject some dependencies to the parent service before inheriting it.</p>
-
-<h3 id="module-service">module.service</h3>
-
+<h3 id="moduleservice">module.service</h3>
 <p>Usually I call the variables attached to my scope View Models and the special services, which encapsulate the business logic – Models. I implement these services with something close to the <a href="http://www.martinfowler.com/eaaCatalog/activeRecord.html">Active Record Pattern</a>. My models are usually responsible for talking to the server, sometimes directly but usually through a <a href="http://www.martinfowler.com/eaaCatalog/gateway.html">Gateway</a>. For the creation of these models I prefer to use <code>module.service</code> method. Internally these services are created through the <code>instantiate</code> <a href="https://github.com/angular/angular.js/blob/master/src/auto/injector.js#L777">method</a>.</p>
-
 <p>Why I prefer using service instead of factory? Well, may be I’m a confused developer who doesn’t understand the true power of the prototypal inheritance used with object literals, however I prefer to use the classical one for my models. By using it I can create a set of constructor functions which model my domain pretty well. One day I may decide to use MDD and generate all my models from some fancy UML diagrams&hellip;</p>
-
 <p>Here is an example of how you can take advantage of the Klassical inheritance pattern for AngularJS services created with <code>module.service</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Human</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Human</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="nx">Human</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">talk</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -314,11 +259,8 @@ Controllers inheritance First, lets talk about controllers. Actually it is very 
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;demo&#39;</span><span class="p">).</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;Human&#39;</span><span class="p">,</span> <span class="nx">Human</span><span class="p">);</span>
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;demo&#39;</span><span class="p">).</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;Superhero&#39;</span><span class="p">,</span> <span class="nx">Superhero</span><span class="p">);</span>
 <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;demo&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Super Dev&#39;</span><span class="p">);</span>
-<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;demo&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">(</span><span class="s1">&#39;AbilitiesCollection&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;C++&#39;</span><span class="p">,</span> <span class="s1">&#39;JavaScript&#39;</span><span class="p">]);</span>
-</code></pre></div>
-
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;demo&#39;</span><span class="p">).</span><span class="nx">value</span><span class="p">(</span><span class="s1">&#39;AbilitiesCollection&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;C++&#39;</span><span class="p">,</span> <span class="s1">&#39;JavaScript&#39;</span><span class="p">]);</span></code></pre></div>
 <p>Here is a talk on this topic I gave on Angular Berlin:</p>
-
 <script async class="speakerdeck-embed" data-id="bb495a56254b4881a2b423c460398b5e" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
                 </section>
@@ -371,7 +313,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.55.5">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -47,16 +47,16 @@
       "@type": "WebPage",
       "@id":"https:\/\/blog.mgechev.com\/"
     },
-    "headline": "Build Your own Simplified AngularJS in 200 Lines of JavaScript - Minko Gechev\x27s blog",
+    "headline": "Build Your own Simplified AngularJS in 200 Lines of JavaScript - Minko Gechev\u0027s blog",
     "datePublished": "2015-03-09T00:00:00JST",
     "dateModified": "2015-03-09T00:00:00JST",
     "author": {
       "@type": "Person",
-      "name": "Minko Gechev\x27s blog"
+      "name": "Minko Gechev\u0027s blog"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Minko Gechev\x27s blog",
+      "name": "Minko Gechev\u0027s blog",
       "logo": {
         "@type": "ImageObject",
         "url": "https:\/\/blog.mgechev.com\/images/logo.png",
@@ -130,126 +130,83 @@
 </aside>
 
 
-  <div class="article-body">
-
-<p>My practice proved that there are two good/easy ways to learn a new technology:</p>
-
+  <div class="article-body"><p>My practice proved that there are two good/easy ways to learn a new technology:</p>
 <ul>
 <li>Re-implement it by your own</li>
 <li>See how the concepts you already know fit in it</li>
 </ul>
-
 <p>In some cases the first approach is too big overhead. For instance, if you want to understand how the <a href="https://github.com/torvalds/linux">kernel</a> works it is far too complex and slow to re-implement it. It might work to implement a light version of it (a model), which abstracts components that are not interesting for your learning purposes.</p>
-
 <p>The second approach works pretty good, especially if you have previous experience with similar technologies. A proof for this is the paper I wrote - <a href="https://github.com/mgechev/angularjs-in-patterns">&#x201C;AngularJS in Patterns&#x201D;</a>. It seems that it is a great introduction to the framework for experienced developers.</p>
-
 <p>However, building something from scratch and understanding the core underlying principles is always better. The whole AngularJS framework is above 20k lines of code and parts of it are quite tricky. Very smart developers have worked with months over it and building everything from an empty file is very ambitious task. However, in order to understand the core of the framework and the main design principles we can simplify the things a little bit - we can build a &#x201C;model&#x201D;.</p>
-
 <blockquote>
 <p>Scientific modelling is a scientific activity, the aim of which is to make a particular part or feature of the world easier to understand, define, quantify, visualize, or simulate by referencing it to existing and usually commonly accepted knowledge. It requires selecting and identifying relevant aspects&#x2026;</p>
 </blockquote>
-
 <p>We can achieve this simplification by:</p>
-
 <ul>
 <li>Simplifying the API</li>
 <li>Removing components, which are not essential for our understanding of the core concepts</li>
 </ul>
-
 <p>This is what I did in my &#x201C;Lightweight AngularJS&#x201D; implementation, which is <a href="https://github.com/mgechev/light-angularjs">hosted on GitHub</a>. The code is <strong>only with educational purpose and should not be used in production</strong> otherwise a kitty somewhere will suffer. I used this method of explaining AngularJS in classes I taught at <a href="http://hackbulgaria.com">HackBulgaria</a> and <a href="http://fmi.uni-sofia.bg/en">Sofia University</a>. You can also find slides from my talk &#x201C;Lightweight AngularJS&#x201D; in the bottom of the blog post.</p>
-
 <p>Before reading the rest of the article I strongly recommend you first to get familiar with the basics of AngularJS. A good start could be this <a href="https://blog.mgechev.com/2014/05/08/angularjs-in-patterns-part-1-overview-of-angularjs/">short overview of AngularJS</a>.</p>
-
 <p>Here are some links with code snippets/demos for the following article:</p>
-
 <ul>
 <li><a href="https://github.com/mgechev/light-angularjs">Lightweight AngularJS source code</a></li>
 <li><a href="https://mgechev.github.io/light-angularjs/">Very simple todo application built with Lightweight AngularJS</a></li>
 </ul>
-
 <p>So lets begin with our implementation!</p>
-
 <h2 id="main-components">Main Components</h2>
-
 <p>Since we are not following the AngularJS implementation completely we will define a set of components and make references to their sources from the original implementation. Although we will not have 100% compatible implementation we will implement most of our framework in the same fashion as it is implemented in AngularJS but with simplified interface and a few missing features.</p>
-
 <p>The AngularJS components we are going to be able to use are:</p>
-
 <ul>
 <li>Controllers</li>
 <li>Directives</li>
 <li>Services</li>
 </ul>
-
 <p>In order to achieve this functionality we will need to implement the <code>$compile</code> service, which we will call <code>DOMCompiler</code>, the <code>$provider</code> and the <code>$injector</code>, grouped into our component called <code>Provider</code>. In order to have two-way data-binding we will implement the scope hierarchy.</p>
-
 <p>This is how the relation between <code>Provider</code>, <code>Scope</code> and <code>DOMCompiler</code> will look like:</p>
-
 <p><a href="/images/lightweight-ng/main-components.png"><amp-img src="/images/lightweight-ng/main-components.png" alt=""></amp-img></a></p>
-
 <h3 id="provider">Provider</h3>
-
 <p>As mentioned above, our provider will union two components from the original framework:</p>
-
 <ul>
 <li><code>$provide</code></li>
 <li><code>$injector</code></li>
 </ul>
-
 <p>It will be a singleton with the following responsibilities:</p>
-
 <ul>
 <li>Register components (directives, services and controllers)</li>
-<li>Resolve components&#x2019; dependencies</li>
+<li>Resolve components&apos; dependencies</li>
 <li>Initialize components</li>
 </ul>
-
 <h3 id="domcompiler">DOMCompiler</h3>
-
 <p>The <code>DOMCompiler</code> is a singleton, which will traverse the DOM tree and find directives. We will support only directive, which could be used as attributes. Once the <code>DOMCompiler</code> finds given directive it will provide scope management functionality (since given directive may require a new scope) and invoke the logic associated to it (in our case the <code>link</code> function). So the main responsibilities of this component will be:</p>
-
 <ul>
 <li>Compile the DOM
-
 <ul>
 <li>Traverse the DOM tree</li>
 <li>Finds registered directives, used as attributes</li>
 <li>Invoke the logic associated with them</li>
 <li>Manages the scope</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <h3 id="scope">Scope</h3>
-
 <p>And the last major component in our Lightweight AngularJS, will be the scope. In order to implement the data-binding logic we need to have <code>$scope</code> to attach properties. We can compose these properties into expressions and watch them. When we discover that the value of given expression has changed we can simply invoke a callback (observer) associated with the expression.</p>
-
 <p>Responsibilities of the scope:</p>
-
 <ul>
 <li>Watches expressions</li>
 <li>Evaluates all watched expressions on each <code>$digest</code> loop, until stable</li>
 <li>Invokes all the observers, which are associated with the watched expression</li>
 </ul>
-
 <h2 id="theory">Theory</h2>
-
 <p>In order to have better understanding of the implementation, we need to dig a bit in theory. I&#x2019;m doing this mostly for completeness, since we will need only basic graph algorithms. If you&#x2019;re familiar with the basic graph traversal algorithms (Depth-First Search and Breath-First Search) feel free to skip this section.</p>
-
 <p>First of all, what actually graphs are? We can think of given graph as pair of two sets: <code>G = { V, E }, E &#x2286; V x V</code>. This seems quite abstract, I believe. Lets make it a bit more understandable. We can think of the set <code>V</code> as different Tinder users and the set <code>E</code> as their matches. For example, if we have the users <code>V = (A, B, C, D)</code> and we have matches between <code>E = ((A, B), (A, C), (A, D), (B, D))</code>, this means not only that <code>A</code> swipes right everyone but also that the edges inside our graph are these matches. Our &#x201C;social graph&#x201D; will look like this:</p>
-
 <p><a href="/images/lightweight-ng/tinder-graph.png"><amp-img src="/images/lightweight-ng/tinder-graph.png" alt=""></amp-img></a></p>
-
 <p>This is an example for undirected graph, since both users like each other. If we have partial match (only one of the users like the other one), we have directed graph. In the case of directed graph, the connections between the nodes will be arrows, to show the direction (i.e. which is the user who is interested in the other one).</p>
-
 <h3 id="graph-theory-in-angularjs">Graph theory in AngularJS</h3>
-
 <p>But how we can apply graph theory in our AngularJS implementation? In AngularJS instead of users we have components (services, controllers, directives, filters). Each component may depend (use) another component. So the nodes in our AngularJS graph are the different components and the edges are the relations between them. For example, the graph of the dependencies of the <code>$resource</code> service, will look something like:</p>
-
 <p><a href="/images/lightweight-ng/resource-graph.png"><amp-img src="/images/lightweight-ng/resource-graph.png" alt=""></amp-img></a></p>
-
 <p>There are two more places we are going to use graphs - the DOM tree and the scope hierarchy. For example, if we turn the following HTML:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
@@ -257,47 +214,34 @@
     <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-
 <p>into a tree, we will get:</p>
-
 <p><a href="/images/lightweight-ng/dom-tree.png"><amp-img src="/images/lightweight-ng/dom-tree.png" alt=""></amp-img></a></p>
-
 <p>For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the <a href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search algorithm</a>, which is used in AngularJS:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">1  procedure DFS(G,v):
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">1  procedure DFS(G,v):
 2      label v as discovered
 3      for all edges from v to w in G.adjacentEdges(v) do
 4          if vertex w is not labeled as discovered then
 5              recursively call DFS(G,w)</code></pre></div>
-
 <h2 id="implementation">Implementation</h2>
-
 <p>Since we are done with theory, we can begin our implementation!</p>
-
 <h3 id="provider-1">Provider</h3>
-
 <p>As we said the <code>Provider</code> will:</p>
-
 <ul>
 <li>Register components (directives, services and controllers)</li>
-<li>Resolve components&#x2019; dependencies</li>
+<li>Resolve components&apos; dependencies</li>
 <li>Initialize components</li>
 </ul>
-
 <p>So it will has the following interface:</p>
-
 <ul>
 <li><code>get(name, locals)</code> - returns service by its name and local dependencies</li>
 <li><code>invoke(fn, locals)</code> - initializes service by its factory and local dependencies</li>
 <li><code>directive(name, fn)</code> - registers a directive by name and factory</li>
-<li><code>controller(name, fn)</code> - registers a controller by name and factory. Note that controllers are not part of the AngularJS&#x2019; core. They are implemented through the <code>$controller</code> service.</li>
+<li><code>controller(name, fn)</code> - registers a controller by name and factory. Note that controllers are not part of the AngularJS&apos; core. They are implemented through the <code>$controller</code> service.</li>
 <li><code>service(name, fn)</code> - registers a service by name and factory</li>
 <li><code>annotate(fn)</code> - returns an array of the names of the dependencies of given service</li>
 </ul>
-
 <h4 id="registration-of-components">Registration of components</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">_providers</span><span class="o">:</span> <span class="p">{},</span>
   <span class="nx">directive</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">,</span> <span class="nx">fn</span><span class="p">);</span>
@@ -316,18 +260,14 @@
   <span class="c1">//...
 </span><span class="c1"></span><span class="p">};</span>
 <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span> <span class="o">=</span> <span class="s1">&apos;Directive&apos;</span><span class="p">;</span>
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span> <span class="o">=</span> <span class="s1">&apos;Controller&apos;</span><span class="p">;</span>
-</code></pre></div>
-
+<span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span> <span class="o">=</span> <span class="s1">&apos;Controller&apos;</span><span class="p">;</span></code></pre></div>
 <p>The code above provides a simple implementation for registration of components. We define the &#x201C;private&#x201D; object called <code>_providers</code>, which contains all factory methods of the registered directives, controllers and services. We also define the methods <code>directive</code>, <code>service</code> and <code>controller</code>, which delegate their call to <code>_register</code>. In <code>controller</code> we wrap the passed controller inside a function for simplicity, since we want to be able to invoke the controller multiple times, without caching the value it returns after being invoked. The method <code>controller</code> will get more obvious after we review the <code>get</code> method and the <code>ngl-controller</code> directive. The only methods left are:</p>
-
 <ul>
 <li><code>invoke</code></li>
 <li><code>get</code></li>
 <li><code>annotate</code></li>
 </ul>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span>  <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="p">{</span>
@@ -358,47 +298,30 @@
     <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">deps</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="nx">_cache</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$rootScope</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>We have a little bit more logic here so lets start with <code>get</code>. In <code>get</code> we initially check whether we already have this component cached in the <code>_cache</code> object. If it is cached we simply return it (see <a href="https://github.com/mgechev/angularjs-in-patterns/#singleton">singleton</a>). <code>$rootScope</code> is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don&#x2019;t find the component in the cache we get its provider (factory) and invoke it using the <code>invoke</code> method, by passing its provider and local dependencies.</p>
-
 <p>In <code>invoke</code> the first thing we do is to assign an empty object to <code>locals</code> if there are no local dependencies. What are the local dependencies?</p>
-
 <h5 id="local-dependencies">Local Dependencies</h5>
-
 <p>In AngularJS we can think of two types of dependencies:</p>
-
 <ul>
 <li>Local dependencies</li>
 <li>Global dependencies</li>
 </ul>
-
 <p>The global dependencies are all the components we register using <code>factory</code>, <code>service</code>, <code>filter</code> etc. They are accessible by each other component in the application. But how about the <code>$scope</code>? For each controller we want a different scope, the <code>$scope</code> object is not a global dependency registered the same way as lets say <code>$http</code> or <code>$resource</code>. The same for <code>$delegate</code> when we create a decorator. <code>$scope</code> and <code>$delegate</code> are local dependencies, specific for given component.</p>
-
 <p>Lets go back to the <code>invoke</code> implementation. After taking care of <code>null</code> or <code>undefined</code> for <code>locals</code> value, we get the names of all dependencies of the current component. Note that our implementation will support resolving of dependencies only declared as parameter names:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span>
-<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;Controller&apos;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span>
-</code></pre></div>
-
-<p>Once we cast <code>Controller</code> into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies&#x2019; names using the regular expression in <code>annotate</code>. But what if we have comments in the <code>Controller</code>&#x2019;s definition:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span> <span class="cm">/* only local scope, for the component */</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;Controller&apos;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></code></pre></div>
+<p>Once we cast <code>Controller</code> into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies&apos; names using the regular expression in <code>annotate</code>. But what if we have comments in the <code>Controller</code>&#x2019;s definition:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span> <span class="cm">/* only local scope, for the component */</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// ...
 </span><span class="c1"></span><span class="p">}</span>
-<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;Controller&apos;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span>
-</code></pre></div>
-
+<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;Controller&apos;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></code></pre></div>
 <p>A simple regular expression will not work here, because invoking <code>Controller.toString()</code> will return the comments as well, so that&#x2019;s why we initially strip them by using <code>.replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, &apos;&apos;)</code>.</p>
-
 <p>Once we get the names of all dependencies we need to instantiate them so that&#x2019;s why we have the <code>map</code>, which loops over all the strings in the array and calls <code>this.get</code>. Do you notice a problem here? What if we have component <code>A</code>, which depends on <code>B</code> and <code>C</code> and lets say <code>C</code> depends on <code>A</code>? In this case we are going to have infinite loop or so called <code>circular dependency</code>. In this implementation we don&#x2019;t handle such problems but you can take care of them by using <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sort</a> or keeping track of the visited &#x201C;nodes&#x201D; (dependencies).</p>
-
 <p>And that&#x2019;s our provider&#x2019;s implementation! Now we can register components like this:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&apos;RESTfulService&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&apos;RESTfulService&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// make restful call &amp; return promise
 </span><span class="c1"></span>  <span class="p">};</span>
@@ -409,42 +332,30 @@
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
   <span class="p">});</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>And later we can invoke <code>MainCtrl</code> by:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">);</span>
-</code></pre></div>
-
-<p>Pretty cool, ah? And that&#x2019;s how we have <sup>1</sup>&#x2044;<sub>4</sub> of our Lightweight AngularJS implementation!</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
+<span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">);</span></code></pre></div>
+<p>Pretty cool, ah? And that&#x2019;s how we have 1/4 of our Lightweight AngularJS implementation!</p>
 <h3 id="domcompiler-1">DOMCompiler</h3>
-
 <p>The main responsibility of the <code>DOMCompiler</code> is to:</p>
-
 <ul>
 <li>Compile the DOM
-
 <ul>
 <li>Traverse the DOM tree</li>
 <li>Finds registered directives, used as attributes</li>
 <li>Invoke the logic associated with them</li>
 <li>Manages the scope</li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 <p>The following API is enough:</p>
-
 <ul>
 <li><code>bootstrap()</code> - bootstraps the application (similar to <code>angular.bootstrap</code> but always uses the root HTML element as root of the application).</li>
 <li><code>compile(el, scope)</code> - invokes the logic of all directives associated with given element (<code>el</code>) and calls itself recursively for each child element of <code>el</code>. We need to have a scope associated with the current element because that&#x2019;s how the data-binding is achieved. Since each directive may create different scope, we need to pass the current scope in the recursive call.</li>
 </ul>
-
 <p>And here is the implementation:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">DOMCompiler</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">DOMCompiler</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">bootstrap</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
       <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;$rootScope&apos;</span><span class="p">));</span>
@@ -466,15 +377,11 @@
     <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="c1">// ...
-</span><span class="c1"></span><span class="p">};</span>
-</code></pre></div>
-
+</span><span class="c1"></span><span class="p">};</span></code></pre></div>
 <p>The implementation of <code>bootstrap</code> is trivial. It delegates its call to <code>compile</code> with the root HTML element. What happens in <code>compile</code> is far more interesting.
 Initially we use a helper method, which gets all directives associated to the given element. We will take a look at <code>_getElDirectives</code> later. Once we have the list of all directives we loop over them and get the provider for each directive. After that we check whether the given directive requires creation of a new scope, if it does and we haven&#x2019;t already instantiated any other scope for the given element we invoke <code>scope.$new()</code>, which creates a new scope, which prototypically inherits from the current <code>scope</code>. After that we invoke the link function of the directive, with the appropriate parameters. What follows after that is the recursive call. Since <code>el.children</code> is a <code>NodeList</code> we cast it to an array by using <code>Array.prototype.slice.call</code>, which is followed by recursive call with the child element and the current scope. What does this algorithm reminds you of? Doesn&#x2019;t it look just like DFS - yes, that&#x2019;s what it is. So here the graphs came handy as well!</p>
-
 <p>Now lets take a quick look at <code>_getElDirectives</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
 </span><span class="c1"></span><span class="nx">_getElDirectives</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">attrs</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">attributes</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">[];</span>
@@ -490,17 +397,11 @@ Initially we use a helper method, which gets all directives associated to the gi
 <span class="p">}</span>
 <span class="c1">// ...
 </span></code></pre></div>
-
 <p>This method iterates over all attributes of <code>el</code>, once it finds an attribute, which is already registered as directive it pushes its name and value in the result list.</p>
-
 <p>Alright! We&#x2019;re done with the <code>DOMCompiler</code>. Lets go to our last major component:</p>
-
 <h3 id="scope-1">Scope</h3>
-
 <p>This might be the trickiest part of the implementation because of the dirty checking functionality. In AngularJS we have the so called <code>$digest</code> loop. Basically the whole data-binding mechanism happens because of watched expressions, which are getting evaluated in the <code>$digest</code> loop. Once this loop is called it runs over all the watched expressions and checks whether the last value we have for the expression differs from the current result of the expression&#x2019;s evaluation. If AngularJS finds that they are not equal, it invokes the callback associated with the given expression. An example for a watcher is an object <code>{ expr, fn, last }</code>, where <code>expr</code> is the watched expression, <code>fn</code> is the function, which should be called once the expression has changed and <code>last</code> is the last known value of the expression. For instance, we can watch the expression <code>foo</code> with a callback, which on change is being invoked with the expression&#x2019;s value and sets the <code>innerHTML</code> of given element (a simplified version of what <code>ng-bind</code> does).</p>
-
 <p>The scope in our implementation has the following methods:</p>
-
 <ul>
 <li><code>$watch(expr, fn)</code> - watches the expression <code>expr</code>. Once we detect change in the <code>expr</code> value we invoke <code>fn</code> (the callback) with the new value</li>
 <li><code>$destroy()</code> - destroys the current scope</li>
@@ -508,36 +409,26 @@ Initially we use a helper method, which gets all directives associated to the gi
 <li><code>$new()</code> - creates a new scope, which prototypically inherits from the target of the call</li>
 <li><code>$digest()</code> - runs the dirty checking loop</li>
 </ul>
-
 <p>So lets dig deeper the scope&#x2019;s implementation:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span> <span class="o">=</span> <span class="p">[];</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">;</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$id</span> <span class="o">=</span> <span class="nx">id</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</code></pre></div>
-
-<p>We simplify the AngularJS&#x2019; scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the &#x201C;static&#x201D; property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.</p>
-
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></code></pre></div>
+<p>We simplify the AngularJS&apos; scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the &#x201C;static&#x201D; property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.</p>
 <p>Lets add the <code>$watch</code> method:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
     <span class="nx">exp</span><span class="o">:</span> <span class="nx">exp</span><span class="p">,</span>
     <span class="nx">fn</span><span class="o">:</span> <span class="nx">fn</span><span class="p">,</span>
     <span class="nx">last</span><span class="o">:</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">))</span>
   <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>In the <code>$watch</code> method all we do is to append a new element to the <code>$$watchers</code> list. The new element contains a watched expression, a callback (observer) and the <code>last</code> result of the expression&#x2019;s evaluation. Since the returned value by <code>this.$eval</code> could be a reference to something, we need to clone it.</p>
-
 <p>Now lets see how we create and destroy scopes!</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$new</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$new</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
   <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span><span class="p">);</span>
   <span class="nb">Object</span><span class="p">.</span><span class="nx">setPrototypeOf</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
@@ -548,14 +439,10 @@ Initially we use a helper method, which gets all directives associated to the gi
 <span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$destroy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">pc</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span><span class="p">.</span><span class="nx">$$children</span><span class="p">;</span>
   <span class="nx">pc</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">pc</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>What we do in <code>$new</code> is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, we remove the current scope from the list of its parent&#x2019;s children.</p>
-
 <p>Now lets take a look at the legendary <code>$digest</code>:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
   <span class="k">do</span> <span class="p">{</span>
     <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
@@ -572,14 +459,10 @@ Initially we use a helper method, which gets all directives associated to the gi
   <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
   <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>Basically we run our loop until it is dirty and by default it is clean. The loop &#x201C;gets dirty&#x201D; only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such &#x201C;a dirty&#x201D; expression we run a loop over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the <code>$digest</code> loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the callback associated to the expression, update the <code>last</code> value and mark the loop as <code>dirty</code>.</p>
-
 <p>Once we&#x2019;re done we invoke <code>$digest</code> recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! One thing to note here is that we may still have circular dependency (a cycle in the graph), so we should be aware of that! Imagine we have:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="s1">&apos;i&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
@@ -589,18 +472,12 @@ Initially we use a helper method, which gets all directives associated to the gi
   <span class="p">});</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<span class="p">}</span></code></pre></div>
 <p>In this case we will see:</p>
-
 <p><a href="/images/lightweight-ng/snap.png"><amp-img src="/images/lightweight-ng/snap.png" alt=""></amp-img></a></p>
-
 <p>at given moment&#x2026;</p>
-
 <p>And the last (and super hacky) method is <code>$eval</code>. Please <strong>do not do that in production</strong>, this is a hack for preventing the need of creating our custom interpreter of expressions:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// In the complete implementation there&apos;re
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// In the complete implementation there&apos;re
 </span><span class="c1">// lexer, parser and interpreter.
 </span><span class="c1">// Note that this implementation is pretty evil!
 </span><span class="c1">// It uses two dangerouse features:
@@ -622,18 +499,12 @@ Initially we use a helper method, which gets all directives associated to the gi
     <span class="p">}</span>
   <span class="p">}</span>
   <span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div>
-
+<span class="p">};</span></code></pre></div>
 <p>We check whether the watched expression is a function, if it is we call it in the context of the current scope. Otherwise we change the context of execution, using <code>with</code> and later run <code>eval</code> for getting the result of the expression. This allows us to evaluate expressions like: <code>foo + bar * baz()</code>, or even more complex JavaScript expressions. Of course, we won&#x2019;t support filters, since they are extension added by AngularJS.</p>
-
 <h3 id="directives">Directives</h3>
-
 <p>So far we can&#x2019;t anything useful with the primitives we have. In order to make it rocks we need to add a few directives and services. Lets implement <code>ngl-bind</code> (called <code>ng-bind</code> in AngularJS), <code>ngl-model</code> (<code>ng-model</code>), <code>ngl-controller</code> (<code>ng-controller</code>) and <code>ngl-click</code> (<code>ng-click</code>)</p>
-
 <h4 id="ngl-bind">ngl-bind</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-bind&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-bind&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
     <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
@@ -643,16 +514,11 @@ Initially we use a helper method, which gets all directives associated to the gi
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p><code>ngl-bind</code> doesn&#x2019;t require a new scope. It only adds a single watcher for the expression used as value of the <code>ngl-value</code> attribute. In the callback, when <code>$digest</code> detects a change, we set the <code>innerHTML</code> of the element.</p>
-
 <h4 id="ngl-model">ngl-model</h4>
-
 <p>Our alternative of <code>ng-model</code> will work only with text inputs. So here is how it looks like:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-model&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-model&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">link</span><span class="o">:</span>  <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
       <span class="nx">el</span><span class="p">.</span><span class="nx">onkeyup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -664,14 +530,10 @@ Initially we use a helper method, which gets all directives associated to the gi
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>We add <code>onkeyup</code> listener to the input. Once the value of the input is changed we call the <code>$digest</code> method of the current scope, in order to make sure that the change in the property will reflect all other watched expressions, which have the given property as dependency. On change of the watched value we set the element&#x2019;s value.</p>
-
 <h4 id="ngl-controller">ngl-controller</h4>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-controller&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-controller&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">scope</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
     <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
@@ -679,16 +541,11 @@ Initially we use a helper method, which gets all directives associated to the gi
       <span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">,</span> <span class="p">{</span> <span class="nx">$scope</span><span class="o">:</span> <span class="nx">scope</span> <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">});</span>
-</code></pre></div>
-
-<p>We need a new scope for each controller, so that&#x2019;s why the value for <code>scope</code> in <code>ngl-controller</code> is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using <code>Provider.get</code>, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using <code>ngl-bind</code>/<code>ngl-model</code>. Once we change the properties&#x2019; values we need to make sure we&#x2019;ve invoked <code>$digest</code> in order the watchers associated with <code>ngl-bind</code> and <code>ngl-model</code> to be invoked.</p>
-
+<span class="p">});</span></code></pre></div>
+<p>We need a new scope for each controller, so that&#x2019;s why the value for <code>scope</code> in <code>ngl-controller</code> is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using <code>Provider.get</code>, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using <code>ngl-bind</code>/<code>ngl-model</code>. Once we change the properties&apos; values we need to make sure we&#x2019;ve invoked <code>$digest</code> in order the watchers associated with <code>ngl-bind</code> and <code>ngl-model</code> to be invoked.</p>
 <h4 id="ngl-click">ngl-click</h4>
-
 <p>This is the last directive we are going to take a look at, before we&#x2019;re able to implement a &#x201C;useful&#x201D; todo application.</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-click&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;ngl-click&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">return</span> <span class="p">{</span>
     <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
     <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
@@ -698,16 +555,11 @@ Initially we use a helper method, which gets all directives associated to the gi
       <span class="p">};</span>
     <span class="p">}</span>
   <span class="p">};</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>We don&#x2019;t need a new scope here. All we need is to evaluate an expression and invoke the <code>$digest</code> loop once the user clicks a button.</p>
-
 <h2 id="wiring-everything-together">Wiring Everything Together</h2>
-
 <p>In order to make sure we understand how the data-binding works, lets take a look at the following example:</p>
-
-<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
@@ -716,41 +568,27 @@ Initially we use a helper method, which gets all directives associated to the gi
   <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ngl-click</span><span class="o">=</span><span class="s">&quot;foo()&quot;</span><span class="p">&gt;</span>Increment<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-
-<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
   <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
     <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
   <span class="p">};</span>
-<span class="p">});</span>
-</code></pre></div>
-
+<span class="p">});</span></code></pre></div>
 <p>Lets follow what is going on in using the following diagram:</p>
-
 <p><a href="/images/lightweight-ng/lifecycle-overview.png"><amp-img src="/images/lightweight-ng/lifecycle-overview.png" alt=""></amp-img></a></p>
-
 <p>Initially the <code>ngl-controller</code> directive is found by the <code>DOMCompiler</code>. The <code>link</code> function of this directive creates a new <code>scope</code> and pass it to the controller&#x2019;s function. We add <code>bar</code> property, which is equals to <code>0</code> and a method called <code>foo</code>, which increments <code>bar</code>. The <code>DOMCompiler</code> finds <code>ngl-bind</code> and adds a watcher for the <code>bar</code> property. It also finds <code>ngl-click</code> and adds <code>click</code> event handler to the button.</p>
-
 <p>Once the user click on the button, the <code>foo</code> method is being evaluated by calling <code>$scope.$eval</code>. The <code>$scope</code> used is the same on, passed as value to <code>MainCtrl</code>. Right after that, <code>ngl-click</code> invokes <code>$scope.$digest</code>. <code>$digest</code> loops over all watchers and detects change in the value of the expression <code>bar</code>. Since we have associated callback for it (the one added for <code>ngl-bind</code>) we invoke it and update the value of the <code>span</code> element.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>The framework we just built is far from a usable into production one, however some of its features:</p>
-
 <ul>
 <li>Data-binding</li>
 <li>Dependency Injection</li>
 <li>Separation of Concerns</li>
 </ul>
-
 <p>work in a similar way they do in AngularJS. This helps understanding AngularJS in deep much easier.</p>
-
 <p>But still you should not forget to <strong>not use this code in production</strong>, much better would be to just <code>bower install angular</code> and enjoy!</p>
-
 <p><a href="/images/no-production.gif"><amp-img src="/images/no-production.gif" alt=""></amp-img></a></p>
-
 <p>And here are the slides from my talk &#x201C;Lightweight AngularJS&#x201D; as promised:</p>
-
 <script async class="speakerdeck-embed" data-id="a8ae722059f30132eac53e5908420f0a" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 </div>
 

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.55.5" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Managing ambient type definitions and dealing with the &#34;Duplicate identifier&#34; TypeScript error &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -89,22 +89,15 @@ Intro Before getting any further we need to tell a few words about the ambient t
                 </header>
                 
                 <section id="post-body">
-                    
-
-<p>Maintaining the <a href="https://github.com/mgechev/angular-seed"><code>angular-seed</code></a>, I found out that the most common problem for developers using the project is:</p>
-<div class="highlight"><pre class="chroma"> Duplicate identifier &#39;export=&#39;. (2300)</pre></div>
-<p>compilation error.</p>
-
+                    <p>Maintaining the <a href="https://github.com/mgechev/angular-seed"><code>angular-seed</code></a>, I found out that the most common problem for developers using the project is:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"> Duplicate identifier &#39;export=&#39;. (2300)
+</code></pre></div><p>compilation error.</p>
 <p>In this quick tutorial I&rsquo;ll show what does this error mean and how you can fix it. In order to get better understanding of the problem we&rsquo;ll discuss the differences between TypeScript and JavaScript, as well as ambient type definitions and <code>@types</code>.</p>
-
 <h2 id="intro">Intro</h2>
-
 <p>Before getting any further we need to tell a few words about the ambient type definitions of TypeScript.</p>
-
 <p>If you are familiar with the differences between TypeScript and JavaScript, you can skip this section.</p>
-
 <p>TypeScript is a statically typed language which is a superset of JavaScript. Being statically typed means that once we write our program it needs to go through a phase of compilation. During this phase the compiler performs type checking in order to verify correctness to some extent. For instance:</p>
-<div class="highlight"><pre class="chroma">// person-hero.ts
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">// person-hero.ts
 
 class Person {
   talk() {
@@ -120,81 +113,60 @@ class Superhero extends Person {
 
 let bar = new Person();
 
-bar.fly();</pre></div>
-<p>If we try to compile the above file, the TypeScript compiler will throw the following error:</p>
-<div class="highlight"><pre class="chroma">$ tsc person-hero.ts
-Property &#39;fly&#39; does not exists on type &#39;Person&#39;.</pre></div>
-<p>In contrast, if we run the following file with JavaScript:</p>
-<div class="highlight"><pre class="chroma">$ node person-human.js
-Uncaught TypeError: bar.fly is not a function</pre></div>
-<p>Although both scripts throw an error, <code>tsc</code> throws the error <strong>compile-time</strong>, compared to <code>node</code>, which throws the error <strong>runtime</strong>.</p>
-
+bar.fly();
+</code></pre></div><p>If we try to compile the above file, the TypeScript compiler will throw the following error:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ tsc person-hero.ts
+Property &#39;fly&#39; does not exists on type &#39;Person&#39;.
+</code></pre></div><p>In contrast, if we run the following file with JavaScript:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ node person-human.js
+Uncaught TypeError: bar.fly is not a function
+</code></pre></div><p>Although both scripts throw an error, <code>tsc</code> throws the error <strong>compile-time</strong>, compared to <code>node</code>, which throws the error <strong>runtime</strong>.</p>
 <p>Compile-time errors are easy to handle by developers because they are based on a static code analysis performed over their code. This means that the compiler is able to notify the developers about eventual mistakes <strong>before the code reaches the users</strong>.</p>
-
 <p>On the other hand, in case we use <strong>dynamic typing</strong> with JavaScript, we may not find all the errors that we have made. The code of the dynamically typed languages is harder (even impossible in most cases) for advanced static code analysis so it is quite likely to not find the possible issue in our code base even after we deploy it to production.</p>
-
 <h3 id="ambient-type-definitions">Ambient Type Definitions</h3>
-
 <p>Although TypeScript is superset of JavaScript we want to be able to use programs written with TypeScript together with such written in JavaScript. For instance, lets suppose we want to use Angular 2, a framework written in TypeScript, together with jQuery.</p>
-
 <p>TypeScript compiles to JavaScript, which is great. This means that once the TypeScript code has been compiled it can communicate with code written in JavaScript but how to use jQuery within our TypeScript code? Lets take a look at the following example:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-demo.ts
-</span><span class="c1"></span><span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span></code></pre></div>
-<p>We invoke the <code>$</code> function with a selector. The code above will produce the following compile-time error:</p>
-<div class="highlight"><pre class="chroma">$ tsc jquery-demo.ts
-Cannot find name &#39;$&#39;.</pre></div>
-<p>This is due the fact that TypeScript is much stricter compared to JavaScript. It cannot relay on the fact that we may have included a reference to jQuery somewhere in our page. TypeScript needs to have <strong>declaration</strong> of <code>$</code>.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-demo.ts
+</span><span class="c1"></span><span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span>
+</code></pre></div><p>We invoke the <code>$</code> function with a selector. The code above will produce the following compile-time error:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ tsc jquery-demo.ts
+Cannot find name &#39;$&#39;.
+</code></pre></div><p>This is due the fact that TypeScript is much stricter compared to JavaScript. It cannot relay on the fact that we may have included a reference to jQuery somewhere in our page. TypeScript needs to have <strong>declaration</strong> of <code>$</code>.</p>
 <p>That is why the <strong>ambient type definitions</strong> appeared. In order to declare that we have a global function called <code>$</code> what we can do is:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-definition.ts
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-definition.ts
 </span><span class="c1"></span><span class="kr">declare</span> <span class="kd">var</span> <span class="nx">$</span>: <span class="kt">Function</span><span class="p">;</span>
 
-<span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span></code></pre></div>
-<p>Now if we run:</p>
-<div class="highlight"><pre class="chroma">$ tsc jquery-definition.ts
+<span class="kd">let</span> <span class="nx">a</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">);</span>
+</code></pre></div><p>Now if we run:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ tsc jquery-definition.ts
 
-# Will output the file jquery-definition.js</pre></div>
-<p>Notice that <code>declare var $: Function</code> is not a definition of the <code>$</code> function but only a <strong>declaration</strong>. In case we run <code>node jquery-definition.js</code> we will still get a run-time error because <code>$</code> is not defined.</p>
-
+# Will output the file jquery-definition.js
+</code></pre></div><p>Notice that <code>declare var $: Function</code> is not a definition of the <code>$</code> function but only a <strong>declaration</strong>. In case we run <code>node jquery-definition.js</code> we will still get a run-time error because <code>$</code> is not defined.</p>
 <h4 id="why-ambient-type-definitions">Why Ambient Type Definitions?</h4>
-
 <p>The main purpose of the ambient type definitions is that they allow text editors and IDEs to perform advanced static analysis over libraries and frameworks written in JavaScript. This is a great benefit since we are able to get compile-time errors and IntelliSense during development! It is much less likely to hit runtime errors caused by misspelling a property name or just passing an object of an incorrect type to a function.</p>
-
 <h3 id="managing-ambient-type-definitions">Managing Ambient Type Definitions</h3>
-
 <p>TypeScript&rsquo;s compiler can discover type definitions distributed with libraries you use. For instance, if you install Angular 2:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ npm i @angular/core</code></pre></div>
-<p>The corresponding type definitions of the library will be already in <code>node_modules/@angular/core</code> directory. Typically most libraries written in TypeScript distribute their type definitions this way.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ npm i @angular/core
+</code></pre></div><p>The corresponding type definitions of the library will be already in <code>node_modules/@angular/core</code> directory. Typically most libraries written in TypeScript distribute their type definitions this way.</p>
 <p>However, there&rsquo;s huge percentage of libraries out there which do not distribute their type definitions as part of their packages. It is quite likely to use the ambient type definitions for some of the most popular libraries written in JavaScript such, as jQuery, AngularJS 1.x, React, etc.</p>
-
 <p>A few years back, from <a href="https://github.com/DefinitelyTyped/">DefinitelyTyped</a>, created a CLI (Command-Line Interface) manager called <code>tsd</code>.</p>
-
 <p>Later this tool was deprecated and replaced by the more advanced one - <a href="https://github.com/typings/typings"><code>typings</code></a>. Typings allows us to download the ambient type definitions of the libraries we use.</p>
-
 <p>As part of the released of TypeScript 2, Microsoft <a href="https://blogs.msdn.microsoft.com/typescript/2016/06/15/the-future-of-declaration-files/">announced a way</a> to manage the TypeScript external type definitions with the <code>npm</code> registry (so we can use both <code>npm</code> and <code>yarn</code>).</p>
-
 <p>By default as part of <code>tsconfig.json</code>&rsquo;s <code>compilerOptions</code> you can include the <code>lib</code> property. It contains a list of typically used type definitions. This means that if your compilation target is ES5, and you&rsquo;re building for the browser you should include: <code>es5</code> and <code>dom</code>, if you&rsquo;re using ES6 features, than you should include <code>es6</code> and so on. This will automatically include definitions for ES6 features such as <code>Map</code>, <code>Set</code>, etc. and the corresponding type definitions. More about the <code>lib</code> property can be found <a href="https://www.typescriptlang.org/docs/handbook/compiler-options.html">here</a>.</p>
-
 <p>In order to install the ambient type definitions of jQuery using <code>npm</code> you can use:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ npm i @types/jquery --save-dev</code></pre></div>
-<p>Note that you usually want to use the <code>--save-dev</code> flag instead of <code>--save</code> since most likely you don&rsquo;t want the users of your <code>npm</code> package to install the type definitions of your third-party dependencies.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ npm i @types/jquery --save-dev
+</code></pre></div><p>Note that you usually want to use the <code>--save-dev</code> flag instead of <code>--save</code> since most likely you don&rsquo;t want the users of your <code>npm</code> package to install the type definitions of your third-party dependencies.</p>
 <h3 id="using-ambient-type-definitions">Using Ambient Type Definitions</h3>
-
 <p>So far so good, but now how to use the provided type definition?</p>
-
 <p>In the same directory where we installed jQuery&rsquo;s ambient type definitions, lets create the following file:</p>
-<div class="highlight"><pre class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-demo.ts
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// jquery-demo.ts
 </span><span class="c1"></span>
 <span class="c1">/// &lt;reference path=&#34;./node_modules/@types/jquery/index.d.ts&#34;/&gt;
-</span><span class="c1"></span><span class="kd">let</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">).</span><span class="nx">height</span><span class="p">();</span></code></pre></div>
-<p>Although this works, it is not quite flexible. If we change the location of the definition file or the location of any file using the definitions we need to change the value of the <code>path</code> attribute. <code>tsconfig.json</code> allows us to have further flexibility:</p>
-
-<h3 id="tsconfig-json"><code>tsconfig.json</code></h3>
-
+</span><span class="c1"></span><span class="kd">let</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.foo&#39;</span><span class="p">).</span><span class="nx">height</span><span class="p">();</span>
+</code></pre></div><p>Although this works, it is not quite flexible. If we change the location of the definition file or the location of any file using the definitions we need to change the value of the <code>path</code> attribute. <code>tsconfig.json</code> allows us to have further flexibility:</p>
+<h3 id="tsconfigjson"><code>tsconfig.json</code></h3>
 <p>TypeScript defines a configuration file called <code>tsconfig.json</code>. In this file you can provide configuration for the TypeScript compiler. Here is a sample such file:</p>
-<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
   <span class="nt">&#34;compilerOptions&#34;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&#34;target&#34;</span><span class="p">:</span> <span class="s2">&#34;es5&#34;</span><span class="p">,</span>
     <span class="nt">&#34;lib&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;dom&#34;</span><span class="p">,</span> <span class="s2">&#34;es6&#34;</span><span class="p">],</span>
@@ -207,15 +179,13 @@ Cannot find name &#39;$&#39;.</pre></div>
     <span class="s2">&#34;dist&#34;</span>
   <span class="p">],</span>
   <span class="nt">&#34;compileOnSave&#34;</span><span class="p">:</span> <span class="kc">false</span>
-<span class="p">}</span></code></pre></div>
-<p>In order to hint <code>tsc</code> where to look for the installed external type definitions you can use the <code>typeRoots</code> array, part of <code>compilerOptions</code> of <code>tsconfig.json</code>.</p>
-
+<span class="p">}</span>
+</code></pre></div><p>In order to hint <code>tsc</code> where to look for the installed external type definitions you can use the <code>typeRoots</code> array, part of <code>compilerOptions</code> of <code>tsconfig.json</code>.</p>
 <p>In this file we&rsquo;ve set that we want to use <code>es5</code> as target language and that we want to <strong>exclude</strong> the directories <code>node_modules</code> and <code>dist</code>.</p>
-
 <p>Let&rsquo;s also install <code>@types/core-js</code> in order to have type definitions for the ES6 APIs that we&rsquo;ll use:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ npm i @types/core-js</code></pre></div>
-<p>In the end our directory structure should look like:</p>
-<div class="highlight"><pre class="chroma">.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ npm i @types/core-js
+</code></pre></div><p>In the end our directory structure should look like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">.
 ├── jquery-demo.js
 ├── jquery-demo.ts
 ├── tsconfig.json
@@ -228,39 +198,30 @@ Cannot find name &#39;$&#39;.</pre></div>
         └── core-js
             ├── package.json
             │── types-metadata.json
-            └── index.d.ts</pre></div>
-<p>Thanks to the <code>tsconfig.json</code> we can compile the <code>jquery-demo.ts</code> file using:</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ tsc</code></pre></div>
-<p>And&hellip;we will get all these errors:</p>
-<div class="highlight"><pre class="chroma">./../.npm-packages/lib/node_modules/typescript/lib/lib.es2015.core.d.ts(17,14): error TS2300: Duplicate identifier &#39;PropertyKey&#39;.
+            └── index.d.ts
+</code></pre></div><p>Thanks to the <code>tsconfig.json</code> we can compile the <code>jquery-demo.ts</code> file using:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ tsc
+</code></pre></div><p>And&hellip;we will get all these errors:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">./../.npm-packages/lib/node_modules/typescript/lib/lib.es2015.core.d.ts(17,14): error TS2300: Duplicate identifier &#39;PropertyKey&#39;.
 node_modules/@types/core-js/index.d.ts(21,14): error TS2300: Duplicate identifier &#39;PropertyKey&#39;.
 node_modules/@types/core-js/index.d.ts(85,5): error TS2687: All declarations of &#39;name&#39; must have identical modifiers.
 node_modules/@types/core-js/index.d.ts(145,5): error TS2403: Subsequent variable declarations must have the same type.  Variable &#39;[Symbol.unscopables]&#39; must be of type &#39;{ copyWithin: boolean; entries: boolean; fill: boolean; find: boolean; findIndex: boolean; keys: ...&#39;, but here has type &#39;any&#39;.
 node_modules/@types/core-js/index.d.ts(262,5): error TS2687: All declarations of &#39;flags&#39; must have identical modifiers.
-...</pre></div>
-<p>This is caused by multiple versions of the same type definitions. In <code>tsconfig.json</code> we have <code>es6</code> as part of the <code>lib</code> array but we also have <code>core-js</code> in <code>node_modules/@types</code>. <strong>The type definitions in <code>core-js</code> overlap with the ones already distributed with TypeScript.</strong> In order to fix this problem we have two options:</p>
-
+...
+</code></pre></div><p>This is caused by multiple versions of the same type definitions. In <code>tsconfig.json</code> we have <code>es6</code> as part of the <code>lib</code> array but we also have <code>core-js</code> in <code>node_modules/@types</code>. <strong>The type definitions in <code>core-js</code> overlap with the ones already distributed with TypeScript.</strong> In order to fix this problem we have two options:</p>
 <ul>
 <li>Change <code>es6</code> to <code>es5</code> in <code>compilerOptions</code>&rsquo;s <code>lib</code> property. This way TypeScript won&rsquo;t include ES6 type definitions.</li>
 <li>Remove <code>core-js</code> from <code>node_modules</code>. This way TypeScript will use only its internal ES6 type definitions.</li>
 </ul>
-
 <p>Since the ES6 type definitions which come with TypeScript are more reliable by using third-party ones, <strong>lets drop <code>node_modules/@types/core-js</code></strong>.</p>
-<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ rm -rf node_modules/@types/core-js</code></pre></div>
-<p>If we run <code>tsc</code> again, we&rsquo;ll get the compiled <code>jquery-demo.js</code> file.</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">$ rm -rf node_modules/@types/core-js
+</code></pre></div><p>If we run <code>tsc</code> again, we&rsquo;ll get the compiled <code>jquery-demo.js</code> file.</p>
 <p>We can even remove the <code>&lt;reference/&gt;</code> tag from <code>jquery-demo.ts</code> and everything is still going to work! The behaviour of <code>tsc</code> in this case will be: &ldquo;Take <strong>all</strong> the files and <strong>all</strong> the type definitions from the current directory and all of its subdirectories, <strong>except the ones declared in the <code>exclude</code></strong> array&rdquo;. This means that <strong>we can also manage ambient type definitions with the <code>exclude</code> property in <code>tsconfig.json</code></strong>.</p>
-
 <p>Another option of <code>tsconfig.json</code> that we can use is the <code>files</code> property. If we set it, <code>tsc</code> will consider <strong>only the files listed there plus all the referenced files within them</strong>.</p>
-
 <h3 id="no-namespacing-of-type-definitions">No Namespacing of Type Definitions</h3>
-
 <p>You might be wondering why would we have the same type definitions in both <code>compilerOptions</code>&rsquo;s <code>lib</code> and <code>core-js</code>? The ambient type definitions in <strong>TypeScript cannot be namespaced</strong>. Why not? Well, if we use jQuery in our project and we cannot include two different sets of ambient type definitions since we have a single global <code>jQuery</code> object, so only a single interface.</p>
-
 <h2 id="recap">Recap</h2>
-
 <p>In recap:</p>
-
 <ul>
 <li>TypeScript is statically typed language, which is great since we can catch the errors we do before the users of our software!</li>
 <li>TypeScript adds type definitions through type annotations which help the compiler to perform advanced static code analysis.</li>
@@ -320,7 +281,6 @@ if (!doNotTrack) {
 	ga('send', 'pageview');
 }
 </script>
-
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
