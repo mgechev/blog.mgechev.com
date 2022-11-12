@@ -104,6 +104,7 @@ A few of my open source projects:
 
 ### Interviews
 
+- [Flying People](https://www.youtube.com/watch?v=Pr_skdEnDsU)
 - [Bulgarian National Radio](https://bnr.bg/en/post/101542983/minko-gechev-about-the-road-from-troyan-to-a-leading-position-in-google)
 - [Angular Discord Q&A](https://www.youtube.com/watch?v=ax0JXFeCBIg)
 - [Behind the Rise of JavaScript Front-end Frameworks](https://www.welcometothejungle.com/en/articles/btc-javascript-frontend-frameworks)
