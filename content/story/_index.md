@@ -12,6 +12,18 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2022</header>
     <section class="timeline-event">
+      <h1>Head of Product for Angular</h1>
+      <section>
+        <img src="/images/story/product.png">
+        <p>
+          November 2022 I became the product manager for Angular.
+        </p>
+        <p>
+          While still leading DevRel and documentation, my role expanded to thinking about <i>what</i> we should be building to make developers successful. I also joined the PM team for Wiz, an internal JavaScript framework powering Search, Photos, and more. I'm truly excited about this role. Being in a developer product it'll help me grow my communication, business, and technical skills further.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
       <h1>TEDx</h1>
       <section>
         <img src="/images/story/tedx.png">
