@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.101.0">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+<meta name="description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture. Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
 
 <meta property="og:title" content="AngularJS in Patterns (Part 3) - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2014/07/05/angularjs-in-patterns-part-3/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+<meta property="og:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture. Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2014/07/05/angularjs-in-patterns-part-3/">
 <meta name="twitter:title" content="AngularJS in Patterns (Part 3) - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
+<meta name="twitter:description" content="This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture. Link to the first part of the series. Link to the second part of the series.This is the last blog post of the series &amp;ldquo;AngularJS in Patterns&amp;rdquo;. You can find the original GitHub repository, which contains all the information at github.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture.  Link to the first part of the series. Link to the second part of the series.\nThis is the last blog post of the series \u0026ldquo;AngularJS in Patterns\u0026rdquo;. You can find the original GitHub repository, which contains all the information at github."
+    "description": "This publication aims to provide a more theoretical overview of some of the AngularJS components in order to show you how the things you are already familiar with (like different Object-Oriented Design Patterns) fit in the picture. Link to the first part of the series. Link to the second part of the series.\nThis is the last blog post of the series \u0026ldquo;AngularJS in Patterns\u0026rdquo;. You can find the original GitHub repository, which contains all the information at github."
   }
 </script>
 
@@ -150,27 +150,27 @@ This publication aims to provide a more theoretical overview of some of the Angu
 </ul>
 <p>They state that the view is composition of components. In AngularJS the situation is similar. Our views are formed by a composition of directives and DOM elements, on which these directives could be applied.</p>
 <p>Lets look at the following example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!doctype html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">zippy</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;zippy&quot;</span><span class="p">&gt;</span>
-      zippy!
-    <span class="p">&lt;/</span><span class="nt">zippy</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;zippy&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&apos;E&apos;</span><span class="p">,</span>
-    <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;div&gt;&lt;div class=&quot;header&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot; ng-transclude&gt;&lt;/div&gt;&lt;/div&gt;&apos;</span><span class="p">,</span>
-    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&apos;.header&apos;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&apos;.content&apos;</span><span class="p">).</span><span class="nx">toggle</span><span class="p">();</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="cp">&lt;!doctype html&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">zippy</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;zippy&quot;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      zippy!
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">zippy</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">myModule</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&apos;zippy&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&apos;E&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;div&gt;&lt;div class=&quot;header&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot; ng-transclude&gt;&lt;/div&gt;&lt;/div&gt;&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&apos;.header&apos;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s1">&apos;.content&apos;</span><span class="p">).</span><span class="nx">toggle</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>This example defines a simple directive, which is a UI component. The defined component (called &#x201C;zippy&#x201D;) has header and content. Click on its header toggles the visibility of the content.</p>
 <p>From the first example we can note that the whole DOM tree is a composition of elements. The root component is the <code>html</code> element, directly followed by the nested elements <code>head</code> and <code>body</code> and so on&#x2026;</p>
 <p>In the second, JavaScript, example we see that the <code>template</code> property of the directive, contains markup with <code>ng-transclude</code> directive inside it. So this means that inside the directive <code>zippy</code> we have another directive called <code>ng-transclude</code>, i.e. composition of directives. Theoretically we can nest the components infinitely until we reach a leaf node.</p>
@@ -188,46 +188,46 @@ The main differences between the JavaScript expressions and AngularJS expression
 <li>are evaluated in given context (the context of the current <code>$scope</code>)</li>
 </ul>
 <p>Inside the <code>$parse</code> service are defined two main components:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">//Responsible for converting given string into tokens
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">Lexer</span><span class="p">;</span>
-<span class="c1">//Responsible for parsing the tokens and evaluating the expression
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">Parser</span><span class="p">;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">//Responsible for converting given string into tokens
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">Lexer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//Responsible for parsing the tokens and evaluating the expression
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">Parser</span><span class="p">;</span></span></span></code></pre></div>
 <p>Once given expression has been tokenized it is cached internally, because of performance concerns.</p>
 <p>The terminal expressions in the AngularJS DSL are defined as follows:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">OPERATORS</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="cm">/* jshint bitwise : false */</span>
-  <span class="s1">&apos;null&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">null</span><span class="p">;},</span>
-  <span class="s1">&apos;true&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">true</span><span class="p">;},</span>
-  <span class="s1">&apos;false&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">false</span><span class="p">;},</span>
-  <span class="kc">undefined</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
-  <span class="s1">&apos;+&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
-        <span class="c1">//...
-</span><span class="c1"></span>      <span class="p">},</span>
-  <span class="s1">&apos;*&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">*</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;/&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">/</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;%&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">%</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;^&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">^</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;=&apos;</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
-  <span class="s1">&apos;===&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">===</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;!==&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;==&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;!=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&lt;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&gt;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&lt;=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&gt;=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&amp;&amp;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;||&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">||</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;&amp;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
-  <span class="s1">&apos;|&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">));},</span>
-  <span class="s1">&apos;!&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">){</span><span class="k">return</span> <span class="o">!</span><span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);}</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">OPERATORS</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/* jshint bitwise : false */</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;null&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">null</span><span class="p">;},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;true&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">true</span><span class="p">;},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;false&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span><span class="k">return</span> <span class="kc">false</span><span class="p">;},</span>
+</span></span><span class="line"><span class="cl">  <span class="kc">undefined</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;+&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;*&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">*</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">/</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;%&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">%</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;^&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">^</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;=&apos;</span><span class="o">:</span><span class="nx">noop</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;===&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">===</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;!==&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;==&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">==</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;!=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">!=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&lt;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&gt;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&lt;=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&lt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&gt;=&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&gt;=</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&amp;&amp;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;||&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">||</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&amp;&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span><span class="o">&amp;</span><span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;|&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">){</span><span class="k">return</span> <span class="nx">b</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">));},</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&apos;!&apos;</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">,</span> <span class="nx">a</span><span class="p">){</span><span class="k">return</span> <span class="o">!</span><span class="nx">a</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>We can think of the function associated with each terminal as implementation of the <code>AbstractExpression</code>&#x2019;s interface.</p>
 <p>Each <code>Client</code> interprets given AngularJS expression in a specific context - specific scope.</p>
 <p>Few sample AngularJS expressions are:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// toUpperCase filter is applied to the result of the expression
-</span><span class="c1">// (foo) ? bar : baz
-</span><span class="c1"></span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="o">?</span> <span class="nx">bar</span> <span class="o">:</span> <span class="nx">baz</span> <span class="o">|</span> <span class="nx">toUpperCase</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// toUpperCase filter is applied to the result of the expression
+</span></span></span><span class="line"><span class="cl"><span class="c1">// (foo) ? bar : baz
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="o">?</span> <span class="nx">bar</span> <span class="o">:</span> <span class="nx">baz</span> <span class="o">|</span> <span class="nx">toUpperCase</span></span></span></code></pre></div>
 <h4 id="template-view">Template View</h4>
 <blockquote>
 <p>Renders information into HTML by embedding markers in an HTML page.</p>
@@ -238,26 +238,26 @@ The main differences between the JavaScript expressions and AngularJS expression
 For example, you can embed PHP code inside HTML and create a dynamic page, you can use Smarty or you can use eRuby with Ruby in order to embed Ruby code inside your static pages.</p>
 <p>For JavaScript there are plenty of template engines, such as mustache.js, handlebars, etc. Most of these engines manipulate the template as a string. The template could be located in different places - as static file, which is fetched with AJAX, as <code>script</code> embedded inside your view or even inlined into your JavaScript.</p>
 <p>For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;template/mustache&quot;</span><span class="p">&gt;</span>
-  <span class="o">&lt;</span><span class="nx">h2</span><span class="o">&gt;</span><span class="nx">Names</span><span class="o">&lt;</span><span class="err">/h2&gt;</span>
-  <span class="p">{{</span><span class="err">#</span><span class="nx">names</span><span class="p">}}</span>
-    <span class="o">&lt;</span><span class="nx">strong</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">name</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/strong&gt;</span>
-  <span class="p">{{</span><span class="err">/names}}</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">script</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;template/mustache&quot;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">&lt;</span><span class="nx">h2</span><span class="o">&gt;</span><span class="nx">Names</span><span class="o">&lt;</span><span class="err">/h2&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{{</span><span class="err">#</span><span class="nx">names</span><span class="p">}}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">&lt;</span><span class="nx">strong</span><span class="o">&gt;</span><span class="p">{{</span><span class="nx">name</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/strong&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{{</span><span class="err">/names}}</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>The template engine turns this string into DOM elements by compiling it within a given context. This way all the expressions embedded in the markup are evaluated and replaced by their value.</p>
 <p>For example if we evaluate the template above in the context of the following object: <code>{ names: [&apos;foo&apos;, &apos;bar&apos;, &apos;baz&apos;] }</code>, so we will get:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Names<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>foo<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>bar<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>baz<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Names<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>foo<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>bar<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>baz<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>AngularJS templates are actually HTML, they are not in an intermediate format like the traditional templates are.
 What AngularJS compiler does is to traverse the DOM tree and look for already known directives (elements, attributes, classes or even comments). When AngularJS finds any of these directives it invokes the logic associated with them, which may involve evaluation of different expressions in the context of the current scope.</p>
 <p>For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;name in names&quot;</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;name in names&quot;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{name}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>in the context of the scope:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$scope</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="s1">&apos;bar&apos;</span><span class="p">,</span> <span class="s1">&apos;baz&apos;</span><span class="p">];</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">$scope</span><span class="p">.</span><span class="nx">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="s1">&apos;bar&apos;</span><span class="p">,</span> <span class="s1">&apos;baz&apos;</span><span class="p">];</span></span></span></code></pre></div>
 <p>will produce the same result as the one above. The main difference here is that the template is not wrapped inside a <code>script</code> tag, it is HTML instead.</p>
 <h3 id="scope">Scope</h3>
 <h4 id="observer">Observer</h4>
@@ -267,17 +267,17 @@ What AngularJS compiler does is to traverse the DOM tree and look for already kn
 <p><amp-img src="/images/patterns/behavioral/observer.svg" alt="Observer" title="Fig. 7"></amp-img></p>
 <p>There are two basic ways of communication between the scopes in an AngularJS application. The first one is calling methods of parent scope by a child scope. This is possible since the child scope inherits prototypically by its parent, as mentioned above (see <a href="#scope">Scope</a>). This allows communication in a single direction - child to parent. Some times it is necessary to call method of given child scope or notify it about a triggered event in the context of the parent scope. AngularJS provides built-in observer pattern, which allows this. Another possible use case, of the observer pattern, is when multiple scopes are interested in given event but the scope, in which context the event is triggered, is not aware of them. This allows decoupling between the different scopes, non of the scopes should be aware of the rest of the scopes.</p>
 <p>Each AngularJS scope has public methods called <code>$on</code>, <code>$emit</code> and <code>$broadcast</code>. The method <code>$on</code> accepts topic as first argument and callback as second. We can think of the callback as an observer - an object, which implements the <code>Observer</code> interface (in JavaScript the functions are first-class, so we can provide only implementation of the <code>notify</code> method):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;event-name&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">handler</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//body
-</span><span class="c1"></span>  <span class="p">});</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;event-name&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="nx">handler</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//body
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>In this way the current scope &#x201C;subscribes&#x201D; to events of type <code>event-name</code>. When <code>event-name</code> is triggered in any parent or child scope of the given one, <code>handler</code> would be called.</p>
 <p>The methods <code>$emit</code> and <code>$broadcast</code> are used for triggering events respectively upwards and downwards through the scope chain.
 For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&apos;event-name&apos;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&apos;bar&apos;</span> <span class="p">});</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">ExampleCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&apos;event-name&apos;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&apos;bar&apos;</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>The scope in the example above, triggers the event <code>event-name</code> to all scopes upwards. This means that each of the parent scopes of the given one, which are subscribed to the event <code>event-name</code>, would be notified and their handler callback will be invoked.</p>
 <p>Analogical is the case when the method <code>$broadcast</code> is called. The only difference is that the event would be transmitted downwards - to all children scopes.
 Each scope can subscribe to any event with multiple callbacks (i.e. it can associate multiple observers to given event).</p>
@@ -296,21 +296,21 @@ Each scope can subscribe to any event with multiple callbacks (i.e. it can assoc
 <li>Stop the event propagation without handling it</li>
 </ul>
 <p>In the example below you can see an example in which <code>ChildCtrl</code> triggers an event, which is propagated upwards through the scope chain. In the case above each of the parent scopes (the one used in <code>ParentCtrl</code> and the one used in <code>MainCtrl</code>) are going to handle the event by logging into the console: <code>&quot;foo received&quot;</code>. If any of the scopes should be considered as final destination it can call the method <code>stopPropagation</code> of the event object, passed to the callback.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;foo received&apos;</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">});</span>
-
-<span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;ParentCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;foo received&apos;</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">});</span>
-
-<span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;ChildCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">);</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;MainCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;foo received&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;ParentCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$on</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&apos;foo received&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">myModule</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&apos;ChildCtrl&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$emit</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>The different handlers from the UML diagram above are the different scopes, injected to the controllers.</p>
 <h4 id="command">Command</h4>
 <blockquote>
@@ -319,25 +319,25 @@ Each scope can subscribe to any event with multiple callbacks (i.e. it can assoc
 <p><amp-img src="/images/patterns/behavioral/command.svg" alt="Command" title="Fig. 11"></amp-img></p>
 <p>Before continuing with the application of the command pattern lets describe how AngularJS implements data binding.</p>
 <p>When we want to bind our model to the view we use the directives <code>ng-bind</code> (for single-way data binding) and <code>ng-model</code> (for two-way data binding). For example, if we want each change in the model <code>foo</code> to reflect the view we can:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>Now each time we change the value of <code>foo</code> the inner text of the span will be changed. We can achieve the same effect with more complex AngularJS expressions, like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo + &quot;</span> <span class="err">&quot;</span> <span class="err">+</span> <span class="na">bar</span> <span class="err">|</span> <span class="na">uppercase</span><span class="err">&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;foo + &quot;</span> <span class="err">&quot;</span> <span class="err">+</span> <span class="na">bar</span> <span class="err">|</span> <span class="na">uppercase</span><span class="err">&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>In the example above the value of the span will be the concatenated uppercased value of <code>foo</code> and <code>bar</code>. What happens behind the scenes?</p>
 <p>Each <code>$scope</code> has method called <code>$watch</code>. When the AngularJS compiler finds the directive <code>ng-bind</code> it creates a new watcher of the expression <code>foo + &apos; &apos; + bar | uppercase</code>, i.e. <code>$scope.$watch(&quot;foo + &apos; &apos; + bar | uppercase&quot;, function () { /* body */ });</code>. The callback will be triggered each time the value of the expression is changed. In the current case the callback will update the value of the span.</p>
 <p>Here are the first couple of lines of the implementation of <code>$watch</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$watch</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span><span class="p">,</span> <span class="nx">objectEquality</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
-      <span class="nx">get</span> <span class="o">=</span> <span class="nx">compileToFn</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="s1">&apos;watch&apos;</span><span class="p">),</span>
-      <span class="nx">array</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span>
-      <span class="nx">watcher</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="nx">fn</span><span class="o">:</span> <span class="nx">listener</span><span class="p">,</span>
-        <span class="nx">last</span><span class="o">:</span> <span class="nx">initWatchVal</span><span class="p">,</span>
-        <span class="nx">get</span><span class="o">:</span> <span class="nx">get</span><span class="p">,</span>
-        <span class="nx">exp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
-        <span class="nx">eq</span><span class="o">:</span> <span class="o">!!</span><span class="nx">objectEquality</span>
-      <span class="p">};</span>
-<span class="c1">//...
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">$watch</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span><span class="p">,</span> <span class="nx">objectEquality</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">scope</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">get</span> <span class="o">=</span> <span class="nx">compileToFn</span><span class="p">(</span><span class="nx">watchExp</span><span class="p">,</span> <span class="s1">&apos;watch&apos;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">array</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">watcher</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">fn</span><span class="o">:</span> <span class="nx">listener</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">last</span><span class="o">:</span> <span class="nx">initWatchVal</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">get</span><span class="o">:</span> <span class="nx">get</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">exp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">eq</span><span class="o">:</span> <span class="o">!!</span><span class="nx">objectEquality</span>
+</span></span><span class="line"><span class="cl">      <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//...
+</span></span></span></code></pre></div>
 <p>We can think of the <code>watcher</code> object as a command. The expression of the command is being evaluated on each <a href="https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$digest"><code>&quot;$digest&quot;</code></a> loop. Once AngularJS detects change in the expression, it invokes the <code>listener</code> function. The <code>watcher</code> command encapsulates all the information required for watching given expression and delegates the execution of the command to the <code>listener</code> (the actual receiver). We can think of the <code>$scope</code> as the command&#x2019;s <code>Client</code> and the <code>$digest</code> loop as the command&#x2019;s <code>Invoker</code>.</p>
 <h3 id="controllers">Controllers</h3>
 <h4 id="page-controller">Page Controller</h4>
@@ -353,72 +353,72 @@ Each scope can subscribe to any event with multiple callbacks (i.e. it can assoc
 <p>Similarly to the page controllers, AngularJS controllers handle user interactions, provide and update the models. The model is exposed to the view when it is being attached to the scope, all methods invoked by the view, in result of user actions, are ones, which are already attached to the scope. Another similarity between the page controllers and the AngularJS controllers is the hierarchy, which they form. It corresponds to the scope hierarchy. That way common actions can be isolated to the base controllers.</p>
 <p>The controllers in AngularJS are quite similar to the code-behind in ASP.NET WebForms, since their responsibilities almost overlap.
 Here is an example hierarchy between few controllers:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!doctype html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;MainCtrl&quot;</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;ChildCtrl&quot;</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>{{user.name}}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;click()&quot;</span><span class="p">&gt;</span>Click<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">User</span><span class="p">.</span><span class="nx">isAuthenticated</span><span class="p">())</span> <span class="p">{</span>
-    <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">(</span><span class="s1">&apos;/unauthenticated&apos;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">function</span> <span class="nx">ChildCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">click</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">alert</span><span class="p">(</span><span class="s1">&apos;You clicked me!&apos;</span><span class="p">);</span>
-  <span class="p">};</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="cp">&lt;!doctype html&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;MainCtrl&quot;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;ChildCtrl&quot;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>{{user.name}}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ng-click</span><span class="o">=</span><span class="s">&quot;click()&quot;</span><span class="p">&gt;</span>Click<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">User</span><span class="p">.</span><span class="nx">isAuthenticated</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">(</span><span class="s1">&apos;/unauthenticated&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">ChildCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">click</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="s1">&apos;You clicked me!&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>This example aims to illustrate the most trivial way to reuse logic by using a base controller, anyway in production applications I don&#x2019;t recommend you to put your authorization logic in the controllers. The access to the different routes could be determined on a higher level of abstraction.</p>
 <p>The <code>ChildCtrl</code> is responsible for handling actions such as clicking the button with label <code>&quot;Click&quot;</code> and exposing the model to the view, by attaching it to the scope.</p>
 <h3 id="others">Others</h3>
 <h4 id="module-pattern">Module Pattern</h4>
 <p>This is actually not a design pattern from Gang of Four, neither one from P of EAA. This is a traditional JavaScript pattern, the main goal of which is to provide encapsulation and privacy.</p>
 <p>Using the module pattern you can achieve privacy based on the JavaScript&#x2019;s functional lexical scope. Each module may have zero or more private members, which are hidden in the local scope of a function. This function returns an object, which exports the public API of the given module:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Page</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-  <span class="kd">var</span> <span class="nx">title</span><span class="p">;</span>
-
-  <span class="kd">function</span> <span class="nx">setTitle</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
-    <span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="kd">function</span> <span class="nx">getTitle</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">title</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">setTitle</span><span class="o">:</span> <span class="nx">setTitle</span><span class="p">,</span>
-    <span class="nx">getTitle</span><span class="o">:</span> <span class="nx">getTitle</span>
-  <span class="p">};</span>
-<span class="p">}());</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Page</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">title</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">setTitle</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">document</span><span class="p">.</span><span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">title</span> <span class="o">=</span> <span class="nx">t</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">getTitle</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">title</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">setTitle</span><span class="o">:</span> <span class="nx">setTitle</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">getTitle</span><span class="o">:</span> <span class="nx">getTitle</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
 <p>In the example above we have IIFE (Immediately-Invoked Function Expression), which after being called returns an object, with two methods (<code>setTitle</code> and <code>getTitle</code>). The returned object is being assigned to the <code>Page</code> variable.</p>
 <p>In this case the user of the <code>Page</code> object doesn&#x2019;t have direct access to the <code>title</code> variable, which is defined inside the local scope of the IIFE.</p>
 <p>The module pattern is very useful when defining services in AngularJS. Using this pattern we can simulate (and actually achieve) privacy:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-  <span class="kd">function</span> <span class="nx">privateMember</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//body...
-</span><span class="c1"></span>  <span class="p">}</span>
-
-  <span class="kd">function</span> <span class="nx">publicMember</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//body...
-</span><span class="c1"></span>    <span class="nx">privateMember</span><span class="p">();</span>
-    <span class="c1">//body
-</span><span class="c1"></span>  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">publicMember</span><span class="o">:</span> <span class="nx">publicMember</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">privateMember</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//body...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">publicMember</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//body...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">privateMember</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//body
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">publicMember</span><span class="o">:</span> <span class="nx">publicMember</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>Once we want to inject <code>foo</code> inside any other component we won&#x2019;t be able to use the private methods, but only the public ones. This solution is extremely powerful especially when one is building a reusable library.</p>
 <h3 id="data-mapper">Data Mapper</h3>
 <blockquote>
@@ -439,47 +439,47 @@ Here is an example hierarchy between few controllers:</p>
 <li><code>GET /friends/:id</code> - returns the list of friends of given user</li>
 </ul>
 <p>Possible solution is to have two different services, one for the first method and one for the second one. Probably more useful solution would be if we have a single service called <code>User</code>, which loads the user&#x2019;s friends when we request the user:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;User&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="kd">function</span> <span class="nx">User</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">address</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">friends</span> <span class="o">=</span> <span class="nx">friends</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/user/&apos;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">),</span>
-        <span class="nx">friends</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/friends/&apos;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-    <span class="nx">$q</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">])</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">);</span>
-    <span class="p">});</span>
-  <span class="p">};</span>
-  <span class="k">return</span> <span class="nx">User</span><span class="p">;</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">app</span><span class="p">.</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&apos;User&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">User</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">address</span> <span class="o">=</span> <span class="nx">address</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">friends</span> <span class="o">=</span> <span class="nx">friends</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/user/&apos;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">friends</span> <span class="o">=</span> <span class="nx">$http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/friends/&apos;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$q</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">friends</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">address</span><span class="p">,</span> <span class="nx">friends</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">User</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>This way we create pseudo-data mapper, which adapts our API according to the SPA requirements.</p>
 <p>We can use the <code>User</code> service by:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
-  <span class="p">});</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">MainCtrl</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">User</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">User</span><span class="p">.</span><span class="nx">get</span><span class="p">({</span> <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>And the following partial:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-    Name: {{user.name}}
-  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-    Address: {{user.address}}
-  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-    Friends with ids:
-    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
-      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;friend in user.friends&quot;</span><span class="p">&gt;</span>{{friend}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
-    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    Name: {{user.name}}
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    Address: {{user.address}}
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    Friends with ids:
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;friend in user.friends&quot;</span><span class="p">&gt;</span>{{friend}}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></span></span></code></pre></div>
 </div>
 
   <aside class="p-share">

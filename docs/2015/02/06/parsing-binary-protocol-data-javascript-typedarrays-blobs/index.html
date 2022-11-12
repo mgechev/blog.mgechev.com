@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.101.0" />
 		<title>Processing Binary Protocols with Client-Side JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -133,49 +133,49 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <li>Forward the data to our client</li>
 </ul>
 <p>In the last case our proxy will look something like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-
-<span class="kd">var</span> <span class="nx">WebSocketServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;ws&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">wss</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocketServer</span><span class="p">({</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">8081</span> <span class="p">});</span>
-<span class="kd">var</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;net&#39;</span><span class="p">);</span>
-
-<span class="nx">wss</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ws</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">client</span><span class="p">;</span>
-  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Message received&#39;</span><span class="p">);</span>
-    <span class="k">try</span> <span class="p">{</span>
-      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">client</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;handshake&#39;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">client</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createConnection</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Connected&#39;</span><span class="p">);</span>
-        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-          <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;handshake&#39;</span><span class="p">,</span>
-          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;success&#39;</span>
-        <span class="p">}));</span>
-      <span class="p">});</span>
-      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">);</span>
-        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span> <span class="nx">binary</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
-      <span class="p">});</span>
-      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">);</span>
-        <span class="nx">ws</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">});</span>
-  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">client</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
-    <span class="p">}</span>
-  <span class="p">});</span>
-<span class="p">});</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on&#39;</span><span class="p">,</span> <span class="mi">8081</span><span class="p">);</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">WebSocketServer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;ws&#39;</span><span class="p">).</span><span class="nx">Server</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">wss</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocketServer</span><span class="p">({</span> <span class="nx">port</span><span class="o">:</span> <span class="mi">8081</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">net</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;net&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">wss</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ws</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">client</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Message received&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">msg</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">client</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">msg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;handshake&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">client</span> <span class="o">=</span> <span class="nx">net</span><span class="p">.</span><span class="nx">createConnection</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">port</span><span class="p">,</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Connected&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">          <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;handshake&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;success&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="p">{</span> <span class="nx">binary</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">client</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">ws</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">ws</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">client</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">client</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on&#39;</span><span class="p">,</span> <span class="mi">8081</span><span class="p">);</span></span></span></code></pre></div>
 <p>And our high-level architecture will look like:</p>
 <p><img src="/images/binary-protocol-processing/client-proxy-server.png" alt=""></p>
 <p>There&rsquo;s a place for improvements in the code above but you get the basic idea - receive binary data and forward it to the remote TCP server, after the handshake was initiated.</p>
@@ -185,46 +185,46 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <p>The ArrayBuffer object is used to represent a generic, fixed-length raw binary data buffer. You can not directly manipulate the contents of an ArrayBuffer; instead, you create one of the typed array objects or a DataView object which represents the buffer in a specific format, and use that to read and write the contents of the buffer.</p>
 </blockquote>
 <p>The <code>TypedArray</code>s allow us to process words (with length 8, 16, 32 bits) in order to handle the binary messages received by the proxy. In order to tell the WebSockets connection, we want to talk in binary with the proxy we need to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s1">&#39;ws://127.0.0.1:8081&#39;</span><span class="p">);</span>
-<span class="nx">socket</span><span class="p">.</span><span class="nx">binaryType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s1">&#39;ws://127.0.0.1:8081&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">socket</span><span class="p">.</span><span class="nx">binaryType</span> <span class="o">=</span> <span class="s1">&#39;arraybuffer&#39;</span><span class="p">;</span></span></span></code></pre></div>
 <p>The two possible values for <code>binaryType</code>, of the WebSocket, are <code>arraybuffer</code> and <code>blob</code>. In most cases <code>arraybuffer</code> will be the one, which allows faster processing since it can be used with the synchronous API of the <code>DataView</code>. In case of large pieces of binary data preferable is the <code>blob</code> binary type.</p>
 <p>So how would we process the following example, using <code>DataView</code> and <code>arraybuffer</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">2      U16      framebuffer-width
-2      U16      framebuffer-height
-16 PIXEL_FORMAT server-pixel-format
-4      U32      name-length</code></pre></div>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">connection</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">dv</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">getPixelFormat</span><span class="p">(</span><span class="nx">dv</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint32</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;We have width: &#39;</span> <span class="o">+</span> <span class="nx">width</span> <span class="o">+</span>
-      <span class="s1">&#39;px, height: &#39;</span> <span class="o">+</span>
-      <span class="nx">height</span> <span class="o">+</span> <span class="s1">&#39;px, name length: &#39;</span> <span class="o">+</span> <span class="nx">len</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">2      U16      framebuffer-width
+</span></span><span class="line"><span class="cl">2      U16      framebuffer-height
+</span></span><span class="line"><span class="cl">16 PIXEL_FORMAT server-pixel-format
+</span></span><span class="line"><span class="cl">4      U32      name-length</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">connection</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">dv</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">height</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">getPixelFormat</span><span class="p">(</span><span class="nx">dv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">dv</span><span class="p">.</span><span class="nx">getUint32</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;We have width: &#39;</span> <span class="o">+</span> <span class="nx">width</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">      <span class="s1">&#39;px, height: &#39;</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">height</span> <span class="o">+</span> <span class="s1">&#39;px, name length: &#39;</span> <span class="o">+</span> <span class="nx">len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p><code>DataView</code> provides interface, which allows us to read specific data type by providing given offset. For example <code>dv.getUint32(2)</code> will return unsigned 32 bit integer with offset 2 bytes from the beginning of the buffer.</p>
 <h3 id="handling-endianness">Handling endianness</h3>
 <p>Endianness refer to the convention used to interpret the bytes making up a data word when those bytes are stored in computer memory. For the one-byte data types we don&rsquo;t have any issues handling the byte order, for 16, 32 and 64 we need to do some additional work.</p>
 <p>The <code>TypedArray</code>&rsquo;s standard doesn&rsquo;t refer to specific endianness used in them, everything depends on the underlaying machine. The usual byte ordering is little endian, but in order to prevent hard-coded values we can use the function <code>getEndianness</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">getEndianness</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayBuffer</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
-  <span class="nx">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xa1</span><span class="p">;</span>
-  <span class="nx">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xb2</span><span class="p">;</span>
-  <span class="nx">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xc3</span><span class="p">;</span>
-  <span class="nx">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xd4</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xd4c3b2a1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">LITTLE_ENDIAN</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xa1b2c3d4</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">BIG_ENDIAN</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Unrecognized endianness&#39;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">getEndianness</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayBuffer</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xa1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xb2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xc3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xd4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xd4c3b2a1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">LITTLE_ENDIAN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">===</span> <span class="mh">0xa1b2c3d4</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">BlobReader</span><span class="p">.</span><span class="nx">ENDIANNESS</span><span class="p">.</span><span class="nx">BIG_ENDIAN</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Unrecognized endianness&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>Let&rsquo;s take a look at the function&rsquo;s implementation:</p>
 <ul>
 <li>Initially we construct an <code>ArrayBuffer</code> with size 4 bytes</li>
@@ -238,38 +238,38 @@ Because of limitations of the client-side API, JavaScript doesn&rsquo;t has acce
 <h3 id="reading-blobs">Reading Blobs</h3>
 <p>As I mentioned above, when you have to deal with huge amount of data, it is much more appropriate to use <code>Blob</code> data instead of <code>ArayBuffer</code>. <code>Blob</code>s could be read using the <code>FileReader</code> API, which is asynchronous by default (always in the main execution thread). <code>Blob</code>s can be read synchronously when used inside <code>Workers</code> with <a href="http://dev.w3.org/2009/dap/file-system/file-dir-sys.html#the-asynchronous-filesystem-interface"><code>FileReaderSync</code></a>.</p>
 <p><code>Blob</code> has method in it&rsquo;s prototype called <code>slice</code>. It accepts interval, as two integers, and returns &ldquo;sub-blob&rdquo; composed by the bytes in the interval:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])]);</span>
-<span class="kd">var</span> <span class="nx">subBlob</span> <span class="o">=</span> <span class="nx">blob</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">fr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
-<span class="nx">fr</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">)[</span><span class="mi">0</span><span class="p">]);</span>
-<span class="p">};</span>
-<span class="nx">fr</span><span class="p">.</span><span class="nx">readAsArrayBuffer</span><span class="p">(</span><span class="nx">subBlob</span><span class="p">);</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">subBlob</span> <span class="o">=</span> <span class="nx">blob</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">fr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nx">fr</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">)[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="nx">fr</span><span class="p">.</span><span class="nx">readAsArrayBuffer</span><span class="p">(</span><span class="nx">subBlob</span><span class="p">);</span></span></span></code></pre></div>
 <p>Each time you want to read specific part of the blob you need to create <code>FileReader</code> instance and eventually slice it. This requires a lot of additional, repetitive work. Also, when you read the code above it is not very semantically clear that you want to read the third element of the array, since there&rsquo;s a lot of additional code around the construction of the <code>FileReader</code> and handling the <code>onload</code> event.</p>
 <p>In order to simplify the process of reading <code>Blob</code>s I created <a href="https://github.com/mgechev/blobreader"><code>BlobReader</code></a>, which provides simple interface for reading binary large objects.</p>
 <p><code>BlobReader</code> allows you to read blobs in the following fashion:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="c1">// Blob definition
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
-<span class="kd">var</span> <span class="nx">uint16</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint16Array</span><span class="p">([</span><span class="mi">3</span><span class="p">]);</span>
-<span class="kd">var</span> <span class="nx">uint82</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
-<span class="kd">var</span> <span class="nx">uint32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">([</span><span class="mi">8</span><span class="p">]);</span>
-<span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="nx">uint8</span><span class="p">,</span> <span class="nx">uint16</span><span class="p">,</span> <span class="nx">uint82</span><span class="p">,</span> <span class="nx">uint32</span><span class="p">]);</span>
-
-<span class="c1">// Reading the blob
-</span><span class="c1"></span><span class="nx">BlobReader</span><span class="p">(</span><span class="nx">blob</span><span class="p">)</span>
-<span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="p">.</span><span class="nx">readUint16</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
-<span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint82&#39;</span><span class="p">)</span>
-<span class="p">.</span><span class="nx">skip</span><span class="p">()</span>
-<span class="p">.</span><span class="nx">readUint32</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
-<span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint16</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint32</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="c1">// Blob definition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">uint8</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">uint16</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint16Array</span><span class="p">([</span><span class="mi">3</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">uint82</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">uint32</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">([</span><span class="mi">8</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">blob</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="nx">uint8</span><span class="p">,</span> <span class="nx">uint16</span><span class="p">,</span> <span class="nx">uint82</span><span class="p">,</span> <span class="nx">uint32</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Reading the blob
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">BlobReader</span><span class="p">(</span><span class="nx">blob</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">readUint16</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">readUint8</span><span class="p">(</span><span class="s1">&#39;uint82&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">skip</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">readUint32</span><span class="p">(</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">commit</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint8</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint16</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="s1">&#39;number&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint82</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">expect</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">uint32</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>There are shortcut methods for reading the main data types, each of the methods accept name of the property to be read, number of words of the given size and optionally format (little or big endian). Using the property name you can access the data associated with it, as property of the object passed to the <code>commit</code> callback. <code>skip</code> allows you to skip bytes (like padding).</p>
 <p>You can lookup the whole API of the library <a href="https://github.com/mgechev/blobreader/tree/master/docs">here</a>.</p>
 <h3 id="reducing-the-latency">Reducing the latency</h3>

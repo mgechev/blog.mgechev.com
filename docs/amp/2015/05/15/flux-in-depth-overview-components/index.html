@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.101.0">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -176,27 +176,27 @@
 <p>How we can make our components pure? Definitely they should not use any global variables because their result (rendered UI), should not depend on anything else except the properties they accept. But that&#x2019;s not all. If the data passed to the component tree is mutable given component may change the data used by another component. For example, we can have the following component tree:</p>
 <p><amp-img src="/images/overview-components/component-tree.png" alt="Component tree"></amp-img></p>
 <p>And the following data applied to it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">{</span>
-  <span class="nx">photoUrl</span><span class="o">:</span> <span class="s2">&quot;photo.png&quot;</span><span class="p">,</span>
-  <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Foo&quot;</span><span class="p">,</span>
-  <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Bar&quot;</span><span class="p">,</span>
-  <span class="nx">age</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span>
-  <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260707251</span><span class="p">,</span>
-  <span class="nx">todos</span><span class="o">:</span> <span class="p">[{</span>
-    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Save the Universe&quot;</span><span class="p">,</span>
-    <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260907251</span><span class="p">,</span>
-    <span class="nx">completed</span><span class="o">:</span> <span class="kc">true</span>
-  <span class="p">},</span> <span class="p">{</span>
-    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Write tests&quot;</span><span class="p">,</span>
-    <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260917251</span><span class="p">,</span>
-    <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
-  <span class="p">}]</span>
-<span class="p">}</span>
-</code></pre></div><p>If we call the object above <code>user</code>, in a flux-like architecture the data will be distributed across the components in the following way:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">photoUrl</span><span class="o">:</span> <span class="s2">&quot;photo.png&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">firstName</span><span class="o">:</span> <span class="s2">&quot;Foo&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">lastName</span><span class="o">:</span> <span class="s2">&quot;Bar&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">age</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260707251</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">todos</span><span class="o">:</span> <span class="p">[{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Save the Universe&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260907251</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">completed</span><span class="o">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Write tests&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">updated</span><span class="o">:</span> <span class="mi">1429260917251</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">completed</span><span class="o">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>If we call the object above <code>user</code>, in a flux-like architecture the data will be distributed across the components in the following way:</p>
 <p><amp-img src="/images/overview-components/flux-like-data-distribution.png" alt="Flux data distribution"></amp-img></p>
 <p>If the <code>User</code> component needs to display the number of pending todo items, we may have the following snippet in its implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">user</span><span class="p">.</span><span class="nx">todos</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">u</span> <span class="p">=&gt;</span> <span class="o">!</span><span class="nx">u</span><span class="p">.</span><span class="nx">completed</span><span class="p">);</span>
-</code></pre></div><p>It definitely looks elegant, we&#x2019;re applying the high-order function <code>filter</code> over the user&#x2019;s todo items. However, this way we&#x2019;re creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in <code>user.todos</code> will introduce an issue - the <code>Todos</code> component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">user</span><span class="p">.</span><span class="nx">todos</span> <span class="o">=</span> <span class="nx">user</span><span class="p">.</span><span class="nx">todos</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">u</span> <span class="p">=&gt;</span> <span class="o">!</span><span class="nx">u</span><span class="p">.</span><span class="nx">completed</span><span class="p">);</span>
+</span></span></code></pre></div><p>It definitely looks elegant, we&#x2019;re applying the high-order function <code>filter</code> over the user&#x2019;s todo items. However, this way we&#x2019;re creating an impure component since it produces side-effect, i.e. changes data, which is used by another component. The change in <code>user.todos</code> will introduce an issue - the <code>Todos</code> component will render only the not completed todo items. Sometimes, such side effects could be very unpleasant and complex for debugging.</p>
 <h4 id="immutable-data">Immutable Data</h4>
 <p>How we can deal with such side effects? We can use something called immutable data, which according to Wikipedia is defined as:</p>
 <blockquote>
@@ -210,21 +210,21 @@
 <li>Combination between both approaches</li>
 </ul>
 <p>Lets create an immutable list using Immutable.js:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
-<span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{};</span>
-<span class="kd">let</span> <span class="nx">newList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2 ]
-</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">newList</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2, [object Object] ]
-</span><span class="c1"></span><span class="nx">newList</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nx">baz</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// 42
-</span></code></pre></div><p>In the snippet above we can notice that:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Immutable</span><span class="p">.</span><span class="nx">List</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">newList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2 ]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">newList</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// List [ 1, 2, [object Object] ]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">newList</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="nx">baz</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// 42
+</span></span></span></code></pre></div><p>In the snippet above we can notice that:</p>
 <ul>
 <li>Each operation, which will eventually mutate the data structure returns a new immutable object (list in this case), so <code>list !== newList</code></li>
 <li>The returned immutable object from the mutation operation is the same as the initial list but with the modification applied</li>
 <li>The list can contains heterogeneous data (numbers and objects)</li>
 <li>The list items are <em>not immutable</em>, we pushed the <code>foo</code> object inside the list and changed it right after that</li>
 </ul>
-<p>It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js&apos; list as a thin wrapper around the standard JavaScript array:</p>
+<p>It is not responsibility of Immutable.js to make the entries immutable. We can think of Immutable.js&#x2019; list as a thin wrapper around the standard JavaScript array:</p>
 <p><amp-img src="/images/overview-components/immutable-collection-mutable-items.png" alt="Immutable data structure with mutable items"></amp-img></p>
 <p>We can simply access any of the mutable items inside the immutable data structure&#x2026;:</p>
 <p><amp-img src="/images/overview-components/touch-mutable-item.png" alt="Access mutable item"></amp-img></p>
@@ -232,13 +232,13 @@
 <p><amp-img src="/images/overview-components/change-mutable-item.png" alt="Change mutable item"></amp-img></p>
 <p>Which is not cool. In order to fix this behavior we can use <code>Object.freeze</code>.</p>
 <p>If we use <code>Object.freeze</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{}</span> <span class="p">}</span>
-<span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
-<span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// undefined
-</span><span class="c1"></span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// &apos;foobar&apos;
-</span></code></pre></div><p>Which means that <code>Object.freeze</code> doesn&#x2019;t do deep freeze of the objects.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">foo</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">bar</span><span class="o">:</span> <span class="p">{}</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Object</span><span class="p">.</span><span class="nx">freeze</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// undefined
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span> <span class="o">=</span> <span class="s1">&apos;foobar&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">bar</span><span class="p">.</span><span class="nx">baz</span><span class="p">);</span> <span class="c1">// &apos;foobar&apos;
+</span></span></span></code></pre></div><p>Which means that <code>Object.freeze</code> doesn&#x2019;t do deep freeze of the objects.</p>
 <p>What we can do is to:</p>
 <ul>
 <li>Use Immutable.js for our data structures</li>
@@ -258,102 +258,102 @@
 </ul>
 <p>Once the chat button is pressed all opened dialogs should be closed and the chat dialog should be opened in the middle area of the page. Once the profile button is pressed all opened dialogs should be closed and the &#x201C;Edit profile dialog&#x201D; should be opened. Pretty straight forward scenario.</p>
 <p>Lets implement the <code>Dialog</code> component in ReactJS:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-  <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hidden</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="nx">open</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-      <span class="nx">hidden</span><span class="o">:</span> <span class="kc">false</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">close</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-      <span class="nx">hidden</span><span class="o">:</span> <span class="kc">true</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">&apos;dialog&apos;</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hidden</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">classNames</span> <span class="o">+=</span> <span class="s1">&apos; hidden&apos;</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">classNames</span><span class="p">}</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">header</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">title</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/header&gt;</span>
-        <span class="o">&lt;</span><span class="nx">content</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">content</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/content&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>&#x2026;and we can use it like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-
-  <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">d</span><span class="p">].</span><span class="nx">close</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">dialog</span><span class="p">].</span><span class="nx">open</span><span class="p">();</span>
-  <span class="p">}</span>
-
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;left-sidebar&quot;</span><span class="o">&gt;</span>
-          <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;chat&apos;</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Chat</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-          <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;profile&apos;</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Profile</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
-        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;profile&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;right-sidebar&quot;</span><span class="o">&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Avatar</span> <span class="nx">profile</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Avatar&gt;</span>
-        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user&#x2019;s profile, etc. In such case we should take advantage of the components&apos; composability and decompose our <code>App</code> into a few simple components. So our <code>App</code> component will look something like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">Navigation</span><span class="o">&gt;&lt;</span><span class="err">/Navigation&gt;</span>
-        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;profile&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-        <span class="o">&lt;</span><span class="nx">ProfileManagement</span><span class="o">&gt;&lt;</span><span class="err">/ProfileManagement&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Okay&#x2026;but how will the <code>Navigation</code> component tell the <code>App</code> component when to open any of the dialogs? Remember our <code>ProfileManagement</code> component needs to be able to open the <code>profile</code> dialog as well&#x2026;? We can workaround this issue by passing callbacks:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-  <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">d</span><span class="p">].</span><span class="nx">close</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">dialg</span><span class="p">].</span><span class="nx">open</span><span class="p">();</span>
-  <span class="p">}</span>
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">Navigation</span> <span class="nx">openDialog</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;&lt;</span><span class="err">/Navigation&gt;</span>
-        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;dialog&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;dialog&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
-        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-        <span class="o">&lt;</span><span class="nx">ProfileManagement</span> <span class="nx">openDialog</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;&lt;</span><span class="err">/ProfileManagement&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Now inside the <code>Navigation</code> and <code>ProfileManagement</code> components we can invoke:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;chat&apos;</span><span class="p">);</span> <span class="c1">// open the chat dialog
-</span><span class="c1"></span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;profile&apos;</span><span class="p">);</span> <span class="c1">// open the edit profile dialog
-</span></code></pre></div><p>It started getting kind of messy, didn&#x2019;t it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component <code>E</code> needs to change the state of component <code>B</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hidden</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">open</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">hidden</span><span class="o">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">close</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">hidden</span><span class="o">:</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">&apos;dialog&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hidden</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">classNames</span> <span class="o">+=</span> <span class="s1">&apos; hidden&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">classNames</span><span class="p">}</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">header</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">title</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/header&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">content</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">content</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/content&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>&#x2026;and we can use it like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">d</span><span class="p">].</span><span class="nx">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">dialog</span><span class="p">].</span><span class="nx">open</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;left-sidebar&quot;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;chat&apos;</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Chat</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;profile&apos;</span><span class="p">)}</span><span class="o">&gt;</span><span class="nx">Profile</span><span class="o">&lt;</span><span class="err">/button&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;profile&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;right-sidebar&quot;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Avatar</span> <span class="nx">profile</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Avatar&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>This looks pretty reasonable. But what if we add more components to the page sections? We may have much more complex navigation with different effects, different components and further logic. Our right section may become more complex as well by adding more components for controlling the user&#x2019;s profile, etc. In such case we should take advantage of the components&#x2019; composability and decompose our <code>App</code> into a few simple components. So our <code>App</code> component will look something like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">Navigation</span><span class="o">&gt;&lt;</span><span class="err">/Navigation&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;profile&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">ProfileManagement</span><span class="o">&gt;&lt;</span><span class="err">/ProfileManagement&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Okay&#x2026;but how will the <code>Navigation</code> component tell the <code>App</code> component when to open any of the dialogs? Remember our <code>ProfileManagement</code> component needs to be able to open the <code>profile</code> dialog as well&#x2026;? We can workaround this issue by passing callbacks:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">App</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">openDialog</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">d</span> <span class="k">in</span> <span class="nx">dialogs</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">d</span><span class="p">].</span><span class="nx">close</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">[</span><span class="nx">dialg</span><span class="p">].</span><span class="nx">open</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">Navigation</span> <span class="nx">openDialog</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;&lt;</span><span class="err">/Navigation&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;main-area&quot;</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;dialog&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="o">&lt;</span><span class="nx">Dialog</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;dialog&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Chat&quot;</span> <span class="nx">content</span><span class="o">=</span><span class="p">{</span><span class="nx">some_content</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="err">/Dialog&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">ProfileManagement</span> <span class="nx">openDialog</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)}</span><span class="o">&gt;&lt;</span><span class="err">/ProfileManagement&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Now inside the <code>Navigation</code> and <code>ProfileManagement</code> components we can invoke:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;chat&apos;</span><span class="p">);</span> <span class="c1">// open the chat dialog
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">openDialog</span><span class="p">(</span><span class="s1">&apos;profile&apos;</span><span class="p">);</span> <span class="c1">// open the edit profile dialog
+</span></span></span></code></pre></div><p>It started getting kind of messy, didn&#x2019;t it? It is still manageable but imagine we have a deep tree with nested components and one component needs to be able to change the state of another component from entirely different subtree. For example in the picture bellow, component <code>E</code> needs to change the state of component <code>B</code>:</p>
 <p><amp-img src="/images/overview-components/sample-state-change.png" alt="Subtree state change"></amp-img></p>
 <p>This is not much different from our &#x201C;Stunning SPA inc&#x201D; app, where the <code>ProfileManagement</code> component needs to be able to change the state of the dialog components:</p>
 <p><amp-img src="/images/overview-components/example-real-life.png" alt="Real-life subtree state change"></amp-img></p>
@@ -375,21 +375,21 @@
 <p>All our components are going to have access to a global mutable object and through this object they are going to achieve bidirectional data flow&#x2026;plenty of dirty words in a single sentence! Did you see how only a second of inattention may cause you regrets during your entire life&#x2026;! I believe this recommendation by facebook was published before flux was released, otherwise they hate us and want us to suffer!</p>
 <h5 id="solution">Solution</h5>
 <p>We can handle this issue by using the &#x201C;flux way&#x201D;. We can externalize the state of all our components and put it into the store. This means that our dialog should receive as input whether it should be open or not:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">&apos;dialog&apos;</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">hidden</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">classNames</span> <span class="o">+=</span> <span class="s1">&apos; hidden&apos;</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">classNames</span><span class="p">}</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">header</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">title</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/header&gt;</span>
-        <span class="o">&lt;</span><span class="nx">content</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">content</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/content&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it&#x2019;s worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Dialog</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nx">classNames</span> <span class="o">=</span> <span class="s1">&apos;dialog&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">hidden</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">classNames</span> <span class="o">+=</span> <span class="s1">&apos; hidden&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">classNames</span><span class="p">}</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">header</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">title</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/header&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">content</span><span class="o">&gt;</span><span class="p">{{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">content</span><span class="p">}}</span><span class="o">&lt;</span><span class="err">/content&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>It should not have its own opinion on the topic! Okay, so how we should proceed if we want to open the chat dialog? I will explain it with the disclaimer that it might sound like a huge overhead but I promise that it&#x2019;s worth trying it! In the following use case in a casual format you can read the exact steps the user and the app need to perform:</p>
 <ul>
 <li>The user clicks the &#x201C;Chat&#x201D; button</li>
 <li>The button <code>onClick</code> handler is being invoked</li>

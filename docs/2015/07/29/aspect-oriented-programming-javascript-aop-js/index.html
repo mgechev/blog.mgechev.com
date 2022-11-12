@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.101.0" />
 		<title>Aspect-Oriented Programming in JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -93,174 +93,174 @@ The object-oriented programming paradigm is powerful. We design an OO system by 
 <p>The object-oriented programming paradigm is powerful. We design an OO system by decomposition of the problem domain, following guiding principles concerning the decomposition and the communication between the different modules. The process is structured; it involves logical thinking, understanding of the domain and eventual predictions for the future evolution of the system. Often we&rsquo;re trying to keep our code DRY (<a href="https://twitter.com/BonzoESC/status/442003113910603776/photo/1">not always</a>), highly coherent and loosely coupled. However, in some cases this is just impossible. There are some code snippets we&rsquo;re just blindly copying and pasting all around our code base.</p>
 <h2 id="cross-cutting-concerns">Cross-cutting Concerns</h2>
 <p>Lets say we have ES2015 class, which implements client-side <a href="https://en.wikipedia.org/wiki/Active_record_pattern">active record</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
-  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>We define the class <code>ArticleCollection</code>, which provides methods for fetching new articles, removing and updating already existing ones. In a typical scenario, during our development process we may want to add logging when given method is called and when its execution is completed:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
-  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked getArticleById with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">article</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of getArticleById completed succssfully&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">article</span><span class="p">;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of getArticleById&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Invoked getArticles with no arguments&#39;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of getArticles completed succssfully&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of getArticles&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked removeArticleById with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of removeArticleById completed succssfully&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of removeArticleById&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked updateArticle with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">, </span><span class="si">${</span><span class="nx">article</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of updateArticle completed succssfully&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
-      <span class="p">})</span>
-      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of updateArticle&#39;</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Cool&hellip;looks quite messy? How about having 20 more similar domain classes where we need to have the same logging logic? Lets look at the snippets and find some patterns:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>We define the class <code>ArticleCollection</code>, which provides methods for fetching new articles, removing and updating already existing ones. In a typical scenario, during our development process we may want to add logging when given method is called and when its execution is completed:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked getArticleById with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">article</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of getArticleById completed succssfully&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">article</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of getArticleById&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Invoked getArticles with no arguments&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of getArticles completed succssfully&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of getArticles&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked removeArticleById with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of removeArticleById completed succssfully&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of removeArticleById&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked updateArticle with arguments: </span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">, </span><span class="si">${</span><span class="nx">article</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;The invocation of updateArticle completed succssfully&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Error during the invocation of updateArticle&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">e</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Cool&hellip;looks quite messy? How about having 20 more similar domain classes where we need to have the same logging logic? Lets look at the snippets and find some patterns:</p>
 <ul>
 <li>In the beginning of the method&rsquo;s invocation we log message in the format: <code>Invoked METHOD_NAME with arguments: ARG1, ARG2, ..., ARG3</code>.</li>
 <li>On success we log: <code>The invocation of METHOD_NAME completed successfully</code></li>
 <li>On error we log: <code>Error during the invocation of METHOD_NAME</code></li>
 </ul>
 <p>What can we do in order to modularize these duplications? Create decorator of the class? Yeah, probably it is going to work. However, there&rsquo;s more elegant way to deal with this. Lets say, we define something called <code>LoggerAspect</code> and take advantage of the <a href="https://medium.com/google-developers/exploring-es7-decorators-76ecb65fb841">ES2016 decorators declarative</a> syntax:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">LoggerAspect</span> <span class="p">{</span>
-  <span class="err">@</span><span class="nx">beforeMethod</span><span class="p">({</span>
-    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-  <span class="p">})</span>
-  <span class="nx">beforeLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with arguments: </span><span class="si">${</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="err">@</span><span class="nx">afterResolve</span><span class="p">({</span>
-    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-  <span class="p">})</span>
-  <span class="nx">afterResolveLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`The invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="err">@</span><span class="nx">afterReject</span><span class="p">({</span>
-    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-  <span class="p">})</span>
-  <span class="nx">afterRejectLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Error during the invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Lets translate this step-by-step to human language:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
-</span><span class="c1"></span><span class="err">@</span><span class="nx">before</span><span class="p">({</span>
-  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-<span class="p">})</span>
-<span class="nx">beforeLogger</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with arguments: </span><span class="si">${</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="c1">// ...
-</span></code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">LoggerAspect</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">beforeMethod</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">beforeLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with arguments: </span><span class="si">${</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">afterResolve</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">afterResolveLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`The invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">afterReject</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">afterRejectLogger</span><span class="p">(</span><span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Error during the invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Lets translate this step-by-step to human language:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nx">before</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="nx">beforeLogger</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Invoked </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb"> with arguments: </span><span class="si">${</span><span class="nx">args</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div><ul>
 <li>Before the execution of all methods, which names match the regular expression <code>/Article/</code> defined inside classes, which names match the regular expression: <code>/.*/</code> - invoke the <code>beforeLogger</code> method&rsquo;s body. So, this definition is going to wrap all matched methods inside a function, which will call <code>beforeLogger</code> and after that will invoke the target method.</li>
 </ul>
 <p>How about this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">afterResolve</span><span class="p">({</span>
-  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-<span class="p">})</span>
-<span class="nx">afterResolveLogger</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`The invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">afterResolve</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="nx">afterResolveLogger</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`The invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
 <li>After the resolution of promise returned any method, which name matches the regular expression <code>/Article/</code>, defined within class, which name matches the regular expression <code>/.*/</code> invoke the body of <code>afterResolveLogger</code>. This means that for all matched methods will be created a wrapper, which invokes the method and on resolve of the returned promise calls the <code>afterResolveLogger</code>.</li>
 </ul>
 <p>Okay, sounds good&hellip;How about <code>afterReject</code>?</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">afterReject</span><span class="p">({</span>
-  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
-  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
-<span class="p">})</span>
-<span class="nx">afterRejectLogger</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Error during the invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">afterReject</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">methodNamePattern</span><span class="o">:</span> <span class="sr">/.*/</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">classNamePattern</span><span class="o">:</span> <span class="sr">/Article/</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="nx">afterRejectLogger</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Error during the invocation of </span><span class="si">${</span><span class="nx">meta</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
 <li>After the rejection of promise returned any method, which name matches the regular expression <code>/Article/</code>, defined within class, which name matches the regular expression <code>/.*/</code> invoke the body of <code>afterRejectLogger</code>. This means that for all matched methods will be created a wrapper, which invokes the method and on reject of the returned promise calls the <code>afterResolveLogger</code>.</li>
 </ul>
 <p>How we can apply this &ldquo;aspect&rdquo; to our <code>ArticleCollection</code>?</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Wove</span>
-<span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
-  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
-        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
-      <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>That&rsquo;s it. We replaced all the 56 lines of the <code>ArticleCollection</code> definition with the 20 lines definition by taking advantage of the module called <code>LoggerAspect</code>. However, the lack of code duplications here is not our biggest win. We were able to isolate the logging code into separate module, called aspect. The same strategy is applicable in many different scenarios:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Wove</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ArticleCollection</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">getArticles</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/articles&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">removeArticleById</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;delete&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">updateArticle</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">article</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fetch</span><span class="p">(</span><span class="sb">`/articles/</span><span class="si">${</span><span class="nx">id</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">method</span><span class="o">:</span> <span class="s1">&#39;put&#39;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>That&rsquo;s it. We replaced all the 56 lines of the <code>ArticleCollection</code> definition with the 20 lines definition by taking advantage of the module called <code>LoggerAspect</code>. However, the lack of code duplications here is not our biggest win. We were able to isolate the logging code into separate module, called aspect. The same strategy is applicable in many different scenarios:</p>
 <ul>
 <li>Transactions</li>
 <li>Authorization</li>

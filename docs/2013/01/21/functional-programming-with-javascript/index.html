@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.101.0" />
 		<title>Functional programming with JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -116,186 +116,186 @@
 <p>I hope these arguments are enough for you to look at the next sections. Now I’ll describe the functional elements in JavaScript and also provide implementations of aspects which are not native but their implementation won’t cost us much.</p>
 <h2 id="anonymous-functions">Anonymous functions</h2>
 <p>It seems that the functional programming becomes more and more popular. Even in Java 8 we’re going to have anonymous functions, in C# we have them since a long time. The anonymous function is a function which is defined without being bound to an identifier. JavaScript is familiar with this concept. If you’ve used JavaScript for more than simple exercises I’m sure that you’re familiar with them. When you use jQuery that’s probably one of the first things you type:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//do some stuff
-</span><span class="c1"></span><span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//do some stuff
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">});</span></span></span></code></pre></div>
 <p>The function passed to $(document).ready is exactly an anonymous function. This concept give as great benefits some times especially when we want to keep things DRY.</p>
 <p>More about passing functions in the next section&hellip;</p>
 <h2 id="high-order-functions">High-order functions</h2>
 <p>High-order functions are functions which accepts functions as arguments or returns functions. We can return and pass functions as arguments in C#, Java 8, Python, Perl, Ruby&hellip; The most popular language – JavaScript has these functional elements built-in for a long time. Here is a basic example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">property</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">endCallback</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">//Animation here...
-</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">endCallback</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">endCallback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="nx">animate</span><span class="p">(</span><span class="s1">&#39;background-color&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Animation finished&#39;</span><span class="p">);</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">property</span><span class="p">,</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">endCallback</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//Animation here...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">endCallback</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">endCallback</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">animate</span><span class="p">(</span><span class="s1">&#39;background-color&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Animation finished&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>In the code above we have function called animate. It accepts as arguments property which should be animated, duration and a callback which should be invoked when the animation is completed. We have this pattern also in jQuery. There are plenty of jQuery methods which accept functions as arguments, for example $.get:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/test.json&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">//processing of the data
-</span><span class="c1"></span><span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;http://example.com/test.json&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//processing of the data
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">});</span></span></span></code></pre></div>
 <p>Callbacks are everywhere in JavaScript, they are just perfect for asynchronous programming like event handling, ajax requests, clients handling (Node.js) and so on. As I mentioned above you can avoid repeating yourself by using callbacks. They are extremely useful when you want a piece of your code to behave differently based on condition.</p>
 <p>We have one more type of high-order functions – ones that return functions. There are many cases in JavaScript when returning a function is great approach. For example when we want to use caching:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="cm">/* From Asen Bozhilov&#39;s lz library */</span>
-<span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">cache</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">join</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s1">&#39;§&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;§&#39;</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">cache</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-    <span class="p">};</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="cm">/* From Asen Bozhilov&#39;s lz library */</span>
+</span></span><span class="line"><span class="cl"><span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">cache</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">join</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s1">&#39;§&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;§&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">cache</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>We have a variable cache defined in the local scope of the parent function. In each call first will be checked whether the function have been already called with these arguments, if so the result will be returned immediately, otherwise the result will be cached and returned. Even the suggestion that the function will return the same result if it’s called with the same arguments is extremely functional way of thinking&hellip;</p>
 <p>Imagine we have this case:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="kd">function</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">baz</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">baz</span> <span class="o">+</span> <span class="nx">foo</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="kd">var</span> <span class="nx">cached</span> <span class="o">=</span> <span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
-<span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2
-</span><span class="c1"></span><span class="nx">foo</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">baz</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">baz</span> <span class="o">+</span> <span class="nx">foo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">cached</span> <span class="o">=</span> <span class="nx">lz</span><span class="p">.</span><span class="nx">memo</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">foo</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">cached</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">//2
+</span></span></span></code></pre></div>
 <p>We have function called bar which accepts a single argument – baz and returns the sum of baz and the global foo. When we use memo we make bar cacheable and save a reference to the cacheable copy in the variable cached. When we call cached for first time its being evaluated for first time with argument 1 so it’s body is invoked and the result is 2. After that we increment foo and call the cached again. Now we get the same result (as we must in the pure functional languages) but it’s not the correct one. That’s because we have some kind of state. The state is something which will be considered lately in the Monads section (not the same type of state). Now lets keep our focus on the high-order functions and especially these which return functions.</p>
 <h2 id="closures">Closures</h2>
 <p>Let’s look at memo again. We have variable called cache which is defined in the lexical scope of the function which returns the cacheable function. This variable is also accessible from the returned function because a closure is created. This is one more element from the functional programming. It’s very wide spread. One of the ways we can implement privacy in JavaScript is using closures:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">articles</span> <span class="o">=</span> <span class="p">[];</span>
-
-    <span class="kd">function</span> <span class="nx">sortArticles</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nx">articles</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">name</span> <span class="o">-</span> <span class="nx">b</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="nx">getArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">articles</span><span class="p">;</span>
-        <span class="p">},</span>
-        <span class="nx">setArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">articleList</span><span class="p">)</span> <span class="p">{</span>
-           <span class="nx">articles</span> <span class="o">=</span> <span class="nx">articleList</span><span class="p">;</span>
-           <span class="nx">sortArticles</span><span class="p">();</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
-<span class="p">}());</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">articles</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">sortArticles</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">articles</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="nx">name</span> <span class="o">-</span> <span class="nx">b</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">getArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">articles</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">},</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">setArticles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">articleList</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">           <span class="nx">articles</span> <span class="o">=</span> <span class="nx">articleList</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">           <span class="nx">sortArticles</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
 <p>In the example above we have object called timeline. It’s the result of the Immediately-Invoked Function Expression (IIFE) which returns an object with properties getArticles and setArticles which is the actual public interface of timeline. Inside of the lexical scope of the IIFE there’s definition of the articles array and sort function, which cannot be called directly using the timeline object.</p>
 <p>I’ll end the topic about the high-order functions with ECMAScript 5. Along the years JavaScript gets even more functional elements. One of the things which appear first in our minds when we hear something about functional programming is the map function. It accept as arguments an anonymous function and a list. It applies the function to all elements from the list. map is officially part of ECMAScript 5.</p>
 <p>Here is a basic usage of it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">});</span>
-<span class="c1">//[2,4,6,8]
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">a</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//[2,4,6,8]
+</span></span></span></code></pre></div>
 <p>In the code above map doubles the array. map is not the only function which is so typical for the functional programming languages and added to ECMAScript 5, there are also filter and reduce.</p>
 <h2 id="recursion">Recursion</h2>
 <p>Another element which is common for almost all modern programming languages is the recursion. It’s function which calls itself inside it’s body:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>Above there’s a basic example which shows implementation of factorial using recursion. This concept is very popular so I’ll skip more detailed description.</p>
 <h2 id="managing-the-state-monads">Managing the state (Monads)</h2>
 <p>Of course, as we saw in the example with memoization, JavaScript is not purely functional language (probably that’s one of the reasons that the language is so popular&hellip;) because it has mutable data and states. Usually the purely functional programming languages like Haskell manages states using monads. There are implementations of Monads in JavaScript. For example here’s one by Douglas Crockford:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="cm">/* Code by Douglas Crockford */</span>
-<span class="kd">function</span> <span class="nx">MONAD</span><span class="p">(</span><span class="nx">modifier</span><span class="p">)</span> <span class="p">{</span>
-    <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-    <span class="nx">prototype</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="kd">function</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">prototype</span><span class="p">);</span>
-        <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span>
-                <span class="kc">undefined</span><span class="p">,</span>
-                <span class="p">[</span><span class="nx">value</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">args</span> <span class="o">||</span> <span class="p">[]))</span>
-            <span class="p">);</span>
-        <span class="p">};</span>
-        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">modifier</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">modifier</span><span class="p">(</span><span class="nx">monad</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">monad</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="nx">unit</span><span class="p">.</span><span class="nx">method</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
-    <span class="p">};</span>
-    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift_value</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-        <span class="p">};</span>
-        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
-    <span class="p">};</span>
-    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-            <span class="k">return</span> <span class="nx">result</span> <span class="o">&amp;&amp;</span> <span class="nx">result</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">?</span> <span class="nx">result</span> <span class="o">:</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
-        <span class="p">};</span>
-        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
-    <span class="p">};</span>
-    <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="cm">/* Code by Douglas Crockford */</span>
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">MONAD</span><span class="p">(</span><span class="nx">modifier</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">prototype</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">prototype</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">func</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="kc">undefined</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="p">[</span><span class="nx">value</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">args</span> <span class="o">||</span> <span class="p">[]))</span>
+</span></span><span class="line"><span class="cl">            <span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">modifier</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">modifier</span><span class="p">(</span><span class="nx">monad</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">monad</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">unit</span><span class="p">.</span><span class="nx">method</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift_value</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">unit</span><span class="p">.</span><span class="nx">lift</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">prototype</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">func</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="nx">result</span> <span class="o">&amp;&amp;</span> <span class="nx">result</span><span class="p">.</span><span class="nx">is_monad</span> <span class="o">===</span> <span class="kc">true</span> <span class="o">?</span> <span class="nx">result</span> <span class="o">:</span> <span class="nx">unit</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">unit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>Here is a short demo which shows how we can create an I/O monad:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nx">MONAD</span><span class="p">();</span>
-<span class="nx">monad</span><span class="p">(</span><span class="nx">prompt</span><span class="p">(</span><span class="s2">&#34;Enter your name:&#34;</span><span class="p">)).</span><span class="nx">bind</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Hello &#39;</span> <span class="o">+</span> <span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;!&#39;</span><span class="p">);</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">monad</span> <span class="o">=</span> <span class="nx">MONAD</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="nx">monad</span><span class="p">(</span><span class="nx">prompt</span><span class="p">(</span><span class="s2">&#34;Enter your name:&#34;</span><span class="p">)).</span><span class="nx">bind</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;Hello &#39;</span> <span class="o">+</span> <span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;!&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>Anyway, for me using monads in JavaScript looks more like academical exercise than really useful but if we want to work in purely functional manner we can use them.</p>
 <h2 id="schönfinkelization-or-simply-curring">Schönfinkelization (or simply Curring)</h2>
 <p>Schönfinkelization is a functional transformation which allows as to fill function’s arguments step by step. When the function accept it’s last argument it returns a result. It was originated by Moses Schönfinkel and later re-discovered by Haskell Curry. Here is a sample implementation in JavaScript, by Stoyan Stefanov:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="cm">/* By Stoyan Stafanov */</span>
-<span class="kd">function</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">slice</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">,</span>
-        <span class="nx">stored_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">new_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">),</span>
-            <span class="nx">args</span> <span class="o">=</span> <span class="nx">stored_args</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">new_args</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
-    <span class="p">};</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="cm">/* By Stoyan Stafanov */</span>
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">slice</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">stored_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">new_args</span> <span class="o">=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">arguments</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="nx">args</span> <span class="o">=</span> <span class="nx">stored_args</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">new_args</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>This is basic example using function for solving a quadratic equation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">quadraticEquation</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">b</span> <span class="o">*</span> <span class="nx">b</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span>
-        <span class="nx">x1</span><span class="p">,</span> <span class="nx">x2</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="s2">&#34;No roots in R&#34;</span><span class="p">;</span>
-    <span class="nx">x1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
-    <span class="nx">x2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="nx">x1</span><span class="o">:</span> <span class="nx">x1</span><span class="p">,</span>
-        <span class="nx">x2</span><span class="o">:</span> <span class="nx">x2</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">quadraticEquation</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">b</span> <span class="o">*</span> <span class="nx">b</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">c</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">x1</span><span class="p">,</span> <span class="nx">x2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">d</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="s2">&#34;No roots in R&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">x1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">x2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="nx">b</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">(</span><span class="nx">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nx">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">x1</span><span class="o">:</span> <span class="nx">x1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">x2</span><span class="o">:</span> <span class="nx">x2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>If we want to fill the function’s arguments one by one we use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">quadraticEquation</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">temp</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
-<span class="nx">temp</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// { x1: 1, x2: 1 }
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">quadraticEquation</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">temp</span> <span class="o">=</span> <span class="nx">schonfinkelize</span><span class="p">(</span><span class="nx">temp</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">temp</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// { x1: 1, x2: 1 }
+</span></span></span></code></pre></div>
 <p>If you want to use built in the language features instead of using the schonfinkelize function, you can use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind</a>. Since it’s defined in the prototype of the constructor function of all functions you can use it as method of each function. bind creates a new function with specific context and parameters. For example we may have the function:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>Now we apply bind to it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">newF</span> <span class="o">=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1, 2]
-</span><span class="c1"></span><span class="nx">newF</span> <span class="o">=</span> <span class="nx">newF</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1,2,3]
-</span><span class="c1"></span><span class="nx">newF</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">//window, [1,2,3,4]
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">newF</span> <span class="o">=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1, 2]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">newF</span> <span class="o">=</span> <span class="nx">newF</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">newF</span><span class="p">();</span> <span class="c1">//window, [1,2,3]
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">newF</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">//window, [1,2,3,4]
+</span></span></span></code></pre></div>
 <p>You have to be careful with bind because it’s not that spread supported. Based on <a href="http://kangax.github.io/es5-compat-table/">kagax ES5 compatibility table</a> IE9+ supports bind.</p>
 <p>This has practical application in some cases. Imagine you have a session object. The session key can be generated using complex time-expensive algorithm, it’s generation is required once the user visit our web site. Our session object also should store some kind of information about the user, for example current skin of the web page chosen by the client. Using currying you can call the session generating function, with it’s parameters, once the page load, this will produce the key. After that we can call the function for the user skin. This will produce the session object after the user select a skin but we won’t have overhead because of the complex algorithm which have generated the session key generation (it won’t be sensible by the user).</p>
 <h2 id="pattern-matching">Pattern matching</h2>
 <p>One of the coolest things I’ve met in the functional programming is the pattern matching. Actually, if I have to be honest I’m not completely sure why I love it so much, probably because of it’s simplicity and the way it breaks the problem into smaller pieces. For example in Haskell you can define factorial like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">factorial</span> <span class="mi">0</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="nx">factorial</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span> <span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">factorial</span> <span class="mi">0</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl"><span class="nx">factorial</span> <span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">factorial</span> <span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></span></span></code></pre></div>
 <p>It looks pretty cool. You divide a large task to smaller ones and make your solution simpler. When I started to write this article I’ve got an idea to implement something like this in JavaScript but I found out that it’s already implemented. Here is an example from <a href="https://github.com/bramstein/funcy">Bram Stein’s funcy</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">.</span><span class="nx">parameter</span><span class="p">,</span>
-    <span class="nx">fact</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">(</span>
-        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}],</span>
-        <span class="p">[</span><span class="nx">$</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="p">}]</span>
-    <span class="p">);</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">$</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">.</span><span class="nx">parameter</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fact</span> <span class="o">=</span> <span class="nx">fun</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span>  <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}],</span>
+</span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="nx">$</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">fact</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span> <span class="p">}]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span></span></span></code></pre></div>
 <p>We have special variable for parameters which is inside fun – fun.parameter. When we call fact with “ – function () { return 1; } will be called, otherwise function (n) { return n * fact(n – 1); }. So cool, right?</p>
 <p>I hope that I showed you clear enough all the functional aspects of JavaScript and how beautiful and simple they could be.</p>
 

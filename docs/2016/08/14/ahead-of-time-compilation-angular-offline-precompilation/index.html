@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.101.0" />
 		<title>Ahead-of-Time Compilation in Angular &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -26,7 +26,7 @@
 
 		<meta property="og:title" content="Ahead-of-Time Compilation in Angular" />
 		<meta property="og:description" content="Recently I added Ahead-of-Time (AoT) compilation support to angular-seed and got a lot of questions about the new feature. In order to answer most of them, we will start from the beginning by explaining the following topics:
- Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?" />
+Why we need compilation in Angular? What needs to be compiled? How it gets compiled? When the compilation takes place? Just-in-Time (JiT) vs Ahead-of-Time (AoT). What we get from AoT? How the AoT compilation works?" />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2016/08/14/ahead-of-time-compilation-angular-offline-precompilation/" />
 		
@@ -102,41 +102,41 @@
 <p>AngularJS 1.x had quite a dynamic approach for both rendering and change detection. For instance, the AngularJS 1.x compiler is quite generic. It is supposed to work for any template by performing a set of dynamic computations. Although this works great in the general case, the JavaScript Virtual Machines (VM) <a href="http://mrale.ph/blog/2012/06/03/explaining-js-vms-in-js-inline-caches.html">struggles with optimizing the calculations on lower level</a> because of their dynamic nature. <strong>Since the VM doesn&rsquo;t know the shapes of the objects which provide context for the dirty-checking logic (i.e. the so called scope), it&rsquo;s inline caches get a lot of misses which slows the execution down.</strong></p>
 <p>Angular, version 2 and above, took different approach. Instead of using the same logic for performing rendering and change detection for each individual component, the framework <strong>generates</strong> VM-friendly code at runtime or build time. <strong>This allows the JavaScript virtual machine to perform property access caching and execute the change detection/rendering logic much faster.</strong></p>
 <p>For instance, take a look at the following example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
-</span><span class="c1"></span><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
-  <span class="k">do</span> <span class="p">{</span>
-    <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">watcher</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-      <span class="nx">current</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">exp</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">Utils</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span><span class="p">,</span> <span class="nx">current</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
-        <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-        <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
-  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-<span class="c1">// ...
-</span></code></pre></div><p>This snippet is copied from my <a href="https://github.com/mgechev/light-angularjs/blob/master/lib/Scope.js#L61-L79">lightweight AngularJS 1.x implementation</a>. Above we perform a Depth-First-Search over the entire scope tree, looking for changes in our bindings. This approach will work for any directive. However, it is obviously slower compared to code which is directive specific:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
-        <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
-    <span class="p">}</span>
-    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
-<span class="c1">// ...
-</span></code></pre></div><p>The snippet above contains a piece of the implementation of the generated <code>detectChangesInternal</code> method of a compiled component from the <a href="https://github.com/mgechev/angular-seed">angular-seed project</a>. It gets the values of the individual bindings by using a direct property access and compares them with the new values using the most efficient way. Once it finds that their values are different, it updates only the impacted DOM elements.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">do</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">watcher</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">current</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">exp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">Utils</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span><span class="p">,</span> <span class="nx">current</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div><p>This snippet is copied from my <a href="https://github.com/mgechev/light-angularjs/blob/master/lib/Scope.js#L61-L79">lightweight AngularJS 1.x implementation</a>. Above we perform a Depth-First-Search over the entire scope tree, looking for changes in our bindings. This approach will work for any directive. However, it is obviously slower compared to code which is directive specific:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div><p>The snippet above contains a piece of the implementation of the generated <code>detectChangesInternal</code> method of a compiled component from the <a href="https://github.com/mgechev/angular-seed">angular-seed project</a>. It gets the values of the individual bindings by using a direct property access and compares them with the new values using the most efficient way. Once it finds that their values are different, it updates only the impacted DOM elements.</p>
 <p>By answering the question &ldquo;Why we need compilation?&rdquo; we answered the question &ldquo;What needs to be compiled?&rdquo; as well. We want to compile the templates of the components to JavaScript classes. These classes have methods that contain logic for detecting changes in the bindings and rendering the user interface. This way we are not coupled to the underlying platform (except the markup format). In other words, by having a different implementation of the renderer we can use the same AoT compiled component and render it without any changes in the code. So the component above could be rendered in NativeScript, for instance, as soon as the renderer understands the passed arguments.</p>
 <h2 id="just-in-time-jit-vs-ahead-of-time-aot">Just-in-Time (JiT) vs Ahead-of-Time (AoT)</h2>
 <img src="/images/aot-angular/timing.jpg" style="display: block; margin: auto;">
@@ -225,131 +225,131 @@
 </ul>
 <p>The factory functions above are only responsible for instantiation of the generated <code>AppViews</code>.</p>
 <p>As I mentioned above, the <code>detectChangesInternal</code> contains VM friendly code. Let&rsquo;s take a look at the compiled version of the template:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>{{newName}}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;text&#34;</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&#34;</span><span class="na">newName</span><span class="err">&#34;</span><span class="p">&gt;</span>
-</code></pre></div><p>The <code>detectChangesInternal</code> method going to look something like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
-</span><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
-        <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
-    <span class="p">}</span>
-    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
-<span class="c1">// ...
-</span></code></pre></div><p>Let&rsquo;s suppose that <code>currVal_6</code> has value <code>3</code> and <code>this_expr_6</code> has value <code>1</code>, and now lets trace the method&rsquo;s execution:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>{{newName}}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;text&#34;</span> <span class="err">[(</span><span class="na">ngModel</span><span class="err">)]=&#34;</span><span class="na">newName</span><span class="err">&#34;</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>The <code>detectChangesInternal</code> method going to look something like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">currVal_6</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">newName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="nx">import4</span><span class="p">.</span><span class="nx">checkBinding</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_NgModel_5_5</span><span class="p">.</span><span class="nx">model</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">((</span><span class="nx">changes</span> <span class="o">===</span> <span class="kc">null</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">(</span><span class="nx">changes</span> <span class="o">=</span> <span class="p">{});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">changes</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">import7</span><span class="p">.</span><span class="nx">SimpleChange</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span><span class="p">,</span> <span class="nx">currVal_6</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_expr_6</span> <span class="o">=</span> <span class="nx">currVal_6</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">detectContentChildrenChanges</span><span class="p">(</span><span class="nx">throwOnChange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div><p>Let&rsquo;s suppose that <code>currVal_6</code> has value <code>3</code> and <code>this_expr_6</code> has value <code>1</code>, and now lets trace the method&rsquo;s execution:</p>
 <p>For call like: <code>import4.checkBinding(1, 3)</code>, in production mode, <code>checkBinding</code> perform the following check:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="mi">1</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">||</span> <span class="k">typeof</span> <span class="mi">1</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="mi">3</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-</code></pre></div><p>The expression above will return <code>false</code>, so we&rsquo;re going to store the change and update the <code>model</code> value of the <code>NgModel</code> directive instance. Right after that the <code>detectContentChildrenChanges</code> will be invoked which will invoke the <code>detectChangesInternal</code> method for all the content children. Once the <code>NgModel</code> directive finds out about the changed value of the <code>model</code> property, it&rsquo;ll update the corresponding element by (almost) directly calling the renderer.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="mi">1</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">||</span> <span class="k">typeof</span> <span class="mi">1</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="k">typeof</span> <span class="mi">3</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isNaN</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</span></span></code></pre></div><p>The expression above will return <code>false</code>, so we&rsquo;re going to store the change and update the <code>model</code> value of the <code>NgModel</code> directive instance. Right after that the <code>detectContentChildrenChanges</code> will be invoked which will invoke the <code>detectChangesInternal</code> method for all the content children. Once the <code>NgModel</code> directive finds out about the changed value of the <code>model</code> property, it&rsquo;ll update the corresponding element by (almost) directly calling the renderer.</p>
 <p>Nothing unusual and terribly complicated so far.</p>
 <h3 id="the-context-property">The <code>context</code> property</h3>
 <p>Maybe you&rsquo;ve noticed that within the <strong>internal component</strong> we&rsquo;re accessing the property <code>this.context</code>. The <code>context</code> of the internal component is the instasnce of the component&rsquo;s controller itself. So for instance:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
-  <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><p>&hellip;<code>this.context</code> will equal to <code>new HeroComponent()</code>. This means that in <code>detectChangesInternal</code> we have to access <code>this.context.name</code>. Here comes a problem. <strong>If we want to emit TypeScript as output of the AoT compilation process we must make sure we access only public fields in the templates of our components.</strong> Why is that? As we already mentioned the compiler can generate both TypeScript and JavaScript. Since TypeScript has access modifiers, and enforces access only to public properties outside the inheritance chain, inside the internal component we cannot access any private properties part of the context object, so both:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><p>&hellip;and&hellip;</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">class</span> <span class="nx">Hero</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
-  <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div><p>will throw a compile time error in the generated <code>*.ngfactory.ts</code>. In the first example the internal component cannot access <code>hero</code> since it&rsquo;s private within <code>HeroComponent</code>, and in the second case the internal component won&rsquo;t be able to access <code>hero.name</code>, since <code>name</code> is private inside <code>Hero</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>&hellip;<code>this.context</code> will equal to <code>new HeroComponent()</code>. This means that in <code>detectChangesInternal</code> we have to access <code>this.context.name</code>. Here comes a problem. <strong>If we want to emit TypeScript as output of the AoT compilation process we must make sure we access only public fields in the templates of our components.</strong> Why is that? As we already mentioned the compiler can generate both TypeScript and JavaScript. Since TypeScript has access modifiers, and enforces access only to public properties outside the inheritance chain, inside the internal component we cannot access any private properties part of the context object, so both:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>&hellip;and&hellip;</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Hero</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;hero-app&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{ hero.name }}&lt;/h1&gt;&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">HeroComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">hero</span><span class="o">:</span> <span class="nx">Hero</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>will throw a compile time error in the generated <code>*.ngfactory.ts</code>. In the first example the internal component cannot access <code>hero</code> since it&rsquo;s private within <code>HeroComponent</code>, and in the second case the internal component won&rsquo;t be able to access <code>hero.name</code>, since <code>name</code> is private inside <code>Hero</code>.</p>
 <h3 id="aot-and-encapsulation">AoT and encapsulation</h3>
 <p>Alright, we&rsquo;ll bind only to public properties and invoke only public methods inside of the templates but what happens with the component encapsulation? This may doesn&rsquo;t seem like a big problem at first, but imagine the following scenario:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
-</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
-</span><span class="sb">    {{ _initials }}
-</span><span class="sb">  `</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
-  <span class="kr">private</span> <span class="nx">_initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-
-  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
-  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">_initials</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;. &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">;</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">_name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>The component above has a single input - <code>name</code>. Inside of the <code>name</code> setter it calculates the value of the <code>_initials</code> property. We can use the component as follows:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&#34;name&#34;&gt;&lt;/third-party&gt;&#39;</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">})</span>
-<span class="c1">// ...
-</span></code></pre></div><p>Since in JiT mode, the Angular compiler generates JavaScript, this works perfect! Each time the value of the <code>name</code> expression changes and equals to truthy value, the <code>_initials</code> property will be recomputed. However, the implementation of <code>ThirdPartyComponent</code> is not AoT-friendly (to make sure you access only public/existing fields in your templates you can use <a href="https://github.com/mgechev/codelyzer">codelyzer</a>. If we want to do so we have to change it to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
-</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
-</span><span class="sb">    {{ initials }}
-</span><span class="sb">  `</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
-  <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-
-  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
-  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
-<span class="p">}</span>
-</code></pre></div><p>And thus something like this will be possible:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span><span class="nx">ThirdPartyComponent</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;third-party-lib&#39;</span><span class="p">;</span>
-
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&#34;name&#34;&gt;&lt;/third-party&gt;&#39;</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">})</span>
-<span class="kr">class</span> <span class="nx">Consumer</span> <span class="p">{</span>
-  <span class="err">@</span><span class="nx">ViewChild</span><span class="p">(</span><span class="nx">ThirdPartyComponent</span><span class="p">)</span> <span class="nx">cmp</span><span class="o">:</span> <span class="nx">ThirdPartyComponent</span><span class="p">;</span>
-  <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo Bar&#39;</span><span class="p">;</span>
-
-  <span class="nx">ngAfterViewInit</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">cmp</span><span class="p">.</span><span class="nx">initials</span> <span class="o">=</span> <span class="s1">&#39;M. D.&#39;</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>&hellip;which will leave the <code>ThirdPartyComponent</code> component in an inconsistent state. The value of the <code>_name</code> property of the <code>ThirdPartyComponent</code>&rsquo;s instance will be <code>Foo Bar</code> but the value of <code>initials</code> will be <code>M. D.</code> (instead of <code>F. B.</code>).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// component.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span></span></span><span class="line"><span class="cl"><span class="sb">    {{ _initials }}
+</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">_initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">_initials</span> <span class="o">=</span> <span class="nx">name</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;. &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">_name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The component above has a single input - <code>name</code>. Inside of the <code>name</code> setter it calculates the value of the <code>_initials</code> property. We can use the component as follows:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&#34;name&#34;&gt;&lt;/third-party&gt;&#39;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div><p>Since in JiT mode, the Angular compiler generates JavaScript, this works perfect! Each time the value of the <code>name</code> expression changes and equals to truthy value, the <code>_initials</code> property will be recomputed. However, the implementation of <code>ThirdPartyComponent</code> is not AoT-friendly (to make sure you access only public/existing fields in your templates you can use <a href="https://github.com/mgechev/codelyzer">codelyzer</a>. If we want to do so we have to change it to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// component.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span></span></span><span class="line"><span class="cl"><span class="sb">    {{ initials }}
+</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>And thus something like this will be possible:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">ThirdPartyComponent</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;third-party-lib&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;third-party [name]=&#34;name&#34;&gt;&lt;/third-party&gt;&#39;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Consumer</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">ViewChild</span><span class="p">(</span><span class="nx">ThirdPartyComponent</span><span class="p">)</span> <span class="nx">cmp</span><span class="o">:</span> <span class="nx">ThirdPartyComponent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo Bar&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">ngAfterViewInit</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">cmp</span><span class="p">.</span><span class="nx">initials</span> <span class="o">=</span> <span class="s1">&#39;M. D.&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>&hellip;which will leave the <code>ThirdPartyComponent</code> component in an inconsistent state. The value of the <code>_name</code> property of the <code>ThirdPartyComponent</code>&rsquo;s instance will be <code>Foo Bar</code> but the value of <code>initials</code> will be <code>M. D.</code> (instead of <code>F. B.</code>).</p>
 <p>The answer of how to solve this issue is rooted in the <a href="https://github.com/angular/angular/blob/14ee75924b6ae770115f7f260d720efa8bfb576a/modules/%40angular/common/testing/mock_location_strategy.ts#L26">Angular&rsquo;s code</a>. In case we want to make our code AoT-friendly (i.e. bind only to public properties and methods in our templates), and in the same time keep encapsulation, we can use the TypeScript annotation <code>/** @internal */</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// component.ts
-</span><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
-</span><span class="sb">    {{ initials }}
-</span><span class="sb">  `</span>
-<span class="p">})</span>
-<span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
-  <span class="cm">/** @internal */</span>
-  <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-
-  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
-  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
-<span class="p">}</span>
-</code></pre></div><p>The <code>initials</code> property will be public but if we compile our third-party library with <code>tsc</code> and the <code>--stripInternal</code> and <code>--declarations</code> flags set, the <code>initials</code> property will be omitted from the type declarations file (e.g. <code>d.ts</code> file) for <code>ThirdPartyComponent</code>. This way we will be able to access it within the bounderies of our library but it won&rsquo;t be accessible by its consumers.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// component.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;third-party&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span></span></span><span class="line"><span class="cl"><span class="sb">    {{ initials }}
+</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ThirdPartyComponent</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="cm">/** @internal */</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">initials</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">_name</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="err">@</span><span class="nx">Input</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">set</span> <span class="nx">name</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The <code>initials</code> property will be public but if we compile our third-party library with <code>tsc</code> and the <code>--stripInternal</code> and <code>--declarations</code> flags set, the <code>initials</code> property will be omitted from the type declarations file (e.g. <code>d.ts</code> file) for <code>ThirdPartyComponent</code>. This way we will be able to access it within the bounderies of our library but it won&rsquo;t be accessible by its consumers.</p>
 <h4 id="recap-of-ngfactoryts">Recap of <code>ngfactory.ts</code></h4>
 <p>Now lets make a quick recap of what&rsquo;s going on behind the scene! Lets suppose we have the <code>HeroComponent</code> from the example above. For this component, the Angular compiler will generate two classes:</p>
 <ul>
@@ -362,7 +362,7 @@
 <p><img src="/images/aot-angular/aot-summary.png" alt="AoT Summary"></p>
 <h2 id="aot-vs-jit---development-experience">AoT vs JiT - development experience</h2>
 <p>In this section we&rsquo;ll discuss another point of difference between the development experience in using AoT vs JiT.</p>
-<p>Maybe the biggest difference between JiT that impacts the development experience is the fact that in JiT mode the internal component and the internal host component will be defined in JavaScript. This means that the fields in our components' controllers are always going to be public so we can&rsquo;t get any compile-time errors because our internal component accesses any private fields of its context.</p>
+<p>Maybe the biggest difference between JiT that impacts the development experience is the fact that in JiT mode the internal component and the internal host component will be defined in JavaScript. This means that the fields in our components&rsquo; controllers are always going to be public so we can&rsquo;t get any compile-time errors because our internal component accesses any private fields of its context.</p>
 <p>In JiT once we bootstrap the application we already have our root injector and all the directives available in the root component (they are included in <code>BrowserModule</code> and all other modules that we import in the root module). This metadata will be passed to the compiler for the process of compilation of the template of the root component. Once the compiler generates the code with JiT, it has all the metadata which should be used for the generation of the code for all child components. It can generate the code for all of them since it already knows not only which providers are available at this level of the component tree but also which directives are visible there.</p>
 <p>This will allow the compiler know what to do when it visit an element in the template. For instance, the element <code>&lt;bar-baz&gt;&lt;/bar-baz&gt;</code> can be interpreted in two different ways depending on whether there&rsquo;s a directive/component with selector <code>bar-baz</code> available or not. Whether the compiler will only create an element <code>bar-baz</code> or also instantiate the component associated with the selector <code>bar-baz</code> depends on the metadata at the current phase of the compilation process (on the current state).</p>
 <p>Here comes the problem. How at build time we would know what directives are accessible on all levels of the component tree? Thanks to the great design of Angular we can perform a static-code analysis and find this out! <a href="https://github.com/chuckjaz">Chuck Jazdzewski</a> and <a href="https://github.com/alexeagle">Alex Eagle</a> did amazing job in this direction by developing the <a href="https://github.com/angular/angular/blob/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped/src/collector.ts"><code>MetadataCollector</code></a> and other <a href="https://github.com/angular/angular/tree/156a52e390256b00ae7c1fe1f80281cb1d1fe773/tools/%40angular/tsc-wrapped">related modules</a>. What the collector does is to walk the component tree and extract the metadata for each individual component and NgModule. This involves some awesome techniques which unfortunately are out of the scope of this blog post.</p>
@@ -385,7 +385,7 @@
 <img src="/images/aot-angular/better-place.jpg" style="display: block; margin: auto;">
 <h2 id="conclusion">Conclusion</h2>
 <p>The Angular&rsquo;s compiler improves the performance of our applications dramatically by taking advantage of the inline caching mechanism of the JavaScript Virtual Machines. On top of that we can perform it as part of our build process which solves problems such as forbidden <code>eval</code>, allows us to perform more efficient tree-shaking, improves the initial rendering time.</p>
-<p>Do we loose anything by not performing the compilation at runtime? In some very limited cases we may need to generate the templates of the components on demand. This will require us to load non-compiled components and perform the compilation process in the browser, in such cases we&rsquo;d need to include the <code>@angular/compiler</code> module as part of our application bundle. Another potential drawback of AoT compiled large to medium applications is the increase in their bundle size. Since the produced JavaScript for the components' templates has bigger size compared to the templates themselves, this will most likely lead to bigger final bundle.</p>
+<p>Do we loose anything by not performing the compilation at runtime? In some very limited cases we may need to generate the templates of the components on demand. This will require us to load non-compiled components and perform the compilation process in the browser, in such cases we&rsquo;d need to include the <code>@angular/compiler</code> module as part of our application bundle. Another potential drawback of AoT compiled large to medium applications is the increase in their bundle size. Since the produced JavaScript for the components&rsquo; templates has bigger size compared to the templates themselves, this will most likely lead to bigger final bundle.</p>
 <p>In general, the AoT compilation is a good technique which is already integrated as part of the <a href="https://github.com/mgechev/angular-seed">angular-seed</a> and <code>angular-cli</code>, so you can take advantage of it today!</p>
 <h2 id="references">References</h2>
 <ul>

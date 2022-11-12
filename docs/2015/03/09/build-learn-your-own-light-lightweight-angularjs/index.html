@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.101.0" />
 		<title>Build Your own Simplified AngularJS in 200 Lines of JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -26,7 +26,7 @@
 
 		<meta property="og:title" content="Build Your own Simplified AngularJS in 200 Lines of JavaScript" />
 		<meta property="og:description" content="My practice proved that there are two good/easy ways to learn a new technology:
- Re-implement it by your own See how the concepts you already know fit in it  In some cases the first approach is too big overhead. For instance, if you want to understand how the kernel works it is far too complex and slow to re-implement it. It might work to implement a light version of it (a model), which abstracts components that are not interesting for your learning purposes." />
+Re-implement it by your own See how the concepts you already know fit in it In some cases the first approach is too big overhead. For instance, if you want to understand how the kernel works it is far too complex and slow to re-implement it. It might work to implement a light version of it (a model), which abstracts components that are not interesting for your learning purposes." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2015/03/09/build-learn-your-own-light-lightweight-angularjs/" />
 		
@@ -131,7 +131,7 @@
 <p>It will be a singleton with the following responsibilities:</p>
 <ul>
 <li>Register components (directives, services and controllers)</li>
-<li>Resolve components' dependencies</li>
+<li>Resolve components&rsquo; dependencies</li>
 <li>Initialize components</li>
 </ul>
 <h3 id="domcompiler">DOMCompiler</h3>
@@ -163,29 +163,29 @@
 <p>But how we can apply graph theory in our AngularJS implementation? In AngularJS instead of users we have components (services, controllers, directives, filters). Each component may depend (use) another component. So the nodes in our AngularJS graph are the different components and the edges are the relations between them. For example, the graph of the dependencies of the <code>$resource</code> service, will look something like:</p>
 <p><a href="/images/lightweight-ng/resource-graph.png"><img src="/images/lightweight-ng/resource-graph.png" alt=""></a></p>
 <p>There are two more places we are going to use graphs - the DOM tree and the scope hierarchy. For example, if we turn the following HTML:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>into a tree, we will get:</p>
 <p><a href="/images/lightweight-ng/dom-tree.png"><img src="/images/lightweight-ng/dom-tree.png" alt=""></a></p>
 <p>For discovering all directives in the DOM tree, we need to visit each element and check whether there is registered directive associated with its attributes. How we can visit all nodes? Well, we can use the <a href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search algorithm</a>, which is used in AngularJS:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">1  procedure DFS(G,v):
-2      label v as discovered
-3      for all edges from v to w in G.adjacentEdges(v) do
-4          if vertex w is not labeled as discovered then
-5              recursively call DFS(G,w)</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">1  procedure DFS(G,v):
+</span></span><span class="line"><span class="cl">2      label v as discovered
+</span></span><span class="line"><span class="cl">3      for all edges from v to w in G.adjacentEdges(v) do
+</span></span><span class="line"><span class="cl">4          if vertex w is not labeled as discovered then
+</span></span><span class="line"><span class="cl">5              recursively call DFS(G,w)</span></span></code></pre></div>
 <h2 id="implementation">Implementation</h2>
 <p>Since we are done with theory, we can begin our implementation!</p>
 <h3 id="provider-1">Provider</h3>
 <p>As we said the <code>Provider</code> will:</p>
 <ul>
 <li>Register components (directives, services and controllers)</li>
-<li>Resolve components' dependencies</li>
+<li>Resolve components&rsquo; dependencies</li>
 <li>Initialize components</li>
 </ul>
 <p>So it will has the following interface:</p>
@@ -193,69 +193,69 @@
 <li><code>get(name, locals)</code> - returns service by its name and local dependencies</li>
 <li><code>invoke(fn, locals)</code> - initializes service by its factory and local dependencies</li>
 <li><code>directive(name, fn)</code> - registers a directive by name and factory</li>
-<li><code>controller(name, fn)</code> - registers a controller by name and factory. Note that controllers are not part of the AngularJS' core. They are implemented through the <code>$controller</code> service.</li>
+<li><code>controller(name, fn)</code> - registers a controller by name and factory. Note that controllers are not part of the AngularJS&rsquo; core. They are implemented through the <code>$controller</code> service.</li>
 <li><code>service(name, fn)</code> - registers a service by name and factory</li>
 <li><code>annotate(fn)</code> - returns an array of the names of the dependencies of given service</li>
 </ul>
 <h4 id="registration-of-components">Registration of components</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">_providers</span><span class="o">:</span> <span class="p">{},</span>
-  <span class="nx">directive</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">,</span> <span class="nx">fn</span><span class="p">);</span>
-  <span class="p">},</span>
-  <span class="nx">controller</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">fn</span><span class="p">;</span>
-    <span class="p">});</span>
-  <span class="p">},</span>
-  <span class="nx">service</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">);</span>
-  <span class="p">},</span>
-  <span class="nx">_register</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">factory</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">_providers</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="c1">//...
-</span><span class="c1"></span><span class="p">};</span>
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;Directive&#39;</span><span class="p">;</span>
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;Controller&#39;</span><span class="p">;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">_providers</span><span class="o">:</span> <span class="p">{},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">directive</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">,</span> <span class="nx">fn</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">controller</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">fn</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">service</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_register</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">fn</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">_register</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">factory</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_providers</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;Directive&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span> <span class="o">=</span> <span class="s1">&#39;Controller&#39;</span><span class="p">;</span></span></span></code></pre></div>
 <p>The code above provides a simple implementation for registration of components. We define the &ldquo;private&rdquo; object called <code>_providers</code>, which contains all factory methods of the registered directives, controllers and services. We also define the methods <code>directive</code>, <code>service</code> and <code>controller</code>, which delegate their call to <code>_register</code>. In <code>controller</code> we wrap the passed controller inside a function for simplicity, since we want to be able to invoke the controller multiple times, without caching the value it returns after being invoked. The method <code>controller</code> will get more obvious after we review the <code>get</code> method and the <code>ngl-controller</code> directive. The only methods left are:</p>
 <ul>
 <li><code>invoke</code></li>
 <li><code>get</code></li>
 <li><code>annotate</code></li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="c1">// ...
-</span><span class="c1"></span>  <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
-    <span class="p">}</span>
-    <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_providers</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">provider</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">provider</span> <span class="o">!==</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">locals</span><span class="p">));</span>
-  <span class="p">},</span>
-  <span class="nx">annotate</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
-        <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\((.*?)\)/</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">res</span> <span class="o">&amp;&amp;</span> <span class="nx">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">res</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="p">[];</span>
-  <span class="p">},</span>
-  <span class="nx">invoke</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">locals</span> <span class="o">=</span> <span class="nx">locals</span> <span class="o">||</span> <span class="p">{};</span>
-    <span class="kd">var</span> <span class="nx">deps</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">locals</span><span class="p">[</span><span class="nx">s</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
-    <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">deps</span><span class="p">);</span>
-  <span class="p">},</span>
-  <span class="nx">_cache</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$rootScope</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">}</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Provider</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">provider</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_providers</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">provider</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">provider</span> <span class="o">!==</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_cache</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">provider</span><span class="p">,</span> <span class="nx">locals</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">annotate</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\((.*?)\)/</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">res</span> <span class="o">&amp;&amp;</span> <span class="nx">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">res</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">invoke</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">locals</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">locals</span> <span class="o">=</span> <span class="nx">locals</span> <span class="o">||</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">deps</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">annotate</span><span class="p">(</span><span class="nx">fn</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">locals</span><span class="p">[</span><span class="nx">s</span><span class="p">]</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">s</span><span class="p">,</span> <span class="nx">locals</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">deps</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">_cache</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$rootScope</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">()</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>We have a little bit more logic here so lets start with <code>get</code>. In <code>get</code> we initially check whether we already have this component cached in the <code>_cache</code> object. If it is cached we simply return it (see <a href="https://github.com/mgechev/angularjs-in-patterns/#singleton">singleton</a>). <code>$rootScope</code> is cached by default since we want only one instance for it and we need it once the application is bootstrapped. If we don&rsquo;t find the component in the cache we get its provider (factory) and invoke it using the <code>invoke</code> method, by passing its provider and local dependencies.</p>
 <p>In <code>invoke</code> the first thing we do is to assign an empty object to <code>locals</code> if there are no local dependencies. What are the local dependencies?</p>
 <h5 id="local-dependencies">Local Dependencies</h5>
@@ -266,33 +266,33 @@
 </ul>
 <p>The global dependencies are all the components we register using <code>factory</code>, <code>service</code>, <code>filter</code> etc. They are accessible by each other component in the application. But how about the <code>$scope</code>? For each controller we want a different scope, the <code>$scope</code> object is not a global dependency registered the same way as lets say <code>$http</code> or <code>$resource</code>. The same for <code>$delegate</code> when we create a decorator. <code>$scope</code> and <code>$delegate</code> are local dependencies, specific for given component.</p>
 <p>Lets go back to the <code>invoke</code> implementation. After taking care of <code>null</code> or <code>undefined</code> for <code>locals</code> value, we get the names of all dependencies of the current component. Note that our implementation will support resolving of dependencies only declared as parameter names:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;Controller&#39;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></code></pre></div>
-<p>Once we cast <code>Controller</code> into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies' names using the regular expression in <code>annotate</code>. But what if we have comments in the <code>Controller</code>&rsquo;s definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span> <span class="cm">/* only local scope, for the component */</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-<span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;Controller&#39;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;Controller&#39;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></span></span></code></pre></div>
+<p>Once we cast <code>Controller</code> into a string we will get the string corresponding to the controllers definition. After that we can simply take all the dependencies&rsquo; names using the regular expression in <code>annotate</code>. But what if we have comments in the <code>Controller</code>&rsquo;s definition:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span> <span class="cm">/* only local scope, for the component */</span><span class="p">,</span> <span class="nx">$http</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nx">angular</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;Controller&#39;</span><span class="p">,</span> <span class="nx">Controller</span><span class="p">);</span></span></span></code></pre></div>
 <p>A simple regular expression will not work here, because invoking <code>Controller.toString()</code> will return the comments as well, so that&rsquo;s why we initially strip them by using <code>.replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg, '')</code>.</p>
 <p>Once we get the names of all dependencies we need to instantiate them so that&rsquo;s why we have the <code>map</code>, which loops over all the strings in the array and calls <code>this.get</code>. Do you notice a problem here? What if we have component <code>A</code>, which depends on <code>B</code> and <code>C</code> and lets say <code>C</code> depends on <code>A</code>? In this case we are going to have infinite loop or so called <code>circular dependency</code>. In this implementation we don&rsquo;t handle such problems but you can take care of them by using <a href="https://en.wikipedia.org/wiki/Topological_sorting">topological sort</a> or keeping track of the visited &ldquo;nodes&rdquo; (dependencies).</p>
 <p>And that&rsquo;s our provider&rsquo;s implementation! Now we can register components like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;RESTfulService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// make restful call &amp; return promise
-</span><span class="c1"></span>  <span class="p">};</span>
-<span class="p">});</span>
-
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">RESTfulService</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">RESTfulService</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;RESTfulService&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// make restful call &amp; return promise
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">RESTfulService</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">RESTfulService</span><span class="p">(</span><span class="nx">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>And later we can invoke <code>MainCtrl</code> by:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
-<span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">);</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">);</span></span></span></code></pre></div>
 <p>Pretty cool, ah? And that&rsquo;s how we have 1/4 of our Lightweight AngularJS implementation!</p>
 <h3 id="domcompiler-1">DOMCompiler</h3>
 <p>The main responsibility of the <code>DOMCompiler</code> is to:</p>
@@ -312,48 +312,48 @@
 <li><code>compile(el, scope)</code> - invokes the logic of all directives associated with given element (<code>el</code>) and calls itself recursively for each child element of <code>el</code>. We need to have a scope associated with the current element because that&rsquo;s how the data-binding is achieved. Since each directive may create different scope, we need to pass the current scope in the recursive call.</li>
 </ul>
 <p>And here is the implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">DOMCompiler</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="nx">bootstrap</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-      <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;$rootScope&#39;</span><span class="p">));</span>
-  <span class="p">},</span>
-  <span class="nx">compile</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">dirs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_getElDirectives</span><span class="p">(</span><span class="nx">el</span><span class="p">);</span>
-    <span class="kd">var</span> <span class="nx">dir</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">scopeCreated</span><span class="p">;</span>
-    <span class="nx">dirs</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">dir</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">dir</span><span class="p">.</span><span class="nx">scope</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">scopeCreated</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">scope</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$new</span><span class="p">();</span>
-        <span class="nx">scopeCreated</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-      <span class="p">}</span>
-      <span class="nx">dir</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-    <span class="p">});</span>
-    <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">el</span><span class="p">.</span><span class="nx">children</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">scope</span><span class="p">);</span>
-    <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
-  <span class="p">},</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">DOMCompiler</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">bootstrap</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;$rootScope&#39;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">compile</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">dirs</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_getElDirectives</span><span class="p">(</span><span class="nx">el</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">dir</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">scopeCreated</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dirs</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">dir</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="nx">dir</span><span class="p">.</span><span class="nx">scope</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">scopeCreated</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scope</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$new</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scopeCreated</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">dir</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">slice</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">el</span><span class="p">.</span><span class="nx">children</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">scope</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span></span></span></code></pre></div>
 <p>The implementation of <code>bootstrap</code> is trivial. It delegates its call to <code>compile</code> with the root HTML element. What happens in <code>compile</code> is far more interesting.
 Initially we use a helper method, which gets all directives associated to the given element. We will take a look at <code>_getElDirectives</code> later. Once we have the list of all directives we loop over them and get the provider for each directive. After that we check whether the given directive requires creation of a new scope, if it does and we haven&rsquo;t already instantiated any other scope for the given element we invoke <code>scope.$new()</code>, which creates a new scope, which prototypically inherits from the current <code>scope</code>. After that we invoke the link function of the directive, with the appropriate parameters. What follows after that is the recursive call. Since <code>el.children</code> is a <code>NodeList</code> we cast it to an array by using <code>Array.prototype.slice.call</code>, which is followed by recursive call with the child element and the current scope. What does this algorithm reminds you of? Doesn&rsquo;t it look just like DFS - yes, that&rsquo;s what it is. So here the graphs came handy as well!</p>
 <p>Now lets take a quick look at <code>_getElDirectives</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
-</span><span class="c1"></span><span class="nx">_getElDirectives</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">attrs</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">attributes</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">[];</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">attrs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">result</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
-        <span class="nx">name</span><span class="o">:</span> <span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">,</span>
-        <span class="nx">value</span><span class="o">:</span> <span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="c1">// ...
-</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">_getElDirectives</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">attrs</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">attributes</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">attrs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">DIRECTIVES_SUFFIX</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">result</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">name</span><span class="o">:</span> <span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">value</span><span class="o">:</span> <span class="nx">attrs</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// ...
+</span></span></span></code></pre></div>
 <p>This method iterates over all attributes of <code>el</code>, once it finds an attribute, which is already registered as directive it pushes its name and value in the result list.</p>
 <p>Alright! We&rsquo;re done with the <code>DOMCompiler</code>. Lets go to our last major component:</p>
 <h3 id="scope-1">Scope</h3>
@@ -367,170 +367,170 @@ Initially we use a helper method, which gets all directives associated to the gi
 <li><code>$digest()</code> - runs the dirty checking loop</li>
 </ul>
 <p>So lets dig deeper the scope&rsquo;s implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span> <span class="o">=</span> <span class="p">[];</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$id</span> <span class="o">=</span> <span class="nx">id</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></code></pre></div>
-<p>We simplify the AngularJS' scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the &ldquo;static&rdquo; property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">Scope</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span> <span class="o">=</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$id</span> <span class="o">=</span> <span class="nx">id</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></span></span></code></pre></div>
+<p>We simplify the AngularJS&rsquo; scope significantly. We will only have a list of watchers, a list of child scopes, a parent scope and an id for the current scope. We add the &ldquo;static&rdquo; property counter only in order to keep track of the last created scope and provide a unique identifier of the next scope we create.</p>
 <p>Lets add the <code>$watch</code> method:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
-    <span class="nx">exp</span><span class="o">:</span> <span class="nx">exp</span><span class="p">,</span>
-    <span class="nx">fn</span><span class="o">:</span> <span class="nx">fn</span><span class="p">,</span>
-    <span class="nx">last</span><span class="o">:</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">))</span>
-  <span class="p">});</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">exp</span><span class="o">:</span> <span class="nx">exp</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">fn</span><span class="o">:</span> <span class="nx">fn</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">last</span><span class="o">:</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>In the <code>$watch</code> method all we do is to append a new element to the <code>$$watchers</code> list. The new element contains a watched expression, a callback (observer) and the <code>last</code> result of the expression&rsquo;s evaluation. Since the returned value by <code>this.$eval</code> could be a reference to something, we need to clone it.</p>
 <p>Now lets see how we create and destroy scopes!</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$new</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span><span class="p">);</span>
-  <span class="nb">Object</span><span class="p">.</span><span class="nx">setPrototypeOf</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$destroy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">pc</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span><span class="p">.</span><span class="nx">$$children</span><span class="p">;</span>
-  <span class="nx">pc</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">pc</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$new</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Scope</span><span class="p">.</span><span class="nx">counter</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">Object</span><span class="p">.</span><span class="nx">setPrototypeOf</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$destroy</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">pc</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$parent</span><span class="p">.</span><span class="nx">$$children</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">pc</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">pc</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>What we do in <code>$new</code> is to create a new scope, with unique identifier and set its prototype to be the current scope. After that we append the newly created scope to the list of child scopes of the current scope. In destroy, we remove the current scope from the list of its parent&rsquo;s children.</p>
 <p>Now lets take a look at the legendary <code>$digest</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
-  <span class="k">do</span> <span class="p">{</span>
-    <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">watcher</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-      <span class="nx">current</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">exp</span><span class="p">);</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">Utils</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span><span class="p">,</span> <span class="nx">current</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
-        <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-        <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
-  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
-  <span class="p">}</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">dirty</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">,</span> <span class="nx">current</span><span class="p">,</span> <span class="nx">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">do</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">watcher</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">current</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">exp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">Utils</span><span class="p">.</span><span class="nx">equals</span><span class="p">(</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span><span class="p">,</span> <span class="nx">current</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">watcher</span><span class="p">.</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">clone</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span><span class="p">(</span><span class="nx">current</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">$$children</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">$digest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>Basically we run our loop until it is dirty and by default it is clean. The loop &ldquo;gets dirty&rdquo; only if we detect that that result of the evaluation of given expression differs from its previously saved value. Once we detect such &ldquo;a dirty&rdquo; expression we run a loop over all watched expressions all over again. Why we do that? We may have some inter-expression dependencies, so one expression may change the value of another one. Thats why we need to run the <code>$digest</code> loop until everything gets stable. If we detect that the result of the evaluation of given expression differs from its previous value we simply invoke the callback associated to the expression, update the <code>last</code> value and mark the loop as <code>dirty</code>.</p>
 <p>Once we&rsquo;re done we invoke <code>$digest</code> recursively for all children of the current scope. So one more time we apply what we learned (or already knew) about graph theory! One thing to note here is that we may still have circular dependency (a cycle in the graph), so we should be aware of that! Imagine we have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="p">});</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="p">});</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">Controller</span><span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$scope</span><span class="p">.</span><span class="nx">j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>In this case we will see:</p>
 <p><a href="/images/lightweight-ng/snap.png"><img src="/images/lightweight-ng/snap.png" alt=""></a></p>
 <p>at given moment&hellip;</p>
 <p>And the last (and super hacky) method is <code>$eval</code>. Please <strong>do not do that in production</strong>, this is a hack for preventing the need of creating our custom interpreter of expressions:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// In the complete implementation there&#39;re
-</span><span class="c1">// lexer, parser and interpreter.
-</span><span class="c1">// Note that this implementation is pretty evil!
-</span><span class="c1">// It uses two dangerouse features:
-</span><span class="c1">// - eval
-</span><span class="c1">// - with
-</span><span class="c1">// The reason the &#39;use strict&#39; statement is
-</span><span class="c1">// omitted is because of `with`
-</span><span class="c1"></span><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$eval</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">val</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">exp</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">val</span> <span class="o">=</span> <span class="nx">exp</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">try</span> <span class="p">{</span>
-      <span class="kd">with</span> <span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">val</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">val</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
-<span class="p">};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// In the complete implementation there&#39;re
+</span></span></span><span class="line"><span class="cl"><span class="c1">// lexer, parser and interpreter.
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Note that this implementation is pretty evil!
+</span></span></span><span class="line"><span class="cl"><span class="c1">// It uses two dangerouse features:
+</span></span></span><span class="line"><span class="cl"><span class="c1">// - eval
+</span></span></span><span class="line"><span class="cl"><span class="c1">// - with
+</span></span></span><span class="line"><span class="cl"><span class="c1">// The reason the &#39;use strict&#39; statement is
+</span></span></span><span class="line"><span class="cl"><span class="c1">// omitted is because of `with`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$eval</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">exp</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">val</span> <span class="o">=</span> <span class="nx">exp</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kd">with</span> <span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">val</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">val</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span></span></span></code></pre></div>
 <p>We check whether the watched expression is a function, if it is we call it in the context of the current scope. Otherwise we change the context of execution, using <code>with</code> and later run <code>eval</code> for getting the result of the expression. This allows us to evaluate expressions like: <code>foo + bar * baz()</code>, or even more complex JavaScript expressions. Of course, we won&rsquo;t support filters, since they are extension added by AngularJS.</p>
 <h3 id="directives">Directives</h3>
 <p>So far we can&rsquo;t anything useful with the primitives we have. In order to make it rocks we need to add a few directives and services. Lets implement <code>ngl-bind</code> (called <code>ng-bind</code> in AngularJS), <code>ngl-model</code> (<code>ng-model</code>), <code>ngl-controller</code> (<code>ng-controller</code>) and <code>ngl-click</code> (<code>ng-click</code>)</p>
 <h4 id="ngl-bind">ngl-bind</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-bind&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
-      <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-bind&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">scope</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p><code>ngl-bind</code> doesn&rsquo;t require a new scope. It only adds a single watcher for the expression used as value of the <code>ngl-value</code> attribute. In the callback, when <code>$digest</code> detects a change, we set the <code>innerHTML</code> of the element.</p>
 <h4 id="ngl-model">ngl-model</h4>
 <p>Our alternative of <code>ng-model</code> will work only with text inputs. So here is how it looks like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-model&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">link</span><span class="o">:</span>  <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">el</span><span class="p">.</span><span class="nx">onkeyup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">scope</span><span class="p">[</span><span class="nx">exp</span><span class="p">]</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-        <span class="nx">scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
-      <span class="p">};</span>
-      <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">el</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-model&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">link</span><span class="o">:</span>  <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">el</span><span class="p">.</span><span class="nx">onkeyup</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scope</span><span class="p">[</span><span class="nx">exp</span><span class="p">]</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">};</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">el</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>We add <code>onkeyup</code> listener to the input. Once the value of the input is changed we call the <code>$digest</code> method of the current scope, in order to make sure that the change in the property will reflect all other watched expressions, which have the given property as dependency. On change of the watched value we set the element&rsquo;s value.</p>
 <h4 id="ngl-controller">ngl-controller</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-controller&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">scope</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">exp</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
-      <span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">,</span> <span class="p">{</span> <span class="nx">$scope</span><span class="o">:</span> <span class="nx">scope</span> <span class="p">});</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
-<p>We need a new scope for each controller, so that&rsquo;s why the value for <code>scope</code> in <code>ngl-controller</code> is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using <code>Provider.get</code>, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using <code>ngl-bind</code>/<code>ngl-model</code>. Once we change the properties' values we need to make sure we&rsquo;ve invoked <code>$digest</code> in order the watchers associated with <code>ngl-bind</code> and <code>ngl-model</code> to be invoked.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-controller&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">scope</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kd">var</span> <span class="nx">ctrl</span> <span class="o">=</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">exp</span> <span class="o">+</span> <span class="nx">Provider</span><span class="p">.</span><span class="nx">CONTROLLERS_SUFFIX</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">Provider</span><span class="p">.</span><span class="nx">invoke</span><span class="p">(</span><span class="nx">ctrl</span><span class="p">,</span> <span class="p">{</span> <span class="nx">$scope</span><span class="o">:</span> <span class="nx">scope</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<p>We need a new scope for each controller, so that&rsquo;s why the value for <code>scope</code> in <code>ngl-controller</code> is true. This is one of the places where the magic of AngularJS happens. We get the required controller by using <code>Provider.get</code>, later we invoke it by passing the current scope. Inside the controller, we can add properties to the scope. We can bind to these properties by using <code>ngl-bind</code>/<code>ngl-model</code>. Once we change the properties&rsquo; values we need to make sure we&rsquo;ve invoked <code>$digest</code> in order the watchers associated with <code>ngl-bind</code> and <code>ngl-model</code> to be invoked.</p>
 <h4 id="ngl-click">ngl-click</h4>
 <p>This is the last directive we are going to take a look at, before we&rsquo;re able to implement a &ldquo;useful&rdquo; todo application.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">el</span><span class="p">.</span><span class="nx">onclick</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">scope</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
-        <span class="nx">scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
-      <span class="p">};</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;ngl-click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">scope</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">link</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">scope</span><span class="p">,</span> <span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">el</span><span class="p">.</span><span class="nx">onclick</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scope</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">exp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>We don&rsquo;t need a new scope here. All we need is to evaluate an expression and invoke the <code>$digest</code> loop once the user clicks a button.</p>
 <h2 id="wiring-everything-together">Wiring Everything Together</h2>
 <p>In order to make sure we understand how the data-binding works, lets take a look at the following example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">body</span> <span class="na">ngl-controller</span><span class="o">=</span><span class="s">&#34;MainCtrl&#34;</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">ngl-bind</span><span class="o">=</span><span class="s">&#34;bar&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ngl-click</span><span class="o">=</span><span class="s">&#34;foo()&#34;</span><span class="p">&gt;</span>Increment<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></div>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="p">};</span>
-<span class="p">});</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&#34;en&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">body</span> <span class="na">ngl-controller</span><span class="o">=</span><span class="s">&#34;MainCtrl&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">ngl-bind</span><span class="o">=</span><span class="s">&#34;bar&#34;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">ngl-click</span><span class="o">=</span><span class="s">&#34;foo()&#34;</span><span class="p">&gt;</span>Increment<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">Provider</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">$scope</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">$scope</span><span class="p">.</span><span class="nx">bar</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
 <p>Lets follow what is going on in using the following diagram:</p>
 <p><a href="/images/lightweight-ng/lifecycle-overview.png"><img src="/images/lightweight-ng/lifecycle-overview.png" alt=""></a></p>
 <p>Initially the <code>ngl-controller</code> directive is found by the <code>DOMCompiler</code>. The <code>link</code> function of this directive creates a new <code>scope</code> and pass it to the controller&rsquo;s function. We add <code>bar</code> property, which is equals to <code>0</code> and a method called <code>foo</code>, which increments <code>bar</code>. The <code>DOMCompiler</code> finds <code>ngl-bind</code> and adds a watcher for the <code>bar</code> property. It also finds <code>ngl-click</code> and adds <code>click</code> event handler to the button.</p>

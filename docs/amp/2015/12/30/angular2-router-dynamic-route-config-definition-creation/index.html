@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.101.0">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+<meta name="description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available. A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
 
 <meta property="og:title" content="Dynamically Configuring the Angular&apos;s Router - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2015/12/30/angular2-router-dynamic-route-config-definition-creation/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+<meta property="og:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available. A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2015/12/30/angular2-router-dynamic-route-config-definition-creation/">
 <meta name="twitter:title" content="Dynamically Configuring the Angular&apos;s Router - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
+<meta name="twitter:description" content="Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available. A couple of months ago I wrote &amp;ldquo;Lazy Loading of Route Components in Angular 2&amp;rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.This way we can incrementally load the entire application by only requesting the resources required for the individual views.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available.  A couple of months ago I wrote \u0026ldquo;Lazy Loading of Route Components in Angular 2\u0026rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.\nThis way we can incrementally load the entire application by only requesting the resources required for the individual views."
+    "description": "Warning: This version of the Angular 2 router is now deprecated! This means that soon the used below APIs will no longer be available. A couple of months ago I wrote \u0026ldquo;Lazy Loading of Route Components in Angular 2\u0026rdquo;, where I explained how we can take advantage of the AsyncRoutes and the virtual proxy pattern in Angular 2.\nThis way we can incrementally load the entire application by only requesting the resources required for the individual views."
   }
 </script>
 
@@ -139,20 +139,20 @@
 <h2 id="problem">Problem</h2>
 <p>This strategy works great! The only things that we need to provide to the <code>AsyncRoute</code> definition are <code>name</code>, <code>path</code> and a <code>loader</code>.</p>
 <p>Inside of the <code>loader</code> function we can have whatever custom logic we want to. The only contract that we sign with the framework is that the <code>loader</code> needs to return a promise:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@RouteConfig</span><span class="p">([</span>
-  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;home&apos;</span> <span class="p">},</span>
-  <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
-    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/about&apos;</span><span class="p">,</span>
-    <span class="nx">loader</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./components/about/about&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span><span class="p">),</span>
-    <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;about&apos;</span>
-  <span class="p">})</span>
-<span class="p">])</span>
-</code></pre></div><p>But what if we receive the routes definitions from a remote service and we don&#x2019;t have them during initialization time?</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@RouteConfig</span><span class="p">([</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">Home</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;home&apos;</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="k">new</span> <span class="nx">AsyncRoute</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/about&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">loader</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">System</span><span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./components/about/about&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">About</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&apos;about&apos;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="p">])</span>
+</span></span></code></pre></div><p>But what if we receive the routes definitions from a remote service and we don&#x2019;t have them during initialization time?</p>
 <p>Well, in such case we need to solve the following three problems:</p>
 <h3 id="referencing-not-registered-routes-inside-of-a-template">Referencing not registered routes inside of a template</h3>
 <p>If we want to reference to a route which is not declared within <code>@RouteConfig</code> by using:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">a</span> <span class="err">[</span><span class="na">routeLink</span><span class="err">]=&quot;[&apos;/</span><span class="na">not-registered</span><span class="err">&apos;]&quot;</span><span class="p">&gt;</span>Not registered<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</code></pre></div><p>We will get a runtime error. This means that we need to implement a behavior in which we can list the available at given point of time routes.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="err">[</span><span class="na">routeLink</span><span class="err">]=&quot;[&apos;/</span><span class="na">not-registered</span><span class="err">&apos;]&quot;</span><span class="p">&gt;</span>Not registered<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>We will get a runtime error. This means that we need to implement a behavior in which we can list the available at given point of time routes.</p>
 <h3 id="updating-the-routeconfigs-metadata">Updating the <code>@RouteConfig</code>&#x2019;s metadata</h3>
 <p>This is required for consistency. Since the way we register routes in Angular 2 is by using <code>@RouteConfig</code>, we need to make sure that it&#x2019;s always up-to-date, with all the routes available.</p>
 <h3 id="dynamically-registering-routes">Dynamically registering routes</h3>
@@ -161,116 +161,116 @@
 <p>Lets start by exploring the solution of the first problem:</p>
 <h3 id="dynamically-rendering-the-applications-navigation">Dynamically rendering the application&#x2019;s navigation</h3>
 <p>We can define a component called <code>AppNav</code> which receives a list of objects of the type <code>{ name: &quot;Route name&quot;, path: [&apos;/Route&apos;, &apos;Path&apos;] }</code> and renders the navigation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;app-nav&apos;</span><span class="p">,</span>
-  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">ROUTER_DIRECTIVES</span><span class="p">],</span>
-  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
-</span><span class="sb">    &lt;nav&gt;
-</span><span class="sb">      &lt;a *ngFor=&quot;#route of routes&quot;
-</span><span class="sb">        [routerLink]=&quot;route.path&quot;&gt;
-</span><span class="sb">        {{route.name}}
-</span><span class="sb">      &lt;/a&gt;
-</span><span class="sb">    &lt;/nav&gt;
-</span><span class="sb">  `</span>
-<span class="p">})</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppNav</span> <span class="p">{</span>
-  <span class="kd">@Input</span><span class="p">()</span>
-  <span class="nx">routes</span>: <span class="kt">string</span><span class="p">[];</span>
-<span class="p">}</span>
-</code></pre></div><p>The component above has a single <code>@Input</code> called <code>routes</code> and uses the <code>ROUTER_DIRECTIVES</code> because of the <code>routerLink</code> directive. Once the <code>routes</code> property changes its template will be populated with the passed value.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;app-nav&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">ROUTER_DIRECTIVES</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span></span></span><span class="line"><span class="cl"><span class="sb">    &lt;nav&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">      &lt;a *ngFor=&quot;#route of routes&quot;
+</span></span></span><span class="line"><span class="cl"><span class="sb">        [routerLink]=&quot;route.path&quot;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">        {{route.name}}
+</span></span></span><span class="line"><span class="cl"><span class="sb">      &lt;/a&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">    &lt;/nav&gt;
+</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppNav</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">@Input</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">routes</span>: <span class="kt">string</span><span class="p">[];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The component above has a single <code>@Input</code> called <code>routes</code> and uses the <code>ROUTER_DIRECTIVES</code> because of the <code>routerLink</code> directive. Once the <code>routes</code> property changes its template will be populated with the passed value.</p>
 <p>We can use this component in the following way:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">app-nav</span> <span class="err">[</span><span class="na">routes</span><span class="err">]=&quot;[</span>
-  <span class="err">{</span> <span class="na">name:</span> <span class="err">&apos;</span><span class="na">Route</span> <span class="na">1</span><span class="err">&apos;,</span> <span class="na">path:</span> <span class="err">[&apos;/</span><span class="na">Path1</span><span class="err">&apos;]</span> <span class="err">},</span>
-  <span class="err">{</span> <span class="na">name:</span> <span class="err">&apos;</span><span class="na">Route</span> <span class="na">2</span><span class="err">&apos;,</span> <span class="na">path:</span> <span class="err">[&apos;/</span><span class="na">Path2</span><span class="err">&apos;]</span> <span class="err">}</span>
-<span class="err">]&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">app-nav</span><span class="p">&gt;</span>
-</code></pre></div><p>So far so good! Now lets see how we can get the list of registered routes and pass them to the directive!</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">app-nav</span> <span class="err">[</span><span class="na">routes</span><span class="err">]=&quot;[</span>
+</span></span><span class="line"><span class="cl">  <span class="err">{</span> <span class="na">name:</span> <span class="err">&apos;</span><span class="na">Route</span> <span class="na">1</span><span class="err">&apos;,</span> <span class="na">path:</span> <span class="err">[&apos;/</span><span class="na">Path1</span><span class="err">&apos;]</span> <span class="err">},</span>
+</span></span><span class="line"><span class="cl">  <span class="err">{</span> <span class="na">name:</span> <span class="err">&apos;</span><span class="na">Route</span> <span class="na">2</span><span class="err">&apos;,</span> <span class="na">path:</span> <span class="err">[&apos;/</span><span class="na">Path2</span><span class="err">&apos;]</span> <span class="err">}</span>
+</span></span><span class="line"><span class="cl"><span class="err">]&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">app-nav</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p>So far so good! Now lets see how we can get the list of registered routes and pass them to the directive!</p>
 <h3 id="messing-around-with-the-routeconfigs-metadata">Messing around with the <code>@RouteConfig</code>&#x2019;s metadata</h3>
 <p>Lets peek at the semantics of the <code>@RouteConfig</code> decorator. All it does is to add another item to the array of <code>annotations</code> stored as metadata associated with given component. This means that by using the <code>Reflect</code> API we can get all the registered routes!</p>
 <p>In order to have better separation of concerns we can isolate the logic for configuring the dynamic routes into a separate class.
 Lets define a class called <code>DynamicRouteConfigurator</code>, which has the following API:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Injectable</span><span class="p">()</span>
-<span class="kr">class</span> <span class="nx">DynamicRouteConfigurator</span> <span class="p">{</span>
-  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">registry</span>: <span class="kt">RouteRegistry</span><span class="p">)</span> <span class="p">{}</span>
-  <span class="c1">// Gets the list of registered with @RouteConfig routes
-</span><span class="c1"></span>  <span class="c1">// associated with given `component`
-</span><span class="c1"></span>  <span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{...}</span>
-  <span class="c1">// Updates the metadata added by @RouteConfig associated
-</span><span class="c1"></span>  <span class="c1">// with given `component`
-</span><span class="c1"></span>  <span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{...}</span>
-  <span class="c1">// Adds additional `route` to given `component`
-</span><span class="c1"></span>  <span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{...}</span>
-<span class="p">}</span>
-</code></pre></div><p>Now lets define a root component which uses the <code>AppNav</code> component and <code>DynamicRouteConfigurator</code> service we defined:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
-  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;app&apos;</span><span class="p">,</span>
-  <span class="nx">viewProviders</span><span class="o">:</span> <span class="p">[</span><span class="nx">DynamicRouteConfigurator</span><span class="p">],</span>
-  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;./components/app/app.html&apos;</span><span class="p">,</span>
-  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;./components/app/app.css&apos;</span><span class="p">],</span>
-  <span class="nx">encapsulation</span>: <span class="kt">ViewEncapsulation.None</span><span class="p">,</span>
-  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppNav</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">]</span>
-<span class="p">})</span>
-<span class="kd">@RouteConfig</span><span class="p">([</span>
-  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">HomeCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&apos;Home&apos;</span> <span class="p">}</span>
-<span class="p">])</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{</span>
-  <span class="nx">appRoutes</span>: <span class="kt">string</span><span class="p">[][];</span>
-  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{...}</span>
-  <span class="kr">private</span> <span class="nx">getAppRoutes</span><span class="p">()</span><span class="o">:</span> <span class="kt">string</span><span class="p">[][]</span> <span class="p">{}</span>
-<span class="p">}</span>
-</code></pre></div><p>Now lets explore the definition of <code>getRoutes</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Injectable</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">DynamicRouteConfigurator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">registry</span>: <span class="kt">RouteRegistry</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Gets the list of registered with @RouteConfig routes
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// associated with given `component`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Updates the metadata added by @RouteConfig associated
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// with given `component`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Adds additional `route` to given `component`
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Now lets define a root component which uses the <code>AppNav</code> component and <code>DynamicRouteConfigurator</code> service we defined:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;app&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">viewProviders</span><span class="o">:</span> <span class="p">[</span><span class="nx">DynamicRouteConfigurator</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&apos;./components/app/app.html&apos;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">styleUrls</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;./components/app/app.css&apos;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">encapsulation</span>: <span class="kt">ViewEncapsulation.None</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">AppNav</span><span class="p">,</span> <span class="nx">ROUTER_DIRECTIVES</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="kd">@RouteConfig</span><span class="p">([</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">HomeCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&apos;Home&apos;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">])</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">appRoutes</span>: <span class="kt">string</span><span class="p">[][];</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{...}</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">private</span> <span class="nx">getAppRoutes</span><span class="p">()</span><span class="o">:</span> <span class="kt">string</span><span class="p">[][]</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Now lets explore the definition of <code>getRoutes</code>:</p>
 <h4 id="getting-the-registered-routes">Getting the registered routes</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">component</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&apos;RouteConfig&apos;</span><span class="p">;</span>
-    <span class="p">}).</span><span class="nx">pop</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div><p>Above we simply get all the <code>annotations</code> associated with the passed as argument component and extract the declared routes.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">component</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">a</span><span class="p">.</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&apos;RouteConfig&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}).</span><span class="nx">pop</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Above we simply get all the <code>annotations</code> associated with the passed as argument component and extract the declared routes.</p>
 <h4 id="updating-the-registered-routes">Updating the registered routes</h4>
 <p>The implementation of <code>updateRouteConfig</code> is quite simple as well:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">annotations</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">component</span><span class="p">);</span>
-  <span class="kd">let</span> <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">annotations</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">annotations</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&apos;RouteConfig&apos;</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">routeConfigIndex</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&apos;No route metadata attached to the component&apos;</span><span class="p">);</span>
-  <span class="p">}</span>
-  <span class="nx">annotations</span><span class="p">[</span><span class="nx">routeConfigIndex</span><span class="p">]</span> <span class="o">=</span> <span class="nx">routeConfig</span><span class="p">;</span>
-  <span class="nx">Reflect</span><span class="p">.</span><span class="nx">defineMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">annotations</span><span class="p">,</span> <span class="nx">AppCmp</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div><p>We loop over all the <code>annotations</code> in order to find the index of the metadata added by the <code>@RouteConfig</code> decorator and when we find it, we update its value. Right after that we update the annotations using <code>Reflect.defineMetadata(...)</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">updateRouteConfig</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">annotations</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">getMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">component</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">annotations</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">annotations</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="kr">constructor</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&apos;RouteConfig&apos;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">routeConfigIndex</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">routeConfigIndex</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&apos;No route metadata attached to the component&apos;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">annotations</span><span class="p">[</span><span class="nx">routeConfigIndex</span><span class="p">]</span> <span class="o">=</span> <span class="nx">routeConfig</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Reflect</span><span class="p">.</span><span class="nx">defineMetadata</span><span class="p">(</span><span class="s1">&apos;annotations&apos;</span><span class="p">,</span> <span class="nx">annotations</span><span class="p">,</span> <span class="nx">AppCmp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>We loop over all the <code>annotations</code> in order to find the index of the metadata added by the <code>@RouteConfig</code> decorator and when we find it, we update its value. Right after that we update the annotations using <code>Reflect.defineMetadata(...)</code>.</p>
 <h4 id="updating-the-navigation">Updating the navigation</h4>
 <p>We already have the definition of the <code>AppNav</code> component! Now we can get the registered with <code>@RouteConfig</code> routes  and render links to all of them.</p>
-<p>We can populate the list with the links to the routes using the <code>AppNav</code> component, by setting the <code>appRoutes</code>&apos; value:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
-  <span class="c1">// ...
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><h3 id="dynamically-registering-new-routes">Dynamically registering new routes</h3>
+<p>We can populate the list with the links to the routes using the <code>AppNav</code> component, by setting the <code>appRoutes</code>&#x2019; value:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></div><h3 id="dynamically-registering-new-routes">Dynamically registering new routes</h3>
 <p>Now lets try to asynchronously add another route! We can notice that the <code>DynamicRouteConfigurator</code> has a method called <code>addRoute</code>, so lets use it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
-  <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">_</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">route</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/about&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">AboutCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&apos;About&apos;</span> <span class="p">};</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">dynamicRouteConfigurator</span><span class="p">.</span><span class="nx">addRoute</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="kr">constructor</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
-  <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div><p>All we do above is to set a timeout for 1 second, define the <code>About</code> route and add it to the <code>AppCmp</code> using the injected instance of the <code>DynamicRouteConfigurator</code>. As last step we update the value of the <code>appRoutes</code> which will be reflected by the <code>AppNav</code> component.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">dynamicRouteConfigurator</span>: <span class="kt">DynamicRouteConfigurator</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">_</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nx">route</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/about&apos;</span><span class="p">,</span> <span class="nx">component</span>: <span class="kt">AboutCmp</span><span class="p">,</span> <span class="kr">as</span><span class="o">:</span> <span class="s1">&apos;About&apos;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">dynamicRouteConfigurator</span><span class="p">.</span><span class="nx">addRoute</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="kr">constructor</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">appRoutes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAppRoutes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>All we do above is to set a timeout for 1 second, define the <code>About</code> route and add it to the <code>AppCmp</code> using the injected instance of the <code>DynamicRouteConfigurator</code>. As last step we update the value of the <code>appRoutes</code> which will be reflected by the <code>AppNav</code> component.</p>
 <h4 id="using-the-routeregistry">Using the RouteRegistry</h4>
 <p>Now in order to get complete clarity of the entire implementation lets take a look at the <code>addRoute</code> method defined within the <code>DynamicRouteConfigurator</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">routeConfig</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">);</span>
-  <span class="nx">routeConfig</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">route</span><span class="p">);</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">updateRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">);</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div><p>As first step we get all the registered routes associated with the target component by using <code>getRoutes</code>, later we append one additional route and we invoke the <code>updateRouteConfig</code> method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the <code>RouteRegister</code> passed as dependency via the DI mechanism of the framework.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">addRoute</span><span class="p">(</span><span class="nx">component</span>: <span class="kt">Type</span><span class="p">,</span> <span class="nx">route</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">routeConfig</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">routeConfig</span><span class="p">.</span><span class="nx">configs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">route</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">updateRoutes</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">routeConfig</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">registry</span><span class="p">.</span><span class="nx">config</span><span class="p">(</span><span class="nx">component</span><span class="p">,</span> <span class="nx">route</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>As first step we get all the registered routes associated with the target component by using <code>getRoutes</code>, later we append one additional route and we invoke the <code>updateRouteConfig</code> method. As last step we register the new route in order to make the framework aware of it. We register it by using the instance of the <code>RouteRegister</code> passed as dependency via the DI mechanism of the framework.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Another point for future improvement of the <code>DynamicRouteConfigurator</code> is to allow further modification of the route configuration, such as deletion of existing routes. Although the <code>RouteRegistry</code> allows this functionality we&#x2019;ll need to touch private APIs (the <code>_routes</code> property of the <code>RouteRegistry</code> instances).</p>
 </div>
