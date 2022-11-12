@@ -14,7 +14,7 @@ layout: page
     <section class="timeline-event">
       <h1>Head of Product for Angular</h1>
       <section>
-        <img src="/images/story/product.png">
+        <img src="/images/story/product.jpg">
         <p>
           November 2022 I became the product manager for Angular.
         </p>

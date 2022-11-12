@@ -25,9 +25,8 @@ Hey, I'm
 
 <ul>
   <li>Engineer in the Angular team at Google</li>
-  <li>Awarded by <a href="/story">Google and the President of Bulgaria</a> for the impact of my open source projects</li>
+  <li>Awarded by Google and the President of Bulgaria for the impact of my open source projects</li>
   <li>Based in San Francisco, California 🇺🇸 and Sofia, Bulgaria 🇧🇬</li>
-  <li>Read <a href="/story">my story</a></li>
   <li>You can contact me at <strong>minko at gechev dot io</strong></li>
 </ul>
 
