@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.101.0" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Faster Angular Applications - Part 2. Pure Pipes, Pure Functions and Memoization &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -111,18 +111,18 @@ The code for this blog post is available at my GitHub account:" />
 <li>When we add a new entry, we calculate the numeric value only for the newly added employee, without performing any redundant calculations for the already existing employees, since we have their numeric values from the rendering phase.</li>
 </ul>
 <p>To implement this behavior, let&rsquo;s take a look at our mocked business calculation - the function of Fibonacci:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>It has two fundamental properties which are typical for all mathematical functions:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div><p>It has two fundamental properties which are typical for all mathematical functions:</p>
 <ul>
 <li><strong>It does not perform any side effects</strong> - when calculating the employee&rsquo;s numeric value, we don&rsquo;t send any network requests, touch local storage, log anything in the console, etc.</li>
 <li><strong>It returns the exact same result for the same set of arguments</strong> - <code>fibonacci(1)</code> is always 1, same for <code>fibonacci(n)</code> which always is going to return the same <code>k</code> where <code>n ∈ ℕ, k ∈ ℕ</code>.</li>
 </ul>
-<p>Such functions in the world of functional programming are called <strong>pure functions</strong>. All mathematical functions are pure, and for performing a meaningful business calculation for the employees&rsquo; numeric value, we&rsquo;d most likely use a mathematical function.</p>
+<p>Such functions in the world of functional programming are called <strong>pure functions</strong>. All mathematical functions are pure, and for performing a meaningful business calculation for the employees' numeric value, we&rsquo;d most likely use a mathematical function.</p>
 <h2 id="angular-pipes-and-pure-functions">Angular Pipes and Pure Functions</h2>
 <p>In Angular, on the other hand, we have pipes. Pipes are used for performing some kind of data processing, for instance, data formatting. There are two types of pipes:</p>
 <ul>
@@ -136,32 +136,32 @@ The code for this blog post is available at my GitHub account:" />
 <p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
 </blockquote>
 <p>Angular is going to determine if the arguments of the pipe are different by performing an equality check. This means that, if we have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl">{{ 2.718281828459045 | number:&#39;3.1-5&#39; }}
-</span></span></code></pre></div><p><strong>Angular is going to evaluate the expression once</strong> and produce the string <code>2.718</code>. <strong>The next time when the change detection runs, Angular will get the last result from the evaluation since the arguments of the pure pipe haven&rsquo;t changed</strong>!</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html">{{ 2.718281828459045 | number:&#39;3.1-5&#39; }}
+</code></pre></div><p><strong>Angular is going to evaluate the expression once</strong> and produce the string <code>2.718</code>. <strong>The next time when the change detection runs, Angular will get the last result from the evaluation since the arguments of the pure pipe haven&rsquo;t changed</strong>!</p>
 <h2 id="optimizing-expression-re-evaluation-with-pure-pipes">Optimizing Expression Re-Evaluation with Pure Pipes</h2>
 <p>Wait, isn&rsquo;t that exactly what we want to do in our application - do not re-evaluate the employee&rsquo;s numeric value unless it gets changed? This means that we can encapsulate our business calculation inside of a pure pipe and as a bonus get the caching that Angular provides.</p>
 <p>Here&rsquo;s how we can proceed:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kd">@Pipe</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;calculate&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pure</span>: <span class="kt">true</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">CalculatePipe</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">transform</span><span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>In fact, all pipes in Angular are pure by default so we can drop the <code>pure: true</code> property.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Pipe</span><span class="p">({</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;calculate&#39;</span><span class="p">,</span>
+  <span class="nx">pure</span>: <span class="kt">true</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">CalculatePipe</span> <span class="p">{</span>
+  <span class="nx">transform</span><span class="p">(</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>In fact, all pipes in Angular are pure by default so we can drop the <code>pure: true</code> property.</p>
 <p>Now we need to modify the template of the <code>ListComponent</code> a little bit to invoke the pipe instead of the <code>calculate</code> method defined inside of its controller:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
-</span></span></span><span class="line"><span class="cl"><span class="sb">    ...
-</span></span></span><span class="line"><span class="cl"><span class="sb">     {{ item.num | calculate }}
-</span></span></span><span class="line"><span class="cl"><span class="sb">    ...
-</span></span></span><span class="line"><span class="cl"><span class="sb">  `</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">ListComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</span></span></code></pre></div><p>To verify if the last optimization improved the application&rsquo;s performance. I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress, I got the following results:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">changeDetection</span>: <span class="kt">ChangeDetectionStrategy.OnPush</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="sb">`
+</span><span class="sb">    ...
+</span><span class="sb">     {{ item.num | calculate }}
+</span><span class="sb">    ...
+</span><span class="sb">  `</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ListComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div><p>To verify if the last optimization improved the application&rsquo;s performance. I wrote another e2e test which adds and removes employees from the sales department. After running it with benchpress, I got the following results:</p>
 <img src="/images/faster-ng-apps-2/adding-removing.png" style="border: 1px solid #ccc;">
 <p>With the latest optimization, the time required for running the tests dropped from 394.53ms to 9.70ms! That is a huge improvement! We achieved it only by performing a small refactoring, without writing any custom code, just taking advantage of what Angular already provides for free!</p>
 <h2 id="initial-application-rendering">Initial Application Rendering</h2>
@@ -180,28 +180,28 @@ The code for this blog post is available at my GitHub account:" />
 <p>Angular is going to evaluate given pure pipe call only if it has received different arguments compared to its previous invocation.</p>
 </blockquote>
 <p>This doesn&rsquo;t say anywhere that Angular is not going to evaluate two pipe expressions in different places in the component tree which have the same arguments. So, if we have:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  {{ &#39;Emily&#39; }}
-</span></span><span class="line"><span class="cl">  {{ 27 | calculate }}
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl">  {{ &#39;Dan&#39; }}
-</span></span><span class="line"><span class="cl">  {{ 27 | calculate }}
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
-</span></span></code></pre></div><p>Angular is going to evaluate <code>{{ 27 | calculate }}</code> twice! The optimization that the framework will perform is that it won&rsquo;t re-evaluate the expressions on the next tick of the change detection mechanism. This means that <strong>it&rsquo;ll cache the result for the last value for a specific place in the rendered (dynamic) component tree</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+  {{ &#39;Emily&#39; }}
+  {{ 27 | calculate }}
+<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+  {{ &#39;Dan&#39; }}
+  {{ 27 | calculate }}
+<span class="p">&lt;/</span><span class="nt">md-list-item</span><span class="p">&gt;</span>
+</code></pre></div><p>Angular is going to evaluate <code>{{ 27 | calculate }}</code> twice! The optimization that the framework will perform is that it won&rsquo;t re-evaluate the expressions on the next tick of the change detection mechanism. This means that <strong>it&rsquo;ll cache the result for the last value for a specific place in the rendered (dynamic) component tree</strong>.</p>
 <p>On the other hand, in functional programming for pure functions, we can apply an optimization called <strong>memoization</strong> which Wikipedia defines as:</p>
 <blockquote>
 <p>In computing, memoization or memoization is an optimization technique used primarily to speed up computer programs by storing the results of expensive function calls and returning the cached result when the same inputs occur again.</p>
 </blockquote>
 <p>In contrast to the caching that Angular performs, memoization uses a global cache used for <strong>all the invocations of given function</strong>. This means that in the context of the example above if we apply memoization to the <code>fibonacci</code> function, although <code>{{ 27 | calculate }}</code> will be evaluated twice, <code>fibonacci(27)</code> will be invoked only once, the next time we&rsquo;ll directly get the memoized result!</p>
 <p>We can apply memoization to <code>fibonacci</code> using <code>lodash.memoize</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">memoize</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;lodash.memoize&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">((</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span>
-</span></span></code></pre></div><p>Now lets see how this affects our initial rendering:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">memoize</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&#39;lodash.memoize&#39;</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">fibonacci</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">((</span><span class="nx">num</span>: <span class="kt">number</span><span class="p">)</span><span class="o">:</span> <span class="kt">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">num</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">num</span> <span class="o">===</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fibonacci</span><span class="p">(</span><span class="nx">num</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><p>Now lets see how this affects our initial rendering:</p>
 <img src="/images/faster-ng-apps-2/memoization.png" style="border: 1px solid #ccc;">
 <p>Not bad! By performing this optimization, we reduced the initial rendering with 30%!</p>
 <h1 id="memoization-pure-pipes-on-push-and-referential-transparency">Memoization, Pure Pipes, On Push and Referential Transparency</h1>
@@ -216,7 +216,7 @@ The code for this blog post is available at my GitHub account:" />
 <li>When the arguments of the pipe are non-primitive values.</li>
 </ul>
 <p>For primitive values, it makes sense to apply memoization since we can create a cache which maps the pipe&rsquo;s arguments to their results. Of course, this is only applicable in case the pure pipe performs no side effects or they are insignificant enough.</p>
-<p>On the other hand, if the pipe has non-primitive arguments the situation can get trickier. In such case, it&rsquo;ll be quite inconvenient to cache the result for the function based on its arguments&rsquo; references. Very often two instances of a data structure which have different references can hold the same data. Should we return the cached result in such case or not? Probably we should. But how can we efficiently determine if the items in the two collections are the same? Maybe hashing? This is a topic of another discussion and there is <a href="http://repository.cmu.edu/cgi/viewcontent.cgi?article=3285&amp;context=compsci">a lot of research in this direction</a>.</p>
+<p>On the other hand, if the pipe has non-primitive arguments the situation can get trickier. In such case, it&rsquo;ll be quite inconvenient to cache the result for the function based on its arguments' references. Very often two instances of a data structure which have different references can hold the same data. Should we return the cached result in such case or not? Probably we should. But how can we efficiently determine if the items in the two collections are the same? Maybe hashing? This is a topic of another discussion and there is <a href="http://repository.cmu.edu/cgi/viewcontent.cgi?article=3285&amp;context=compsci">a lot of research in this direction</a>.</p>
 <p>For components, we can think similarly. We can abstract them as functions and consider their inputs as arguments, and the UI that they render as the function&rsquo;s result. We think of the Angular templates as expressions and the components with <code>OnPush</code> change detection used in these templates as referentially transparent sub-expressions.</p>
 <p>That&rsquo;s how we found some patterns which are already well described by computer science in the face of pure functions, referential transparency, and memoization.</p>
 <h1 id="conclusion">Conclusion</h1>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.101.0">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -312,7 +312,7 @@ tr {
 <p>Angular has a preloading strategy called <a href="https://angular.io/api/router/PreloadAllModules"><code>PreloadAllModules</code></a>. The router will prefetch all lazy-loaded modules and all of their children&#x2019;s routes using dynamic imports. The router needs to parse each preloaded module to discover its children&#x2019;s routes, making the strategy very inefficient from a network usage point of view and CPU cycles. Check the profile below:</p>
 <amp-img src="/images/prefetching/preload-all.png" style="display: block; margin: auto;"></amp-img>
 <p>It is from an <a href="https://github.com/mgechev/preload-all-stress-test">app</a> with 500 automatically generated routes, which uses <code>PreloadAllModules</code>. It&#x2019;s an artificial example but still shows accurately how inefficient this strategy could be in large apps.</p>
-<p>Does this mean that you should never be using <code>PreloadAllModules</code>? No. If your app has a dozen routes or so, preloading all routes will not significantly negatively impact your users&#x2019; experience. At the same time, the setup cost and maintenance will be very low.</p>
+<p>Does this mean that you should never be using <code>PreloadAllModules</code>? No. If your app has a dozen routes or so, preloading all routes will not significantly negatively impact your users&apos; experience. At the same time, the setup cost and maintenance will be very low.</p>
 <h4 id="precaching">Precaching</h4>
 <p>An alternative approach is using precaching with a service worker. By default, you&#x2019;re getting this behavior from the <a href="https://angular.io/guide/service-worker-intro">Angular Service Worker</a>. At build time, the Angular CLI will generate a manifest file with all your static assets and associated hash sums that the service worker will download and parse. At runtime, the service worker will download all the resources from the manifest and cache them.</p>
 <p>This strategy is still costly in terms of network consumption, but it has a much lower impact on the CPU usage because it is not running in the main UI thread.</p>
@@ -331,7 +331,7 @@ tr {
 <p>Predictive prefetching is the most advanced heuristic. Based on user navigational patterns, we try to predict their subsequent action and download the resources we assume they need next. We can manually provide predictive prefetching instructions, hardcoding them in the source code, or use something like <a href="https://github.com/guess-js">Guess.js</a>.</p>
 <p>I&#x2019;ve written a lot about this strategy in the past in &#x201C;<a href="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">Machine Learning-Driven Bundling. The Future of JavaScript Tooling</a>&#x201D; and &#x201C;<a href="https://blog.mgechev.com/2018/05/09/introducing-guess-js-data-driven-user-experiences-web/">Introducing Guess.js - a toolkit for enabling data-driven user-experiences on the Web</a>&#x201D;.</p>
 <amp-img src="/images/prefetching/guess-js.jpg" style="display: block; margin: auto;"></amp-img>
-<p>Usually, the setup cost for this heuristic is higher. It requires integration with a data source that collects users&#x2019; journeys in the web app, and you need to plug it as part of the build process. Depending on the approach, predictive prefetching may also have a larger implementation size. Imagine you need to ship a TensorFlow model to predict user actions, for example. Guess.js takes a more straightforward approach, allowing it to send a distributed Markov chain that is relatively cheap and efficient, but it&#x2019;s also less accurate than a more advanced model.</p>
+<p>Usually, the setup cost for this heuristic is higher. It requires integration with a data source that collects users&apos; journeys in the web app, and you need to plug it as part of the build process. Depending on the approach, predictive prefetching may also have a larger implementation size. Imagine you need to ship a TensorFlow model to predict user actions, for example. Guess.js takes a more straightforward approach, allowing it to send a distributed Markov chain that is relatively cheap and efficient, but it&#x2019;s also less accurate than a more advanced model.</p>
 <p>The apps which benefit from this prefetching heuristic are usually larger, with many pages where the navigation speed is critical. For example, e-commerce or content-heavy apps.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Often prefetching is a micro-optimization and a significant investment in this space could be a bad use of your time. I&#x2019;d recommend using some of the off-the-shelf solutions already available for your technology. Going this way will provide low cost performance benefits.</p>

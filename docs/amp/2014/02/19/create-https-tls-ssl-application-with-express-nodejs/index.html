@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.101.0">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -134,51 +134,51 @@
 <p>Here are two simple steps, which can be used to achieve this result:</p>
 <h3 id="generate-self-signed-certificate">Generate self-signed certificate</h3>
 <p>If you don&#x2019;t already have certificate you need to generate one:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">  $ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days <span class="m">365</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">  $ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days <span class="m">365</span></code></pre></div>
 <p>You will be asked a couple of questions&#x2026;
 <amp-img src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675"></amp-img></p>
 <p>In this case we generated a self-signed certificate for 365 days.</p>
 <h3 id="use-express-with-https">Use Express with HTTPS</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;fs&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">https</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;https&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">https</span><span class="p">.</span><span class="nx">createServer</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">key</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">&apos;key.pem&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">cert</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">&apos;cert.pem&apos;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="nx">app</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">55555</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">res</span><span class="p">.</span><span class="nx">header</span><span class="p">(</span><span class="s1">&apos;Content-type&apos;</span><span class="p">,</span> <span class="s1">&apos;text/html&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">&apos;&lt;h1&gt;Hello, Secure World!&lt;/h1&gt;&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript">    <span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;fs&apos;</span><span class="p">),</span>
+    <span class="nx">https</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;https&apos;</span><span class="p">),</span>
+    <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;express&apos;</span><span class="p">),</span>
+    <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+
+    <span class="nx">https</span><span class="p">.</span><span class="nx">createServer</span><span class="p">({</span>
+      <span class="nx">key</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">&apos;key.pem&apos;</span><span class="p">),</span>
+      <span class="nx">cert</span><span class="o">:</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">&apos;cert.pem&apos;</span><span class="p">)</span>
+    <span class="p">},</span> <span class="nx">app</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">55555</span><span class="p">);</span>
+
+    <span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;/&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">header</span><span class="p">(</span><span class="s1">&apos;Content-type&apos;</span><span class="p">,</span> <span class="s1">&apos;text/html&apos;</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">&apos;&lt;h1&gt;Hello, Secure World!&lt;/h1&gt;&apos;</span><span class="p">);</span>
+    <span class="p">});</span></code></pre></div>
 <p>This script will create Express application running over HTTPs.
 Run the application:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">    $ node index.js</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">    $ node index.js</code></pre></div>
 <p>Enter the passphrase you entered during the creation of the certificate&#x2026;</p>
 <p>Now open your browser: <a href="https://localhost:55555/">https://localhost:55555/</a>.
 After trusting the certificate you&#x2019;d be done!</p>
 <hr>
 <p>PS: Note that you may get error like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mgechev &#x2192; MinBook Pro ~/Desktop/test Thu Apr <span class="m">30</span> 11:56:03
-</span></span><span class="line"><span class="cl"> $ node index.js
-</span></span><span class="line"><span class="cl">_tls_common.js:67
-</span></span><span class="line"><span class="cl">      c.context.setKey<span class="o">(</span>options.key<span class="o">)</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">                ^
-</span></span><span class="line"><span class="cl">Error: error:0906A068:PEM routines:PEM_do_header:bad password <span class="nb">read</span>
-</span></span><span class="line"><span class="cl">    at Error <span class="o">(</span>native<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Object.createSecureContext <span class="o">(</span>_tls_common.js:67:17<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Server <span class="o">(</span>_tls_wrap.js:595:25<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at new Server <span class="o">(</span>https.js:36:14<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Object.exports.createServer <span class="o">(</span>https.js:56:10<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Object.&lt;anonymous&gt; <span class="o">(</span>/Users/mgechev/Desktop/test/index.js:6:11<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Module._compile <span class="o">(</span>module.js:449:26<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Object.Module._extensions..js <span class="o">(</span>module.js:467:10<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Module.load <span class="o">(</span>module.js:349:32<span class="o">)</span>
-</span></span><span class="line"><span class="cl">    at Function.Module._load <span class="o">(</span>module.js:305:12<span class="o">)</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">mgechev &#x2192; MinBook Pro ~/Desktop/test Thu Apr <span class="m">30</span> 11:56:03
+ $ node index.js
+_tls_common.js:67
+      c.context.setKey<span class="o">(</span>options.key<span class="o">)</span><span class="p">;</span>
+                ^
+Error: error:0906A068:PEM routines:PEM_do_header:bad password <span class="nb">read</span>
+    at Error <span class="o">(</span>native<span class="o">)</span>
+    at Object.createSecureContext <span class="o">(</span>_tls_common.js:67:17<span class="o">)</span>
+    at Server <span class="o">(</span>_tls_wrap.js:595:25<span class="o">)</span>
+    at new Server <span class="o">(</span>https.js:36:14<span class="o">)</span>
+    at Object.exports.createServer <span class="o">(</span>https.js:56:10<span class="o">)</span>
+    at Object.&lt;anonymous&gt; <span class="o">(</span>/Users/mgechev/Desktop/test/index.js:6:11<span class="o">)</span>
+    at Module._compile <span class="o">(</span>module.js:449:26<span class="o">)</span>
+    at Object.Module._extensions..js <span class="o">(</span>module.js:467:10<span class="o">)</span>
+    at Module.load <span class="o">(</span>module.js:349:32<span class="o">)</span>
+    at Function.Module._load <span class="o">(</span>module.js:305:12<span class="o">)</span></code></pre></div>
 <p>In this case you need to remove the pass:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">openssl rsa -in key.pem -out newkey.pem <span class="o">&amp;&amp;</span> mv newkey.pem key.pem</span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">openssl rsa -in key.pem -out newkey.pem <span class="o">&amp;&amp;</span> mv newkey.pem key.pem</code></pre></div>
 <p>Source <a href="https://www.madboa.com/geek/openssl/#key-removepass">madboa.com</a>.</p>
 <amp-img src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-19-at-10.14.40.png" alt="Https with Express" width="558" height="465" class="aligncenter size-full wp-image-676"></amp-img></div>
 

@@ -10,13 +10,40 @@ layout: page
     
   </p>
   <section class="timeline-period">
+    <header class="timeline-header">2023</header>
+    <section class="timeline-event">
+      <h1>Google Photos DevRel</h1>
+      <section>
+        <img src="/images/story/okinawa.png">
+        <p>
+          Summer of 2023 I did my first trip to Okinawa - the birthplace of karate!
+        </p>
+        <p>
+          This has been my childhood dream since I was 8! Although it was a struggle due to a typhoon, which also interrupted my grading for nidan, I managed to get my second degree black belt under Higaonna Sensei. In the grading commitee there were also Terauchi Sensei, Uehara Sensei, Yonesato Sensei, Joseph Tait Sensei. Grateful to Mirko Sensei for supporting me in the process and Tierney for being next to me...and being my bunkai partner! :)
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
+      <h1>Google Photos DevRel</h1>
+      <section>
+        <img src="/images/story/google-photos.jpg">
+        <p>
+          In the summer of 2023 I took the lead for Google Photos at Google.
+        </p>
+        <p>
+          I expanded my scope taking over multiple teams at Google - Angular DevRel, docs, product, and Google Photos DevRel. With more scope comes more responsibility :-).
+        </p>
+      </section>
+    </section>
+  </section>
+  <section class="timeline-period">
     <header class="timeline-header">2022</header>
     <section class="timeline-event">
       <h1>Head of Product for Angular</h1>
       <section>
         <img src="/images/story/product.jpg">
         <p>
-          November 2022 I became the product manager for Angular.
+          November 2022 I became the product lead for Angular.
         </p>
         <p>
           While still leading DevRel and documentation, my role expanded to thinking about <i>what</i> we should be building to make developers successful. I also joined the PM team for Wiz, an internal JavaScript framework powering Search, Photos, and more. I'm truly excited about this role. Being in a developer product it'll help me grow my communication, business, and technical skills further.

@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.101.0" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Persistent State of ReactJS Component &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -90,27 +90,27 @@
 <p>The code from this article could be found <a href="https://github.com/mgechev/react-pstate">at GitHub</a>.</p>
 <h2 id="state">State</h2>
 <p>Each ReactJS component may have a state. It also accepts properties passed by its ancestors. Based on the state of the component and the properties passed by its ancestors the component knows how to render itself. For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">self</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">ticks</span><span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="cl">      <span class="p">});</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="nx">self</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 <p>The <code>Ticker</code> has a state, which represents the number of ticks passed. The ticks count is being incremented each second and rendered into a span element.
 If we want to use this component somewhere onto the page we can:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">React</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Ticker</span><span class="o">&gt;&lt;</span><span class="err">/Ticker&gt;, document.getElementById(&#39;container&#39;));</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">React</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Ticker</span><span class="o">&gt;&lt;</span><span class="err">/Ticker&gt;, document.getElementById(&#39;container&#39;));</span></code></pre></div>
 <p>The snippet above will render the component in a container with id <code>container</code>. Once the <code>Ticker</code> has been rendered the ticking will begin.</p>
 <p>Another example for component state could be the position (left and top) of a dialog on the screen, boolean flag, which indicates whether given dialog is open or closed, etc.</p>
 <h2 id="persistence">Persistence</h2>
@@ -124,57 +124,57 @@ If we want to use this component somewhere onto the page we can:</p>
 </ul>
 <p>Doesn&rsquo;t it gets a bit messy? There is easier way of doing this which doesn&rsquo;t violates the component&rsquo;s &ldquo;pureness&rdquo; that much.</p>
 <p>What we can do is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;{}&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="cl">      <span class="p">});</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s1">&#39;{}&#39;</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+      <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">));</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 <p>Okay, this seems to work but we should duplicate the same code for each new element, which state we want to save&hellip;There are also some issues with the &ldquo;transactional&rdquo; behavior. What if the <code>localStorage</code> is full and it throws an error? We won&rsquo;t have the state saved persistently so we will have inconsistency between the state in the RAM memory and the one on the disk</p>
 <h2 id="mixins">Mixins</h2>
-<p>ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality and could be plugged into a component (class, package, component, whatever&hellip;). This is something in-between inheritance and delegation. We can&rsquo;t state that component using given mixin is a subclass of the mixin but it can be considered as subtype of it, since it implements it&rsquo;s interface (we can think of duck typing here - &ldquo;When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck.&rdquo;). Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes or <a href="https://kerflyn.wordpress.com/2012/07/09/java-8-now-you-have-mixins/">interfaces in Java 8</a>).</p>
+<p>ReactJS uses one more well known idea for code reuse called mixin. The mixin is basically a piece of code, which provides functionality and could be plugged into a component (class, package, component, whatever&hellip;). This is something in-between inheritance and delegation. We can&rsquo;t state that component using given mixin is a subclass of the mixin but it can be considered as subtype of it, since it implements it&rsquo;s interface (we can think of duck typing here - &ldquo;When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck.&quot;). Mixins are usually used in dynamically typed languages such as JavaScript, Ruby, Perl but can also be useful in statically typed languages as well (for example Java, where we implement the mixins as abstract classes or <a href="https://kerflyn.wordpress.com/2012/07/09/java-8-now-you-have-mixins/">interfaces in Java 8</a>).</p>
 <p>So we can implement the <code>localStorage.setItem</code> and <code>localStorage.getItem</code> thing into a mixin. But we won&rsquo;t have a big value by this&hellip;What about if we want to have different types of persistent storages? We want to dynamically change the storage from cookies to <code>localStorage</code> or why not even a RESTful API? If we want to make RESTful calls we need to better have asynchronous API, although <code>localStorage</code> accesses the disk synchronously. So obviously we need an <a href="https://en.wikipedia.org/wiki/Adapter_pattern">adapter</a>.</p>
 <h2 id="react-pstate">react-pstate</h2>
 <p>A few days ago I wrote the <code>react-pstate</code> mixin, which does exactly this - it allows persistence of the state of ReactJS components, through pluggable storage. For example lets take a look at the following example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">ReactPersistentState</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">setPState</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
-</span></span><span class="line"><span class="cl">      <span class="p">});</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
-</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Ticker</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">ReactPersistentState</span><span class="p">],</span>
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">ticks</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+  <span class="p">},</span>
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setPState</span><span class="p">({</span>
+        <span class="nx">ticks</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span> <span class="o">+</span> <span class="mi">1</span>
+      <span class="p">});</span>
+    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">ticks</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 <p>This code looks a little bit simpler. We don&rsquo;t use any globals but only instance methods instead. The magic happens in these three lines of code:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="k">this</span><span class="p">.</span><span class="nx">setPStorage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">localStorage</span><span class="p">);</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">setPId</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">);</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">restorePState</span><span class="p">();</span></code></pre></div>
 <p>Initially we set the persistent storage we are going to use by <code>this.setPState(this.localStorage)</code>, later we set a unique identifier of the component <code>this.setPId('ticker')</code> and after that we restore the component&rsquo;s state if there is such by calling <code>this.restorePState</code>.</p>
 <p>In order to save the component&rsquo;s state persistently you can use <code>this.setPState</code>, which has exactly the same interface as <code>this.setState</code>, as first argument it accepts the new state and as second a callback, which will be invoked once the state is set.</p>
 <p>But how to change the storage from <code>localStorage</code> to XHR for example? We simply need to pass to <code>setPStorage</code> an object, which implements the following interface:</p>

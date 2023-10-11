@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.101.0" />
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Blogger image resize &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -87,55 +87,55 @@
                 
                 <section id="post-body">
                     <p>That’s my second post here and the first one which is going to have any sense. Today a friend of mine was fighting with Google’s blog system&hellip;He was posting some data with images in it. When he was setting width and height of images in the html editor they were being resized later after he post the article. When he tried to put any CSS restriction about picture’s width the effect was – picture flattened (because blogger was setting the picture height). I looked at the source for few minutes, stopped the JavaScript because I thought that it is the problem but there was no result&hellip;So I wrote a tiny script which deals with the problem. And here is it:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl">   
-</span></span><span class="line"><span class="cl"><span class="cm">/*
-</span></span></span><span class="line"><span class="cl"><span class="cm">    Blogger image resize script Copyright (C) 2011  Minko Gechev (http://mgechev.com)
-</span></span></span><span class="line"><span class="cl"><span class="cm">    This program comes with ABSOLUTELY NO WARRANTY; for details type http://www.gnu.org/licenses/gpl-3.0.html.
-</span></span></span><span class="line"><span class="cl"><span class="cm">    This is free software, and you are welcome to redistribute it
-</span></span></span><span class="line"><span class="cl"><span class="cm">    under certain conditions; type http://www.gnu.org/licenses/gpl-3.0.html for details.
-</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">//Picture&#39;s maximum width
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">var</span> <span class="nx">maxImageWidth</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">//Posts content is in div with post-body class so I&#39;m performing resize for the pictures
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//which are in all divs from this kind
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">(</span><span class="kd">function</span> <span class="nx">performResize</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.post-body&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">container</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">getImages</span><span class="p">(</span><span class="nx">container</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">})();</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">//Recursively taking all images. I&#39;m using recursion because there might be any &#39;a&#39;, &#39;span&#39;...etc tag where is
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//the image. If I find any image tag then I&#39;m comparing image&#39;s width with the max width and if it&#39;s more resizing it.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">function</span> <span class="nx">getImages</span><span class="p">(</span><span class="nx">container</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">tagName</span> <span class="o">===</span> <span class="s1">&#39;IMG&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">width</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nx">maxImageWidth</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">resizeImage</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">                <span class="k">return</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                    <span class="nx">getImages</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">get</span><span class="p">(</span><span class="nx">i</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">                <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="k">return</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>    
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="c1">//Calculating maxImageWidth in percents.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">function</span> <span class="nx">resizeImage</span><span class="p">(</span><span class="nx">image</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">maxSizeInPercents</span> <span class="o">=</span> <span class="nx">maxImageWidth</span> <span class="o">/</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">width</span><span class="p">());</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">newHeight</span> <span class="o">=</span> <span class="nx">maxSizeInPercents</span> <span class="o">*</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">height</span><span class="p">());</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">image</span><span class="p">.</span><span class="nx">width</span><span class="p">(</span><span class="nx">maxImageWidth</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">image</span><span class="p">.</span><span class="nx">height</span><span class="p">(</span><span class="nx">newHeight</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>    
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript">   
+<span class="cm">/*
+</span><span class="cm">    Blogger image resize script Copyright (C) 2011  Minko Gechev (http://mgechev.com)
+</span><span class="cm">    This program comes with ABSOLUTELY NO WARRANTY; for details type http://www.gnu.org/licenses/gpl-3.0.html.
+</span><span class="cm">    This is free software, and you are welcome to redistribute it
+</span><span class="cm">    under certain conditions; type http://www.gnu.org/licenses/gpl-3.0.html for details.
+</span><span class="cm">*/</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="c1">//Picture&#39;s maximum width
+</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">maxImageWidth</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+
+    <span class="c1">//Posts content is in div with post-body class so I&#39;m performing resize for the pictures
+</span><span class="c1"></span>    <span class="c1">//which are in all divs from this kind
+</span><span class="c1"></span>    <span class="p">(</span><span class="kd">function</span> <span class="nx">performResize</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.post-body&#39;</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">container</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">getImages</span><span class="p">(</span><span class="nx">container</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+    <span class="p">})();</span>
+
+    <span class="c1">//Recursively taking all images. I&#39;m using recursion because there might be any &#39;a&#39;, &#39;span&#39;...etc tag where is
+</span><span class="c1"></span>    <span class="c1">//the image. If I find any image tag then I&#39;m comparing image&#39;s width with the max width and if it&#39;s more resizing it.
+</span><span class="c1"></span>    <span class="kd">function</span> <span class="nx">getImages</span><span class="p">(</span><span class="nx">container</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">container</span><span class="p">.</span><span class="nx">tagName</span> <span class="o">===</span> <span class="s1">&#39;IMG&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">width</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nx">maxImageWidth</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">resizeImage</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">));</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">getImages</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">container</span><span class="p">).</span><span class="nx">children</span><span class="p">().</span><span class="nx">get</span><span class="p">(</span><span class="nx">i</span><span class="p">));</span>
+                <span class="p">}</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>    
+    <span class="p">}</span>
+
+    <span class="c1">//Calculating maxImageWidth in percents.
+</span><span class="c1"></span>    <span class="kd">function</span> <span class="nx">resizeImage</span><span class="p">(</span><span class="nx">image</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">maxSizeInPercents</span> <span class="o">=</span> <span class="nx">maxImageWidth</span> <span class="o">/</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">width</span><span class="p">());</span>
+        <span class="kd">var</span> <span class="nx">newHeight</span> <span class="o">=</span> <span class="nx">maxSizeInPercents</span> <span class="o">*</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">height</span><span class="p">());</span>
+        <span class="nx">image</span><span class="p">.</span><span class="nx">width</span><span class="p">(</span><span class="nx">maxImageWidth</span><span class="p">);</span>
+        <span class="nx">image</span><span class="p">.</span><span class="nx">height</span><span class="p">(</span><span class="nx">newHeight</span><span class="p">);</span>
+    <span class="p">}</span>    
+<span class="p">});</span></code></pre></div>
 <p>I hope that it&rsquo;s going to be helpful for some of you.<br>
 Greetings!</p>
 
