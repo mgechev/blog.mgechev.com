@@ -26,7 +26,7 @@ layout: page
     <section class="timeline-event">
       <h1>Google Photos DevRel</h1>
       <section>
-        <img src="/images/story/google-photos.jpg">
+        <img src="/images/story/google-photos.png">
         <p>
           In the summer of 2023 I took the lead for Google Photos at Google.
         </p>
