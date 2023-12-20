@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.121.1">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -171,71 +171,71 @@ You can find <strong>revive</strong> on GitHub at <a href="https://github.com/mg
 <p>Later, I&#x2019;ll explain how we can quickly develop more rules for <code>revive</code> but before that, let me share a few instructions on how you can use the linter!</p>
 <h2 id="usage">Usage</h2>
 <p>Install <code>revive</code> with:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">go get github.com/mgechev/revive
-</code></pre></div><p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">go get github.com/mgechev/revive
+</span></span></code></pre></div><p>The command above adds the <code>revive</code> binary under <code>$GOPATH/bin</code>.</p>
 <p>Using the tool with no flags has the same behavior as <code>golint</code>. The magic happens when we add the <code>-formatter</code> flag:</p>
 <amp-img src="/images/revive/friendly.svg" alt="Friendly formatter" style="width: 100%; display: block; margin: auto"></amp-img>
 <p>From the image above, we can see that we got 31 warnings for the <code>&quot;exported&quot;</code> rule. This rule is port of a built-in rule from <code>golint</code> which enforces practices for exported symbols (find the full set of rules <a href="https://github.com/mgechev/revive#available-rules">here</a>).</p>
 <p>If we prefer to ignore these warnings for the entire project, we can use a config file in TOML format:</p>
 <amp-img src="/images/revive/editconfig.svg" alt="Edit config" style="width: 100%; display: block; margin: auto"></amp-img>
 <p>What if we want to disable a specific rule for only part of the file? In such case, we can use the following technique:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
-
-<span class="c1">//revive:disable
-</span><span class="c1"></span>
-<span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
-    <span class="nx">Value</span>      <span class="kt">string</span>
-    <span class="nx">IsStar</span>     <span class="kt">bool</span>
-    <span class="nx">IsVariadic</span> <span class="kt">bool</span>
-    <span class="nx">IsWriter</span>   <span class="kt">bool</span>
-    <span class="nx">Underlying</span> <span class="kt">string</span>
-<span class="p">}</span>
-<span class="c1">//revive:enable
-</span></code></pre></div><p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">models</span>
-
-<span class="c1">//revive:disable:exported
-</span><span class="c1"></span>
-<span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
-    <span class="nx">Value</span>      <span class="kt">string</span>
-    <span class="nx">IsStar</span>     <span class="kt">bool</span>
-    <span class="nx">IsVariadic</span> <span class="kt">bool</span>
-    <span class="nx">IsWriter</span>   <span class="kt">bool</span>
-    <span class="nx">Underlying</span> <span class="kt">string</span>
-<span class="p">}</span>
-<span class="c1">//revive:enable:exported
-</span></code></pre></div><p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">models</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//revive:disable
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Value</span>      <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsStar</span>     <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsVariadic</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsWriter</span>   <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Underlying</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//revive:enable
+</span></span></span></code></pre></div><p>The annotations above disables all <code>revive</code> rules for the entire struct. In case we prefer to disable only the <code>exported</code> rule, we should use:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nx">models</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//revive:disable:exported
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Expression</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Value</span>      <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsStar</span>     <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsVariadic</span> <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">IsWriter</span>   <span class="kt">bool</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Underlying</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//revive:enable:exported
+</span></span></span></code></pre></div><p><em>Keep in mind that comments which are meant for the linter, should not start with a whitespace. For more details see <a href="https://github.com/mgechev/revive/issues/1">revive: unidiomatic <code>// revive:</code> syntax</a></em>.</p>
 <p>Finally, if we want to ignore all files from a directory, we can use the <code>-exclude</code> flag:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... ./...
-</code></pre></div><p>The command above will lint all files from the current directory, excluding all files in <code>tests</code>, recursively. If we want to exclude more than one directory use:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell">revive -exclude tests/... -exclude utils/... ./...
-</code></pre></div><h3 id="configurability">Configurability</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">revive -exclude tests/... ./...
+</span></span></code></pre></div><p>The command above will lint all files from the current directory, excluding all files in <code>tests</code>, recursively. If we want to exclude more than one directory use:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">revive -exclude tests/... -exclude utils/... ./...
+</span></span></code></pre></div><h3 id="configurability">Configurability</h3>
 <p>In an image in the last section, we saw that by using a config file in TOML format, we could configure the execution of <code>revive</code>. Here&#x2019;s an example config file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"># Ignores files with &quot;GENERATED&quot; header, similar to golint
-ignoreGeneratedHeader = true
-
-# Sets the default severity to &quot;warning&quot;
-severity = &quot;warning&quot;
-
-# Sets the default failure confidence. The semantics behind this property
-# is that revive ignores all failures with a confidence level below 0.8.
-confidence = 0.8
-
-# Sets the error code for failures with severity &quot;error&quot;
-errorCode = 0
-
-# Sets the error code for failures with severity &quot;warning&quot;
-warningCode = 0
-
-# Configuration of the `cyclomatic` rule. Here we specify that
-# the rule should fail if it detects code with higher complexity than 10.
-[rule.cyclomatic]
-  arguments = [10]
-
-# Sets the severity of the `package-comments` rule to &quot;error&quot;.
-[rule.package-comments]
-  severity = &quot;error&quot;
-</code></pre></div><p>Let&#x2019;s quickly go over the individual properties.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl"># Ignores files with &quot;GENERATED&quot; header, similar to golint
+</span></span><span class="line"><span class="cl">ignoreGeneratedHeader = true
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Sets the default severity to &quot;warning&quot;
+</span></span><span class="line"><span class="cl">severity = &quot;warning&quot;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Sets the default failure confidence. The semantics behind this property
+</span></span><span class="line"><span class="cl"># is that revive ignores all failures with a confidence level below 0.8.
+</span></span><span class="line"><span class="cl">confidence = 0.8
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Sets the error code for failures with severity &quot;error&quot;
+</span></span><span class="line"><span class="cl">errorCode = 0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Sets the error code for failures with severity &quot;warning&quot;
+</span></span><span class="line"><span class="cl">warningCode = 0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Configuration of the `cyclomatic` rule. Here we specify that
+</span></span><span class="line"><span class="cl"># the rule should fail if it detects code with higher complexity than 10.
+</span></span><span class="line"><span class="cl">[rule.cyclomatic]
+</span></span><span class="line"><span class="cl">  arguments = [10]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Sets the severity of the `package-comments` rule to &quot;error&quot;.
+</span></span><span class="line"><span class="cl">[rule.package-comments]
+</span></span><span class="line"><span class="cl">  severity = &quot;error&quot;
+</span></span></code></pre></div><p>Let&#x2019;s quickly go over the individual properties.</p>
 <ul>
 <li><code>ignoreGeneratedHeader</code> - <code>golint</code> ignores files which have header <code>GENERATED</code>. To disable this behavior, set the flag to <code>false</code>.</li>
 <li><code>severity</code> - <code>revive</code> has two types of severity - <code>warning</code> and <code>error</code>. This way we can distinguish between critical failures with high confidence level and such with lower.</li>
@@ -250,32 +250,32 @@ warningCode = 0
 <ul>
 <li>Contribute to the project - <code>revive</code> is open for external contributions. If a rule makes sense and passes its unit tests, it&#x2019;s more than welcome to become part of <code>revive</code>! On top of that, creating a new rule is just a matter of implementing this simple interface:</li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
-    <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
-    <span class="nf">Apply</span><span class="p">(</span><span class="o">*</span><span class="nx">File</span><span class="p">,</span> <span class="nx">Arguments</span><span class="p">)</span> <span class="p">[]</span><span class="nx">Failure</span>
-<span class="p">}</span>
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Rule</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Apply</span><span class="p">(</span><span class="o">*</span><span class="nx">File</span><span class="p">,</span> <span class="nx">Arguments</span><span class="p">)</span> <span class="p">[]</span><span class="nx">Failure</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
 <li>Fork the project and push the rules there. If you think your rules won&#x2019;t apply to others (although the chances are that they will), you can fork <code>revive</code> and not push them upstream. Just make sure that you sync your code with upstream once in a while to get all the new features and bug fixes from there!</li>
 </ul>
 <p>Keep in mind that to create a rule you don&#x2019;t have to be familiar with the entire codebase. All rules are well encapsulated into visitors with simple interface. A sample implementation of <code>arguments-limit</code> could be found <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/rule/argument-limit.go">here</a>.</p>
 <p><strong>What about formatters?</strong></p>
 <p>Well, creating a new formatter is as simple as creating a new rule. Just implement the following interface:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
-    <span class="nf">Format</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">Failure</span><span class="p">,</span> <span class="nx">RulesConfig</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
-    <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
-<span class="p">}</span>
-</code></pre></div><p>Here you can find a sample implementation of a <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/formatter/json.go">JSON formatter</a>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">type</span> <span class="nx">Formatter</span> <span class="kd">interface</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Format</span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">Failure</span><span class="p">,</span> <span class="nx">RulesConfig</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">Name</span><span class="p">()</span> <span class="kt">string</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Here you can find a sample implementation of a <a href="https://github.com/mgechev/revive/blob/b754e5414caec17f6465692421b87c5ef38aa113/formatter/json.go">JSON formatter</a>.</p>
 <h2 id="performance">Performance</h2>
 <p>I run some basic benchmarks to compare the performance of <code>golint</code> and <code>revive</code>. Here&#x2019;s what I found out after running both linters against <code>kubernetes</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> golint be/&#x2026;
-real    0m25.389s
-user    0m29.221s
-sys     0m3.065s
-</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">time</span> revive be/&#x2026;
-real    0m6.524s
-user    0m22.882s
-sys     0m1.114s
-</code></pre></div><p>Since <strong><code>revive</code></strong> lints the individual files in separate goroutines, it <strong>outperforms <code>golint</code> about 4 times</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">time</span> golint be/&#x2026;
+</span></span><span class="line"><span class="cl">real    0m25.389s
+</span></span><span class="line"><span class="cl">user    0m29.221s
+</span></span><span class="line"><span class="cl">sys     0m3.065s
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nb">time</span> revive be/&#x2026;
+</span></span><span class="line"><span class="cl">real    0m6.524s
+</span></span><span class="line"><span class="cl">user    0m22.882s
+</span></span><span class="line"><span class="cl">sys     0m1.114s
+</span></span></code></pre></div><p>Since <strong><code>revive</code></strong> lints the individual files in separate goroutines, it <strong>outperforms <code>golint</code> about 4 times</strong>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p><code>Revive</code> is a simple, fast, configurable, extensible, flexible, and beautiful linter for Go. It runs the linting rules on top of each file in a separate goroutine which improves the performance significantly. <code>Revive</code> lets us configure the individual rules and disable them for the entire project, individual files, or range of lines within a file. Last but not least, <code>revive</code> lets us use a set of built-in formatters which output the failures in a digestible, accessible, and easy to consume format.</p>
 <p>The project is continuously evolving and open for new contributions in the form of new rules, formatters, or bug fixes! If you want to create an even stricter linting preset, cut the coding style discussions in your team to the minimum, and focus on the essential things, <code>revive</code> may help.</p>

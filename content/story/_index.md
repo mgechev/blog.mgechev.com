@@ -12,7 +12,22 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2023</header>
     <section class="timeline-event">
-      <h1>Google Photos DevRel</h1>
+      <h1>Promotion at Google</h1>
+      <section>
+        <img src="/images/story/google.png">
+        <p>
+          I got a second promotion at Google!
+        </p>
+        <p>
+          It has been such a recognition to get to the next level. This happened at the end of October, and just now I feel like I've started to digest it. Being at this level means a lot to me and I hope I am setting a good example for other Googlers in the company.
+        </p>
+        <p>
+          The recognition came from leading the Angular framework and contributing to the Web strategy at Google, defining our framework narrative. It involved a lot of strategic work, a lot of collaboration, and a lot of learning. The more I grow in my career, the more I understand that the domain expertise is just a part of the job - interpersonal communication, empathy, and care for others is what matter a lot.
+        </p>
+      </section>
+    </section>
+    <section class="timeline-event">
+      <h1>Trip to Okinawa</h1>
       <section>
         <img src="/images/story/okinawa.png">
         <p>
