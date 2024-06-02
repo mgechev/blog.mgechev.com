@@ -16,7 +16,7 @@ title: Are LLMs going to replace us?
 url: /2024/05/28/are-llms-going-to-replace-us
 ---
 
-Over the past few years, I have published most of my posts on [blog.angular.dev](https://blog.angular.dev), but my blog has received little attention. Today, I decided to interrupt this unintentional pause by sharing a thought in my mind lately. It's provoked by a mixture of one of the most memorable moments from my degree at Sofia University and the recent boom of AI. I've been getting inspiration from the theory of computation to answer the question, "Are we going to be replaced by AI?"
+Over the past few years, I have published most of my posts on [blog.angular.dev](https://blog.angular.dev) and my blog has received little attention. Today, I decided to share something that has been on the mind lately. It's inspired by a mixture of one of the most memorable moments from my university classes and the recent boom of AI. Through the lens of the theory of computation I'll attempt to answer the question, "Are we going to be replaced by AI?"
 
 If I were a YouTuber, I'd have said, "Make sure you read the article until the end to find the answer...Also, make sure you like and subscribe." Luckily, I'm not a YouTuber, and I don't want to lose your time, so if you're looking for an answer, you better stop reading here. If you'd enjoy my brief rambling incorporating some of my limited understanding of mathematics and philosophy, please spend the next 3 minutes reading through.
 
