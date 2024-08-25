@@ -4,7 +4,7 @@ categories:
 - Angular
 - Web development
 - Open source
-date: 2024-08-26T00:00:00Z
+date: 2024-08-25T00:00:00Z
 draft: false
 tags:
 - Angular
@@ -12,7 +12,7 @@ tags:
 - Open source
 title: Managing Angular
 og_image: /images/managing-angular/gradient.webp
-url: /2024/08/26/managing-angular
+url: /2024/08/25/managing-angular
 ---
 
 Over the past couple of years, I've been the product lead for Angular. In this article, I'd like to share how we've been managing the framework. Keep in mind this content lives on my personal blog for a reason - it represents my point of view and doesn't share a complete picture of all the processes within the team, such as people management, program management, etc. Also, that's the second time I'm writing this article. The first time, I wanted to be as descriptive as possible and stopped writing at about thirty pages, after which I deleted the content and decided to start over. Today, I'll keep it short with the caveat that I'll skip some important details and keep it on a high level.
