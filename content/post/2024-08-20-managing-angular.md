@@ -11,6 +11,7 @@ tags:
 - Web development
 - Open source
 title: Managing Angular
+og_image: /images/managing-angular/gradient.webp
 url: /2024/08/20/managing-angular
 ---
 

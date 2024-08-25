@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.121.1">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:Part 1 Part 2 Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
+<meta name="description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at: Part 1 Part 2  Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
 
 <meta property="og:title" content="Even Faster AngularJS Data Structures - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:Part 1 Part 2 Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
+<meta property="og:description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at: Part 1 Part 2  Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2015/04/20/fast-angular-data-structures-versionable/">
 <meta name="twitter:title" content="Even Faster AngularJS Data Structures - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:Part 1 Part 2 Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
+<meta name="twitter:description" content="This is the last post of the series &amp;ldquo;Boost the Performance of an AngularJS Application Using Immutable Data&amp;rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at: Part 1 Part 2  Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "This is the last post of the series \u0026ldquo;Boost the Performance of an AngularJS Application Using Immutable Data\u0026rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:\nPart 1 Part 2 Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop."
+    "description": "This is the last post of the series \u0026ldquo;Boost the Performance of an AngularJS Application Using Immutable Data\u0026rdquo;. I strongly recommend you to take a look at the previous two parts before continue reading this content. You can find them at:\n Part 1 Part 2  Introduction Before about a month ago, I decided to experiment using immutable data structures in an AngularJS application. The goal behind my decision was quite simple - optimization of the $digest loop."
   }
 </script>
 
@@ -154,89 +154,89 @@
 <h3 id="watch">$watch</h3>
 <p><amp-img src="/images/papi-lego.jpg" alt=""></amp-img></p>
 <p>The only way to take advantage of the first option is by receiving a new reference to the data structure once it changes or watch an internal property, which indicates a change. Unfortunately, we cannot change the value of the reference. What we can do is to create a wrapper of the native JavaScript collection and on each change to create a new wrapper, without copying the collection, i.e.:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">primitive</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ListWrapper</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">changedList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span> <span class="o">===</span> <span class="nx">changedList</span><span class="p">);</span> <span class="c1">// false
-</span></span></span><span class="line"><span class="cl"><span class="c1">// The primitive collection is changed
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
-</span></span></span></code></pre></div><p>But this will also have one important side effect:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changedList</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
-</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">primitive</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ListWrapper</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">changedList</span> <span class="o">=</span> <span class="nx">list</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span> <span class="o">===</span> <span class="nx">changedList</span><span class="p">);</span> <span class="c1">// false
+</span><span class="c1">// The primitive collection is changed
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">primitive</span><span class="p">);</span> <span class="c1">// [1, 2, 3, 4]
+</span></code></pre></div><p>But this will also have one important side effect:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">changedList</span><span class="p">.</span><span class="nx">toJS</span><span class="p">());</span> <span class="c1">// [ 1, 2, 3, 4]
+</span></code></pre></div>
 <p>Keeping the same reference to the primitive list in both collections will cause change inside the underlaying data in both collections, once we perform a mutation operation. This solution looks like a dirty hack.</p>
 <h3 id="watchcollection">$watchCollection</h3>
-<p>How we can reduce the keys over which AngularJS&#x2019; dirty checker iterates? If we have a collection with 100,000,000 items, how to make AngularJS iterates only over a few of them in order to detect if the collection has changes? We will definitely need a wrapper but how to do the optimization?</p>
+<p>How we can reduce the keys over which AngularJS&apos; dirty checker iterates? If we have a collection with 100,000,000 items, how to make AngularJS iterates only over a few of them in order to detect if the collection has changes? We will definitely need a wrapper but how to do the optimization?</p>
 <p>AngularJS does not need to iterate over the entire collection but only need to check a control flag, which shows the change of the collection. What we can do is to have a wrapper, which keeps a reference to a standard JavaScript array. All operations over the wrapper will be forwarded to the array but the ones, which change the collection, will update the control flag, with a new value. On the next iteration of the <code>$digest</code> loop, AngularJS will check only the control flag and if it differs from its previous value the callbacks associated with the expression will be invoked.</p>
 <p>But how we can limit AngularJS to watch <strong>only</strong> the control flag? We can do something like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">$watch</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">isChanged</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">},</span> <span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">$watch</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">isChanged</span><span class="p">;</span>
+<span class="p">},</span> <span class="nx">cb</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span></code></pre></div>
 <p>There are three drawbacks of this approach:</p>
 <ul>
 <li>We expose underlaying implementation details to the user of our library.</li>
 <li>AngularJS needs to reset the <code>isChanged</code> flag once it detects a change. This requires changes in the AngularJS watch mechanism.</li>
 <li>We can change <code>isChanged</code> outside the collection.</li>
 </ul>
-<p>Lets take a look at AngularJS&#x2019; <code>$watchCollection</code> implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">for</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">newValue</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">newLength</span><span class="o">++</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">newItem</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">oldItem</span> <span class="o">=</span> <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">oldValue</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">bothNaN</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oldItem</span> <span class="o">!==</span> <span class="nx">oldItem</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">newItem</span> <span class="o">!==</span> <span class="nx">newItem</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">bothNaN</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">oldItem</span> <span class="o">!==</span> <span class="nx">newItem</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">changeDetected</span><span class="o">++</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newItem</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">oldLength</span><span class="o">++</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newItem</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">changeDetected</span><span class="o">++</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// ...
-</span></span></span></code></pre></div>
-<p>This part of the implementation is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using <code>for-in</code>. In order to achieve complexity around <code>O(1)</code>, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag as only key of the collection&#x2019; instances.</p>
+<p>Lets take a look at AngularJS&apos; <code>$watchCollection</code> implementation:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="c1">// ...
+</span><span class="c1"></span><span class="k">for</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">newValue</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">newValue</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">newLength</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">newItem</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="nx">oldItem</span> <span class="o">=</span> <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">oldValue</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">bothNaN</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oldItem</span> <span class="o">!==</span> <span class="nx">oldItem</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">newItem</span> <span class="o">!==</span> <span class="nx">newItem</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">bothNaN</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">oldItem</span> <span class="o">!==</span> <span class="nx">newItem</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">changeDetected</span><span class="o">++</span><span class="p">;</span>
+        <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newItem</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">oldLength</span><span class="o">++</span><span class="p">;</span>
+      <span class="nx">oldValue</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newItem</span><span class="p">;</span>
+      <span class="nx">changeDetected</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// ...
+</span></code></pre></div>
+<p>This part of the implementation is invoked, when the watched collection is not array-like. What we notice is that AngularJS iterates over the keys using <code>for-in</code>. In order to achieve complexity around <code>O(1)</code>, we need to decrease the amount of keys over, which AngularJS will iterate and possibly leave only the change control flag as only key of the collection&apos; instances.</p>
 <p>Here is how we achieve behavior result:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">defineMethod</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">method</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">enumerable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">value</span><span class="o">:</span> <span class="nx">method</span>
-</span></span><span class="line"><span class="cl">  <span class="p">});</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">VersionableList</span><span class="p">(</span><span class="nx">list</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">_version</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;_data&apos;</span><span class="p">,</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">enumerable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">value</span><span class="o">:</span> <span class="nx">list</span> <span class="o">||</span> <span class="p">[]</span>
-</span></span><span class="line"><span class="cl">  <span class="p">});</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="s1">&apos;push pop shift unshift&apos;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&apos; &apos;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">defineMethod</span><span class="p">(</span><span class="nx">VersionableList</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_updateVersion</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">  <span class="p">});</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span>
-</span></span><span class="line"><span class="cl"><span class="nx">defineMethod</span><span class="p">(</span><span class="nx">VersionableList</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="s1">&apos;set&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="k">this</span><span class="p">.</span><span class="nx">_updateVersion</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
+  <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">descriptor</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">defineMethod</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">method</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
+  <span class="nx">defineProperty</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">enumerable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nx">value</span><span class="o">:</span> <span class="nx">method</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">VersionableList</span><span class="p">(</span><span class="nx">list</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_version</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="s1">&apos;_data&apos;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">enumerable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nx">value</span><span class="o">:</span> <span class="nx">list</span> <span class="o">||</span> <span class="p">[]</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="s1">&apos;push pop shift unshift&apos;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&apos; &apos;</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+  <span class="s1">&apos;use strict&apos;</span><span class="p">;</span>
+  <span class="nx">defineMethod</span><span class="p">(</span><span class="nx">VersionableList</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_updateVersion</span><span class="p">();</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+<span class="nx">defineMethod</span><span class="p">(</span><span class="nx">VersionableList</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="s1">&apos;set&apos;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_data</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">_updateVersion</span><span class="p">();</span>
+<span class="p">});</span></code></pre></div>
 <p>There are three main parts of the snippet above:</p>
 <ul>
 <li>The way we take advantage of non-enumerable properties</li>
@@ -245,19 +245,19 @@
 </ul>
 <p>The update method does not have to do something complex, it can only increment the version property.</p>
 <p>Here is sample usage of <code>VersionableList</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VersionableList</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 0
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl"><span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2, 3]
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 1
-</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">let</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VersionableList</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 0
+</span><span class="c1"></span>
+<span class="nx">list</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">valueOf</span><span class="p">());</span> <span class="c1">// [1, 2, 3]
+</span><span class="c1"></span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">list</span><span class="p">.</span><span class="nx">_version</span><span class="p">);</span> <span class="c1">// 1
+</span></code></pre></div>
 <p>And here are the keys over which AngularJS will iterate:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [&apos;_version&apos;]
-</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span> <span class="c1">// [&apos;_version&apos;]
+</span></code></pre></div>
 <h2 id="benchmark-results">Benchmark Results</h2>
 <p><amp-img src="/images/batman-superman-robbin-lego.jpg" alt=""></amp-img></p>
 <p>I compared the performance of <a href="https://github.com/mgechev/versionable-collections/blob/master/lib/versionable-list.js"><code>VersionableList</code></a> versus Immutable.js list and the built-in JavaScript arrays with the following variables in mind:</p>
@@ -283,7 +283,7 @@
 <p><amp-img src="/images/faster-collections/data-size-10000.png" alt=""></amp-img></p>
 <p>The supreme champion is the <code>VersionableList</code>. The interesting fact here is that the immutable list performs just slightly worst than the <code>VersionableList</code> list, although on each change <strike>a new collection with 10,000 items is created</strike> a lot of operations for maintaining the <a href="https://en.wikipedia.org/wiki/Persistent_data_structure">persistent data structure</a> are performed.</p>
 <h2 id="further-optimization">Further Optimization</h2>
-<p>There&#x2019;s no way to go much further without making any optimizations in the AngularJS&#x2019; internal change detection. We may gain slight performance improvement if AngularJS doesn&#x2019;t invoke <code>hasOwnProperty</code> in the <code>$watchCollection</code> dirty checking strategy, since the poor performance of the method. This will require us to change <code>VersionableList</code> to something &#x201C;array-like&#x201D; in order to enter <a href="https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601">the second case of <code>$watchCollection</code>&#x2019;s interceptor</a>.</p>
+<p>There&#x2019;s no way to go much further without making any optimizations in the AngularJS&apos; internal change detection. We may gain slight performance improvement if AngularJS doesn&#x2019;t invoke <code>hasOwnProperty</code> in the <code>$watchCollection</code> dirty checking strategy, since the poor performance of the method. This will require us to change <code>VersionableList</code> to something &#x201C;array-like&#x201D; in order to enter <a href="https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L575-L601">the second case of <code>$watchCollection</code>&#x2019;s interceptor</a>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Using Immutable data we can gain performance improvements in the running time of our AngularJS applications. By workarounding the biggest drawback of using immutable data - copying the entire data structure on change, we can reduce the running time even further. In both cases we should keep in mind that Immutable.js and VersionableCollections are both only wrappers around the standard collections. If you make any change in the collection items, AngularJS will not detect any change in the collection, which on their other hand won&#x2019;t force update of your view.</p>
 <p>As I suggested in the previous blog post, before performing any of the optimization listed do application specific benchmarks using the data, which your application will process. Sample benchpress configurations could be found <a href="https://github.com/mgechev/benchpress-angularjs-immutable">here</a> and <a href="https://github.com/jeffbcross/karma-benchpress">here</a>.</p>
@@ -293,7 +293,7 @@
 <li><a href="https://blog.mgechev.com/2015/04/11/immutability-in-angularjs-immutablejs-part-2/">Part 2</a></li>
 <li><a href="https://github.com/mgechev/versionable-collections">VersionableCollection</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Persistent_data_structure">Persistent Data Structures</a></li>
-<li><a href="https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L563-L641">AngularJS&#x2019; watchCollection interceptor</a></li>
+<li><a href="https://github.com/angular/angular.js/blob/master/src/ng/rootScope.js#L563-L641">AngularJS&apos; watchCollection interceptor</a></li>
 <li><a href="https://www.flickr.com/photos/ryechess/6645151473/">Image in the introduction section</a></li>
 <li><a href="https://www.flickr.com/photos/126429057@N06/14549507589/">Image in the $watch section</a></li>
 <li><a href="https://www.flickr.com/photos/thebritishbafoon/12228264015/">Image in the benchmarks section</a></li>

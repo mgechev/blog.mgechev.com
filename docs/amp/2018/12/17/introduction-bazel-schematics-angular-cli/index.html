@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.121.1">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -143,53 +143,53 @@
 <p><strong>Does this mean we want to replace webpack in Angular CLI? No.</strong> Although webpack and Bazel have some intersection regarding vision, to a large extent they are orthogonal. For example, Bazel is a universal build tool which can bundle JavaScript projects with webpack.</p>
 <h2 id="introducing-bazel-schematics-for-angular-cli">Introducing Bazel Schematics for Angular CLI</h2>
 <p>The <code>@angular/bazel</code> schematics allow us to bootstrap a project in a way that our build will be managed by Bazel. Here&#x2019;s how we can use them:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i -g yarn
-</span></span><span class="line"><span class="cl">yarn global add @angular/bazel@7.2.0-rc.0
-</span></span></code></pre></div><p>After we have the schematics installed, just execute:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ng new bzl-app --collection<span class="o">=</span>@angular/bazel
-</span></span></code></pre></div><p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g yarn
+yarn global add @angular/bazel@7.2.0-rc.0
+</code></pre></div><p>After we have the schematics installed, just execute:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">ng new bzl-app --collection<span class="o">=</span>@angular/bazel
+</code></pre></div><p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
 <p>This will create the following directory structure:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">.
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; BUILD.bazel
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; README.md
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; WORKSPACE
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; angular.json
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; e2e
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.conf.js
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.on-prepare.js
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; src
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app.e2e-spec.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; app.po.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tsconfig.e2e.json
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; package.json
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; src
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; assets
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; browserslist
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environments
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environment.prod.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; environment.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; favicon.ico
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; index.html
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; initialize_testbed.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; karma.conf.js
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.dev.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.prod.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; polyfills.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; styles.css
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; test.ts
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.app.json
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.spec.json
-</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tslint.json
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; tsconfig.json
-</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; tslint.json
-</span></span><span class="line"><span class="cl">&#x2514;&#x2500;&#x2500; yarn.lock
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">6 directories, 36 files
-</span></span></code></pre></div><p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">.
+&#x251C;&#x2500;&#x2500; BUILD.bazel
+&#x251C;&#x2500;&#x2500; README.md
+&#x251C;&#x2500;&#x2500; WORKSPACE
+&#x251C;&#x2500;&#x2500; angular.json
+&#x251C;&#x2500;&#x2500; e2e
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.conf.js
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.on-prepare.js
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; src
+&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app.e2e-spec.ts
+&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; app.po.ts
+&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tsconfig.e2e.json
+&#x251C;&#x2500;&#x2500; package.json
+&#x251C;&#x2500;&#x2500; src
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; assets
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; browserslist
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environments
+&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environment.prod.ts
+&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; environment.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; favicon.ico
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; index.html
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; initialize_testbed.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; karma.conf.js
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.dev.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.prod.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; polyfills.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; styles.css
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; test.ts
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.app.json
+&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.spec.json
+&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tslint.json
+&#x251C;&#x2500;&#x2500; tsconfig.json
+&#x251C;&#x2500;&#x2500; tslint.json
+&#x2514;&#x2500;&#x2500; yarn.lock
+
+6 directories, 36 files
+</code></pre></div><p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
 <ul>
 <li>We have a <code>WORKSPACE</code> file. It configures our build dependencies, such as Bazel rules for TypeScript, web testing, and others.</li>
 <li>There are a few <code>BUILD.bazel</code> files which contain build configuration. We don&#x2019;t have to worry about them at the moment. In the future releases, Angular CLI will manage them automatically for us. In short, they divide our project into packages, configure the build configuration for each package, and define the dependencies between the individual packages.</li>
@@ -203,8 +203,8 @@
 </ul>
 <p>These steps are required to ensure that the Bazel rules for Angular are the same in both <code>node_modules</code> and in the Bazel workspace. In the next versions of the schematics, Bazel will reuse the rules from the <code>node_modules</code> directory.</p>
 <p>Now in the project folder run:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">yarn
-</span></span></code></pre></div><p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yarn
+</code></pre></div><p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
 <p>As the next step, let us start the development server! As expected, run <code>ng serve</code> (or <code>npm start</code>). The cold build may take a few minutes, please, don&#x2019;t interrupt it. Once it completes, open <a href="http://127.0.0.1:4200">127.0.0.1:4200</a>. If all the steps so far have been successful, you should see the familiar home screen of the CLI:</p>
 <amp-img src="/images/bazel-angular-cli/angular-cli.png" style="display: block; margin: auto"></amp-img>
 <p>Notice that if we update <code>app.component.ts</code> the browser will not automatically refresh. Bazel will not even recompile the changed file. In future releases of the schematics, this will be fixed. Until now, feel free to use <code>ibazel</code>:</p>

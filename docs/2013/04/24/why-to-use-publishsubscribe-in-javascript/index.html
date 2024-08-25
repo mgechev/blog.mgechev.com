@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Why I should use publish/subscribe in JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -111,89 +111,89 @@ Loose coupling is an Object-oriented principle in which each component of the sy
 <p><a href="https://en.wikipedia.org/wiki/Loose_coupling" target="_blank">Loose coupling</a> is an Object-oriented principle in which each component of the system knows it’s responsibility and don’t care about the other components (or at least tries to not care about them as much as possible). Loosing coupling is a good thing because you can easily reuse the different modules. You’re not coupled with the interfaces of other modules. Using publish/subscribe you’re only coupled with the publish/subscribe interface which is not a big deal – just two methods. So if you decide to reuse a module in different project you can just copy and paste it and it’ll probably work or at least you won’t need much effort to make it work.</p>
 <p>As talking about loose coupling we should mention the <a href="https://en.wikipedia.org/wiki/Separation_of_concerns" target="_blank">separation of concerns</a>. If you’re building an application using MV* architectural pattern you have always a Model(s) and a View(s). The Model is the business part of the application. You can reuse it in different applications, so it’s not a good idea to couple it with the View of a single application, where you want to show it, because usually in the different applications you have different views. So it’s a good idea to use publish/subscribe for the Model-View communication. When your Model changes it publish an event, the View catch it and update itself. You don’t have any overhead from the publish/subscribe, it helps you for the decoupling. In the same manner you can keep your application logic into the Controller for example (MVVM, MVP it’s not exactly a Controller) and keep the View as simple as possible. When your View changes (or the user click on something, for example) it just publish a new event, the Controller catch it and decides what to do. If you are familiar with the <a href="https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller" target="_blank">MVC</a> pattern or with <a href="https://en.wikipedia.org/wiki/MVVM" target="_blank">MVVM</a> in the Microsoft technologies (WPF/Silverlight) you can think for the publish/subscribe like the <a href="https://en.wikipedia.org/wiki/Observer_pattern" target="_blank">Observer pattern</a>. This approach is used in frameworks like Backbone.js, Knockout.js (MVVM).</p>
 <p>Here is an example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="c1">//Model
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">function</span> <span class="nx">Book</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">isbn</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">isbn</span> <span class="o">=</span> <span class="nx">isbn</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">   
-</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">BookCollection</span><span class="p">(</span><span class="nx">books</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">books</span> <span class="o">=</span> <span class="nx">books</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl"><span class="nx">BookCollection</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addBook</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;book-added&#39;</span><span class="p">,</span> <span class="nx">book</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">book</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl"><span class="nx">BookCollection</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">removeBook</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="kd">var</span> <span class="nx">removed</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">   <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">book</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">removed</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">book</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">          <span class="nx">removed</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;book-removed&#39;</span><span class="p">,</span> <span class="nx">removed</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">   <span class="k">return</span> <span class="nx">removed</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl"><span class="c1">//View
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">var</span> <span class="nx">BookListView</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl"> 
-</span></span><span class="line"><span class="cl">   <span class="kd">function</span> <span class="nx">removeBook</span><span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">isbn</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl"> 
-</span></span><span class="line"><span class="cl">   <span class="kd">function</span> <span class="nx">addBook</span><span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#bookList&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;&lt;div id=&#34;&#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">isbn</span> <span class="o">+</span> <span class="s1">&#39;&#34;&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">  &#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">&lt;/div&gt;&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">   <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;book-removed&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">             <span class="nx">removeBook</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">         <span class="p">});</span>
-</span></span><span class="line"><span class="cl">         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;book-aded&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">             <span class="nx">addBook</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">         <span class="p">});</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="c1">//Model
+</span><span class="c1"></span><span class="kd">function</span> <span class="nx">Book</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">isbn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">isbn</span> <span class="o">=</span> <span class="nx">isbn</span><span class="p">;</span>
+<span class="p">}</span>
+   
+<span class="kd">function</span> <span class="nx">BookCollection</span><span class="p">(</span><span class="nx">books</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">books</span> <span class="o">=</span> <span class="nx">books</span><span class="p">;</span>
+<span class="p">}</span>
+    
+<span class="nx">BookCollection</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">addBook</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;book-added&#39;</span><span class="p">,</span> <span class="nx">book</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">book</span><span class="p">;</span>
+<span class="p">}</span>
+    
+<span class="nx">BookCollection</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">removeBook</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">removed</span><span class="p">;</span>
+   <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">book</span> <span class="o">===</span> <span class="s1">&#39;number&#39;</span><span class="p">)</span> <span class="p">{</span>
+       <span class="nx">removed</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">book</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+   <span class="p">}</span>
+   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">removed</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="p">}</span>
+   <span class="p">}</span>
+   <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;book-removed&#39;</span><span class="p">,</span> <span class="nx">removed</span><span class="p">);</span>
+   <span class="k">return</span> <span class="nx">removed</span><span class="p">;</span>
+<span class="p">}</span>
+    
+<span class="c1">//View
+</span><span class="c1"></span><span class="kd">var</span> <span class="nx">BookListView</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+ 
+   <span class="kd">function</span> <span class="nx">removeBook</span><span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">isbn</span><span class="p">).</span><span class="nx">remove</span><span class="p">();</span>
+   <span class="p">}</span>
+ 
+   <span class="kd">function</span> <span class="nx">addBook</span><span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#bookList&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;&lt;div id=&#34;&#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">isbn</span> <span class="o">+</span> <span class="s1">&#39;&#34;&gt;
+</span><span class="s1">  &#39;</span> <span class="o">+</span> <span class="nx">book</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">&#39;
+</span><span class="s1">&lt;/div&gt;&#39;</span><span class="p">);</span>
+   <span class="p">}</span>
+  
+   <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;book-removed&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+             <span class="nx">removeBook</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
+         <span class="p">});</span>
+         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;book-aded&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">book</span><span class="p">)</span> <span class="p">{</span>
+             <span class="nx">addBook</span><span class="p">(</span><span class="nx">book</span><span class="p">);</span>
+         <span class="p">});</span>
+      <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}());</span></code></pre></div>
 <p>Another example. If you don’t like the MV* approach you can use something a little different (there’s an intersection between the one I’ll describe next and the last mentioned). Just structure your application in different modules. For example look at Twitter.</p>
 <img src="https://blog.mgechev.com/slides/javascript-patterns/images/twitter.png" width="650" class="aligncenter" />
 <p>If you look at the interface you simply have different boxes. You can think of each box as different module. For example you can post a tweet. This action requires update of few modules. Firstly it has to update your profile data (upper left box) but it also has to update your timeline. Of course, you can keep references to both modules and update them separately using their public interface but it’s easier (and better) to just publish an event. This will make the modification of your application easier because of loosing coupling. If you develop new module which depends on new tweets you can just subscribe to the “publish-tweet” event and handle it. This approach is very useful and can make your application very decoupled. You can reuse your modules very easy.</p>
 <p>Here is a basic example of the last approach (this is not original twitter code it’s just a sample by me):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Twitter</span><span class="p">.</span><span class="nx">Timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="kd">var</span> <span class="nx">tweets</span> <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="cl">   <span class="kd">function</span> <span class="nx">publishTweet</span><span class="p">(</span><span class="nx">tweet</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">tweets</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tweet</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="c1">//publishing the tweet
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="p">};</span>
-</span></span><span class="line"><span class="cl">   <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;tweet-posted&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">             <span class="nx">publishTweet</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">         <span class="p">});</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">}());</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Twitter</span><span class="p">.</span><span class="nx">TweetPoster</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="k">return</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">           <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#postTweet&#39;</span><span class="p">).</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">              <span class="kd">var</span> <span class="nx">tweet</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#tweetInput&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">               <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;tweet-posted&#39;</span><span class="p">,</span> <span class="nx">tweet</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">           <span class="p">});</span>
-</span></span><span class="line"><span class="cl">       <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">Twitter</span><span class="p">.</span><span class="nx">Timeline</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">tweets</span> <span class="o">=</span> <span class="p">[];</span>
+   <span class="kd">function</span> <span class="nx">publishTweet</span><span class="p">(</span><span class="nx">tweet</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">tweets</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tweet</span><span class="p">);</span>
+      <span class="c1">//publishing the tweet
+</span><span class="c1"></span>   <span class="p">};</span>
+   <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+         <span class="nx">$</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;tweet-posted&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+             <span class="nx">publishTweet</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+         <span class="p">});</span>
+      <span class="p">}</span>
+   <span class="p">};</span>
+<span class="p">}());</span>
+
+<span class="kd">var</span> <span class="nx">Twitter</span><span class="p">.</span><span class="nx">TweetPoster</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+   <span class="k">return</span> <span class="p">{</span>
+       <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+           <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#postTweet&#39;</span><span class="p">).</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+              <span class="kd">var</span> <span class="nx">tweet</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#tweetInput&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+               <span class="nx">$</span><span class="p">.</span><span class="nx">publish</span><span class="p">(</span><span class="s1">&#39;tweet-posted&#39;</span><span class="p">,</span> <span class="nx">tweet</span><span class="p">);</span>
+           <span class="p">});</span>
+       <span class="p">}</span>
+   <span class="p">};</span>
+<span class="p">}());</span></code></pre></div>
 <p>For this approach there’s very good talk by <a href="http://www.nczonline.net/" target="_blank">Nicholas Zakas</a>. For the first MV* approach the best articles and books, I know, are published by <a href=" http://addyosmani.com/blog/" target="_blank">Addy Osmani</a>.</p>
 <p>Drawbacks. You have to be careful about the excessive use of publish/subscribe. If you’ve got hundreds of events it can become very confusing to manage all of them. You may also have collisions if you’re not using namespacing (or not using it in the right way). An advanced implementation of mediator which looks much like an publish/subscribe can be found here <a href="https://github.com/ajacksified/Mediator.js">https://github.com/ajacksified/Mediator.js</a>. It has namespacing and feature like event “bubbling” which, of course, can be interrupted. Another drawback of the publish/subscribe is the hard unit testing, it may become difficult to isolate the different functions in the modules and test them independently.</p>
 
@@ -235,7 +235,7 @@ Loose coupling is an Object-oriented principle in which each component of the sy
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

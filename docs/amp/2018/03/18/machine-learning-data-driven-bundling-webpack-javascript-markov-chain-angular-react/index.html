@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.121.1">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&amp;rsquo; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
+<meta name="description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&apos; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
 
 <meta property="og:title" content="Machine Learning-Driven Bundling. The Future of JavaScript Tooling. - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&amp;rsquo; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
+<meta property="og:description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&apos; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2018/03/18/machine-learning-data-driven-bundling-webpack-javascript-markov-chain-angular-react/">
 <meta name="twitter:title" content="Machine Learning-Driven Bundling. The Future of JavaScript Tooling. - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&amp;rsquo; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
+<meta name="twitter:description" content="In this article, I&amp;rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&apos; behavior performs the most optimal build. We&amp;rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "In this article, I\u0026rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users\u0026rsquo; behavior performs the most optimal build. We\u0026rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App."
+    "description": "In this article, I\u0026rsquo;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users\u0027 behavior performs the most optimal build. We\u0026rsquo;re also going to introduce a webpack plugin which works with Angular CLI and Create React App."
   }
 </script>
 
@@ -130,7 +130,7 @@
 </aside>
 
 
-  <div class="article-body"><p>In this article, I&#x2019;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. <strong>The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&#x2019; behavior performs the most optimal build.</strong> We&#x2019;re also going to introduce a <strong>webpack plugin which works with Angular CLI and Create React App</strong>.</p>
+  <div class="article-body"><p>In this article, I&#x2019;ll introduce the early implementation of a few tools which based on techniques from the machine learning allow us to perform data-driven chunk clustering and pre-fetching for single-page applications. <strong>The purpose is to provide a zero-configuration mechanism which based on data from Google Analytics for the users&apos; behavior performs the most optimal build.</strong> We&#x2019;re also going to introduce a <strong>webpack plugin which works with Angular CLI and Create React App</strong>.</p>
 <p><strong>Such tool can improve the user-perceived page load performance by making the build process of our applications data-driven!</strong> The final result is achieved by combining and/or pre-fetching JavaScript chunks which are most likely to be requested together in the same user session.</p>
 <p><em>I want to thank <a href="https://twitter.com/addyosmani">Addy Osmani</a> for the review and his feedback of the early drafts of this post and the described tools!</em></p>
 <section style="background: #eee; padding: 15px;">
@@ -174,33 +174,33 @@ Based on the research shown in this article, in collaboration with the Google Ch
 <p>The Angular application which uses the <code>mlx</code> package can be found <a href="https://github.com/mgechev/ng-dd-bundled">here</a><sup>[9]</sup> and the React one <a href="https://github.com/mgechev/react-dd-bundled">here</a><sup>[10]</sup>. Both projects are ejected from the official CLI tools of the corresponding framework.</p>
 <p>Let&#x2019;s take a look at how we can use the tools in the contexts of both React and Angular.</p>
 <p>First, clone the example of your choice:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Angular example</span>
-</span></span><span class="line"><span class="cl">git clone https://github.com/mgechev/ng-dd-bundled demo
-</span></span><span class="line"><span class="cl"><span class="c1"># React example</span>
-</span></span><span class="line"><span class="cl">git clone https://github.com/mgechev/react-dd-bundled demo
-</span></span></code></pre></div><p>After that, install the dependencies of the project:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">cd</span> demo <span class="o">&amp;&amp;</span> npm i
-</span></span></code></pre></div><p>As next step, let&#x2019;s build the project:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm run build
-</span></span></code></pre></div><p>The last step is going to produce a non-minified build of the application. All we need to do now is serve the static assets. For the purpose, we can use the npm package <code>serve</code>. You can install it with:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i -g serve
-</span></span></code></pre></div><p>Now run:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># For Angular</span>
-</span></span><span class="line"><span class="cl">serve -s dist
-</span></span><span class="line"><span class="cl"><span class="c1"># For React</span>
-</span></span><span class="line"><span class="cl">serve -s build
-</span></span></code></pre></div><p>When you open <a href="http://localhost:5000">http://localhost:5000</a>, you should see a screen similar to the gif below:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Angular example</span>
+git clone https://github.com/mgechev/ng-dd-bundled demo
+<span class="c1"># React example</span>
+git clone https://github.com/mgechev/react-dd-bundled demo
+</code></pre></div><p>After that, install the dependencies of the project:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> demo <span class="o">&amp;&amp;</span> npm i
+</code></pre></div><p>As next step, let&#x2019;s build the project:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm run build
+</code></pre></div><p>The last step is going to produce a non-minified build of the application. All we need to do now is serve the static assets. For the purpose, we can use the npm package <code>serve</code>. You can install it with:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g serve
+</code></pre></div><p>Now run:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># For Angular</span>
+serve -s dist
+<span class="c1"># For React</span>
+serve -s build
+</code></pre></div><p>When you open <a href="http://localhost:5000">http://localhost:5000</a>, you should see a screen similar to the gif below:</p>
 <p><amp-img src="/images/mlx/demo.gif" alt="Demo"></amp-img></p>
 <p><strong>Notice that we have only lazy-loaded route definitions in both demos</strong>. This means that the browser will send a request over the network for each chunk corresponding to the route that the user navigates to. The build from the gif above is using the automated data-driven clustering and pre-fetching from mlx.</p>
 <p>Notice that when the user navigates from &#x201C;Parent&#x201D; to &#x201C;Settings&#x201D; the browser doesn&#x2019;t send an extra HTTP request to load the chunk associated with the &#x201C;Settings&#x201D; route. This is because the webpack plugin combined the &#x201C;Settings&#x201D; and the &#x201C;Parent&#x201D; chunks based on the Google Analytics data which we provided. Another interesting observation is that when we navigate to &#x201C;Settings&#x201D;, the application pre-fetches the &#x201C;FAQ&#x201D; module, together with the &#x201C;Intro&#x201D; module. Again, this is based on the data we got from Google Analytics which hints the tooling that after the user goes to &#x201C;Settings&#x201D; they will most likely visit &#x201C;FAQ&#x201D; or &#x201C;Intro&#x201D;.</p>
 <p>Now, let&#x2019;s look at the extra configuration that we&#x2019;ve provided on top of the default Angular CLI/Create React App setup. Look at <code>webpack.config.js</code> for Angular CLI, and <code>config/webpack.config.prod.js</code> for the React project. You&#x2019;ll notice the following lines:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="p">{</span> <span class="nx">MLPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/webpack&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;./data.json&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl">  <span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span> <span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span></code></pre></div><p>Here <code>data</code> is a configuration property which contains processed data from Google Analytics. This data is extracted using <code>@mlx/ga</code>. A working example of the data extraction can be found <a href="https://github.com/mgechev/mlx-ga-demo">here</a><sup>[11]</sup>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="p">...</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">MLPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/webpack&apos;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;./data.json&apos;</span><span class="p">);</span>
+<span class="p">...</span>
+  <span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span> <span class="p">})</span>
+<span class="p">...</span>
+</code></pre></div><p>Here <code>data</code> is a configuration property which contains processed data from Google Analytics. This data is extracted using <code>@mlx/ga</code>. A working example of the data extraction can be found <a href="https://github.com/mgechev/mlx-ga-demo">here</a><sup>[11]</sup>.</p>
 <p>I&#x2019;d encourage you to play with the examples. Keep in mind that the React one will work properly only if you follow strictly the route definition convention in the project. We&#x2019;ll talk more about the limitations of the current React route parser in the <code>@mlx/parser</code> section of the project.</p>
 <p>We&#x2019;re going to dig in implementation details and what happens under the hood but before that, we&#x2019;ll continue with the explanation of the mathematical foundation of the project.</p>
 <h1 id="mathematical-background">Mathematical Background</h1>
@@ -214,55 +214,55 @@ Based on the research shown in this article, in collaboration with the Google Ch
 <section class="zippy hidden" id="zippy">
 <h2 id="basics-of-graph-theory">Basics of Graph Theory</h2>
 <p>A graph in graph theory is represented as the tuple <strong><code>G = (E, V)</code></strong> where <code>E</code> is a set of edges and <code>V</code> is a set of vertices (nodes). In this article, we&#x2019;re often going to mention the term &#x201C;dependency graph&#x201D;. This is a graph which represents the dependencies between entities (source files, people, chunks, etc.). The individual entities of the problem domain are represented with the nodes of the graph and the dependencies between them are represented with the edges. For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// foo.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// bar.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
-</span></span></code></pre></div><p>The program above can be represented with the following dependency graph:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// foo.ts
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// bar.ts
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+</code></pre></div><p>The program above can be represented with the following dependency graph:</p>
 <amp-img src="/images/mlx/simple.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;"></amp-img>
 <p>Notice that we have an arrow pointing from <code>bar.ts</code> to <code>foo.ts</code>. This is because <code>bar.ts</code> depends on <code>foo.ts</code>. Mathematically this graph looks like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">G = ([(&apos;bar.ts&apos;, &apos;foo.ts&apos;)], [&apos;bar.ts&apos;, &apos;foo.ts&apos;])
-</span></span></code></pre></div><p>Or in other words, we have the nodes <code>foo.ts</code> and <code>bar.ts</code> and one edge from <code>bar.ts</code> to <code>foo.ts</code>. Graphs with edges which point from one node to another are called <strong>directed</strong> graphs, otherwise, if there&#x2019;s a path in both directions, we call the graph <strong>undirected</strong>. In directed graphs, the edges are ordered tuples, in undirected graphs the edges are unordered tuples.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">G = ([(&apos;bar.ts&apos;, &apos;foo.ts&apos;)], [&apos;bar.ts&apos;, &apos;foo.ts&apos;])
+</code></pre></div><p>Or in other words, we have the nodes <code>foo.ts</code> and <code>bar.ts</code> and one edge from <code>bar.ts</code> to <code>foo.ts</code>. Graphs with edges which point from one node to another are called <strong>directed</strong> graphs, otherwise, if there&#x2019;s a path in both directions, we call the graph <strong>undirected</strong>. In directed graphs, the edges are ordered tuples, in undirected graphs the edges are unordered tuples.</p>
 <p>Let&#x2019;s now suppose we have the following graph:</p>
 <amp-img src="/images/mlx/dependencies.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;"></amp-img>
 <p>In our program, we can represent it in different ways. For our purposes, we&#x2019;ll often use a <strong>list of neighbors</strong> representation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;foo.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;bar.js&apos;</span><span class="p">,</span> <span class="s1">&apos;baz.js&apos;</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;baz.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;foo.js&apos;</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;bar.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;baz.js&apos;</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>The object above has three keys - one for each node of the graph. Each of the keys has an associated array which lists the neighbors of the current node.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;foo.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;bar.js&apos;</span><span class="p">,</span> <span class="s1">&apos;baz.js&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;baz.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;foo.js&apos;</span><span class="p">],</span>
+  <span class="s1">&apos;bar.js&apos;</span><span class="o">:</span> <span class="p">[</span><span class="s1">&apos;baz.js&apos;</span><span class="p">]</span>
+<span class="p">};</span>
+</code></pre></div><p>The object above has three keys - one for each node of the graph. Each of the keys has an associated array which lists the neighbors of the current node.</p>
 <p>Often we have a numeric value associated with an edge between two nodes. For example, if we have a Google Analytics report, we can represent the pages as nodes and the transitions between them as edges. The numeric values from the report which represent the number of visits from page <code>A</code> to page <code>B</code>, we can associate with the edges and call them <strong>weights</strong>. A graph which has weights associated with its edges we are going to call a <strong>weighted graph</strong>. Here&#x2019;s the data structure we can use for representing the Google Analytics report in our program:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="mi">3</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>From the graph, above we can see that there are <code>10</code> visits from page <code>/a</code> to page <code>/b</code>, <code>3</code> visits from <code>/a</code> to <code>/c</code>, and <code>4</code> visits from <code>/b</code> to <code>/a</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="mi">3</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div><p>From the graph, above we can see that there are <code>10</code> visits from page <code>/a</code> to page <code>/b</code>, <code>3</code> visits from <code>/a</code> to <code>/c</code>, and <code>4</code> visits from <code>/b</code> to <code>/a</code>.</p>
 <h3 id="connected-components">Connected Components</h3>
 <p>Often, however, users visit different modules of our application independently. For example, let&#x2019;s suppose that the following graph represents Google Analytics data:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/d&apos;</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/e&apos;</span><span class="o">:</span> <span class="mi">5</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/e&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/d&apos;</span><span class="o">:</span> <span class="mi">5</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>Let&#x2019;s look at the graphical representation of this graph:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/d&apos;</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&apos;/e&apos;</span><span class="o">:</span> <span class="mi">5</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/e&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/d&apos;</span><span class="o">:</span> <span class="mi">5</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div><p>Let&#x2019;s look at the graphical representation of this graph:</p>
 <amp-img src="/images/mlx/connected-components.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;"></amp-img>
 <p>We can see that the entire graph consists of two smaller graphs: one which has the nodes <code>/a</code>, <code>/b</code>, and another one, with the nodes <code>/c</code>, <code>/d</code>, <code>/e</code>. Such &#x201C;sub-graphs&#x201D; in our graph are called <strong>connected components</strong>. In fact, <strong>it&#x2019;s convenient to think of the lazy-loaded chunks of our applications as the connected component of the dependency graph of our JavaScript</strong>.</p>
 <h3 id="trees">Trees</h3>
@@ -276,20 +276,20 @@ Based on the research shown in this article, in collaboration with the Google Ch
 <p>As we can see, the root of the tree is <code>/</code>, its children are <code>/a</code> and <code>/b</code>, where <code>/a</code> has children <code>/a/a</code> and <code>/a/b</code>. From the diagram above, we can see that the <strong>lowest-common ancestor (or LCA)</strong> of <code>/a/a</code> and <code>/a/b</code> is <code>/a</code>.</p>
 <h2 id="basics-probability-theory">Basics Probability Theory</h2>
 <p>Let&#x2019;s take a look at this aggregated data from Google Analytics:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="mi">3</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">8</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>We can notice that when the user is at page <code>/a</code>, <code>10</code> out of <code>13</code> visits they are going to go to <code>/b</code> (we&#x2019;re ignoring the cases when the user leaves the page). This means that <code>10/13</code> is the <strong>probability</strong> the user to go from <code>/a</code> to <code>/b</code> and <code>3/13</code> is the probability the user to go from <code>/a</code> to <code>/c</code>. The probability of an event is a number between 0 and 1 (i.e. in the interval <code>[0, 1]</code>).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">graph</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="mi">3</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">4</span>
+  <span class="p">},</span>
+  <span class="s1">&apos;/c&apos;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="mi">8</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div><p>We can notice that when the user is at page <code>/a</code>, <code>10</code> out of <code>13</code> visits they are going to go to <code>/b</code> (we&#x2019;re ignoring the cases when the user leaves the page). This means that <code>10/13</code> is the <strong>probability</strong> the user to go from <code>/a</code> to <code>/b</code> and <code>3/13</code> is the probability the user to go from <code>/a</code> to <code>/c</code>. The probability of an event is a number between 0 and 1 (i.e. in the interval <code>[0, 1]</code>).</p>
 <p>Now, based on the probabilities for all the pages, we can form a matrix:</p>
 <table>
 <thead>
@@ -358,12 +358,12 @@ collapse.onclick = function () {
 <p>The graph above we&#x2019;ll call <strong>navigation graph</strong>. The individual nodes in the navigation graph are the pages of our application and the edges between them represent the transitions from one page to another. It&#x2019;s important to mention that the <strong>navigation graph is directed</strong>. Usually, the edges between the individual nodes are represented by links in our application. This means that if we have an edge between <code>/a</code> and <code>/b</code>, we most likely have a link between these two pages. Of course, another way the user to navigate between <code>/a</code> and <code>/b</code> is by directly using the address bar of the browser. The navigation graph encapsulates both types of transitions.</p>
 <p>We&#x2019;re going to build the navigation graph from a Google Analytics report using the package <code>@mlx/ga</code>. We&#x2019;ll cover this tool later in the article.</p>
 <h2 id="page-graph">Page Graph</h2>
-<p>Although the navigation graph looks pretty handy, it&#x2019;s not usable for our purposes because often our applications&#x2019; routes are parametrized. For example, let&#x2019;s suppose we have the routes:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">/a
-</span></span><span class="line"><span class="cl">/a/:id
-</span></span><span class="line"><span class="cl">/b
-</span></span><span class="line"><span class="cl">/c
-</span></span></code></pre></div><p>In this case, if we&#x2019;re interested in analyzing the application we most likely want to think of both <code>/a/a</code> and <code>/a/b</code> as <code>/a/:id</code>. The navigation graph, which contains aggregated information based on the routes of the application we&#x2019;ll call a <strong>page graph</strong>, or a <strong>route graph</strong>. The navigation graph from above, translated to a page graph will look like:</p>
+<p>Although the navigation graph looks pretty handy, it&#x2019;s not usable for our purposes because often our applications&apos; routes are parametrized. For example, let&#x2019;s suppose we have the routes:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text">/a
+/a/:id
+/b
+/c
+</code></pre></div><p>In this case, if we&#x2019;re interested in analyzing the application we most likely want to think of both <code>/a/a</code> and <code>/a/b</code> as <code>/a/:id</code>. The navigation graph, which contains aggregated information based on the routes of the application we&#x2019;ll call a <strong>page graph</strong>, or a <strong>route graph</strong>. The navigation graph from above, translated to a page graph will look like:</p>
 <amp-img src="/images/mlx/page-graph.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;"></amp-img>
 <h2 id="routing-tree">Routing Tree</h2>
 <p>The declarations of the routes of the application form a tree-like structure. For example, we have the root route <code>/</code>, which has three children routes <code>/a</code>, <code>/b</code>, and <code>/c</code>. The route <code>/a</code> has a single child route <code>/a/:id</code>. This tree we&#x2019;re going to call a <strong>routing tree</strong>.</p>
@@ -371,32 +371,32 @@ collapse.onclick = function () {
 <h2 id="bundle-routing-tree">Bundle Routing Tree</h2>
 <p>If we suppose that all the routes in the application are associated with entry points of chunks then our bundle tree&#x2019;s shape matches the routing tree. The only difference is that the routing tree&#x2019;s nodes will be named after the routes and the bundle routing tree&#x2019;s nodes are going to be named after the entry points of the chunks.</p>
 <p>Now let&#x2019;s suppose we have the following route declarations:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// React
-</span></span></span><span class="line"><span class="cl"><span class="c1">// app.tsx
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/a&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./com&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/b&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./com&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/c&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./c&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
-</span></span></code></pre></div><p>or in Angular:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// Angular
-</span></span></span><span class="line"><span class="cl"><span class="c1">// app.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">appRoutes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./com#A&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;a&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./com#B&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;b&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./c#C&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;c&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">];</span>
-</span></span></code></pre></div><p>In this case, the routing tree will differ from the bundle routing tree:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// React
+</span><span class="c1">// app.tsx
+</span><span class="c1"></span><span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/a&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./com&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/b&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./com&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
+<span class="p">&lt;</span><span class="nt">Route</span> <span class="na">path</span><span class="o">=</span><span class="s">&quot;/c&quot;</span> <span class="na">component</span><span class="o">=</span><span class="p">{</span><span class="nx">AsyncComponent</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./c&apos;</span><span class="p">))}</span> <span class="p">/&gt;</span>
+</code></pre></div><p>or in Angular:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// Angular
+</span><span class="c1">// app.ts
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">appRoutes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./com#A&apos;</span><span class="p">,</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;a&apos;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./com#B&apos;</span><span class="p">,</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;b&apos;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&apos;./c#C&apos;</span><span class="p">,</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;c&apos;</span>
+  <span class="p">}</span>
+<span class="p">];</span>
+</code></pre></div><p>In this case, the routing tree will differ from the bundle routing tree:</p>
 <ul>
 <li>The routing tree will have a single root node called <code>/</code> with three children: <code>/a</code>, <code>/b</code>, and <code>/c</code>.</li>
-<li>The bundle routing tree will have root node named after the file which contains the routes&#x2019; definitions  (<code>app.ts</code> for Angular and <code>app.tsx</code> for React), and two children (for Angular - <code>./com</code> and <code>./c</code>, and for React - <code>./com.tsx</code> and <code>./c.tsx</code>). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.</li>
+<li>The bundle routing tree will have root node named after the file which contains the routes&apos; definitions  (<code>app.ts</code> for Angular and <code>app.tsx</code> for React), and two children (for Angular - <code>./com</code> and <code>./c</code>, and for React - <code>./com.tsx</code> and <code>./c.tsx</code>). In this case, the routing tree and the bundle routing tree differ because two routes point to the same chunk entry point.</li>
 </ul>
 <amp-img src="/images/mlx/bundle-routing-tree.svg" style="display: block; margin: auto; margin-top: 30px; margin-bottom: 30px;"></amp-img>
 <h2 id="bundle-page-graph">Bundle Page Graph</h2>
@@ -414,33 +414,33 @@ collapse.onclick = function () {
 <p>Let&#x2019;s first explain how we can use <code>@mlx/ga</code> and how it works internally.</p>
 <h2 id="mlxga"><code>@mlx/ga</code></h2>
 <p>In the repository <a href="https://github.com/mgechev/mlx-ga-demo">mlx-ga-demo</a><sup>[11]</sup>, there&#x2019;s an example which shows how this module can be used. Here&#x2019;s the main file which illustrates the module&#x2019;s API:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="p">{</span> <span class="nx">fetch</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/ga&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="p">{</span> <span class="nx">parseRoutes</span><span class="p">,</span> <span class="nx">ProjectType</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/parser&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="p">{</span> <span class="nx">writeFileSync</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;fs&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Credentials from the Google Console with access to the Google Analytics API
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;./credentials.json&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="c1">// Google Analytics View ID
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">const</span> <span class="nx">viewId</span> <span class="o">=</span> <span class="s1">&apos;000000000&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">applicationRoutes</span> <span class="o">=</span> <span class="nx">parseRoutes</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;&lt;Path_to_tsconfig.json&gt;&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">ProjectType</span><span class="p">.</span><span class="nx">Angular</span> <span class="c1">// or ProjectType.React
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">fetch</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">key</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">viewId</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">period</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">startDate</span>: <span class="kt">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&apos;YYYY-MM-DD&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">endDate</span>: <span class="kt">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&apos;YYYY-MM-DD&apos;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">formatter</span>: <span class="kt">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&apos;/app&apos;</span><span class="p">,</span> <span class="s1">&apos;&apos;</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">routes</span>: <span class="kt">applicationRoutes.map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">path</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">expression</span><span class="o">:</span> <span class="s1">&apos;ga:sessions&apos;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">g</span> <span class="o">=&gt;</span> <span class="nx">writeFileSync</span><span class="p">(</span><span class="s1">&apos;data.json&apos;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">2</span><span class="p">)));</span>
-</span></span></code></pre></div><p>In the snippet above we import <code>fetch</code> from <code>@mlx/ga</code>. That&#x2019;s the only exported symbol from the package. The <code>fetch</code> method accepts an object holding the following data:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="p">{</span> <span class="nx">fetch</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/ga&apos;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">parseRoutes</span><span class="p">,</span> <span class="nx">ProjectType</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/parser&apos;</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">writeFileSync</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;fs&apos;</span><span class="p">);</span>
+
+<span class="c1">// Credentials from the Google Console with access to the Google Analytics API
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;./credentials.json&apos;</span><span class="p">);</span>
+<span class="c1">// Google Analytics View ID
+</span><span class="c1"></span><span class="kr">const</span> <span class="nx">viewId</span> <span class="o">=</span> <span class="s1">&apos;000000000&apos;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">applicationRoutes</span> <span class="o">=</span> <span class="nx">parseRoutes</span><span class="p">(</span>
+  <span class="s1">&apos;&lt;Path_to_tsconfig.json&gt;&apos;</span><span class="p">,</span>
+  <span class="nx">ProjectType</span><span class="p">.</span><span class="nx">Angular</span> <span class="c1">// or ProjectType.React
+</span><span class="c1"></span><span class="p">);</span>
+
+<span class="nx">fetch</span><span class="p">({</span>
+  <span class="nx">key</span><span class="p">,</span>
+  <span class="nx">viewId</span><span class="p">,</span>
+  <span class="nx">period</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">startDate</span>: <span class="kt">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&apos;YYYY-MM-DD&apos;</span><span class="p">),</span>
+    <span class="nx">endDate</span>: <span class="kt">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&apos;YYYY-MM-DD&apos;</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="nx">formatter</span>: <span class="kt">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&apos;/app&apos;</span><span class="p">,</span> <span class="s1">&apos;&apos;</span><span class="p">),</span>
+  <span class="nx">routes</span>: <span class="kt">applicationRoutes.map</span><span class="p">(</span><span class="nx">f</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">.</span><span class="nx">path</span><span class="p">),</span>
+  <span class="nx">expression</span><span class="o">:</span> <span class="s1">&apos;ga:sessions&apos;</span>
+<span class="p">})</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">g</span> <span class="o">=&gt;</span> <span class="nx">writeFileSync</span><span class="p">(</span><span class="s1">&apos;data.json&apos;</span><span class="p">,</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">g</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">2</span><span class="p">)));</span>
+</code></pre></div><p>In the snippet above we import <code>fetch</code> from <code>@mlx/ga</code>. That&#x2019;s the only exported symbol from the package. The <code>fetch</code> method accepts an object holding the following data:</p>
 <ul>
 <li>Key for access to the Google Analytics API (you can find how to get it <a href="http://2ality.com/2015/10/google-analytics-api.html">here</a><sup>[12]</sup>).</li>
 <li>Google Analytics View ID <sup>[12]</sup> for our application.</li>
@@ -449,33 +449,33 @@ collapse.onclick = function () {
 <li>Optional list of route names from our application. We can either provide them as an array, which we have manually collected or we can use <code>@mlx/parser</code> in order to extract them automatically. This array is essential in order to allow <code>@mlx/ga</code> to map the navigation graph to a page graph.</li>
 <li>Google Analytics expression to be used for the weights of the navigation/page graph.</li>
 </ul>
-<p>Internally, <strong><code>@mlx/ga</code> will build the weighted page graph of the application</strong>. In case we don&#x2019;t provide a list of the routes, the result of the invocation will be the weighted navigation graph. Internally, the tool will query Google Analytics&#x2019; API and get the previous page for each visited page, together with the number of visits (i.e. the variable associated with the provided expression). This way, in the end, we&#x2019;ll have a graph similar to this one:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="mi">144</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="mi">36</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro/parent/personalize&quot;</span><span class="o">:</span> <span class="mi">23</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">25</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/question/:standard/:question&quot;</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/reports&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="mi">69</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="mi">18</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/question/:standard/:question&quot;</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/parent/home&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/parent/settings&quot;</span><span class="o">:</span> <span class="mi">2</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="mi">28</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="mi">17</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/intro/parent/info&quot;</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
-</span></span></code></pre></div><p>This is stripped version of the graph that I used for developing the two examples for <a href="https://github.com/mgechev/ng-dd-bundled">Angular</a><sup>[9]</sup> and <a href="https://github.com/mgechev/react-dd-bundled">React</a><sup>[10]</sup>. Here&#x2019;s an interactive visualization of the entire aggregated data:</p>
+<p>Internally, <strong><code>@mlx/ga</code> will build the weighted page graph of the application</strong>. In case we don&#x2019;t provide a list of the routes, the result of the invocation will be the weighted navigation graph. Internally, the tool will query Google Analytics&apos; API and get the previous page for each visited page, together with the number of visits (i.e. the variable associated with the provided expression). This way, in the end, we&#x2019;ll have a graph similar to this one:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">{</span>
+  <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="mi">144</span><span class="p">,</span>
+    <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="mi">36</span><span class="p">,</span>
+    <span class="s2">&quot;/intro/parent/personalize&quot;</span><span class="o">:</span> <span class="mi">23</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/question/:standard/:question&quot;</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/reports&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="mi">69</span><span class="p">,</span>
+    <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="mi">18</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/question/:standard/:question&quot;</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s2">&quot;/main/parent/home&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;/main/parent/settings&quot;</span><span class="o">:</span> <span class="mi">2</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;/intro/parent&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;/intro&quot;</span><span class="o">:</span> <span class="mi">28</span><span class="p">,</span>
+    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="mi">17</span><span class="p">,</span>
+    <span class="s2">&quot;/intro/parent/info&quot;</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s2">&quot;/main/kid/question/:standard/:question/:id&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>This is stripped version of the graph that I used for developing the two examples for <a href="https://github.com/mgechev/ng-dd-bundled">Angular</a><sup>[9]</sup> and <a href="https://github.com/mgechev/react-dd-bundled">React</a><sup>[10]</sup>. Here&#x2019;s an interactive visualization of the entire aggregated data:</p>
 <div style="height: 600px; width: 100%; background-color: #23283B;" id="canvas"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.9/cytoscape.js"></script>
 <script src="/assets/js/mlx/graph.js"></script>
@@ -483,73 +483,73 @@ collapse.onclick = function () {
 <p>You can find demo of this module <a href="https://github.com/mgechev/mlx-ga-demo">here</a><sup>[11]</sup>. As prerequirement, download your private key from the Google Developer Console, place it in <code>credentials.json</code> and replace the <a href="http://2ality.com/2015/10/google-analytics-api.html">view ID with the one of your web app</a><sup>[12]</sup>.</p>
 <h2 id="mlxwebpack"><code>@mlx/webpack</code></h2>
 <p>Now, once we have collected the data from Google Analytics, we can plug <code>@mlx/webpack</code> in our build process. For the purpose, we should eject the Angular CLI application (or <code>create-react-app</code> one) and in <code>webpack.config.js</code> add the following lines:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="p">{</span> <span class="nx">MLPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/webpack&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">plugins</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">require</span><span class="p">(</span><span class="s1">&apos;./path/to/data.json&apos;</span><span class="p">)</span> <span class="p">})</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">]</span>
-</span></span></code></pre></div><p>&#x2026;and that&#x2019;s it! Our application now will be bundled according to the data gotten from Google Analytics. There are a couple of magical things going on but before explaining them, let&#x2019;s take a look at the detailed configuration of the <code>MLPlugin</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// Configuration of the MLPlugin
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">MLPluginConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">debug?</span>: <span class="kt">boolean</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">data</span>: <span class="kt">Graph</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">routeProvider?</span>: <span class="kt">RouteProvider</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">runtime?</span>: <span class="kt">false</span> <span class="o">|</span> <span class="nx">RuntimeConfig</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">build?</span>: <span class="kt">false</span> <span class="o">|</span> <span class="nx">BuildConfig</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Configuration of the RuntimePrefetchPlugin
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RuntimeConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">basePath?</span>: <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">prefetchConfig?</span>: <span class="kt">PrefetchConfig</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Configuration of the ClusterChunksPlugin
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">BuildConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">minChunks?</span>: <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">algorithm?</span>: <span class="kt">ClusteringAlgorithm</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">Neighbors</span> <span class="o">=</span> <span class="p">{</span> <span class="p">[</span><span class="nx">key</span>: <span class="kt">string</span><span class="p">]</span><span class="o">:</span> <span class="kt">number</span> <span class="p">};</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Represents the probability threshold for the different
-</span></span></span><span class="line"><span class="cl"><span class="c1">// effective connection types.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">PrefetchConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;4g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;3g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;slow-2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Graph</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="p">[</span><span class="nx">key</span>: <span class="kt">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">Neighbors</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="p">{</span> <span class="nx">MLPlugin</span> <span class="p">}</span> <span class="o">=</span> <span class="kr">require</span><span class="p">(</span><span class="s1">&apos;@mlx/webpack&apos;</span><span class="p">);</span>
+
+<span class="nx">plugins</span><span class="o">:</span> <span class="p">[</span>
+  <span class="c1">// ...
+</span><span class="c1"></span>  <span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span>: <span class="kt">require</span><span class="p">(</span><span class="s1">&apos;./path/to/data.json&apos;</span><span class="p">)</span> <span class="p">})</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">]</span>
+</code></pre></div><p>&#x2026;and that&#x2019;s it! Our application now will be bundled according to the data gotten from Google Analytics. There are a couple of magical things going on but before explaining them, let&#x2019;s take a look at the detailed configuration of the <code>MLPlugin</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// Configuration of the MLPlugin
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">MLPluginConfig</span> <span class="p">{</span>
+  <span class="nx">debug?</span>: <span class="kt">boolean</span><span class="p">;</span>
+  <span class="nx">data</span>: <span class="kt">Graph</span><span class="p">;</span>
+  <span class="nx">routeProvider?</span>: <span class="kt">RouteProvider</span><span class="p">;</span>
+  <span class="nx">runtime?</span>: <span class="kt">false</span> <span class="o">|</span> <span class="nx">RuntimeConfig</span><span class="p">;</span>
+  <span class="nx">build?</span>: <span class="kt">false</span> <span class="o">|</span> <span class="nx">BuildConfig</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Configuration of the RuntimePrefetchPlugin
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RuntimeConfig</span> <span class="p">{</span>
+  <span class="nx">basePath?</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">prefetchConfig?</span>: <span class="kt">PrefetchConfig</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Configuration of the ClusterChunksPlugin
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">BuildConfig</span> <span class="p">{</span>
+  <span class="nx">minChunks?</span>: <span class="kt">number</span><span class="p">;</span>
+  <span class="nx">algorithm?</span>: <span class="kt">ClusteringAlgorithm</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">type</span> <span class="nx">Neighbors</span> <span class="o">=</span> <span class="p">{</span> <span class="p">[</span><span class="nx">key</span>: <span class="kt">string</span><span class="p">]</span><span class="o">:</span> <span class="kt">number</span> <span class="p">};</span>
+
+<span class="c1">// Represents the probability threshold for the different
+</span><span class="c1">// effective connection types.
+</span><span class="c1"></span><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">PrefetchConfig</span> <span class="p">{</span>
+  <span class="s1">&apos;4g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;3g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;slow-2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">Graph</span> <span class="p">{</span>
+  <span class="p">[</span><span class="nx">key</span>: <span class="kt">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">Neighbors</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><ul>
 <li><code>debug</code> indicates if the plugin&#x2019;s verbose logging should be enabled.</li>
 <li><code>data</code> is the page graph gotten from Google Analytics.</li>
 <li><code>routeProvider</code> is a function which returns the mapping between routes and chunk entry points. If a <code>routeProvider</code> is not specified, <code>@mlx/webpack</code> will use the default route provider implementation from <code>@mlx/parser</code>. This is <strong>extremely powerful configuration property</strong>. If you have a React application and the default <code>routeProvider</code> doesn&#x2019;t work you can provide a custom function which returns the metadata:
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">routeProvider</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[{...},</span> <span class="p">{...}]</span> <span class="p">})</span>
-</span></span></code></pre></div></li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="k">new</span> <span class="nx">MLPlugin</span><span class="p">({</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">routeProvider</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[{...},</span> <span class="p">{...}]</span> <span class="p">})</span>
+</code></pre></div></li>
 <li><code>runtime</code> configures the plugin for data-driven bundle pre-fetching. With this property, we can either specify an optional <code>basePath</code> and/or <code>prefetchConfig</code> or disable the pre-fetching completely.</li>
 <li><code>build</code> is the part of the <code>@mlx/webpack</code> plugin which by default groups the webpack chunks based on the clustering algorithm performed by <code>@mlx/cluster</code>. We can think of it as an algorithm which tries to reason from the provided data from Google Analytics which pages will be visited in the same session. Based on this information the plugin may group (integrate) some chunks together.</li>
 </ul>
 <p>Keep in mind that <strong>the plugin will not do any code splitting</strong>. It relies that all your routes are loaded lazily and it may only group some of the corresponding chunks together depending on the provided data.</p>
 <h3 id="custom-route-provider">Custom Route Provider</h3>
 <p>As I mentioned, if <code>routeProvider</code> is not passed to the plugin configuration object, the default one will be used. The default route provider will return an array of objects in the following format:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">interface</span> <span class="nx">RoutingModule</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span>: <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">lazy</span>: <span class="kt">boolean</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">parentModulePath</span>: <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>In case the default route provider doesn&#x2019;t work for you, you can implement a function which parses your application and returns the routes in the specified format. If an entire parser seems like an overhead for your application, you can even collect the metadata manually and return it as the result of a constant function:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">routeProvider</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="nx">lazy</span>: <span class="kt">true</span><span class="p">,</span> <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="s1">&apos;/foo&apos;</span><span class="p">,</span> <span class="nx">parentModulePath</span>: <span class="kt">null</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;bar&apos;</span><span class="p">,</span> <span class="nx">lazy</span>: <span class="kt">true</span><span class="p">,</span> <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="s1">&apos;/bar&apos;</span><span class="p">,</span> <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/foo&apos;</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">];</span>
-</span></span></code></pre></div><p>My recommendation would be to implement a parser in order to keep your application as the single source of truth (SSOT). You can find implementations of Angular and React parsers in the <code>@mlx/parser</code> package.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">interface</span> <span class="nx">RoutingModule</span> <span class="p">{</span>
+  <span class="nx">path</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">lazy</span>: <span class="kt">boolean</span><span class="p">;</span>
+  <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">parentModulePath</span>: <span class="kt">string</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>In case the default route provider doesn&#x2019;t work for you, you can implement a function which parses your application and returns the routes in the specified format. If an entire parser seems like an overhead for your application, you can even collect the metadata manually and return it as the result of a constant function:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">const</span> <span class="nx">routeProvider</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;foo&apos;</span><span class="p">,</span> <span class="nx">lazy</span>: <span class="kt">true</span><span class="p">,</span> <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="s1">&apos;/foo&apos;</span><span class="p">,</span> <span class="nx">parentModulePath</span>: <span class="kt">null</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;bar&apos;</span><span class="p">,</span> <span class="nx">lazy</span>: <span class="kt">true</span><span class="p">,</span> <span class="kr">module</span><span class="nx">Path</span><span class="o">:</span> <span class="s1">&apos;/bar&apos;</span><span class="p">,</span> <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/foo&apos;</span> <span class="p">}</span>
+<span class="p">];</span>
+</code></pre></div><p>My recommendation would be to implement a parser in order to keep your application as the single source of truth (SSOT). You can find implementations of Angular and React parsers in the <code>@mlx/parser</code> package.</p>
 <h3 id="performed-algorithm">Performed Algorithm</h3>
 <p>Once the line <code>new MLPlugin({ data: require(&apos;./path/to/data.json&apos;) })</code> gets evaluated, few steps will happen:</p>
 <ul>
@@ -561,37 +561,37 @@ collapse.onclick = function () {
 <p>In other words, <strong><code>RuntimePrefetchPlugin</code> performs predictive and adaptive pre-fetching</strong>.</p>
 <h3 id="runtime-pre-fetching">Runtime Pre-Fetching</h3>
 <p>The <code>RuntimePrefetchPlugin</code> will generate a <a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chain</a><sup>[14]</sup> model based on the generated weighted bundle page graph. For each route in the application, we&#x2019;ll get a row from the matrix. For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/&apos;</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;b.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.7</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;a.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.3</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;b.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.1</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">]</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/a/:id&apos;</span><span class="o">:</span> <span class="p">[]</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">[],</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;/b/a&apos;</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;a.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">1</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">],</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>In the example above, we can see that when the user is in page <code>/</code> there&#x2019;s <code>0.7</code> probability the chunk <code>b.js</code> to be required next and <code>0.3</code> probability for the bundle <code>a.js</code>. Notice also that <code>RuntimePrefetchPlugin</code> gets the chunks in a sorted order by probability. Another feature of the plugin is that it&#x2019;s going to have a different probability threshold depending on the user&#x2019;s connection speed. For example, if the user has effective speed <code>4g</code>, we&#x2019;ll download all chunks which probability is over <code>0.15</code>, if the user is with <code>3g</code> we will download only chunks with probability over <code>0.3</code>, etc.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="p">{</span>
+  <span class="s1">&apos;/&apos;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;b.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.7</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;a.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.3</span> <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s1">&apos;/a&apos;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;b.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">0.1</span> <span class="p">},</span>
+  <span class="p">]</span>
+  <span class="s1">&apos;/a/:id&apos;</span><span class="o">:</span> <span class="p">[]</span>
+  <span class="s1">&apos;/b&apos;</span><span class="o">:</span> <span class="p">[],</span>
+  <span class="s1">&apos;/b/a&apos;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">chunk</span><span class="o">:</span> <span class="s1">&apos;a.js&apos;</span><span class="p">,</span> <span class="nx">probability</span>: <span class="kt">1</span> <span class="p">},</span>
+  <span class="p">],</span>
+<span class="p">}</span>
+</code></pre></div><p>In the example above, we can see that when the user is in page <code>/</code> there&#x2019;s <code>0.7</code> probability the chunk <code>b.js</code> to be required next and <code>0.3</code> probability for the bundle <code>a.js</code>. Notice also that <code>RuntimePrefetchPlugin</code> gets the chunks in a sorted order by probability. Another feature of the plugin is that it&#x2019;s going to have a different probability threshold depending on the user&#x2019;s connection speed. For example, if the user has effective speed <code>4g</code>, we&#x2019;ll download all chunks which probability is over <code>0.15</code>, if the user is with <code>3g</code> we will download only chunks with probability over <code>0.3</code>, etc.</p>
 <p><code>RuntimePrefetchPlugin</code> can be configured with the following options:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">PrefetchConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;4g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;3g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="s1">&apos;slow-2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RuntimePrefetchConfig</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">debug?</span>: <span class="kt">boolean</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">data</span>: <span class="kt">Graph</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">basePath?</span>: <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">prefetchConfig?</span>: <span class="kt">PrefetchConfig</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">routes</span>: <span class="kt">RoutingModule</span><span class="p">[];</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>The <code>graph</code> passed here is the Google Analytics graph we got from <code>@mlx/ga</code> (i.e., either a navigation or a page graph). The <code>routes</code> array contains one object per route. Each object has a <code>modulePath</code> of the chunk entry point associated with the given route, <code>parentModulePath</code> which equals the path of the entry point of the parent module, and a <code>path</code> which equals to the route that this object represents.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">PrefetchConfig</span> <span class="p">{</span>
+  <span class="s1">&apos;4g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;3g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+  <span class="s1">&apos;slow-2g&apos;</span><span class="o">:</span> <span class="kt">number</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">export</span> <span class="kr">interface</span> <span class="nx">RuntimePrefetchConfig</span> <span class="p">{</span>
+  <span class="nx">debug?</span>: <span class="kt">boolean</span><span class="p">;</span>
+  <span class="nx">data</span>: <span class="kt">Graph</span><span class="p">;</span>
+  <span class="nx">basePath?</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="nx">prefetchConfig?</span>: <span class="kt">PrefetchConfig</span><span class="p">;</span>
+  <span class="nx">routes</span>: <span class="kt">RoutingModule</span><span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div><p>The <code>graph</code> passed here is the Google Analytics graph we got from <code>@mlx/ga</code> (i.e., either a navigation or a page graph). The <code>routes</code> array contains one object per route. Each object has a <code>modulePath</code> of the chunk entry point associated with the given route, <code>parentModulePath</code> which equals the path of the entry point of the parent module, and a <code>path</code> which equals to the route that this object represents.</p>
 <p><code>prefetchConfig</code> is also configurable! It contains the pre-fetching thresholds depending on the value of <code>window.navigator.connection.effectiveType</code>. Since <code>connection.effectiveType</code> is currently supported only by Chrome, the plugin will use the <code>3g</code> thresholds by default.</p>
 <h3 id="how-pre-fetching-works">How Pre-Fetching Works</h3>
 <p>Currently, when given chunk needs to be pre-fetched, the plugin will create a new <code>link</code> element with <a href="https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf"><code>rel=&quot;prefetch&quot;</code></a><sup>[13]</sup> and <code>href</code> attribute equal to the path to the chunk. This element will be added as child element to the <code>head</code> element, or the parent of the first <code>script</code> item in the page in case the <code>head</code> doesn&#x2019;t exist. Using this technique allows the browser to prioritize the pre-fetching process.</p>
@@ -861,28 +861,28 @@ collapse.onclick = function () {
 </ol>
 <p>Although we can do this manually, it&#x2019;s still much more convenient to use <code>@mlx/parser</code> because your application&#x2019;s source code will always be the single source of truth.</p>
 <p>The second point is crucial for the work of <code>@mlx/webpack</code> and <code>@mlx/cluster</code>. Once we provide a project type and a <code>tsconfig.json</code> file to <code>@mlx/parser</code>&#x2019;s <code>parseRoutes</code> method, it&#x2019;ll automatically extract all the metadata and populate it into a JavaScript array of the form:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="p">[</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/main&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/app.module.ts&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/main/parent&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/parent/parent.module.ts&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/intro/parent/reward/:id&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-reward/intro-reward.module.ts&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-parent.module.ts&apos;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">]</span>
-</span></span></code></pre></div><p>This is stripped version of the array produced after parsing the <a href="https://github.com/mgechev/ng-dd-bundled">sample Angular project</a><sup>[9]</sup>. There are several important things to notice:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/main&apos;</span><span class="p">,</span>
+    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts&apos;</span><span class="p">,</span>
+    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/app.module.ts&apos;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/main/parent&apos;</span><span class="p">,</span>
+    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/parent/parent.module.ts&apos;</span><span class="p">,</span>
+    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/main/main.module.ts&apos;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">path</span><span class="o">:</span> <span class="s1">&apos;/intro/parent/reward/:id&apos;</span><span class="p">,</span>
+    <span class="nx">modulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-reward/intro-reward.module.ts&apos;</span><span class="p">,</span>
+    <span class="nx">lazy</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">parentModulePath</span><span class="o">:</span> <span class="s1">&apos;/home/foo/Projects/ng-dd-bundled/src/app/intro/intro-parent/intro-parent.module.ts&apos;</span>
+  <span class="p">}</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">]</span>
+</code></pre></div><p>This is stripped version of the array produced after parsing the <a href="https://github.com/mgechev/ng-dd-bundled">sample Angular project</a><sup>[9]</sup>. There are several important things to notice:</p>
 <ul>
 <li>The array contains the routes from our definitions. This means that the parameterized routes look the way we define them in the source code.</li>
 <li>Each array element has a <code>modulePath</code> property which points to the entry point of the JavaScript chunk which will be loaded when the user navigates to the given <code>path</code>.</li>
