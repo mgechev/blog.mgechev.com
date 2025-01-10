@@ -1,0 +1,331 @@
+    <!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		<meta name="generator" content="Hugo 0.121.1">
+		<title>Reactive framework in ~200 lines of code &middot; Minko Gechev&#39;s blog</title>
+		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/style.css">
+		
+
+		
+		<link rel="stylesheet" href="https://blog.mgechev.com/css/font-awesome.min.css">
+		
+
+		
+		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+		
+		<link rel="amphtml" href="https://blog.mgechev.com/amp/2025/01/09/minimal-reactive-framework/">
+		
+
+		<meta property="og:title" content="Reactive framework in ~200 lines of code" />
+		<meta property="og:description" content="One of my current projects is converging Angular and Wiz into the same framework. This is a complex projects that involves a lot of work and many people. It also got me thinking about different client-side rendering models. In this blog post I&rsquo;ll show a very simple library that enables you to develop components with fine-grained reactivity. To make it easier to talk about this library, I called it &ldquo;revolt.&rdquo;" />
+		<meta property="og:type" content="article" />
+		<meta property="og:url" content="https://blog.mgechev.com/2025/01/09/minimal-reactive-framework/" />
+		
+		<meta property="og:image" content="https://blog.mgechev.com/images/revolt/banner.png"/>
+		<meta property="og:image:secure_url" content="https://blog.mgechev.com/images/revolt/banner.png"/>
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+  
+  <div class="link-wrapper">
+	
+	
+		<a href='https://blog.mgechev.com/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='https://blog.mgechev.com/post'>Posts</a>
+	<a href='https://blog.mgechev.com/about'>About</a>
+	<a href='https://blog.mgechev.com/talks'>Speaking</a>
+  </div>
+
+	
+
+	
+  
+	
+</nav>
+<a href="https://github.com/mgechev" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="z-index: 100000; fill:#70B7FD; color:#fff; position: fixed; top: 20px; border: 0; left: 20px; transform: scale(-1.5, 1.5);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+        <section id="wrapper">
+            <article class="post">
+                <header>
+                    <h1>
+                        Reactive framework in ~200 lines of code
+                    </h1>
+                    <h2 class="headline">
+                    <a href="https://github.com/mgechev/blog.mgechev.com/tree/master/content/post/2025-01-09-minimal-reactive-framework.md">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </a>
+                    · Jan 9, 2025
+                    · 6 minutes read
+                    · <a href="https://twitter.com/mgechev?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+                      <span class="tags">
+                      
+                      
+                          
+                              <a href="https://blog.mgechev.com/tags/reactivity">Reactivity</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/web-development">Web development</a>
+                          
+                              <a href="https://blog.mgechev.com/tags/web-frameworks">Web frameworks</a>
+                          
+                      
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>One of my current projects is <a href="https://blog.angular.dev/angular-and-wiz-are-better-together-91e633d8cd5a">converging Angular and Wiz</a> into the same framework. This is a complex projects that involves a lot of work and many people. It also got me thinking about different client-side rendering models. In this blog post I&rsquo;ll show a very simple library that enables you to develop components with fine-grained reactivity. To make it easier to talk about this library, I called it &ldquo;revolt.&rdquo;</p>
+<p>You can find the implementation <a href="https://github.com/mgechev/revolt">in my repo on GitHub</a>.</p>
+<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+This prototype is just meant to be a fun experiment and nothing more!
+</div>
+<h2 id="component-model">Component model</h2>
+<p>Each component in revolt is a function which returns a view. The view is represented by nested objects which correspond to DOM elements and text nodes that we&rsquo;d render on the page. For each DOM element we can specify event listeners and attributes.</p>
+<p>Here&rsquo;s how a &ldquo;Hello, world!&rdquo; component in revolt:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">HelloWorld</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="s1">&#39;Hello, world!&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>Here&rsquo;s how a timer would look like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">Timer</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">timer</span> <span class="o">=</span> <span class="nx">signal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">timer</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="nx">timer</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1000</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="sb">`Timer: </span><span class="si">${</span><span class="nx">timer</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>And here&rsquo;s an example of how you can compose components and pass properties:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">Avatar</span> <span class="o">=</span> <span class="p">(</span><span class="nx">photo</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="kt">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;img&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">attributes</span><span class="o">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">src</span>: <span class="kt">photo</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">UserProfile</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">userProfile</span> <span class="o">=</span> <span class="nx">signal</span><span class="p">(...);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">[{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;h1&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">children</span><span class="o">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="p">()</span> <span class="o">=&gt;</span> <span class="sb">`Profile of </span><span class="si">${</span><span class="nx">userProfile</span><span class="p">.</span><span class="nx">name</span><span class="p">()</span><span class="si">}</span><span class="sb">`</span>
+</span></span><span class="line"><span class="cl">      <span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Avatar</span><span class="p">(</span><span class="nx">userProfile</span><span class="p">.</span><span class="nx">avatarUrl</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>You can play with the grocery list app below that I built with revolt:</p>
+<div id="app-demo"></div>
+<script src="/assets/js/revolt/app.js"></script>
+<p>A couple of things to observe:</p>
+<ul>
+<li>Each component is a function which returns a structure of nested objects that represents the view</li>
+<li>We declare the state of each component with signals within the function body</li>
+<li>There&rsquo;s a way to get a reference to a particular DOM node that&rsquo;s inspired by React&rsquo;s <code>ref</code></li>
+<li>We have &ldquo;fine-grained reactivity&rdquo; in a sense that we can bind an attribute or a text node to a particular signal</li>
+</ul>
+<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+This implementation uses functions for convenience. I know that many people feel strongly about the abstractions that enable component definition (e.g. classes vs functions vs sfc). As an Angular team member, I feel obligated to share that this prototype does not represent mine or the team's vision for the future of Angular's authoring.
+</div>
+<p>We can render a component using:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">render</span><span class="p">(</span><span class="nx">Component</span><span class="p">(),</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+</span></span></code></pre></div><p>I decided to use nested objects instead of JSX or templating language to simplify the build and use fewer abstractions.</p>
+<h2 id="view-model">View model</h2>
+<p>Let&rsquo;s look at the type definitions of the view:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">Binding</span> <span class="o">=</span> <span class="kt">string</span> <span class="o">|</span> <span class="nx">ReadableSignal</span><span class="p">&lt;</span><span class="nt">string</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">EventListener</span> <span class="o">=</span> <span class="p">&lt;</span><span class="nt">K</span> <span class="na">extends</span> <span class="na">keyof</span> <span class="na">GlobalEventHandlersEventMap</span><span class="p">&gt;(</span><span class="nx">event</span>: <span class="kt">GlobalEventHandlersEventMap</span><span class="p">[</span><span class="nx">K</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">When</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">condition</span>: <span class="kt">ReadableSignal</span><span class="p">&lt;</span><span class="nt">boolean</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">then</span>: <span class="kt">View</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">else</span><span class="o">?:</span> <span class="nx">View</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">For</span><span class="p">&lt;</span><span class="nt">T</span><span class="err">,</span> <span class="na">I</span> <span class="na">extends</span> <span class="na">Iterable</span><span class="err">&lt;</span><span class="na">T</span><span class="p">&gt;</span> <span class="o">=</span> <span class="nx">T</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">collection</span>: <span class="kt">ReadableSignal</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">items</span><span class="o">:</span> <span class="p">(</span><span class="nx">item</span>: <span class="kt">T</span><span class="p">,</span> <span class="nx">index</span>: <span class="kt">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">ViewNode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">ElementConfig</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">name</span>: <span class="kt">keyof</span> <span class="nx">HTMLElementTagNameMap</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">attributes?</span>: <span class="kt">Record</span><span class="p">&lt;</span><span class="nt">string</span><span class="err">,</span> <span class="na">string</span><span class="err">|</span><span class="na">ReadableSignal</span><span class="err">&lt;</span><span class="na">string</span><span class="err">|</span><span class="na">false</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">children?</span>: <span class="kt">View</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">events</span><span class="o">?:</span> <span class="p">{[</span><span class="nx">key</span> <span class="k">in</span> <span class="k">keyof</span> <span class="nx">GlobalEventHandlersEventMap</span><span class="p">]</span><span class="o">?:</span> <span class="nx">EventListener</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">ref</span><span class="o">?:</span> <span class="p">(</span><span class="nx">node</span>: <span class="kt">Element</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">ViewNode</span> <span class="o">=</span> <span class="nx">Binding</span> <span class="o">|</span> <span class="nx">ElementConfig</span> <span class="o">|</span> <span class="nx">When</span> <span class="o">|</span> <span class="nx">For</span><span class="p">&lt;</span><span class="nt">any</span><span class="p">&gt;;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">View</span> <span class="o">=</span> <span class="nx">ViewNode</span> <span class="o">|</span> <span class="nx">View</span><span class="p">[];</span>
+</span></span></code></pre></div><p>When writing these types, it&rsquo;s fun to see how similar they look to a <a href="https://en.wikipedia.org/wiki/Formal_grammar">grammar of a programming language</a>. Templating languages are pretty much programming languages that render DOM.</p>
+<p>Each view is a composition of nodes which could be:</p>
+<ul>
+<li>Text or a text binding</li>
+<li>DOM elements</li>
+<li>Control flow (when, for)</li>
+</ul>
+<p>It&rsquo;s interesting to notice that revolt does not have the concept of a &ldquo;<a href="https://angular.dev/guide/components/host-elements">host element</a>&rdquo; - a component can produce any number of root nodes including zero if we just render a text node.</p>
+<p>Also notice that both <code>When</code> and <code>For</code> accept a readable signal and they rerender when the value of the signal changes. Similarly, we can get a sense how we implement fine-grained reactivity in text and attribute bindings - both could be either strings or <code>ReadableSignal</code>s.</p>
+<h2 id="signals">Signals</h2>
+<p>Our reactive framework will use a minimal signal implementation that I reused from the post <a href="https://dev.to/ryansolid/building-a-reactive-library-from-scratch-1i0p">&ldquo;Building a Reactive Library from Scratch&rdquo;</a>. The library exports three abstractions <code>ReadableSignal&lt;T&gt;</code>, <code>WritableSignal&lt;T&gt;</code> and <code>Effect</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">ReadableSignal</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">T</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">interface</span> <span class="nx">WritableSignal</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="kr">extends</span> <span class="nx">ReadableSignal</span><span class="p">&lt;</span><span class="nt">T</span><span class="p">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">set</span><span class="p">(</span><span class="nx">value</span>: <span class="kt">T</span><span class="p">)</span><span class="o">:</span> <span class="k">void</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">type</span> <span class="nx">Effect</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
+</span></span></code></pre></div><p>Here&rsquo;s how you can use them:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">counter</span> <span class="o">=</span> <span class="nx">signal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">effect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Current value&#39;</span><span class="p">,</span> <span class="nx">counter</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">counter</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span></code></pre></div><p>The code above will output <code>&quot;Current value 0&quot;</code> and <code>&quot;Current value 1&quot;</code>. If you&rsquo;re interested in how the signals library works, have a look at its <a href="https://github.com/mgechev/revolt/blob/c989a107945d23595493453c2c53b95fb2cba922/lib/signal.ts">implementation</a> or Ryan&rsquo;s <a href="https://dev.to/ryansolid/building-a-reactive-library-from-scratch-1i0p">blog post</a>.</p>
+<h2 id="rendering">Rendering</h2>
+<p>We already have the view and the signal library. The only thing left is the renderer! Let&rsquo;s look at the <code>render</code> function:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">render</span> <span class="o">=</span> <span class="p">(</span><span class="nx">view</span>: <span class="kt">View</span><span class="p">,</span> <span class="nx">root</span>: <span class="kt">Element</span><span class="p">)</span><span class="o">:</span> <span class="nx">Node</span> <span class="o">|</span> <span class="nx">Node</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">isConditional</span><span class="p">(</span><span class="nx">view</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">renderCondition</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">isIterator</span><span class="p">(</span><span class="nx">view</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">renderIterator</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">view</span> <span class="k">instanceof</span> <span class="nb">Array</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">renderViewList</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">view</span> <span class="o">===</span> <span class="s2">&#34;string&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">renderTextNode</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">view</span> <span class="o">===</span> <span class="s2">&#34;function&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">renderDynamicText</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">renderElement</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>Pretty straightforward and very similar to a parser. Now let&rsquo;s look at the implementation of <code>isIterator</code> to see how we use signals:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">renderIterator</span> <span class="o">=</span> <span class="p">(</span><span class="nx">view</span>: <span class="kt">For</span><span class="p">&lt;</span><span class="nt">any</span><span class="p">&gt;,</span> <span class="nx">root</span>: <span class="kt">Element</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">collection</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">result</span>: <span class="kt">Node</span> <span class="o">|</span> <span class="nx">Node</span><span class="p">[]</span> <span class="o">|</span> <span class="kc">undefined</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">effect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">collection</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">collection</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">destroy</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">result</span> <span class="o">=</span> <span class="nx">render</span><span class="p">(</span><span class="nx">collection</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">items</span><span class="p">),</span> <span class="nx">root</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">result</span> <span class="o">??</span> <span class="p">[];</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></div><p>That&rsquo;s it!</p>
+<p>Inside an <code>effect</code> we read the signal representing the collection, after that we destroy the DOM from the previous value of the signal, and we render the new collection. Here we take advantage of the synchronous <code>effect</code> implementation.</p>
+<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+Keep in mind that's an oversimplified implementation. All modern frameworks will have diffing logic that will rerender only the changed items to optimize the runtime.
+</div>
+<p>In a similar way we implement other signal bindings:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">renderElement</span> <span class="o">=</span> <span class="p">(</span><span class="nx">view</span>: <span class="kt">ElementConfig</span><span class="p">,</span> <span class="nx">root</span>: <span class="kt">Element</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">const</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kr">const</span> <span class="nx">attribute</span> <span class="k">in</span> <span class="nx">view</span><span class="p">.</span><span class="nx">attributes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">const</span> <span class="nx">binding</span> <span class="o">=</span> <span class="nx">view</span><span class="p">.</span><span class="nx">attributes</span><span class="p">[</span><span class="nx">attribute</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isDynamicBinding</span><span class="p">(</span><span class="nx">binding</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">element</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="nx">attribute</span><span class="p">,</span> <span class="nx">binding</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">effect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kr">const</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">binding</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">element</span><span class="p">.</span><span class="nx">removeAttribute</span><span class="p">(</span><span class="nx">attribute</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">element</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="nx">attribute</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></div><p>Here we create an <code>effect</code> for attribute bindings that are signals. Each time we receive a new value for the signal, we manually update the attribute.</p>
+<p>You can see the entire implementation <a href="https://github.com/mgechev/revolt">on GitHub</a>.</p>
+<h2 id="other-approaches">Other approaches</h2>
+<p>Angular and React use very different approaches. Virtual DOM relies on pruning parts of the component tree that have not changed. Its elegance comes from functional programming, but could also cause extra rendering.</p>
+<p>Similarly to the approach in revolt, Angular separates creation from update, but differently. The Angular compiler generates two rendering code paths:</p>
+<ul>
+<li>One for initial render of the component</li>
+<li>Another which contains only the dynamic parts of the view</li>
+</ul>
+<p>Signals notify the framework that something in the dynamic part of the view has changed, which causes Angular to schedule change detection and update it.</p>
+<h2 id="thats-all-folks">That&rsquo;s all folks</h2>
+<p>That was pretty much everything. Revolt is a tiny library that allows exploration of different concepts from web frameworks such as fine-grained reactivity, host elements, references, server-side rendering, etc.</p>
+<p>In this write up we focused primarily on rendering and fine-grained reactivity, but I&rsquo;ll be happy to drill more in other topics. Let me know what you&rsquo;d be interested in learning about!</p>
+
+                </section>
+            </article>
+
+            
+
+            
+                <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'mgechev';
+
+     
+    (function () {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            
+
+            
+
+            <footer id="footer">
+    <div class="by-author">with <i class="fa fa-heart" aria-hidden="true"></i> by Minko Gechev</div>
+    <p class="small">
+         © Copyright 2025  
+    </p>
+</footer>
+        </section>
+
+        <script src="https://blog.mgechev.com/js/main.js"></script>
+
+
+
+
+  
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-18060688-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+<script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+<script>
+  window.addEventListener('load', function () {
+    twemoji.parse(document.body, { size: 72 });
+  });
+</script>
+
+
+
+    </body>
+</html>

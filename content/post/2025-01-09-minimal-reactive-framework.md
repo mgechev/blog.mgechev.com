@@ -10,8 +10,8 @@ tags:
 - Reactivity
 - Web development
 - Web frameworks
-title: Reactive framework on ~100 lines of code
-og_image: /images/managing-angular/gradient.webp
+title: Reactive framework in ~200 lines of code
+og_image: /images/revolt/banner.png
 url: /2025/01/09/minimal-reactive-framework
 ---
 
@@ -45,59 +45,35 @@ const Timer = () => {
 };
 ```
 
-And here's a basic todo app:
+And here's an example of how you can compose components and pass properties:
 
 ```typescript
-const TodoApp = (): View => {
-  const todos = signal<string[]>(["Buy milk", "Create a framework"]);
-  let inputElement: HTMLInputElement | undefined;
-
-  const addTodo = () => {
-    if (!inputElement) {
-      return;
+const Avatar = (photo: () => string) => {
+  return () => {
+    name: 'img',
+    attributes: {
+      src: photo
     }
-    todos.set([...todos(), inputElement.value]);
-    inputElement.value = "";
   };
+};
 
-  return [
-    {
-      name: "input",
-      attributes: {
-        type: "text",
-      },
-      ref(input: Element) {
-        inputElement = input as HTMLInputElement;
-      },
-      events: {
-        keydown(e: Event) {
-          const event = e as KeyboardEvent;
-          if (event.code === "Enter") {
-            addTodo();
-          }
-        }
-      },
+const UserProfile = () => {
+  const userProfile = signal(...);
+  return [{
+      name: 'h1',
+      children: [
+        () => `Profile of ${userProfile.name()}`
+      ]
     },
-    {
-      name: "ul",
-      children: {
-        collection: todos,
-        items(item: string) {
-          return {
-            name: "li",
-            children: item,
-            events: {
-              click() {
-                todos.set(todos().filter((t) => t !== item));
-              },
-            },
-          };
-        },
-      }
-    },
+    Avatar(userProfile.avatarUrl)
   ];
 };
 ```
+
+You can play with the grocery list app below that I built with revolt:
+
+<div id="app-demo"></div>
+<script src="/assets/js/revolt/app.js"></script>
 
 A couple of things to observe:
 
