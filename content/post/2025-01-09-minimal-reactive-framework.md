@@ -10,7 +10,7 @@ tags:
 - Reactivity
 - Web development
 - Web frameworks
-title: Reactive framework in ~200 lines of code
+title: Reactive framework in ~200 lines of JavaScript
 og_image: /images/revolt/banner.png
 url: /2025/01/09/minimal-reactive-framework
 ---
