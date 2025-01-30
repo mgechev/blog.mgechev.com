@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.121.1">
+<meta name="generator" content="Hugo 0.91.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -148,65 +148,65 @@ B. Abstractions should not depend on details. Details should depend on abstracti
 </blockquote>
 <p>Although DI does not directly enforces it, it can predispose us to write code which follows the principle.</p>
 <p>A few days ago I published a library called <strong><a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a></strong>. It is <strong>an extraction of the Angular&#x2019;s dependency injection mechanism</strong>. Thanks to the fact that <a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a> comes from the Angular&#x2019;s source code, it&#x2019;s <strong>well tested and mature</strong>, so you can give it a try!</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ npm i injection-js --save
-</span></span></code></pre></div><h2 id="using-dependency-injection">Using dependency injection</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">$ npm i injection-js --save
+</code></pre></div><h2 id="using-dependency-injection">Using dependency injection</h2>
 <p>Now, lets see how we can use the library! But before that, lets get familiar with the core concepts behind it. In the root of the dependency injection mechanism of <a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a> (and respectively Angular) is the <strong>injector</strong>. It is responsible for holding different &#x201C;recipes&#x201D; for instantiation of the individual dependencies. These recipes are called <strong>providers</strong>. To each provider we have an associated <strong>token</strong>. We can think of the tokens as identifiers of the individual dependencies and providers (we have 1:1 mapping, or bijection, between providers and dependencies). We ask the injector for an instance of any of the dependencies by using its token.</p>
 <p>Here&#x2019;s an example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="c1">// We can use the same imports from &apos;@angular/core&apos;.
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">ReflectiveInjector</span><span class="p">,</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;injection-js&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Http</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Injectable</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">UserService</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">http</span>: <span class="kt">Http</span><span class="p">)</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">Http</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">Http</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">UserService</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">UserService</span> <span class="p">},</span>
-</span></span><span class="line"><span class="cl"><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">UserService</span><span class="p">);</span>
-</span></span></code></pre></div><p>The following examples use <a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a> but we can use <code>@angular/core</code> the same way. Above we import <code>ReflectiveInjector</code> and <code>@Injectable</code>. <code>ReflectiveInjector</code> has a factory method called <code>resolveAndCreate</code> which allows us to create an injector by passing a set of providers. In this case we pass providers for the classes <code>Http</code> and <code>UserService</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// We can use the same imports from &apos;@angular/core&apos;.
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">ReflectiveInjector</span><span class="p">,</span> <span class="nx">Injectable</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;injection-js&apos;</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">Http</span> <span class="p">{}</span>
+
+<span class="kd">@Injectable</span><span class="p">()</span>
+<span class="kr">class</span> <span class="nx">UserService</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">http</span>: <span class="kt">Http</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
+  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">Http</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">Http</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">UserService</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">UserService</span> <span class="p">},</span>
+<span class="p">]);</span>
+
+<span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">UserService</span><span class="p">);</span>
+</code></pre></div><p>The following examples use <a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a> but we can use <code>@angular/core</code> the same way. Above we import <code>ReflectiveInjector</code> and <code>@Injectable</code>. <code>ReflectiveInjector</code> has a factory method called <code>resolveAndCreate</code> which allows us to create an injector by passing a set of providers. In this case we pass providers for the classes <code>Http</code> and <code>UserService</code>.</p>
 <p>We declare the token associated with given provider by setting the value of its <code>provide</code> property. Above we instruct the injector to instantiate the individual dependencies by directly invoking their constructor. This means that, if we want to get an instance of <code>Http</code>, the injector will return <code>new Http()</code>. If we want to get a <code>UserService</code>, the injector will peek at the parameters of its constructor and first create an instance of <code>Http</code> (or use an existing one if it&#x2019;s already available). After that it can invoke the constructor of <code>UserService</code> with the already existing instance of <code>Http</code>.</p>
 <p>Finally, the decorator <code>@Injectable</code> doesn&#x2019;t do anything. It just forces TypeScript to generate metadata regarding the types of the dependencies that <code>UserService</code> accepts.</p>
 <p><em>Note that in order to make TypeScript generate such metadata, we need to set the <code>emitDecoratorMetadata</code> property in <code>tsconfig.json</code> to <code>true</code>.</em></p>
 <p>Since the syntax for configuring the injector looks a bit redundant, we can use the following definition of the providers instead:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Http</span><span class="p">,</span> <span class="nx">UserService</span>
-</span></span><span class="line"><span class="cl"><span class="p">]);</span>
-</span></span></code></pre></div><p>In some cases, the dependencies that we want to declare are simply values which need to be injected. For example, if we want to inject a constant, it is not convenient as token to use the constructor of the constant. In this case we can set the token to any other value - remember - the token is nothing more than an identifier:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="s1">&apos;buffer-size&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Socket</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">BUFFER_SIZE</span><span class="p">,</span> <span class="nx">useValue</span>: <span class="kt">42</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">]);</span>
-</span></span></code></pre></div><p>In the example above, we create a provider for the <code>BUFFER_SIZE</code> token. We declare that once the token <code>BUFFER_SIZE</code> is required we want the injector to return the value <code>42</code>. Here&#x2019;s an example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">BUFFER_SIZE</span><span class="p">);</span> <span class="c1">// 42
-</span></span></span></code></pre></div><p>There are two more details in the example above:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
+  <span class="nx">Http</span><span class="p">,</span> <span class="nx">UserService</span>
+<span class="p">]);</span>
+</code></pre></div><p>In some cases, the dependencies that we want to declare are simply values which need to be injected. For example, if we want to inject a constant, it is not convenient as token to use the constructor of the constant. In this case we can set the token to any other value - remember - the token is nothing more than an identifier:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="s1">&apos;buffer-size&apos;</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
+  <span class="nx">Socket</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">BUFFER_SIZE</span><span class="p">,</span> <span class="nx">useValue</span>: <span class="kt">42</span> <span class="p">}</span>
+<span class="p">]);</span>
+</code></pre></div><p>In the example above, we create a provider for the <code>BUFFER_SIZE</code> token. We declare that once the token <code>BUFFER_SIZE</code> is required we want the injector to return the value <code>42</code>. Here&#x2019;s an example:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">BUFFER_SIZE</span><span class="p">);</span> <span class="c1">// 42
+</span></code></pre></div><p>There are two more details in the example above:</p>
 <ol>
 <li>What if we have name collision with another token called <code>buffer-size</code>?</li>
 <li>How do we declare that given class accepts the <code>BUFFER_SIZE</code> size as dependency if it&#x2019;s not a type?</li>
 </ol>
 <p>We can handle the first problem by using <code>OpaqueToken</code>. This way our <code>BUFFER_SIZE</code> definition will be:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OpaqueToken</span><span class="p">(</span><span class="s1">&apos;BufferSize&apos;</span><span class="p">);</span>
-</span></span></code></pre></div><p>The instances of the class <code>OpaqueToken</code> are uniques values which are used by the DI mechanism of Angular to represent tokens in cases when we cannot use a type.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OpaqueToken</span><span class="p">(</span><span class="s1">&apos;BufferSize&apos;</span><span class="p">);</span>
+</code></pre></div><p>The instances of the class <code>OpaqueToken</code> are uniques values which are used by the DI mechanism of Angular to represent tokens in cases when we cannot use a type.</p>
 <p>For the second problem, we can require a dependency whose token is not a type by using the <code>@Inject</code> parameter decorator of Angular/<a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OpaqueToken</span><span class="p">(</span><span class="s1">&apos;BufferSize&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Socket</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kd">@Inject</span><span class="p">(</span><span class="nx">BUFFER_SIZE</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">size</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Socket</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">BUFFER_SIZE</span><span class="p">,</span> <span class="nx">useValue</span>: <span class="kt">42</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">Socket</span><span class="p">).</span><span class="nx">size</span><span class="p">;</span> <span class="c1">// 42
-</span></span></span></code></pre></div><h2 id="hierarchy-of-injectors">Hierarchy of injectors</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">const</span> <span class="nx">BUFFER_SIZE</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OpaqueToken</span><span class="p">(</span><span class="s1">&apos;BufferSize&apos;</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Socket</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kd">@Inject</span><span class="p">(</span><span class="nx">BUFFER_SIZE</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">size</span>: <span class="kt">number</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">([</span>
+  <span class="nx">Socket</span><span class="p">,</span>
+  <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">BUFFER_SIZE</span><span class="p">,</span> <span class="nx">useValue</span>: <span class="kt">42</span> <span class="p">}</span>
+<span class="p">]);</span>
+
+<span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">Socket</span><span class="p">).</span><span class="nx">size</span><span class="p">;</span> <span class="c1">// 42
+</span></code></pre></div><h2 id="hierarchy-of-injectors">Hierarchy of injectors</h2>
 <p>In AngularJS all the providers were stored into a flat structure. A big improvement in the dependency injection mechanism of Angular 2 and above, is that we can build a hierarchical structure of injectors. For instance, lets take a look at the image below:</p>
 <amp-img src="/images/react-di/injectors-hierarchy.png" alt="Dependency Injection Hierarchy" style="display: block; margin: auto;"></amp-img>
 <p>We have a root injector called <code>House</code>, which is parent of the injectors <code>Bathroom</code>, <code>Kitchen</code> and <code>Garage</code>. <code>Garage</code> is parent of <code>Car</code> and <code>Storage</code>. If we require the dependency with token <code>tire</code>, for instance, from the injector <code>Storage</code>, <code>Storage</code> will try to find it in its set of registered providers. If it doesn&#x2019;t find it there, it&#x2019;ll look into <code>Garage</code>. If it is not there, <code>Garage</code> will look in <code>House</code>. In case <code>House</code> finds the dependency it will return it to <code>Garage</code> which will give it back to <code>Storage</code>.</p>
@@ -220,39 +220,39 @@ B. Abstractions should not depend on details. Details should depend on abstracti
 </ul>
 <p>When a user plays the game in a single-player mode, we want to send some metadata to our application server through a Web Socket. However, if our user plays against another player, we want to establish a WebRTC data channel between both players in order to synchronize the game. Of course, it makes sense to send data to the application server as well. With Angular/<a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a> we can handle this with <a href="https://blog.thoughtram.io/angular2/2015/11/23/multi-providers-in-angular-2.html">multi-providers</a>, but for the sake of simplicity lets suppose that for multi-player we want only p2p connection.</p>
 <p>So, we have our <code>DataChannel</code>, which is an abstract class with a single method and an observable:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">DataChannel</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">dataStream</span>: <span class="kt">Observable</span><span class="p">&lt;</span><span class="nt">string</span><span class="p">&gt;;</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">abstract</span> <span class="nx">send</span><span class="p">(</span><span class="nx">data</span>: <span class="kt">string</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Later, this abstract class can be implemented by the classes <code>WebRTCDataChannel</code> and <code>WebSocketDataChannel</code>. Respectively, the <code>SinglePlayerGameComponent</code> will use the <code>WebSocketDataChannel</code> and <code>MultiPlayerGameComponent</code> will use the <code>WebRTCDataChannel</code>. But what about the <code>GameComponent</code>? <code>GameComponent</code> can depend on <code>DataChannel</code>. This way, depending on the context it&#x2019;s used in, its associated element injector can pass the correct implementation, configured by its parent component. We can take a look at how this looks in Angular, with the following snippet in pseudo code:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;game-cmp&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;...&apos;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">GameComponent</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">channel</span>: <span class="kt">DataChannel</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;single-player&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">DataChannel</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">WebSocketDataChannel</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;game-cmp&gt;&lt;/game-cmp&gt;&apos;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">SinglePlayerGameComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;multi-player&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">DataChannel</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">WebRTCDataChannel</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;game-cmp&gt;&lt;/game-cmp&gt;&apos;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">MultiPlayerGameComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-</span></span></code></pre></div><p>In the example above we have the declaration of the <code>GameComponent</code>, <code>SinglePlayerGameComponent</code> and <code>MultiPlayerGameComponent</code>. <code>GameComponent</code> has a single dependency of type <code>DataChannel</code> (we don&#x2019;t need the <code>@Injectable</code> decorator since <code>@Component</code> already forces TypeScript to generate metadata). Later in <code>SinglePlayerGameComponent</code> we associate the class <code>WebSocketDataChannel</code> with the token of the dependency that <code>GameComponent</code> accepts (i.e. <code>DataChannel</code>). Finally, in <code>MultiPlayerGameComponent</code> we associate <code>DataChannel</code> with <code>WebRTCDataChannel</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">abstract</span> <span class="kr">class</span> <span class="nx">DataChannel</span> <span class="p">{</span>
+  <span class="nx">dataStream</span>: <span class="kt">Observable</span><span class="p">&lt;</span><span class="nt">string</span><span class="p">&gt;;</span>
+  <span class="kr">abstract</span> <span class="nx">send</span><span class="p">(</span><span class="nx">data</span>: <span class="kt">string</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p>Later, this abstract class can be implemented by the classes <code>WebRTCDataChannel</code> and <code>WebSocketDataChannel</code>. Respectively, the <code>SinglePlayerGameComponent</code> will use the <code>WebSocketDataChannel</code> and <code>MultiPlayerGameComponent</code> will use the <code>WebRTCDataChannel</code>. But what about the <code>GameComponent</code>? <code>GameComponent</code> can depend on <code>DataChannel</code>. This way, depending on the context it&#x2019;s used in, its associated element injector can pass the correct implementation, configured by its parent component. We can take a look at how this looks in Angular, with the following snippet in pseudo code:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;game-cmp&apos;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;...&apos;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">GameComponent</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">channel</span>: <span class="kt">DataChannel</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;single-player&apos;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">DataChannel</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">WebSocketDataChannel</span> <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;game-cmp&gt;&lt;/game-cmp&gt;&apos;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">SinglePlayerGameComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;multi-player&apos;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">provide</span>: <span class="kt">DataChannel</span><span class="p">,</span> <span class="nx">useClass</span>: <span class="kt">WebRTCDataChannel</span> <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&apos;&lt;game-cmp&gt;&lt;/game-cmp&gt;&apos;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">MultiPlayerGameComponent</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div><p>In the example above we have the declaration of the <code>GameComponent</code>, <code>SinglePlayerGameComponent</code> and <code>MultiPlayerGameComponent</code>. <code>GameComponent</code> has a single dependency of type <code>DataChannel</code> (we don&#x2019;t need the <code>@Injectable</code> decorator since <code>@Component</code> already forces TypeScript to generate metadata). Later in <code>SinglePlayerGameComponent</code> we associate the class <code>WebSocketDataChannel</code> with the token of the dependency that <code>GameComponent</code> accepts (i.e. <code>DataChannel</code>). Finally, in <code>MultiPlayerGameComponent</code> we associate <code>DataChannel</code> with <code>WebRTCDataChannel</code>.</p>
 <p>What will happen behind the scene is shown on the image below:</p>
 <amp-img src="/images/react-di/element-injectors.png" alt="Element Injectors" style="display: block; margin: auto;"></amp-img>
 <p>The element injectors of <code>SinglePlayerGameComponent</code> and <code>MultiPlayerGameComponent</code> will have a parent injector. For simplicity, lets suppose both have the same parent since this is not interesting for our discussion. <code>SinglePlayerGameComponent</code> will register a provider which will associate the <code>DataChannel</code> token with the <code>WebSocketDataChannel</code> class. This provider, together with a provider for the <code>SinglePlayerGameComponent</code> component will be registered into the injector shown on the diagram as <code>single</code> (Angular registers more providers in the element injectors but we can ignore them for simplicity).
@@ -272,24 +272,24 @@ On the other hand, in the <code>multi</code> injector from the diagram we will h
 <p>That&#x2019;s it! Now lets implement it.</p>
 <h2 id="declaring-components-providers">Declaring component&#x2019;s providers</h2>
 <p>In order to declare the providers for given component we will use approach similar to the one used in Angular. Angular&#x2019;s components declare their providers as value of the <code>providers</code> property of the object literal passed to the <code>@Component</code> decorator:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;foo-bar&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">Provider1</span><span class="p">,</span> <span class="nx">Provider2</span><span class="p">,</span> <span class="p">...,</span> <span class="nx">ProviderN</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Component</span> <span class="p">{...}</span>
-</span></span></code></pre></div><p>We will declare a class decorator called <code>@ProviderConfig</code> which using the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">ES6 Reflect API</a> associates the providers to the corresponding component.</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">ProviderConfig</span><span class="p">(</span><span class="nx">config</span>: <span class="kt">any</span><span class="p">[])</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span>: <span class="kt">any</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">Reflect</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="s1">&apos;providers&apos;</span><span class="p">,</span> <span class="nx">config</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">target</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">};</span>
-</span></span></code></pre></div><p>The decorator can be used as follows:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@ProviderConfig</span><span class="p">([</span> <span class="nx">Provider1</span><span class="p">,</span> <span class="nx">Provider2</span><span class="p">,</span> <span class="p">...,</span> <span class="nx">ProviderN</span> <span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><h2 id="creating-element-injectors">Creating element injectors</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&apos;foo-bar&apos;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">Provider1</span><span class="p">,</span> <span class="nx">Provider2</span><span class="p">,</span> <span class="p">...,</span> <span class="nx">ProviderN</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">Component</span> <span class="p">{...}</span>
+</code></pre></div><p>We will declare a class decorator called <code>@ProviderConfig</code> which using the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">ES6 Reflect API</a> associates the providers to the corresponding component.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">export</span> <span class="kd">function</span> <span class="nx">ProviderConfig</span><span class="p">(</span><span class="nx">config</span>: <span class="kt">any</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">target</span>: <span class="kt">any</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">Reflect</span><span class="p">.</span><span class="kr">set</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="s1">&apos;providers&apos;</span><span class="p">,</span> <span class="nx">config</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">target</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div><p>The decorator can be used as follows:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@ProviderConfig</span><span class="p">([</span> <span class="nx">Provider1</span><span class="p">,</span> <span class="nx">Provider2</span><span class="p">,</span> <span class="p">...,</span> <span class="nx">ProviderN</span> <span class="p">])</span>
+<span class="kr">class</span> <span class="nx">Component</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="creating-element-injectors">Creating element injectors</h2>
 <p>The purpose of this section is to apply the points listed in the previous section with minimum amount of changes in the React&#x2019;s code. Furthermore, the modifications should be as isolated as possible in order to be possible to distribute them as separate module, which allows using React with <a href="https://github.com/mgechev/injection-js">injection-js</a>. Finally, <strong>the implementation is not complete</strong>, it ignores the case of factory components. Supporting factory components is possible but not necessary for the purpose of the post.</p>
 <p>Internally, React wraps each component, together with a bunch of other stuff, into <code>ReactElement</code>s. Later, it uses the individual <code>ReactElement</code>s in order to create the specific component instances.</p>
 <p>These two happen in the following files (we&#x2019;ll explore only <code>react-dom</code>, ignoring other platforms):</p>
@@ -298,44 +298,44 @@ On the other hand, in the <code>multi</code> injector from the diagram we will h
 <li><code>react-dom/lib/ReactCompositeComponent.js</code> - contains the method used for construction of the components.</li>
 </ul>
 <p>For our purpose, we&#x2019;ll make a few modifications only in the <code>react-dom/lib/ReactCompositeComponent.js</code>. Lets explore it!</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">require</span><span class="p">(</span><span class="s1">&apos;reflect-metadata&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">ReflectiveInjector</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;injection-js&apos;</span><span class="p">).</span><span class="nx">ReflectiveInjector</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nx">_constructComponentWithoutOwner</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">doConstruct</span><span class="p">,</span> <span class="nx">publicProps</span><span class="p">,</span> <span class="nx">publicContext</span><span class="p">,</span> <span class="nx">updateQueue</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">Component</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">providers</span> <span class="o">=</span> <span class="p">[</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">Component</span><span class="p">,</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;props&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">publicProps</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;context&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">publicContext</span>
-</span></span><span class="line"><span class="cl">    <span class="p">},</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;update&apos;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">updateQueue</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">Reflect</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">,</span> <span class="s1">&apos;providers&apos;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]);</span>
-</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">injector</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">_owner</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">(</span><span class="nx">providers</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">injector</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">_owner</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="s1">&apos;injector&apos;</span><span class="p">).</span><span class="nx">resolveAndCreateChild</span><span class="p">(</span><span class="nx">providers</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Reflect</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">Component</span><span class="p">,</span> <span class="s1">&apos;injector&apos;</span><span class="p">,</span> <span class="nx">injector</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">doConstruct</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">&apos;production&apos;</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">measureLifeCyclePerf</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">_debugID</span><span class="p">,</span> <span class="s1">&apos;ctor&apos;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">...</span>
-</span></span></code></pre></div><p>This is fork of React 15.4.2. The code above shows all the modifications that I had to do in order to create an injector for each component, and later instantiate the component with the corresponding injector. Lets explore the snippet step by step.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">require</span><span class="p">(</span><span class="s1">&apos;reflect-metadata&apos;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">ReflectiveInjector</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&apos;injection-js&apos;</span><span class="p">).</span><span class="nx">ReflectiveInjector</span><span class="p">;</span>
+
+<span class="p">...</span>
+
+<span class="nx">_constructComponentWithoutOwner</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">doConstruct</span><span class="p">,</span> <span class="nx">publicProps</span><span class="p">,</span> <span class="nx">publicContext</span><span class="p">,</span> <span class="nx">updateQueue</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">Component</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">type</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">providers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nx">Component</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;props&apos;</span><span class="p">,</span>
+      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">publicProps</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;context&apos;</span><span class="p">,</span>
+      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">publicContext</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nx">provide</span><span class="o">:</span> <span class="s1">&apos;update&apos;</span><span class="p">,</span>
+      <span class="nx">useValue</span><span class="o">:</span> <span class="nx">updateQueue</span>
+    <span class="p">}</span>
+  <span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">Reflect</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">,</span> <span class="s1">&apos;providers&apos;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]);</span>
+  <span class="kd">var</span> <span class="nx">injector</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">_owner</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">injector</span> <span class="o">=</span> <span class="nx">ReflectiveInjector</span><span class="p">.</span><span class="nx">resolveAndCreate</span><span class="p">(</span><span class="nx">providers</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">injector</span> <span class="o">=</span> <span class="nx">Reflect</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">_owner</span><span class="p">.</span><span class="nx">_currentElement</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="s1">&apos;injector&apos;</span><span class="p">).</span><span class="nx">resolveAndCreateChild</span><span class="p">(</span><span class="nx">providers</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nx">Reflect</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">Component</span><span class="p">,</span> <span class="s1">&apos;injector&apos;</span><span class="p">,</span> <span class="nx">injector</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">doConstruct</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">&apos;production&apos;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">measureLifeCyclePerf</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">);</span>
+      <span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">_debugID</span><span class="p">,</span> <span class="s1">&apos;ctor&apos;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">injector</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">Component</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="p">...</span>
+</code></pre></div><p>This is fork of React 15.4.2. The code above shows all the modifications that I had to do in order to create an injector for each component, and later instantiate the component with the corresponding injector. Lets explore the snippet step by step.</p>
 <p>First, we get reference to the component&#x2019;s class. This happens by getting the value of the property <code>this._currentElement.type</code>. Later we register a set of providers. The default set contains the component&#x2019;s class, providers for <code>props</code>, <code>context</code> and <code>updateQueue</code>. The last three providers are by default passed to the constructor of each component during instantiation. Later to this set of providers we also add the providers declared with <code>@ProviderConfig</code>. For this purpose we use the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect">ES6 Reflect API</a>.</p>
 <p>As next step we check if the element of the current component has an owner. If it doesn&#x2019;t, this means that we&#x2019;re at the root component and we need to create the root injector. For this purpose we use the static <code>resolveAndCreate</code> method of the <code>ReflectiveInjector</code> class. In case the current element has an owner, we instantiate a child injector by invoking the <code>resolveAndCreateChild</code> of the owner&#x2019;s injector.</p>
 <p>Since we want the created injector to be available for child components, we keep it as an entry in the Reflect API.</p>
@@ -343,22 +343,22 @@ On the other hand, in the <code>multi</code> injector from the diagram we will h
 <p><strong>Note that this code manipulates React&#x2019;s internals and uses private properties, prefixed with <code>_</code>! I don&#x2019;t recommend it for production usage because it is not well tested, doesn&#x2019;t cover factory components and most likely won&#x2019;t work in future releases of React.</strong></p>
 <h2 id="using-react-with-di">Using React with DI</h2>
 <p>Here&#x2019;s a quick demo which illustrates how we can use DI in React with the described implementation:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s1">&apos;react&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;injection-js&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">ProviderConfig</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;../providers&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">WebSocketService</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;../websocket.service&apos;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@ProviderConfig</span><span class="p">([</span> <span class="nx">WebSocketService</span> <span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">HelloWorldComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">&lt;</span><span class="nt">any</span><span class="err">,</span> <span class="na">any</span><span class="p">&gt;</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">constructor</span><span class="p">(</span><span class="kd">@Inject</span><span class="p">(</span><span class="s1">&apos;update&apos;</span><span class="p">)</span> <span class="nx">update</span><span class="p">,</span> <span class="nx">ws</span>: <span class="kt">WebSocketService</span><span class="p">,</span> <span class="kd">@Inject</span><span class="p">(</span><span class="s1">&apos;props&apos;</span><span class="p">)</span> <span class="nx">props</span>: <span class="kt">any</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  
-</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">(){</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span><span class="nx">Hello</span> <span class="nx">world</span><span class="o">!</span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>There&#x2019;s one important difference between how we use components with DI enabled, compared to the traditional approach - the parameters that the target component accepts are not injected positionally but instead based on the order they are declared in the constructor.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">React</span> <span class="kr">from</span> <span class="s1">&apos;react&apos;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">Inject</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;injection-js&apos;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">ProviderConfig</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;../providers&apos;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">WebSocketService</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&apos;../websocket.service&apos;</span><span class="p">;</span>
+
+<span class="kd">@ProviderConfig</span><span class="p">([</span> <span class="nx">WebSocketService</span> <span class="p">])</span>
+<span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">HelloWorldComponent</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span><span class="p">&lt;</span><span class="nt">any</span><span class="err">,</span> <span class="na">any</span><span class="p">&gt;</span> <span class="p">{</span>
+  <span class="kr">constructor</span><span class="p">(</span><span class="kd">@Inject</span><span class="p">(</span><span class="s1">&apos;update&apos;</span><span class="p">)</span> <span class="nx">update</span><span class="p">,</span> <span class="nx">ws</span>: <span class="kt">WebSocketService</span><span class="p">,</span> <span class="kd">@Inject</span><span class="p">(</span><span class="s1">&apos;props&apos;</span><span class="p">)</span> <span class="nx">props</span>: <span class="kt">any</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+  <span class="p">}</span>
+  
+  <span class="nx">render</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span><span class="nx">Hello</span> <span class="nx">world</span><span class="o">!</span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>There&#x2019;s one important difference between how we use components with DI enabled, compared to the traditional approach - the parameters that the target component accepts are not injected positionally but instead based on the order they are declared in the constructor.</p>
 <p>As we can see from the example above, <code>HelloWorldComponent</code> accepts tree arguments, all of them are injected through the DI mechanism of <a href="https://github.com/mgechev/injection-js"><code>injection-js</code></a>. <strong>In contrast to the original component API, the dependencies are going to be injected with the order of their declaration</strong>.</p>
 <h1 id="conclusion">Conclusion</h1>
 <p>In this experiment we saw how we can use the dependency injection mechanism of Angular in React. We explained what DI is and what benefits it brings. We also saw how we apply it in the context of the development of user interface by using element injectors.</p>

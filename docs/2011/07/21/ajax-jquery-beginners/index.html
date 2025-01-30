@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Ajax without jQuery for beginners &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -89,75 +89,75 @@ Many developers don’t have an idea how to write this without a library. In the
                 
                 <section id="post-body">
                     <p>Before years I was writing all the code by my own, without additional libraries (including jQuery). For beginner developer it’s a good strategy. When you use <strong>$.ajax</strong> it’s all that easy:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">url</span><span class="o">:</span> <span class="s2">&#34;any/url/for/the/request&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;get&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+  <span class="nx">url</span><span class="o">:</span> <span class="s2">&#34;any/url/for/the/request&#34;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="o">:</span> <span class="s2">&#34;get&#34;</span><span class="p">,</span>
+  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></code></pre></div>
 <p>But you can’t get the main idea.<br>
 Many developers don’t have an idea how to write this without a library. In their opinion AJAX without library a hard, near impossible task. Well the truth is that it’s not so hard&hellip;there are just some incompatibilities between the different browsers but you can deal with all of them in few lines of code. First for creating the HTTP request you have to create new XMLHttpRequest (for most browsers). Of course, in Internet Explorer you have to do something slightly different&hellip;In Internet Explorer under version 7 you have to create special kind of ActiveX Object which has different versions – MSXML2.XMLHttp.5.0, MSXML2.XMLHttp.4.0, MSXML2.XMLHttp.3.0, MSXML2.XMLHttp, Microsoft.XMLHttp. For our goals we want to use the newest version of the XMLHttp object. Here is a function which creates object which we can use for out request:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">createXMLHttp</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">//If XMLHttpRequest is available then using it
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">XMLHttpRequest</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">//if window.ActiveXObject is available than the user is using IE...so we have to create the newest version XMLHttp object
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">ieXMLHttpVersions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MSXML2.XMLHttp.5.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp.4.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp.3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp&#39;</span><span class="p">,</span> <span class="s1">&#39;Microsoft.XMLHttp&#39;</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">xmlHttp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">//In this array we are starting from the first element (newest version) and trying to create it. If there is an
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//exception thrown we are handling it (and doing nothing ^^)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">ieXMLHttpVersions</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">try</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">xmlHttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="nx">ieXMLHttpVersions</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">xmlHttp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">createXMLHttp</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">//If XMLHttpRequest is available then using it
+</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">XMLHttpRequest</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">;</span>
+  <span class="c1">//if window.ActiveXObject is available than the user is using IE...so we have to create the newest version XMLHttp object
+</span><span class="c1"></span>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">ActiveXObject</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">ieXMLHttpVersions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MSXML2.XMLHttp.5.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp.4.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp.3.0&#39;</span><span class="p">,</span> <span class="s1">&#39;MSXML2.XMLHttp&#39;</span><span class="p">,</span> <span class="s1">&#39;Microsoft.XMLHttp&#39;</span><span class="p">],</span>
+        <span class="nx">xmlHttp</span><span class="p">;</span>
+    <span class="c1">//In this array we are starting from the first element (newest version) and trying to create it. If there is an
+</span><span class="c1"></span>    <span class="c1">//exception thrown we are handling it (and doing nothing ^^)
+</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">ieXMLHttpVersions</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="nx">xmlHttp</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="nx">ieXMLHttpVersions</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="k">return</span> <span class="nx">xmlHttp</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
 <p>Actually function similar to this one was published by <strong>Nicholas C. Zakas, Jeremy McPeak, Joe Fawcett</strong> (<a href="http://www.amazon.com/Professional-Ajax-2nd-Programmer/dp/0470109491" title="link to Amazon">link to Amazon</a>).<br>
 And we&rsquo;re done with the first step.<br>
 Now we have to send the request and process the result.<br>
 Here we&rsquo;re going to make a simple &ldquo;get&rdquo; request:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">xmlHttp</span> <span class="o">=</span> <span class="nx">createXMLHttp</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;http://localhost/ajaxTest.txt&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">success</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">error</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="c1">//still processing
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">getData</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">xmlHttp</span> <span class="o">=</span> <span class="nx">createXMLHttp</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;http://localhost/ajaxTest.txt&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+  <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">===</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">success</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">error</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="c1">//still processing
+</span><span class="c1"></span>    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">}</span></code></pre></div>
 <p>I think that this is even simpler. Firstly we get the xmlhttp object. After that start a request. In this situation the request was with method &lsquo;get&rsquo; and the url was &lsquo;http://localhost/ajaxTest.txt&rsquo;. The third parameter indicates if the request is going to be synchronous or asynchronous. If it&rsquo;s synchronous then the browser is going to freeze until the request is ready. If it&rsquo;s asynchronous then the request is gong to be executed in background.<br>
 When you use &lsquo;post&rsquo; you&rsquo;ve to add this line:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">,</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">);</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">setRequestHeader</span><span class="p">(</span><span class="s2">&#34;Content-Type&#34;</span><span class="p">,</span> <span class="s2">&#34;application/x-www-form-urlencoded&#34;</span><span class="p">);</span></code></pre></div>
 <p>And you&rsquo;ve to change this line:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span></code></pre></div>
 <p>to this one:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="nx">xmlHttp</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span></code></pre></div>
 <p>This data have to be structured like url. You can the function below:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">   <span class="kd">var</span> <span class="nx">dataArray</span> <span class="o">=</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="cl">   <span class="c1">//Getting the data from all elements in the form
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">     <span class="kd">var</span> <span class="nx">encodedData</span> <span class="o">=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">     <span class="nx">encodedData</span> <span class="o">+=</span> <span class="s2">&#34;=&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">     <span class="nx">encodedData</span> <span class="o">+=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">     <span class="nx">dataArray</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">ProM</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">   <span class="p">}</span>
-</span></span><span class="line"><span class="cl">   <span class="k">return</span> <span class="nx">dataArray</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&#34;&amp;&#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"> <span class="p">}</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">function</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">)</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">dataArray</span> <span class="o">=</span> <span class="p">[];</span>
+   <span class="c1">//Getting the data from all elements in the form
+</span><span class="c1"></span>   <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+     <span class="kd">var</span> <span class="nx">encodedData</span> <span class="o">=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+     <span class="nx">encodedData</span> <span class="o">+=</span> <span class="s2">&#34;=&#34;</span><span class="p">;</span>
+     <span class="nx">encodedData</span> <span class="o">+=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">sendForm</span><span class="p">.</span><span class="nx">elements</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">);</span>
+     <span class="nx">dataArray</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">ProM</span><span class="p">);</span>
+   <span class="p">}</span>
+   <span class="k">return</span> <span class="nx">dataArray</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&#34;&amp;&#34;</span><span class="p">);</span>
+ <span class="p">}</span></code></pre></div>
 <p>And just:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">form</span><span class="p">);</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-JavaScript" data-lang="JavaScript"><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">insinfo</span><span class="p">(</span><span class="nx">form</span><span class="p">);</span></code></pre></div>
 <p>Of course using jQuery&rsquo;s $.ajax is shorter, easier, well tested, optimised but with this article I think that you saw that the &ldquo;native&rdquo; way of using Ajax is&rsquo;t that hard too. May be this post will be your first step of creating your own library.</p>
 <p>Greetings!<br>
 Minko.</p>
@@ -200,7 +200,7 @@ Minko.</p>
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

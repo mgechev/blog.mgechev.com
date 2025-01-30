@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Angular quicklink Preloading Strategy &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -104,22 +104,22 @@
 <h2 id="quicklink-in-angular">quicklink in Angular</h2>
 <p><code>quicklink</code> is a script which you drop on the page and it does its job. Unfortunately, that&rsquo;s not the case for frameworks which manage their own routing, creating indirection between a URL and content. Examples are Angular, React with React Router, etc.</p>
 <p>Let&rsquo;s take a look at an Angular example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Routes</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@angular/router&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./about/about.module#AboutModule&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">},</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;contact&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./contact/contact.module#ContactModule&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">},</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">pathMatch</span><span class="o">:</span> <span class="s1">&#39;full&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}];</span>
-</span></span></code></pre></div><p>With the following routing definition, we can link to the page that the <code>AboutModule</code> is going to render using <code>routerLink</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">routerLink</span><span class="o">=</span><span class="s">&#34;/about&#34;</span><span class="p">&gt;</span>About<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span></span></code></pre></div><p><code>quicklink</code> will find all the <code>a</code> elements on the page at idle time and prefetch the page associated with their <code>href</code> attribute. Given the template above, this is not going to work as expected. <code>quicklink</code> will not be able to find the bundle associated with the <code>/about</code> page.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Routes</span> <span class="p">}</span> <span class="kr">from</span> <span class="s2">&#34;@angular/router&#34;</span><span class="p">;</span>
+
+<span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./about/about.module#AboutModule&#39;</span>
+<span class="p">},</span> <span class="p">{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;contact&#39;</span><span class="p">,</span>
+  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./contact/contact.module#ContactModule&#39;</span>
+<span class="p">},</span> <span class="p">{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="nx">redirectTo</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="nx">pathMatch</span><span class="o">:</span> <span class="s1">&#39;full&#39;</span>
+<span class="p">}];</span>
+</code></pre></div><p>With the following routing definition, we can link to the page that the <code>AboutModule</code> is going to render using <code>routerLink</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">routerLink</span><span class="o">=</span><span class="s">&#34;/about&#34;</span><span class="p">&gt;</span>About<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</code></pre></div><p><code>quicklink</code> will find all the <code>a</code> elements on the page at idle time and prefetch the page associated with their <code>href</code> attribute. Given the template above, this is not going to work as expected. <code>quicklink</code> will not be able to find the bundle associated with the <code>/about</code> page.</p>
 <h2 id="introducing-ngx-quicklink">Introducing ngx-quicklink</h2>
 <p>To let all Angular developers take advantage of the powerful prefetching strategy that <code>quicklink</code> provides, I developed <a href="https://github.com/mgechev/ngx-quicklink"><code>ngx-quicklink</code></a>.</p>
 <img src="/images/ngx-quicklink/logo.png" style="display: block; margin: auto">
@@ -131,30 +131,30 @@
 </ol>
 <p>You can read more about module preloading and the Angular&rsquo;s <code>PreloadingStrategy</code> <a href="https://vsavkin.com/angular-router-preloading-modules-ba3c75e424cb">here</a>.</p>
 <p>To use <code>ngx-quicklink</code>, first, make sure you install the package:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i ngx-quicklink --save
-</span></span></code></pre></div><p>Here&rsquo;s how you can integrate the <code>QuicklinkModule</code> with your existing application:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">QuicklinkModule</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;ngx-quicklink&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@NgModule</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">QuicklinkModule</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">declarations</span><span class="o">:</span> <span class="p">[...],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="nx">QuicklinkModule</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">SharedModule</span> <span class="p">{}</span>
-</span></span></code></pre></div><p>The snippet above adds the <code>QuicklinkModule</code> to the list of <code>imports</code> and <code>exports</code> of a <code>SharedModule</code>. This module should be later imported in your <code>AppModule</code> and all the lazy-loaded modules. You don&rsquo;t have to create a new shared module if you already have one.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i ngx-quicklink --save
+</code></pre></div><p>Here&rsquo;s how you can integrate the <code>QuicklinkModule</code> with your existing application:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">import</span> <span class="p">{</span> <span class="nx">QuicklinkModule</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;ngx-quicklink&#39;</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="kd">@NgModule</span><span class="p">({</span>
+  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">QuicklinkModule</span><span class="p">],</span>
+  <span class="nx">declarations</span><span class="o">:</span> <span class="p">[...],</span>
+  <span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="nx">QuicklinkModule</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">SharedModule</span> <span class="p">{}</span>
+</code></pre></div><p>The snippet above adds the <code>QuicklinkModule</code> to the list of <code>imports</code> and <code>exports</code> of a <code>SharedModule</code>. This module should be later imported in your <code>AppModule</code> and all the lazy-loaded modules. You don&rsquo;t have to create a new shared module if you already have one.</p>
 <p>Next, in your routing module set the preloading strategy:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">QuicklinkStrategy</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;ngx-quicklink&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@NgModule</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">RouterModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">(</span><span class="nx">routes</span><span class="p">,</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">preloadingStrategy</span>: <span class="kt">QuicklinkStrategy</span>
-</span></span><span class="line"><span class="cl">  <span class="p">})],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="nx">RouterModule</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppRoutingModule</span> <span class="p">{}</span>
-</span></span></code></pre></div><p>On <a href="https://github.com/mgechev/angular-realworld-example-app-qucklink/commit/33ea101c7d84bb5ca086f107148bbc958659f83f">this link</a>, you can find an integration of <code>ngx-quicklink</code> with the <code>angular-realworld-example-app</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">import</span> <span class="p">{</span> <span class="nx">QuicklinkStrategy</span> <span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;ngx-quicklink&#39;</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="kd">@NgModule</span><span class="p">({</span>
+  <span class="nx">imports</span><span class="o">:</span> <span class="p">[</span><span class="nx">RouterModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">(</span><span class="nx">routes</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">preloadingStrategy</span>: <span class="kt">QuicklinkStrategy</span>
+  <span class="p">})],</span>
+  <span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="nx">RouterModule</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppRoutingModule</span> <span class="p">{}</span>
+</code></pre></div><p>On <a href="https://github.com/mgechev/angular-realworld-example-app-qucklink/commit/33ea101c7d84bb5ca086f107148bbc958659f83f">this link</a>, you can find an integration of <code>ngx-quicklink</code> with the <code>angular-realworld-example-app</code>.</p>
 <h3 id="how-it-works">How it works</h3>
 <p>Here are the key features of <code>ngx-quicklink</code>:</p>
 <ul>
@@ -170,20 +170,20 @@
 <li><code>ngx-quicklink</code> will download all parent modules of the requested module to prefetch.</li>
 </ol>
 <p>Let us take a look at the last point. Suppose that we have the following routing definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./about/about.module#AboutModule&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">},</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">];</span>
-</span></span></code></pre></div><p>In the <code>AboutModule</code> we have the following route:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;team&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./team/team.module#TeamModule&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">},</span>
-</span></span><span class="line"><span class="cl"><span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">];</span>
-</span></span></code></pre></div><p>If on the page there&rsquo;s a <code>routerLink=&quot;/about/team&quot;</code>, <code>ngx-quicklink</code> will first download the <code>AboutModule</code> and after that will proceed with the <code>TeamModule</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./about/about.module#AboutModule&#39;</span>
+<span class="p">},</span>
+<span class="p">...</span>
+<span class="p">];</span>
+</code></pre></div><p>In the <code>AboutModule</code> we have the following route:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">routes</span>: <span class="kt">Routes</span> <span class="o">=</span> <span class="p">[{</span>
+  <span class="nx">path</span><span class="o">:</span> <span class="s1">&#39;team&#39;</span><span class="p">,</span>
+  <span class="nx">loadChildren</span><span class="o">:</span> <span class="s1">&#39;./team/team.module#TeamModule&#39;</span>
+<span class="p">},</span>
+<span class="p">...</span>
+<span class="p">];</span>
+</code></pre></div><p>If on the page there&rsquo;s a <code>routerLink=&quot;/about/team&quot;</code>, <code>ngx-quicklink</code> will first download the <code>AboutModule</code> and after that will proceed with the <code>TeamModule</code>.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>In this article, we talked about prefetching in web applications. We discussed the <code>quicklink</code> prefetching strategy and where it originates from. After that, we discussed what&rsquo;s the difference between predictive prefetching and <code>quicklink</code>.</p>
 <p>In the next section, we put <code>quicklink</code> into the context of Angular, and discussed the limitations of the original implementation. Combining Angular&rsquo;s <code>routerLink</code> directive with the framework&rsquo;s <code>PreloadingStrategy</code>, we introduced <code>ngx-quicklink</code> - <code>quicklink</code> implementation for Angular.</p>
@@ -226,7 +226,7 @@
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

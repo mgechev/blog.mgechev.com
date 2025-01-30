@@ -10,6 +10,25 @@ layout: page
     
   </p>
   <section class="timeline-period">
+    <header class="timeline-header">2024</header>
+    <section class="timeline-event">
+      <h1>Promotion at Google</h1>
+      <section>
+        <img src="/images/story/google.png">
+        <p>
+          Core Tech Impact Award
+        </p>
+        <p>
+          Given the success of Angular over the past few years, we won the Core Tech Impact award!
+        </p>
+        <p>
+          Google's Core organization that consists of 4-5k people gives a few impact awards couple of times a year. Small percentage of projects at Core win the Tech Impact award and it meant a lot of me to get this recognition for our team. Compared to other accomplishments on this page, that's a team effort - every person on the Angular team put the work and made this possible!
+        </p>
+      </section>
+    </section>
+    </section>
+  </section>
+  <section class="timeline-period">
     <header class="timeline-header">2023</header>
     <section class="timeline-event">
       <h1>Promotion at Google</h1>
