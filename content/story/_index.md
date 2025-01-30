@@ -26,7 +26,6 @@ layout: page
         </p>
       </section>
     </section>
-    </section>
   </section>
   <section class="timeline-period">
     <header class="timeline-header">2023</header>
