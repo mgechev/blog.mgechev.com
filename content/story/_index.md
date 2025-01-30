@@ -12,12 +12,9 @@ layout: page
   <section class="timeline-period">
     <header class="timeline-header">2024</header>
     <section class="timeline-event">
-      <h1>Promotion at Google</h1>
+      <h1>Core Tech Impact Award</h1>
       <section>
         <img src="/images/story/google.png">
-        <p>
-          Core Tech Impact Award
-        </p>
         <p>
           Given the success of Angular over the past few years, we won the Core Tech Impact award!
         </p>
