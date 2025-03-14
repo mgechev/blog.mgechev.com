@@ -24,7 +24,7 @@ Hey, I'm
 </code></pre></div>
 
 <ul>
-  <li>Engineer in the Angular team at Google</li>
+  <li>Lead for Web frameworks at Google</li>
   <li>Awarded by Google and the President of Bulgaria for the impact of my open source projects</li>
   <li>Based in San Francisco, California 🇺🇸 and Sofia, Bulgaria 🇧🇬</li>
   <li>You can contact me at <strong>minko at gechev dot io</strong></li>
@@ -45,9 +45,9 @@ A few of my open source projects:
 ### Selected
 
 <div class="top-projects">
-  <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
-  <a href="http://angular.io/"><img src="/images/about/angular.png"></a>
   <a href="http://revive.run"><img src="/images/about/revive.png"></a>
+  <a href="http://angular.dev/"><img src="/images/about/angular-new.gif"></a>
+  <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
 </div>
 
 ### Popular
