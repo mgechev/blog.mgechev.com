@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.121.1">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -158,61 +158,61 @@
 <li>Application - wires everything together - passes the program to the lexer, feeds the parser with the lexer&#x2019;s output, and the interpreter with the produced AST</li>
 </ul>
 <p>You can find the example <a href="https://github.com/mgechev/bazel-demo">here</a>. The directory structure is as follows:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">.
-&#x251C;&#x2500;&#x2500; BUILD
-&#x251C;&#x2500;&#x2500; WORKSPACE
-&#x251C;&#x2500;&#x2500; interpreter
-&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
-&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
-&#x251C;&#x2500;&#x2500; lexer
-&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
-&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
-&#x251C;&#x2500;&#x2500; package.json
-&#x251C;&#x2500;&#x2500; parser
-&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
-&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
-&#x251C;&#x2500;&#x2500; test.ts
-&#x2514;&#x2500;&#x2500; tsconfig.json
-</code></pre></div><p>The tree above looks like a standard TypeScript project - we have a bunch of <code>*.ts</code> files, <code>package.json</code>, and <code>tsconfig.json</code>. We also have <code>WORKSPACE</code> and four <code>BUILD</code> files. That&#x2019;s what this blog post is all about.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; BUILD
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; WORKSPACE
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; interpreter
+</span></span><span class="line"><span class="cl">&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
+</span></span><span class="line"><span class="cl">&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; lexer
+</span></span><span class="line"><span class="cl">&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
+</span></span><span class="line"><span class="cl">&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; package.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; parser
+</span></span><span class="line"><span class="cl">&#x2502;   &#x251C;&#x2500;&#x2500; BUILD
+</span></span><span class="line"><span class="cl">&#x2502;   &#x2514;&#x2500;&#x2500; index.ts
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; test.ts
+</span></span><span class="line"><span class="cl">&#x2514;&#x2500;&#x2500; tsconfig.json
+</span></span></code></pre></div><p>The tree above looks like a standard TypeScript project - we have a bunch of <code>*.ts</code> files, <code>package.json</code>, and <code>tsconfig.json</code>. We also have <code>WORKSPACE</code> and four <code>BUILD</code> files. That&#x2019;s what this blog post is all about.</p>
 <p>First, let us look at <code>package.json</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel-demo&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;@bazel/bazel&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.19.1&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;@bazel/typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;0.21.0&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;^3.1.6&quot;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><h2 id="configuring-the-workspace">Configuring the Workspace</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel-demo&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;@bazel/bazel&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.19.1&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;@bazel/typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;0.21.0&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;^3.1.6&quot;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="configuring-the-workspace">Configuring the Workspace</h2>
 <p>Our project depends on the npm packages TypeScript, Bazel, and its TypeScript rules. So far nothing new. Let us now dive into the <code>WORKSPACE</code> configuration file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="n">workspace</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&apos;lang&apos;</span><span class="p">)</span>
-
-<span class="n">http_archive</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;build_bazel_rules_typescript&quot;</span><span class="p">,</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/bazelbuild/rules_typescript/archive/0.21.0.zip&quot;</span><span class="p">,</span>
-    <span class="n">strip_prefix</span> <span class="o">=</span> <span class="s2">&quot;rules_typescript-0.21.0&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Fetch our Bazel dependencies that aren&apos;t distributed on npm</span>
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:package.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;rules_typescript_dependencies&quot;</span><span class="p">)</span>
-<span class="n">rules_typescript_dependencies</span><span class="p">()</span>
-
-<span class="c1"># Setup TypeScript toolchain</span>
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_setup_workspace&quot;</span><span class="p">)</span>
-<span class="n">ts_setup_workspace</span><span class="p">()</span>
-
-<span class="c1"># Setup the Node.js toolchain</span>
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_nodejs//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;node_repositories&quot;</span><span class="p">,</span> <span class="s2">&quot;yarn_install&quot;</span><span class="p">)</span>
-<span class="n">node_repositories</span><span class="p">()</span>
-
-<span class="c1"># Setup Bazel managed npm dependencies with the `yarn_install` rule.</span>
-<span class="n">yarn_install</span><span class="p">(</span>
-  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;npm&quot;</span><span class="p">,</span>
-  <span class="n">package_json</span> <span class="o">=</span> <span class="s2">&quot;//:package.json&quot;</span><span class="p">,</span>
-  <span class="n">yarn_lock</span> <span class="o">=</span> <span class="s2">&quot;//:yarn.lock&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">workspace</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&apos;lang&apos;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">http_archive</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;build_bazel_rules_typescript&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/bazelbuild/rules_typescript/archive/0.21.0.zip&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">strip_prefix</span> <span class="o">=</span> <span class="s2">&quot;rules_typescript-0.21.0&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Fetch our Bazel dependencies that aren&apos;t distributed on npm</span>
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:package.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;rules_typescript_dependencies&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">rules_typescript_dependencies</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Setup TypeScript toolchain</span>
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_setup_workspace&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ts_setup_workspace</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Setup the Node.js toolchain</span>
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_nodejs//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;node_repositories&quot;</span><span class="p">,</span> <span class="s2">&quot;yarn_install&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">node_repositories</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Setup Bazel managed npm dependencies with the `yarn_install` rule.</span>
+</span></span><span class="line"><span class="cl"><span class="n">yarn_install</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;npm&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">package_json</span> <span class="o">=</span> <span class="s2">&quot;//:package.json&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">yarn_lock</span> <span class="o">=</span> <span class="s2">&quot;//:yarn.lock&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
 Keep in mind that this is a low-level introduction. In reality, it&apos;s very likely that you never have to manage your Bazel configuration by yourself.
 </div>
 <p>The file above uses a language called <a href="https://github.com/bazelbuild/starlark">Starlark</a>, you can think of it as a subset of Python. Here&#x2019;s what we declare:</p>
@@ -228,80 +228,80 @@ Keep in mind that this is a low-level introduction. In reality, it&apos;s very l
 <h2 id="configuring-the-targets">Configuring the Targets</h2>
 <p>We&#x2019;re going to go on a very granular level. We can directly map the individual modules of the project to separate Bazel packages, and in each package, we&#x2019;ll define a target. As we mentioned above, we can think of the packages as directories and their corresponding files and the targets as build rules.</p>
 <p>Each directory has a <code>BUILD</code> file (or <code>BUILD.bzl</code> if you prefer). Let us take a look at the <code>BUILD</code> file in the root of the project:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="n">package</span><span class="p">(</span><span class="n">default_visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">])</span>
-
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_library&quot;</span><span class="p">)</span>
-
-<span class="n">ts_library</span><span class="p">(</span>
-  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
-  <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;test.ts&quot;</span><span class="p">],</span>
-  <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//lexer&quot;</span><span class="p">,</span> <span class="s2">&quot;//parser&quot;</span><span class="p">,</span> <span class="s2">&quot;//interpreter&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_nodejs//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;rollup_bundle&quot;</span><span class="p">)</span>
-
-<span class="n">rollup_bundle</span><span class="p">(</span>
-  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bundle&quot;</span><span class="p">,</span>
-  <span class="n">entry_point</span> <span class="o">=</span> <span class="s2">&quot;test.js&quot;</span><span class="p">,</span>
-  <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:app&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</code></pre></div><p>Above we first set the visibility of this package to the public, and after that, load two Bazel rules:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">package</span><span class="p">(</span><span class="n">default_visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_library&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ts_library</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">srcs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;test.ts&quot;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//lexer&quot;</span><span class="p">,</span> <span class="s2">&quot;//parser&quot;</span><span class="p">,</span> <span class="s2">&quot;//interpreter&quot;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_nodejs//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;rollup_bundle&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">rollup_bundle</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;bundle&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">entry_point</span> <span class="o">=</span> <span class="s2">&quot;test.js&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;:app&quot;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><p>Above we first set the visibility of this package to the public, and after that, load two Bazel rules:</p>
 <ul>
 <li><code>ts_library</code> - we use it to build the TypeScript files</li>
 <li><code>rollup_bundle</code> - internally invokes Rollup.js to combine the individual modules into a single file</li>
 </ul>
 <p>The <code>ts_library</code> rule we use to build the <code>app</code> target. The <code>app</code> target represents our programming language which wires the individual modules together. It depends on the <code>lexer</code>, <code>parser</code>, and the <code>interpreter</code>. In the directories of these modules, we have <code>BUILD</code> files with similar content. For example, the <code>parser</code>&#x2019;s content looks as follows:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="n">package</span><span class="p">(</span><span class="n">default_visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">])</span>
-
-<span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_library&quot;</span><span class="p">)</span>
-
-<span class="n">ts_library</span><span class="p">(</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;parser&quot;</span><span class="p">,</span>
-    <span class="n">srcs</span> <span class="o">=</span> <span class="n">glob</span><span class="p">([</span><span class="s2">&quot;*.ts&quot;</span><span class="p">]),</span>
-    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//lexer&quot;</span><span class="p">],</span>
-<span class="p">)</span>
-</code></pre></div><p>This time we use a <code>glob</code> to indicate the source files. Also, notice that the parser depends only on the lexer.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">package</span><span class="p">(</span><span class="n">default_visibility</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//visibility:public&quot;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">load</span><span class="p">(</span><span class="s2">&quot;@build_bazel_rules_typescript//:defs.bzl&quot;</span><span class="p">,</span> <span class="s2">&quot;ts_library&quot;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ts_library</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;parser&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">srcs</span> <span class="o">=</span> <span class="n">glob</span><span class="p">([</span><span class="s2">&quot;*.ts&quot;</span><span class="p">]),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;//lexer&quot;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><p>This time we use a <code>glob</code> to indicate the source files. Also, notice that the parser depends only on the lexer.</p>
 <p>Having a lot of targets with many dependencies may get confusing. A neat feature of Bazel is that the dependency graph is statically analyzable! We can directly query the dependency graph using Bazel&#x2019;s query language. Let us go one step further and directly visualize it!</p>
 <p>First, run <code>yarn</code> to install all the dependencies from <code>package.json</code> so that we can get the Bazel&#x2019;s binary:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yarn
-</code></pre></div><p>Now run (you may need to install <code>graphviz</code> before that):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">./node_modules/.bin/bazel query --output<span class="o">=</span>graph ... <span class="p">|</span> dot -Tpng &gt; graph.png
-</code></pre></div><p>The output of the command looks as follows:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">yarn
+</span></span></code></pre></div><p>Now run (you may need to install <code>graphviz</code> before that):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./node_modules/.bin/bazel query --output<span class="o">=</span>graph ... <span class="p">|</span> dot -Tpng &gt; graph.png
+</span></span></code></pre></div><p>The output of the command looks as follows:</p>
 <amp-img src="/images/bazel-intro/graph.png" style="display: block; margin: auto"></amp-img>
 <p>We can see the dependencies between the individual targets - <code>:bundle</code> depends on the <code>:app</code> target, which depends on the <code>:interpreter</code>, <code>:parser</code>, and the <code>:lexer</code>. The output <code>//parser:parser</code> means &#x201C;the target <code>:parser</code> from the package <code>//parser</code>.</p>
 <p>Now we&#x2019;re ready to build the project! Run:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">./node_modules/.bin/bazel build :bundle
-</code></pre></div><p>The first invocation of the command above may take some time because Bazel will load the dependencies of the workspace when it needs them. Each subsequent invocation should be instantaneous.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./node_modules/.bin/bazel build :bundle
+</span></span></code></pre></div><p>The first invocation of the command above may take some time because Bazel will load the dependencies of the workspace when it needs them. Each subsequent invocation should be instantaneous.</p>
 <p>Now let us verify that everything works as expected by executing the produced bundle:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">node bazel-bin/bundle.js
-<span class="m">43</span>
-</code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">node bazel-bin/bundle.js
+</span></span><span class="line"><span class="cl"><span class="m">43</span>
+</span></span></code></pre></div><div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
 Once you build a target Bazel will create a bunch of symlinks in your workspace. They contain different build artifacts. If you prefer to get rid of them, you can configure Bazel with <code>bazel.rc</code>.
 </div>
 <h2 id="watch-mode">Watch Mode</h2>
 <p>How about watching the files of the project and rebuilding on change? For the purpose, we need to install <code>@bazel/ibazel</code> and run:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Don&#x2019;t forget yarn add -D @bazel/ibazel</span>
-./node_modules/.bin/ibazel build :app
-</code></pre></div><p>With both <code>ibazel</code> and <code>bazel</code> we&#x2019;ll rebuild given target only when any of its direct or transitive dependencies change.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Don&#x2019;t forget yarn add -D @bazel/ibazel</span>
+</span></span><span class="line"><span class="cl">./node_modules/.bin/ibazel build :app
+</span></span></code></pre></div><p>With both <code>ibazel</code> and <code>bazel</code> we&#x2019;ll rebuild given target only when any of its direct or transitive dependencies change.</p>
 <div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
 Notice that in the <code>ibazel</code> example above we build the <code>:app</code> target. This is because we wouldn&#x2019;t be able to demonstrate incrementality with the <code>:bundle</code> target since at the time of writing the Rollup.js rule for Bazel is still under active development.
 </div>
 <p>Let us now create some shortcuts so that we don&#x2019;t directly invoke <code>./node_modules/.bin/bazel</code> or <code>./node_modules/.bin/ibazel</code> every time:</p>
 <p>Update <code>package.json</code> and add the following two scripts:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel-demo&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;scripts&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;build&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel build :bundle&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;watch&quot;</span><span class="p">:</span> <span class="s2">&quot;ibazel build :app&quot;</span>
-  <span class="p">},</span>
-  <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;@bazel/bazel&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.19.1&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;@bazel/typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;0.21.0&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;^3.1.6&quot;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Now with <code>yarn build</code> we&#x2019;ll rebuild the project and with <code>yarn watch</code> we&#x2019;ll watch and rebuild the targets on change.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel-demo&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;MIT&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;scripts&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;build&quot;</span><span class="p">:</span> <span class="s2">&quot;bazel build :bundle&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;watch&quot;</span><span class="p">:</span> <span class="s2">&quot;ibazel build :app&quot;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;devDependencies&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;@bazel/bazel&quot;</span><span class="p">:</span> <span class="s2">&quot;^0.19.1&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;@bazel/typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;0.21.0&quot;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;typescript&quot;</span><span class="p">:</span> <span class="s2">&quot;^3.1.6&quot;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Now with <code>yarn build</code> we&#x2019;ll rebuild the project and with <code>yarn watch</code> we&#x2019;ll watch and rebuild the targets on change.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>In this blog post, we looked at Google&#x2019;s build system Bazel. We explained some of the problems that Bazel solves to provide fast and scalable build solution.</p>
 <p>In the second part of the post, we looked at a sample build setup for a small TypeScript project, where we compile a bunch of files and bundle them with Rollup.js. In the process, we explained what a workspace, a build target, package, and how we can configure them.</p>
