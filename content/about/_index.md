@@ -24,7 +24,7 @@ Hey, I'm
 </code></pre></div>
 
 <ul>
-  <li>Engineer in the Angular team at Google</li>
+  <li>Lead for Web frameworks at Google</li>
   <li>Awarded by Google and the President of Bulgaria for the impact of my open source projects</li>
   <li>Based in San Francisco, California 🇺🇸 and Sofia, Bulgaria 🇧🇬</li>
   <li>You can contact me at <strong>minko at gechev dot io</strong></li>
@@ -45,9 +45,9 @@ A few of my open source projects:
 ### Selected
 
 <div class="top-projects">
-  <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
-  <a href="http://angular.io/"><img src="/images/about/angular.png"></a>
   <a href="http://revive.run"><img src="/images/about/revive.png"></a>
+  <a href="http://angular.dev/"><img src="/images/about/angular-new.gif"></a>
+  <a href="http://guessjs.com"><img src="/images/about/guess.png"></a>
 </div>
 
 ### Popular
@@ -65,7 +65,7 @@ A few of my open source projects:
 
 #### Angular
 
-- [Angular - as a DevRel lead I've worked across the entire platform](https://angular.io/)
+- [Angular](https://angular.dev/)
 - [Angular DevTools - developer tools for Angular](https://angular.io/devtools)
 - [ngrev - reverse engineering for Angular applications](https://github.com/mgechev/ngrev)
 - [ngworld](https://github.com/mgechev/ngworld) [demo here](https://mgechev.github.io/ngworld/)
@@ -103,8 +103,11 @@ A few of my open source projects:
 
 ### Interviews
 
+- [The Power of Open Source Explained by Google Angular Lead Minko Gechev](https://therecursive.com/the-power-of-open-source-explained-by-google-angular-expert-minko-gechev/)
+- [Beautiful Code - Forbes (BG)](https://forbesbulgaria.com/2020/03/30/%d0%ba%d1%80%d0%b0%d1%81%d0%b8%d0%b2-%d0%ba%d0%be%d0%b4/)
 - [Flying People - Nova TV](https://www.youtube.com/watch?v=Pr_skdEnDsU)
 - [Bulgarian National Radio](https://bnr.bg/en/post/101542983/minko-gechev-about-the-road-from-troyan-to-a-leading-position-in-google)
+- [Виртуален свят: Минко Гечев - един успял българин в Гугъл за войната на чатботовете](https://www.btv.bg/shows/predi-obed/videos/virtualen-svjat-minko-gechev-edin-uspjal-balgarin-v-gugal-za-vojnata-na-chatbotovete.html)
 - [Angular Discord Q&A](https://www.youtube.com/watch?v=ax0JXFeCBIg)
 - [Behind the Rise of JavaScript Front-end Frameworks](https://www.welcometothejungle.com/en/articles/btc-javascript-frontend-frameworks)
 - [Why switch to Angular for web development – Interview with Minko Gechev](https://hub.packtpub.com/why-switch-to-angular-for-web-development/)
@@ -124,6 +127,7 @@ A few of my open source projects:
 
 - [Software Engineering Daily](https://softwareengineeringdaily.com/2021/11/05/angular-dev-tools-with-minko-gechev/)
 - [Modern Web Podcast - All About Compilers with Minko Gechev, Kristofer Baxter, Radoslav Kirov, Jake Dohm, and Rob Ocel](https://dev.to/modernweb/s06e3-modern-web-podcast-all-about-compilers-with-minko-gechev-kristofer-baxter-radoslav-kirov-jake-dohm-and-rob-ocel)
+- [Пътят до Google на Минко Гечев](https://zvuk.com/episode/85053464)
 - [Codelyzer and Static Analysis Tools for Angular with Minko Gechev](https://dev.to/adventuresinangular/aia-147-codelyzer-and-static-analysis-tools-for-angular-with-minko-gechev)
 - [Angular Tooling with Minko Gechev](https://www.youtube.com/watch?v=PZ0WoyLbrso)
 - [How Service Workers will change the way you think about web apps](https://www.youtube.com/watch?v=ZPuryHgluUk)
