@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Static Code Analysis of Angular 2 and TypeScript Projects &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -26,7 +26,7 @@
 
 		<meta property="og:title" content="Static Code Analysis of Angular 2 and TypeScript Projects" />
 		<meta property="og:description" content="So far, most of the blog posts I&rsquo;ve written are tutorials; they explain how we can use given technologies, architectures, algorithm etc. For instance:
-Flux in Depth. Store and Network Communication. ViewChildren and ContentChildren in Angular 2 Build Your own Simplified AngularJS in 200 Lines of JavaScript Remote Desktop Client with AngularJS and Yeoman The code for the current research could be found here and here.
+ Flux in Depth. Store and Network Communication. ViewChildren and ContentChildren in Angular 2 Build Your own Simplified AngularJS in 200 Lines of JavaScript Remote Desktop Client with AngularJS and Yeoman  The code for the current research could be found here and here.
 The current post is about an exciting project I am working on in my spare time." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2016/02/29/static-code-analysis-angular-typescript/" />
@@ -146,49 +146,49 @@ The current post is about an exciting project I am working on in my spare time."
 <h3 id="introducing-the-lexer">Introducing the Lexer</h3>
 <p>The main purpose of the lexer (a.k.a. tokenizer, scanner) is to take the input character stream and output a stream of tokens. Each token has a &ldquo;lexeme&rdquo; which is the actual substring of the program and a &ldquo;type&rdquo;.</p>
 <p>For instance, lets take a look at the following program:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">if (1) {
-</span></span><span class="line"><span class="cl">  if (0) {
-</span></span><span class="line"><span class="cl">    42 + 12 + 2
-</span></span><span class="line"><span class="cl">  }
-</span></span><span class="line"><span class="cl">  2 + 3
-</span></span><span class="line"><span class="cl">}
-</span></span></code></pre></div><p>We can implement our parser so it returns an array of JavaScript object, each of which represent an individual token. The first a couple of tokens are going to be:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="p">[</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;if&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;keyword&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="kr">char</span><span class="o">:</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;open_bracket&#39;</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="kr">char</span><span class="o">:</span> <span class="mi">3</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lexeme</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="kr">char</span><span class="o">:</span> <span class="mi">4</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;close_bracket&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">      <span class="kr">char</span><span class="o">:</span> <span class="mi">5</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">},</span>
-</span></span><span class="line"><span class="cl">  <span class="p">...</span>
-</span></span><span class="line"><span class="cl"><span class="p">]</span>
-</span></span></code></pre></div><p>If you are interested in further reading about lexical analysis I&rsquo;d recommend you to get familiar with:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">if (1) {
+  if (0) {
+    42 + 12 + 2
+  }
+  2 + 3
+}
+</code></pre></div><p>We can implement our parser so it returns an array of JavaScript object, each of which represent an individual token. The first a couple of tokens are going to be:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;if&#39;</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;keyword&#39;</span><span class="p">,</span>
+    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="kr">char</span><span class="o">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;open_bracket&#39;</span>
+    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="kr">char</span><span class="o">:</span> <span class="mi">3</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">lexeme</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span>
+    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="kr">char</span><span class="o">:</span> <span class="mi">4</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nx">lexeme</span><span class="o">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;close_bracket&#39;</span><span class="p">,</span>
+    <span class="nx">position</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">line</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="kr">char</span><span class="o">:</span> <span class="mi">5</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">]</span>
+</code></pre></div><p>If you are interested in further reading about lexical analysis I&rsquo;d recommend you to get familiar with:</p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Finite-state_machine">Finite Automata</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Regular_expression">Regular Expressions</a></li>
@@ -218,64 +218,64 @@ The current post is about an exciting project I am working on in my spare time."
 </ul>
 <p>This means that the visitor pattern is perfect for this purpose - we will develop an algorithm for processing the AST but we won&rsquo;t couple it with any of these algorithms.</p>
 <p>Here&rsquo;s how we can develop a visitor for this purpose:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">InterpretationVisitor</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">execute</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="nx">ast</span><span class="p">.</span><span class="nx">statements</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="kr">type</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">case</span> <span class="s1">&#39;if_statement&#39;</span><span class="o">:</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitIfStatement</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="k">case</span> <span class="s1">&#39;expression&#39;</span><span class="o">:</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">      <span class="k">break</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">      <span class="k">default</span><span class="o">:</span>
-</span></span><span class="line"><span class="cl">      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Unrecognized node&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">visitIfStatement</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">condition</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="nx">node</span><span class="p">.</span><span class="nx">statements</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">visitExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">operator</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">left</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Now all we have to do in order to interpret the program is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">visitor</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InterpretationVisitor</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl"><span class="nx">visitor</span><span class="p">.</span><span class="nx">execute</span><span class="p">(</span><span class="nx">root</span><span class="p">);</span>
-</span></span></code></pre></div><p><a href="https://github.com/palantir/tslint"><code>tslint</code></a> for instance, uses similar approach for the implementation of the rules it provides.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">class</span> <span class="nx">InterpretationVisitor</span> <span class="p">{</span>
+  <span class="nx">execute</span><span class="p">(</span><span class="nx">ast</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ast</span><span class="p">.</span><span class="nx">statements</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="kr">type</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="s1">&#39;if_statement&#39;</span><span class="o">:</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitIfStatement</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">&#39;expression&#39;</span><span class="o">:</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
+      <span class="k">break</span><span class="p">;</span>
+      <span class="k">default</span><span class="o">:</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Unrecognized node&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nx">visitIfStatement</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">condition</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">statements</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="nx">visitExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">operator</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">left</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">visitNode</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">right</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Now all we have to do in order to interpret the program is:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">visitor</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InterpretationVisitor</span><span class="p">();</span>
+<span class="nx">visitor</span><span class="p">.</span><span class="nx">execute</span><span class="p">(</span><span class="nx">root</span><span class="p">);</span>
+</code></pre></div><p><a href="https://github.com/palantir/tslint"><code>tslint</code></a> for instance, uses similar approach for the implementation of the rules it provides.</p>
 <p>Lets peek at a sample rule definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">ts</span> <span class="kr">from</span> <span class="s1">&#39;typescript&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">Lint</span> <span class="kr">from</span> <span class="s1">&#39;../lint&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">Rule</span> <span class="kr">extends</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">Rules</span><span class="p">.</span><span class="nx">AbstractRule</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">public</span> <span class="kr">static</span> <span class="nx">FAILURE_STRING</span> <span class="o">=</span> <span class="s2">&#34;type decoration of &#39;any&#39; is forbidden&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kr">public</span> <span class="nx">apply</span><span class="p">(</span><span class="nx">sourceFile</span>: <span class="kt">ts.SourceFile</span><span class="p">)</span><span class="o">:</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">RuleFailure</span><span class="p">[]</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">applyWithWalker</span><span class="p">(&lt;</span><span class="nt">Lint.RuleWalker</span><span class="p">&gt;(</span><span class="k">new</span> <span class="nx">NoAnyWalker</span><span class="p">(</span><span class="nx">sourceFile</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getOptions</span><span class="p">())));</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">NoAnyWalker</span> <span class="kr">extends</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">RuleWalker</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kr">public</span> <span class="nx">visitAnyKeyword</span><span class="p">(</span><span class="nx">node</span>: <span class="kt">ts.Node</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="p">.</span><span class="nx">addFailure</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">createFailure</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">getStart</span><span class="p">(),</span> <span class="nx">node</span><span class="p">.</span><span class="nx">getWidth</span><span class="p">(),</span> <span class="nx">Rule</span><span class="p">.</span><span class="nx">FAILURE_STRING</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">        <span class="kr">super</span><span class="p">.</span><span class="nx">visitAnyKeyword</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>In the snippet above we have definition of two classes:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">ts</span> <span class="kr">from</span> <span class="s1">&#39;typescript&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="o">*</span> <span class="kr">as</span> <span class="nx">Lint</span> <span class="kr">from</span> <span class="s1">&#39;../lint&#39;</span><span class="p">;</span>
+
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Rule</span> <span class="kr">extends</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">Rules</span><span class="p">.</span><span class="nx">AbstractRule</span> <span class="p">{</span>
+    <span class="kr">public</span> <span class="kr">static</span> <span class="nx">FAILURE_STRING</span> <span class="o">=</span> <span class="s2">&#34;type decoration of &#39;any&#39; is forbidden&#34;</span><span class="p">;</span>
+
+    <span class="kr">public</span> <span class="nx">apply</span><span class="p">(</span><span class="nx">sourceFile</span>: <span class="kt">ts.SourceFile</span><span class="p">)</span><span class="o">:</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">RuleFailure</span><span class="p">[]</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">applyWithWalker</span><span class="p">(&lt;</span><span class="nt">Lint.RuleWalker</span><span class="p">&gt;(</span><span class="k">new</span> <span class="nx">NoAnyWalker</span><span class="p">(</span><span class="nx">sourceFile</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getOptions</span><span class="p">())));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">NoAnyWalker</span> <span class="kr">extends</span> <span class="nx">Lint</span><span class="p">.</span><span class="nx">RuleWalker</span> <span class="p">{</span>
+    <span class="kr">public</span> <span class="nx">visitAnyKeyword</span><span class="p">(</span><span class="nx">node</span>: <span class="kt">ts.Node</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">addFailure</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">createFailure</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">getStart</span><span class="p">(),</span> <span class="nx">node</span><span class="p">.</span><span class="nx">getWidth</span><span class="p">(),</span> <span class="nx">Rule</span><span class="p">.</span><span class="nx">FAILURE_STRING</span><span class="p">));</span>
+        <span class="kr">super</span><span class="p">.</span><span class="nx">visitAnyKeyword</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>In the snippet above we have definition of two classes:</p>
 <ul>
 <li><code>Rule</code> - <code>tslint</code> uses TypeScript&rsquo;s compiler for generation of the AST of each file in given project. Once the AST is available, <code>tslint</code> passes it to the <code>apply</code> method of each rule.</li>
 <li><code>NoAnyWalker</code> - a visitor which extends the <code>RuleWalker</code> class that provides some features, such as <code>createFailure</code>, <code>addFailure</code>, etc. The <code>NoAnyWalker</code> overrides the definition of the <code>visitAnyKeyword</code> method and reports a failure once it finds &ldquo;<code>any</code> decorations&rdquo;.</li>
 </ul>
 <p>For instance:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">foo</span>: <span class="kt">any</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
-</span></span></code></pre></div><p>Will fail with <code>type decoration of 'any' is forbidden</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">foo</span>: <span class="kt">any</span> <span class="o">=</span> <span class="mi">32</span><span class="p">;</span>
+</code></pre></div><p>Will fail with <code>type decoration of 'any' is forbidden</code>.</p>
 <h2 id="challenges-in-ng2lint">Challenges in <code>ng2lint</code></h2>
 <p>Now lets take a look at the goals we defined earlier and see how we can take advantage of already know in order to achieve them.</p>
 <h3 id="usage-out-of-the-box-1">Usage out-of-the box</h3>
@@ -294,67 +294,67 @@ The current post is about an exciting project I am working on in my spare time."
 <p>Lets discuss approaches for handling some of these challenges.</p>
 <h4 id="typescript-does-not-parses-the-angular-templates">TypeScript does not parses the Angular templates</h4>
 <p>Suppose we have the following component definition:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;custom-heading&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{heading}}&lt;/h1&gt;&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">CustomHeadingComponent</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">heading</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Once TypeScript&rsquo;s compiler parses Angular program the AST will look something like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;custom-heading&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{heading}}&lt;/h1&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">CustomHeadingComponent</span> <span class="p">{</span>
+  <span class="nx">heading</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>Once TypeScript&rsquo;s compiler parses Angular program the AST will look something like:</p>
 <p><img src="/images/ng2ast.png" alt="Simple TypeScript AST of Angular program"></p>
 <p>Notice the red node in the bottom-right - it is the initializer of the second key-value pair from the object literal that we pass to the <code>@Component</code> decorator.</p>
 <p>Since it is not responsibility of TypeScript to parse Angular&rsquo;s templates it only holds their string representations, or in case of <code>templateUrl</code> their paths.</p>
 <p>Fortunately, Angular 2 exposes its <code>TemplateParser</code>. Thanks to Angular&rsquo;s platform agnostic implementation and <a href="https://github.com/inikulin/parse5">parse5</a>, <code>TemplateParser</code> could be used in node environment.
 It allows us to parse the templates of our components using the following API:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">parser</span>: <span class="kt">TemplateParser</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">TemplateParser</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">templateString</span><span class="p">,</span> <span class="nx">directivesList</span><span class="p">,</span> <span class="nx">pipesList</span><span class="p">,</span> <span class="nx">templateUrl</span><span class="p">);</span>
-</span></span></code></pre></div><p>The first argument of the <code>parse</code> method of the parser is the template of the component. As second argument we need to pass the list of the directives and pipes visible by the component (this includes the list of directives/pipes declared in the <code>directives</code>/<code>pipes</code> property of <code>ComponentMetadata</code> as well as all other directives/pipes declared in the same way in parent components). In our case we don&rsquo;t need to pass any value for <code>templateUrl</code> since the template is used inline.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">let</span> <span class="nx">parser</span>: <span class="kt">TemplateParser</span> <span class="o">=</span> <span class="nx">injector</span><span class="p">.</span><span class="kr">get</span><span class="p">(</span><span class="nx">TemplateParser</span><span class="p">);</span>
+<span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">templateString</span><span class="p">,</span> <span class="nx">directivesList</span><span class="p">,</span> <span class="nx">pipesList</span><span class="p">,</span> <span class="nx">templateUrl</span><span class="p">);</span>
+</code></pre></div><p>The first argument of the <code>parse</code> method of the parser is the template of the component. As second argument we need to pass the list of the directives and pipes visible by the component (this includes the list of directives/pipes declared in the <code>directives</code>/<code>pipes</code> property of <code>ComponentMetadata</code> as well as all other directives/pipes declared in the same way in parent components). In our case we don&rsquo;t need to pass any value for <code>templateUrl</code> since the template is used inline.</p>
 <p>In case <code>CustomHeadingComponent</code> is a top-level component we can parse its template with:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">&#39;&lt;h1&gt;{{heading}}&lt;/h1&gt;&#39;</span><span class="p">,</span> <span class="nx">COMMON_DIRECTIVES</span><span class="p">,</span> <span class="nx">COMMON_PIPES</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
-</span></span></code></pre></div><p>The <code>parse</code> method will return an <code>HtmlAst</code> which can be validated with visitor, similar to the one we use for validation of the TypeScript code.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">&#39;&lt;h1&gt;{{heading}}&lt;/h1&gt;&#39;</span><span class="p">,</span> <span class="nx">COMMON_DIRECTIVES</span><span class="p">,</span> <span class="nx">COMMON_PIPES</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</code></pre></div><p>The <code>parse</code> method will return an <code>HtmlAst</code> which can be validated with visitor, similar to the one we use for validation of the TypeScript code.</p>
 <h4 id="definitions-of-directives-and-components-which-need-to-be-resolved">Definitions of directives and components which need to be resolved</h4>
 <p>Now lets suppose we have the following components definitions:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="c1">// cmp_a.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">B</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./cmps_b_c&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./a.html&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">B</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">A</span> <span class="p">{}</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="c1">// cmps_b_c.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span><span class="nx">D</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./dir_d&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;c&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">C</span> <span class="p">{}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;c&gt;&lt;/c&gt;&lt;div d&gt;&lt;/div&gt;&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">,</span> <span class="nx">C</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">inputs</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">B</span> <span class="p">{}</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="c1">// dir_d.ts
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Directive</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="kd">@Directive</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;[d]&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">D</span> <span class="p">{}</span>
-</span></span></code></pre></div><p>Lets suppose we want to validate the template of component <code>B</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">&#39;&lt;c&gt;&lt;/c&gt;&lt;div d&gt;&lt;/div&gt;&#39;</span><span class="p">,</span> <span class="nx">COMMON_DIRECTIVES</span><span class="p">,</span> <span class="nx">COMMON_PIPES</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
-</span></span></code></pre></div><p>The parser will throw an error similar to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Template parse errors:
-</span></span><span class="line"><span class="cl">The element &#39;div&#39; does not have a native attribute &#39;d&#39;.
-</span></span></code></pre></div><p>This happens because we haven&rsquo;t included the directive <code>D</code> in the array we pass as second argument to <code>parse</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// cmp_a.ts
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">B</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./cmps_b_c&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s1">&#39;./a.html&#39;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">B</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">A</span> <span class="p">{}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// cmps_b_c.ts
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Component</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span><span class="nx">D</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;./dir_d&#39;</span><span class="p">;</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;c&#39;</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">C</span> <span class="p">{}</span>
+
+<span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;c&gt;&lt;/c&gt;&lt;div d&gt;&lt;/div&gt;&#39;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">D</span><span class="p">,</span> <span class="nx">C</span><span class="p">],</span>
+  <span class="nx">inputs</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">B</span> <span class="p">{}</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="c1">// dir_d.ts
+</span><span class="c1"></span><span class="kr">import</span> <span class="p">{</span><span class="nx">Directive</span><span class="p">}</span> <span class="kr">from</span> <span class="s1">&#39;@angular/core&#39;</span><span class="p">;</span>
+
+<span class="kd">@Directive</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;[d]&#39;</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">D</span> <span class="p">{}</span>
+</code></pre></div><p>Lets suppose we want to validate the template of component <code>B</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="nx">parser</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="s1">&#39;&lt;c&gt;&lt;/c&gt;&lt;div d&gt;&lt;/div&gt;&#39;</span><span class="p">,</span> <span class="nx">COMMON_DIRECTIVES</span><span class="p">,</span> <span class="nx">COMMON_PIPES</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+</code></pre></div><p>The parser will throw an error similar to:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Template parse errors:
+The element &#39;div&#39; does not have a native attribute &#39;d&#39;.
+</code></pre></div><p>This happens because we haven&rsquo;t included the directive <code>D</code> in the array we pass as second argument to <code>parse</code>.</p>
 <p>This means that we need to create a context specific for each of the components in the component tree which includes the visible by the component directives and pipes.
 In case we want to validate the entire component tree what we need to do is to validate each of the components in their own context. Before doing this, similarly to the AST that the parsers build, we need to create an intermediate representation of the entire component tree.</p>
 <p>Lets track the process of building the component tree&rsquo;s intermediate representation:</p>
@@ -405,15 +405,15 @@ In case we want to validate the entire component tree what we need to do is to v
 <h5 id="validation-of-template-expressions">Validation of Template Expressions</h5>
 <p>The final thing left here is the procedure for validation of the template&rsquo;s expressions. Why we haven&rsquo;t solved this yet?</p>
 <p>Lets take a look at the following component:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;custom-cmp&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{foo + bar}}&lt;/h1&gt;&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">CustomComponent</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">foo</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">bar</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>If we parse this source file using TypeScript&rsquo;s parser and after that we parse its template by using Angular&rsquo;s <code>TemplateParser</code> we will get:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;custom-cmp&#39;</span><span class="p">,</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;h1&gt;{{foo + bar}}&lt;/h1&gt;&#39;</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">CustomComponent</span> <span class="p">{</span>
+  <span class="nx">foo</span><span class="p">;</span>
+  <span class="nx">bar</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><p>If we parse this source file using TypeScript&rsquo;s parser and after that we parse its template by using Angular&rsquo;s <code>TemplateParser</code> we will get:</p>
 <p><img src="/images/ng2ast_html.png" alt="AST of Angular component with parsed template"></p>
 <p>On the image above we can see two ASTs merged together:</p>
 <ul>
@@ -428,23 +428,23 @@ In case we want to validate the entire component tree what we need to do is to v
 <h4 id="externalized-templates-which-need-to-be-loaded-from-disk">Externalized templates which need to be loaded from disk</h4>
 <p>Now lets suppose instead of <code>template</code> our component uses <code>templateUrl</code>. This means that the validator need to read the template from the disk, in a directory (usually) relative to the component&rsquo;s definition.</p>
 <p>The disk I/O operations are slow:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Latency Comparison Numbers
-</span></span><span class="line"><span class="cl">--------------------------
-</span></span><span class="line"><span class="cl">L1 cache reference                           0.5 ns
-</span></span><span class="line"><span class="cl">Branch mispredict                            5   ns
-</span></span><span class="line"><span class="cl">L2 cache reference                           7   ns                      14x L1 cache
-</span></span><span class="line"><span class="cl">Mutex lock/unlock                           25   ns
-</span></span><span class="line"><span class="cl">Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
-</span></span><span class="line"><span class="cl">Compress 1K bytes with Zippy             3,000   ns        3 us
-</span></span><span class="line"><span class="cl">Send 1K bytes over 1 Gbps network       10,000   ns       10 us
-</span></span><span class="line"><span class="cl">Read 4K randomly from SSD*             150,000   ns      150 us          ~1GB/sec SSD
-</span></span><span class="line"><span class="cl">Read 1 MB sequentially from memory     250,000   ns      250 us
-</span></span><span class="line"><span class="cl">Round trip within same datacenter      500,000   ns      500 us
-</span></span><span class="line"><span class="cl">Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
-</span></span><span class="line"><span class="cl">Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
-</span></span><span class="line"><span class="cl">Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
-</span></span><span class="line"><span class="cl">Send packet CA-&gt;Netherlands-&gt;CA    150,000,000   ns  150,000 us  150 ms
-</span></span></code></pre></div><p>This means that in the perfect scenario we want to read external templates from the disk <strong>only</strong> when they change. This could be achieved with something like <a href="https://nodejs.org/docs/latest/api/fs.html"><code>fs.watch</code></a> or any of its high-level wrappers. Once a change is discovered, this need to update <strong>only</strong> the impacted region.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Latency Comparison Numbers
+--------------------------
+L1 cache reference                           0.5 ns
+Branch mispredict                            5   ns
+L2 cache reference                           7   ns                      14x L1 cache
+Mutex lock/unlock                           25   ns
+Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
+Compress 1K bytes with Zippy             3,000   ns        3 us
+Send 1K bytes over 1 Gbps network       10,000   ns       10 us
+Read 4K randomly from SSD*             150,000   ns      150 us          ~1GB/sec SSD
+Read 1 MB sequentially from memory     250,000   ns      250 us
+Round trip within same datacenter      500,000   ns      500 us
+Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
+Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
+Read 1 MB sequentially from disk    20,000,000   ns   20,000 us   20 ms  80x memory, 20X SSD
+Send packet CA-&gt;Netherlands-&gt;CA    150,000,000   ns  150,000 us  150 ms
+</code></pre></div><p>This means that in the perfect scenario we want to read external templates from the disk <strong>only</strong> when they change. This could be achieved with something like <a href="https://nodejs.org/docs/latest/api/fs.html"><code>fs.watch</code></a> or any of its high-level wrappers. Once a change is discovered, this need to update <strong>only</strong> the impacted region.</p>
 <h2 id="current-progress">Current Progress</h2>
 <p>A few weeks ago I developed a few rules for <code>tslint</code> which add some custom Angular 2 specific validation behavior. The project is located in the master branch of the <a href="https://github.com/mgechev/ng2lint"><code>ng2lint</code></a> repository.</p>
 <p>According to <a href="https://www.npmjs.com/package/ng2lint"><code>npm</code></a> on average it has 150 downloads per day.</p>
@@ -471,13 +471,13 @@ In case we want to validate the entire component tree what we need to do is to v
 <p>could save us form a lot of boilerplate code in <code>ng2lint</code>.</p>
 <p>Another possible extension is validation of the file names we lint based on a semantics gathered from the file&rsquo;s content.</p>
 <p>For instance, if we find out that inside of given file there&rsquo;s definition of a component we can validate that the file name follows the name convention:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">NAME.component.ts
-</span></span></code></pre></div><p>The last weekend I spend playing with more advanced implementation of the linter which aims validation for correctness. The entire progress is located in the <a href="https://github.com/mgechev/ng2lint/tree/advanced/">advanced branch of <code>ng2lint</code></a>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">NAME.component.ts
+</code></pre></div><p>The last weekend I spend playing with more advanced implementation of the linter which aims validation for correctness. The entire progress is located in the <a href="https://github.com/mgechev/ng2lint/tree/advanced/">advanced branch of <code>ng2lint</code></a>.</p>
 <p>In this branch I implemented the following:</p>
 <ul>
 <li>Building in-memory intermediate representation of the component tree.</li>
 <li>Reads externalized templates from disk.</li>
-<li>Recursively validating components&rsquo; templates for missing pipes/directives declared for given sub tree.</li>
+<li>Recursively validating components' templates for missing pipes/directives declared for given sub tree.</li>
 <li>Parsing component&rsquo;s templates.</li>
 </ul>
 <p>Tasks pending are:</p>
@@ -548,7 +548,7 @@ In case we want to validate the entire component tree what we need to do is to v
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

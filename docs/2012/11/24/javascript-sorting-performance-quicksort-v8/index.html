@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Looking for performance? Probably you should NOT use [].sort (V8) &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -100,7 +100,7 @@ function sort() { [native code] } That’s why I’ve wrote not optimized versio
                 
                 <section id="post-body">
                     <p>A few days ago, I’ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">sort</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sort</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span></code></pre></div>
 <p>That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements. I waited&hellip;waited&hellip;and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I’ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google’s V8 engine</a>). After merge sort I’ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I’ve generated another array with 500k elements using a simple perl script. The result was very interesting&hellip;In the chart below you can see mergesort compared to heapsort for array with 50k elements.</p>
 <div id="attachment_237" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -109,102 +109,102 @@ function sort() { [native code] } That’s why I’ve wrote not optimized versio
 </div>
 <p>In the X-axis it’s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).</p>
 <p>Here is the implementation of the Mergesort:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="cm">/* Mergesort */</span>
-</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">mergeSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">[];</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">middle</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="p">[],</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">right</span> <span class="o">=</span> <span class="p">[],</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">leftSize</span> <span class="o">=</span> <span class="nx">middle</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">rightSize</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">middle</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">maxSize</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">leftSize</span><span class="p">,</span> <span class="nx">rightSize</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">size</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">i</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">maxSize</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">leftSize</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">left</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">rightSize</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">right</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">middle</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">right</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">right</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">                <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="cm">/* Mergesort */</span>
+<span class="kd">var</span> <span class="nx">mergeSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">[];</span>
+        <span class="p">}</span>
+        <span class="kd">var</span> <span class="nx">middle</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+
+        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">);</span>
+        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="p">[],</span>
+            <span class="nx">right</span> <span class="o">=</span> <span class="p">[],</span>
+            <span class="nx">leftSize</span> <span class="o">=</span> <span class="nx">middle</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
+            <span class="nx">rightSize</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">middle</span><span class="p">,</span>
+            <span class="nx">maxSize</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">leftSize</span><span class="p">,</span> <span class="nx">rightSize</span><span class="p">),</span>
+            <span class="nx">size</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
+            <span class="nx">i</span><span class="p">;</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">maxSize</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">leftSize</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">left</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">rightSize</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">right</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">middle</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">right</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">right</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
+                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
+                <span class="p">}</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}());</span></code></pre></div>
 <p>And the heapsort:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="cm">/* Heapsort */</span>
-</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">heapSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">right</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">index</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">left</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">right</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">right</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">largest</span> <span class="o">!==</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">largest</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">size</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">temp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">size</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">size</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="cm">/* Heapsort */</span>
+<span class="kd">var</span> <span class="nx">heapSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="nx">right</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">index</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">left</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span>
+            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">right</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">])</span>
+            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">right</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">largest</span> <span class="o">!==</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+            <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">];</span>
+            <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">largest</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">size</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+            <span class="nx">temp</span><span class="p">;</span>
+        <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+            <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+            <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+            <span class="nx">size</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">size</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}());</span></code></pre></div>
 <p>If you find any mistakes in any of the implementations I’ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API.
 After I’ve made the test between merge and heap sorts I noticed that there’s a quite big difference&hellip;So that’s why I started heap vs the default sort to see how faster the native sort will be:</p>
 <div id="attachment_239" style="width: 683px" class="wp-caption alignnone">
@@ -214,149 +214,149 @@ After I’ve made the test between merge and heap sorts I noticed that there’s
 </div>
 <p>As you see the result is quite unexpected&hellip;I’ve checked my algorithm many times because I thought that it isn’t correct&hellip;In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays. The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.</p>
 <p>That is the perl script which I used for the test:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="line"><span class="cl"><span class="ch">#!/usr/bin/perl</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">strict</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">warnings</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="k">use</span> <span class="nn">Time::HiRes</span> <span class="sx">qw/time/</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">%sorts</span> <span class="o">=</span> <span class="p">();</span>
-</span></span><span class="line"><span class="cl"><span class="k">my</span> <span class="nv">%algorithm_source</span> <span class="o">=</span> <span class="p">();</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Generates JavaScript array with defined size and maximum size of it&#39;s elements</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">generate_js_array</span><span class="p">($ $) {</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$array</span> <span class="o">=</span> <span class="s">&#39;var array = [&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">map</span> <span class="p">{</span> <span class="nv">$array</span> <span class="o">.=</span> <span class="nb">rand</span><span class="p">(</span><span class="nv">$max</span><span class="p">)</span> <span class="o">.</span> <span class="s">&#34;,\n&#34;</span> <span class="p">}</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="nv">$size</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">$array</span> <span class="o">.=</span> <span class="s">&#39;];&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Creates a new test for given sort type and array</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">create_test</span><span class="p">($ $) {</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$sort_algorithm</span> <span class="o">=</span> <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$test_case</span> <span class="o">=</span> <span class="s">&#34;$array\n$sort_algorithm&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$test_case</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Saves the test in a file into the temp directory</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">save_test_case</span><span class="p">($ $ $) {</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$i</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="s">&#34;./temp/$sort_type-$i.js&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#34;&gt;$filename&#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="n">FH</span> <span class="nv">$test_case</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$filename</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Runs the test and measures the runtime</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">run_test_case</span><span class="p">($)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$time</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">    <span class="sb">`d8 $filename`</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="nv">$time</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Tests an algorithm with given array</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">test_algorithm</span><span class="p">($ $ $) {</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$filename</span><span class="p">,</span> <span class="nv">$performance</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">$test_case</span> <span class="o">=</span> <span class="n">create_test</span><span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">$filename</span> <span class="o">=</span> <span class="n">save_test_case</span><span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="s">&#34;Running the test case...\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nv">$performance</span> <span class="o">=</span> <span class="n">run_test_case</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">#unlink($filename);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="s">&#34;Cleaning the trash...\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$performance</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Gets the source of an algorithm from the algorithms folder</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">get_algorithm</span><span class="p">($)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$sort_type</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$sorts</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#34;&lt;./algorithms/$file&#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="sr">&lt;FH&gt;</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$result</span> <span class="o">.=</span> <span class="nv">$_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Caches all algorithms into a hash with keys the algorithm name and value the algorithm</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">cache_algorithms_source</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="n">get_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Tests all algorithms with different arrays and tests count</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">test_algorithms</span><span class="p">($ $ $) {</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="p">();</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="p">(</span><span class="nv">$array</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$tests_count</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$array</span> <span class="o">=</span> <span class="n">generate_js_array</span><span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$count</span> <span class="o">=</span> <span class="nv">$i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">print</span> <span class="s">&#34;Running $algorithm test number $count...\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="o">[]</span> <span class="k">unless</span> <span class="nb">defined</span><span class="p">(</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">});</span>
-</span></span><span class="line"><span class="cl">            <span class="nb">push</span><span class="p">(</span><span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}},</span> <span class="n">test_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$i</span><span class="p">));</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="o">\</span><span class="nv">%result</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">#Builds a CSV string from the results</span>
-</span></span><span class="line"><span class="cl"><span class="k">sub</span> <span class="nf">build_csv</span><span class="p">($)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="nv">%$result</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">@algorithms</span> <span class="o">=</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%result</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$current</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">@current_result</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="s">&#34;Building a CSV statistics...\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@algorithms</span><span class="p">);</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$current</span> <span class="o">=</span> <span class="nv">$algorithms</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current</span> <span class="o">.</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">@current_result</span> <span class="o">=</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$current</span><span class="p">}};</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">);</span> <span class="nv">$j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current_result</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&#34;\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nv">$data</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">MAIN:</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$array_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$tests_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="s">&#34;Starting $tests_count test cases for all
-</span></span></span><span class="line"><span class="cl"><span class="s">algorithms (&#34;</span> <span class="o">.</span> <span class="nb">join</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="p">,</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="o">.</span> <span class="s">&#34;) with parementers:
-</span></span></span><span class="line"><span class="cl"><span class="s">arrays with size $array_size, maximum size of each element $max.\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="n">cache_algorithms_source</span><span class="p">();</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="n">test_algorithms</span><span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$array_size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">my</span> <span class="nv">$csv_result</span> <span class="o">=</span> <span class="n">build_csv</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#39;&gt;result.csv&#39;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="n">FH</span> <span class="nv">$csv_result</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="k">print</span> <span class="s">&#34;Exiting\n&#34;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-perl" data-lang="perl"><span class="ch">#!/usr/bin/perl</span>
+
+<span class="k">use</span> <span class="nn">strict</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">warnings</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">Time::HiRes</span> <span class="sx">qw/time/</span><span class="p">;</span>
+
+<span class="k">my</span> <span class="nv">%sorts</span> <span class="o">=</span> <span class="p">();</span>
+<span class="k">my</span> <span class="nv">%algorithm_source</span> <span class="o">=</span> <span class="p">();</span>
+
+<span class="c1">#Generates JavaScript array with defined size and maximum size of it&#39;s elements</span>
+<span class="k">sub</span> <span class="nf">generate_js_array</span><span class="p">($ $) {</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$array</span> <span class="o">=</span> <span class="s">&#39;var array = [&#39;</span><span class="p">;</span>
+    <span class="nb">map</span> <span class="p">{</span> <span class="nv">$array</span> <span class="o">.=</span> <span class="nb">rand</span><span class="p">(</span><span class="nv">$max</span><span class="p">)</span> <span class="o">.</span> <span class="s">&#34;,\n&#34;</span> <span class="p">}</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="nv">$size</span><span class="p">);</span>
+    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
+    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
+    <span class="nv">$array</span> <span class="o">.=</span> <span class="s">&#39;];&#39;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nv">$array</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Creates a new test for given sort type and array</span>
+<span class="k">sub</span> <span class="nf">create_test</span><span class="p">($ $) {</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$sort_algorithm</span> <span class="o">=</span> <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
+    <span class="k">my</span> <span class="nv">$test_case</span> <span class="o">=</span> <span class="s">&#34;$array\n$sort_algorithm&#34;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nv">$test_case</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Saves the test in a file into the temp directory</span>
+<span class="k">sub</span> <span class="nf">save_test_case</span><span class="p">($ $ $) {</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$i</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="s">&#34;./temp/$sort_type-$i.js&#34;</span><span class="p">;</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#34;&gt;$filename&#34;</span><span class="p">);</span>
+    <span class="k">print</span> <span class="n">FH</span> <span class="nv">$test_case</span><span class="p">;</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nv">$filename</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Runs the test and measures the runtime</span>
+<span class="k">sub</span> <span class="nf">run_test_case</span><span class="p">($)</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$time</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>
+    <span class="sb">`d8 $filename`</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="nv">$time</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Tests an algorithm with given array</span>
+<span class="k">sub</span> <span class="nf">test_algorithm</span><span class="p">($ $ $) {</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$filename</span><span class="p">,</span> <span class="nv">$performance</span><span class="p">);</span>
+    <span class="nv">$test_case</span> <span class="o">=</span> <span class="n">create_test</span><span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">);</span>
+    <span class="nv">$filename</span> <span class="o">=</span> <span class="n">save_test_case</span><span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">);</span>
+    <span class="k">print</span> <span class="s">&#34;Running the test case...\n&#34;</span><span class="p">;</span>
+    <span class="nv">$performance</span> <span class="o">=</span> <span class="n">run_test_case</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+    <span class="c1">#unlink($filename);</span>
+    <span class="k">print</span> <span class="s">&#34;Cleaning the trash...\n&#34;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nv">$performance</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Gets the source of an algorithm from the algorithms folder</span>
+<span class="k">sub</span> <span class="nf">get_algorithm</span><span class="p">($)</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="nv">$sort_type</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$sorts</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
+    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#34;&lt;./algorithms/$file&#34;</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="sr">&lt;FH&gt;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">.=</span> <span class="nv">$_</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Caches all algorithms into a hash with keys the algorithm name and value the algorithm</span>
+<span class="k">sub</span> <span class="nf">cache_algorithms_source</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="n">get_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">#Tests all algorithms with different arrays and tests count</span>
+<span class="k">sub</span> <span class="nf">test_algorithms</span><span class="p">($ $ $) {</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="p">();</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$array</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$tests_count</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$array</span> <span class="o">=</span> <span class="n">generate_js_array</span><span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
+        <span class="nv">$count</span> <span class="o">=</span> <span class="nv">$i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">print</span> <span class="s">&#34;Running $algorithm test number $count...\n&#34;</span><span class="p">;</span>
+            <span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="o">[]</span> <span class="k">unless</span> <span class="nb">defined</span><span class="p">(</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">});</span>
+            <span class="nb">push</span><span class="p">(</span><span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}},</span> <span class="n">test_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$i</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="o">\</span><span class="nv">%result</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">#Builds a CSV string from the results</span>
+<span class="k">sub</span> <span class="nf">build_csv</span><span class="p">($)</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="nv">%$result</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">@algorithms</span> <span class="o">=</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%result</span><span class="p">);</span>
+    <span class="k">my</span> <span class="nv">$current</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">@current_result</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&#34;Building a CSV statistics...\n&#34;</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@algorithms</span><span class="p">);</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$current</span> <span class="o">=</span> <span class="nv">$algorithms</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+        <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current</span> <span class="o">.</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
+        <span class="nv">@current_result</span> <span class="o">=</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$current</span><span class="p">}};</span>
+        <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">);</span> <span class="nv">$j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current_result</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&#39;,&#39;</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nv">$data</span> <span class="o">.=</span> <span class="s">&#34;\n&#34;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nv">$data</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">MAIN:</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="nv">$max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$array_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">my</span> <span class="nv">$tests_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&#34;Starting $tests_count test cases for all
+</span><span class="s">algorithms (&#34;</span> <span class="o">.</span> <span class="nb">join</span><span class="p">(</span><span class="s">&#39;, &#39;</span><span class="p">,</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="o">.</span> <span class="s">&#34;) with parementers:
+</span><span class="s">arrays with size $array_size, maximum size of each element $max.\n&#34;</span><span class="p">;</span>
+
+    <span class="n">cache_algorithms_source</span><span class="p">();</span>
+    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="n">test_algorithms</span><span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$array_size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
+    <span class="k">my</span> <span class="nv">$csv_result</span> <span class="o">=</span> <span class="n">build_csv</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+
+    <span class="nb">open</span><span class="p">(</span><span class="n">FH</span><span class="p">,</span> <span class="s">&#39;&gt;result.csv&#39;</span><span class="p">);</span>
+    <span class="k">print</span> <span class="n">FH</span> <span class="nv">$csv_result</span><span class="p">;</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">FH</span><span class="p">);</span>
+    <span class="k">print</span> <span class="s">&#34;Exiting\n&#34;</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
 <p>If you find any issue in the script please let me know, I’ll fix it as soon as possible.
 For the test cases I used both – different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn’t found any difference between both alternatives that’s why I choose to generate a single array for each test (for faster testing).</p>
 <p>So let me tell you few words about the script because not everyone is familiar with perl and it’s syntax. I have three configuration variables: $max, $array_size and $tests_count. $max defines the maximum size of the array’s elements, $array_size is the size of the arrays we want to test with and $tests_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort =&gt; ‘heapsort.js’, Default =&gt; ‘default.js’ ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I’ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven’t mentioned explicitly that I use something different). In all test cases I’ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven’t mentioned explicitly different CPU) with Fedora 18, x86_64. The content of default.js is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">});</span></code></pre></div>
 <p>Let start&hellip;
 In the charts below there’s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).</p>
 <div id="attachment_240" style="width: 683px" class="wp-caption alignnone">
@@ -379,42 +379,42 @@ In the charts below there’s a statistic for Selection sort, Insertion sort, Bu
 <p>From the chart it’s easy to see that the default sort is slower than the merge and the heap sorts&hellip;It’s very unusual. If you’ve ever tried to beat the default sort in Java or STL&hellip;well it’s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible.
 If we increase the array to more than 300k elements mergesort’s performance becomes very bad (more than 10 minutes) so I’ll just exclude the mergesort from the next tests.</p>
 <p>Let me include one more algorithm implementation. It will be quicksort. Its’ implementation is like taken from a book, nothing special:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">quickSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">cmp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">minEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">maxEnd</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="nx">maxEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">&lt;</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nx">array</span><span class="p">[</span><span class="nx">maxEnd</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nx">cmp</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">maxEnd</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">                <span class="nx">minEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">            <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">,</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">minEnd</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
-</span></span><span class="line"><span class="cl">        <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kd">function</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">            <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">p</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">        <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">    <span class="p">};</span>
-</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">quickSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">function</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">cmp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="nx">minEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">,</span>
+            <span class="nx">maxEnd</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="nx">maxEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">&lt;</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">array</span><span class="p">[</span><span class="nx">maxEnd</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nx">cmp</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">maxEnd</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">);</span>
+                <span class="nx">minEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">,</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">minEnd</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+        <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
+        <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
+            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">p</span><span class="p">);</span>
+            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">}());</span></code></pre></div>
 <p>I&rsquo;ll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:</p>
 <div id="attachment_243" style="width: 683px" class="wp-caption alignnone">
   <a href="/images/legacy/uploads2012/11/500k-quick-heap-default.png"><img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-quick-heap-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
@@ -478,7 +478,7 @@ If you&rsquo;re interested about the tests with other CPU types please send me a
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

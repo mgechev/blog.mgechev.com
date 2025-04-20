@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.121.1">
+		<meta name="generator" content="Hugo 0.91.2" />
 		<title>Angular 2 Hot Loader &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -101,27 +101,27 @@
 <h2 id="handling-the-state">Handling the State</h2>
 <p>The tricky part here is to preserve the state of the application itself although we need to patch or rerender the changed component(s). This is an easy task with dumb components (pure components) because they don&rsquo;t hold any state so you can freely rerender them and just populate them with data stored somewhere else in your app. In react this can be achieved by using a flux-like architecture where the state of your application is decoupled from the UI in a module called store. We can approach the exact same way in Angular 2 by taking advantage of flux/redux/whatever. However, in Angular we also have out-of-the-box dependency injection, which can makes our life even easier.</p>
 <p>Here is an example of how we can preserve the state of the application by using a singleton services:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">provide</span><span class="p">(</span><span class="nx">NameList</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useValue</span>: <span class="kt">new</span> <span class="nx">NameList</span><span class="p">()</span> <span class="p">})],</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kd">@RouteConfig</span><span class="p">([</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{}</span>
-</span></span></code></pre></div><p>Basically we define a root component called <code>AppCmp</code>, which has a single provider - binding of the <code>NameList</code> services to an instance of the class itself. Since this is a singleton if we are required to rerender the application, even if we need to re-instantiate all the components inside of it they will get the exact same instance of the <code>NameList</code> service.  We can apply this for all the component&rsquo;s dependencies and this way their state can be easily externalized. This allows us to render the new version of the components based on the same state.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;app&#39;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">provide</span><span class="p">(</span><span class="nx">NameList</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useValue</span>: <span class="kt">new</span> <span class="nx">NameList</span><span class="p">()</span> <span class="p">})],</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">})</span>
+<span class="kd">@RouteConfig</span><span class="p">([</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">])</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">AppCmp</span> <span class="p">{}</span>
+</code></pre></div><p>Basically we define a root component called <code>AppCmp</code>, which has a single provider - binding of the <code>NameList</code> services to an instance of the class itself. Since this is a singleton if we are required to rerender the application, even if we need to re-instantiate all the components inside of it they will get the exact same instance of the <code>NameList</code> service.  We can apply this for all the component&rsquo;s dependencies and this way their state can be easily externalized. This allows us to render the new version of the components based on the same state.</p>
 <p>You may ask, but what if I hold the state in my component instead? For example, what if I have the following component and I change its <code>_foo</code> field by an input:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="line"><span class="cl"><span class="kd">@Component</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">  <span class="c1">// ...
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">})</span>
-</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">Foobar</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">_foo</span>: <span class="kt">string</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="kr">set</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">_foo</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Well, when new version of any component is delivered to the application state hold by instance variables be lost. React-hot-loader solves this issue by patching the components without re-instantiating them, however, I wasn&rsquo;t able to find a clean way to do this in Angular so far. Does this mean that react is better in sense of hot loading? I wouldn&rsquo;t say so. I might have not considered all the different options for patching the components (I&rsquo;m not completely familiar with Angular 2&rsquo;s code base) and still..since react&rsquo;s components are only being patched, no change in the constructor of the component will be applied to the patched component in the front-end. This means that the state of given an instance of given component can be initialized only ONCE when the instance is rendered for first time. As we can see both approaches (re-instantiating the component on change and only patching its prototype) has their pros and cons.
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-typescript" data-lang="typescript"><span class="kd">@Component</span><span class="p">({</span>
+  <span class="c1">// ...
+</span><span class="c1"></span><span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">Foobar</span> <span class="p">{</span>
+  <span class="nx">_foo</span>: <span class="kt">string</span><span class="p">;</span>
+  <span class="kr">set</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_foo</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Well, when new version of any component is delivered to the application state hold by instance variables be lost. React-hot-loader solves this issue by patching the components without re-instantiating them, however, I wasn&rsquo;t able to find a clean way to do this in Angular so far. Does this mean that react is better in sense of hot loading? I wouldn&rsquo;t say so. I might have not considered all the different options for patching the components (I&rsquo;m not completely familiar with Angular 2&rsquo;s code base) and still..since react&rsquo;s components are only being patched, no change in the constructor of the component will be applied to the patched component in the front-end. This means that the state of given an instance of given component can be initialized only ONCE when the instance is rendered for first time. As we can see both approaches (re-instantiating the component on change and only patching its prototype) has their pros and cons.
 However, we can handle all the related to these approaches issues in both Angular 2 and react by using pure components and externalizing their state, which generally is considered as good practice.</p>
 <h2 id="current-limitations">Current limitations</h2>
 <p>Since the hot loader is based on a couple of hours effort, I wasn&rsquo;t able to make it as well functional as I&rsquo;d want to. The work is still in progress so I&rsquo;d love to hear your opinions on if we can approach better in the component patching. However, here are a few things which work pretty well:</p>
@@ -185,7 +185,7 @@ However, we can handle all the related to these approaches issues in both Angula
 
 
   
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
