@@ -22,6 +22,10 @@ Looking at the current landscape of platforms for "vibe coding" I see two main p
 - Mismatch of API versions. Often the LLM will generate code that uses deprecated or missing APIs from previous versions
 - Lack of substantial training data. If you're using a framework that's not as popular or has new APIs that the LLM is not familiar with yet, you will likely get a dissatisfactory output
 
+<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+You can find the code from this experiment <a href="https://github.com/mgechev/revolt-llm">on GitHub</a>.
+</div>
+
 There are a variety of solutions to these problems. For example:
 
 - We can use the context window to provide relevant examples of the latest APIs
@@ -64,7 +68,7 @@ You can find the source [code on GitHub](https://github.com/mgechev/revolt-llm/t
 
 Here's a quick demo video:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/hphNsJkfrSM?si=DmBTC8RNkrtCV7H1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/hphNsJkfrSM?si=DmBTC8RNkrtCV7H1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Here's the first draft of the system prompt I came up with:
 
