@@ -11,7 +11,7 @@ tags:
 - LLMs
 - Web frameworks
 title: LLM-first Web Framework
-og_image: /images/revolt-llm/banner.png
+og_image: /images/revolt-llm/banner.jpg
 url: /2025/04/19/llm-first-web-framework
 ---
 
