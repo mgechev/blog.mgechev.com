@@ -137,8 +137,25 @@ In Revolt LLM, I decided to keep chat history for the past two prompts and respo
 
 In the example above, in addition to the "Change the color..." prompt, the LLM will also receive the previous prompt and output it produced.
 
-As a quick recap: Revolt LLM solves the API version consistency issue in LLM-based code generation by providing a small-enough framework that we can pass in the context window.
+## Revolt as an IR
 
-That's not the solution I'd recommend for a few reasons, for example the lack of interop with the existing ecosystem. I can see how this approach can benefit minimalistic frameworks such as Preact which also have an interop layer with React.
+Another potential path forward is to use Revolt as an intermediate representation to generate code that uses a general purpose framework such as Angular or React. Technologies like [mitosis](https://mitosis.builder.io/) use a similar technique for other use cases.
 
-That's all I had for today. Let me know if you have any thoughts in the comments :).
+<img src="/images/revolt-llm/revolt-ir.png" style="display: block; margin: auto;">
+<p style="text-align: center;">Revolt as an IR</p> 
+
+This way we get the benefit of avoiding version skew since we pass Revolt in the context window. At the same time, the final output is code that uses a general purpose framework. In the compiler that transforms Revolt to Angular/React, we can hardcode rules that ensure the output uses the latest general purpose framework APIs.
+
+Generating code that uses a general purpose framework allows developers to debug a technology they are familiar with and get a better interop with the corresponding framework ecosystem.
+
+## Moving forward
+
+The three different approaches we discussed are:
+
+1. Augment the model by passing examples to ensure we generate working code using latest APIs
+2. Instead of using a general purpose framework, use Revolt and pass it in the context window
+3. Generate Revolt code and transform it to a general purpose framework via a deterministic compiler
+
+All the three approaches have their trade-offs. I can definitely see a future in which an entire product will be based on a LLM-first framework and will provide a component model, together with integrations with other platforms.
+
+In the short-term, I bet tools will primarily use the first approach and fallback to the third one in case of highly personalized user interface.
