@@ -15,7 +15,7 @@ og_image: /images/revolt-llm/banner.png
 url: /2025/04/19/llm-first-web-framework
 ---
 
-<div style="padding: 20px; border-radius: 5px; background-color: #fff4da">
+<div style="padding: 15px; border-radius: 5px; background-color: #fff4da; border: 1px solid #ffe88c;">
 The opinions stated here are my own, not necessarily those of my employer.
 </div>
 
@@ -26,7 +26,7 @@ Looking at the current landscape of platforms for "vibe coding" I see two main p
 - Mismatch of API versions. Often the LLM will generate code that uses deprecated or missing APIs from previous versions. I see that across the board with all frameworks since they all use versions and deprecate APIs.
 - Lack of substantial training data. If you're using a framework that's not as popular or has new APIs that the LLM is not familiar with yet, you will likely get a dissatisfactory output. Frameworks such as Angular and React often are not too impacted here due to abundance of training data. You can still see this manifest for new APIs that are not widely used and documented yet.
 
-<div style="padding: 20px; border-radius: 5px; background-color:rgb(220, 255, 218)">
+<div style="padding: 15px; border-radius: 5px; background-color:rgb(241 255 240); border: 1px solid #e9e9e9;">
 You can find the code from this experiment <a href="https://github.com/mgechev/revolt-llm">on GitHub</a>.
 </div>
 
