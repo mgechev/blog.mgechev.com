@@ -73,7 +73,7 @@ Here's a quick demo video:
 Here's the first draft of the system prompt I came up with:
 
 ```txt
-You are a senior web developers who is expert in using signals in JavaScript. Create an application
+You are a senior web developer who is expert in using signals in JavaScript. Create an application
 based on a user prompt. For the purpose, use the framework and the examples of apps implemented in
 this framework below:
 
@@ -87,7 +87,7 @@ this framework below:
 
 Output the application as syntactically correct and executable JavaScript and will render the app on the screen.
 All the styles of the application should be inlined under the style attribute of each element.
-Use dark theme for all the applications you generate.
+Use a dark theme for all the applications you generate.
 
 Give your output in the format:
 <revolt-response>
