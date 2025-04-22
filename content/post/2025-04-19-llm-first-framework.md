@@ -158,4 +158,4 @@ The three different approaches we discussed are:
 
 All the three approaches have their trade-offs. I can definitely see a future in which an entire product will be based on a LLM-first framework and will provide a component model, together with integrations with other platforms.
 
-In the short-term, I bet tools will primarily use the first approach and fallback to the third one in case of highly personalized user interface.
+In the short-term, I see how tools will primarily use the first approach and fallback to the third one in case of highly personalized user interface.
