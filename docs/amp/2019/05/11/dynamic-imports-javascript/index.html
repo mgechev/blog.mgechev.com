@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.121.1">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -138,107 +138,107 @@
 <p>Why does JavaScript restricts us to use only string literals when specifying the module in ES2015 imports?</p>
 </blockquote>
 <p>To see what are the benefits of this, let&#x2019;s look at an example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;./bar&apos;</span><span class="p">;</span>
-</code></pre></div><p>Above we have the <code>import</code> keyword, import specifier (<code>{ foo }</code>), <code>from</code> keyword, followed by the <code>./bar</code> string literal. There are two great things about this construct:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&apos;./bar&apos;</span><span class="p">;</span>
+</span></span></code></pre></div><p>Above we have the <code>import</code> keyword, import specifier (<code>{ foo }</code>), <code>from</code> keyword, followed by the <code>./bar</code> string literal. There are two great things about this construct:</p>
 <ul>
 <li>Statically we can determine what symbols we import</li>
 <li>Statically we can determine from which module we import</li>
 </ul>
 <h2 id="static-vs-dynamic-analysis">Static vs. Dynamic Analysis</h2>
 <p>It&#x2019;s essential to understand what I mean by saying <em>statically</em>. In practice, any correct program can be partially executed at build time (for example, by webpack, <a href="https://prepack.io/">prepack</a>, etc.) and, potentially, fully executed at runtime (if we have sufficient information, and of course, this does not imply that the program will ever terminate). Look at this example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">const</span> <span class="nx">fib</span> <span class="o">=</span> <span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-</code></pre></div><p>If we add a <a href="https://prepack.io/">prepack</a> plugin to our webpack build, the final bundle will look something like this:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
-</code></pre></div><p>Which means that our users will directly see <code>5</code> in the console, without having to execute the <code>fib</code> function. This is only possible because our program does not use data which is only available at runtime. For example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">const</span> <span class="nx">fib</span> <span class="o">=</span> <span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">num</span><span class="p">));</span>
-</code></pre></div><p>The evaluation of the snippet above would be impossible at build time because we don&#x2019;t know what&#x2019;s the value of <code>window.num</code> (imagine we rely on a Chrome extension to set the <code>window.num</code> property).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">fib</span> <span class="o">=</span> <span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+</span></span></code></pre></div><p>If we add a <a href="https://prepack.io/">prepack</a> plugin to our webpack build, the final bundle will look something like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span></span></code></pre></div><p>Which means that our users will directly see <code>5</code> in the console, without having to execute the <code>fib</code> function. This is only possible because our program does not use data which is only available at runtime. For example:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">fib</span> <span class="o">=</span> <span class="nx">n</span> <span class="p">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">num</span><span class="p">));</span>
+</span></span></code></pre></div><p>The evaluation of the snippet above would be impossible at build time because we don&#x2019;t know what&#x2019;s the value of <code>window.num</code> (imagine we rely on a Chrome extension to set the <code>window.num</code> property).</p>
 <p>How does this relate to ES2015 imports? It connects in at least two different ways. With ES2015 imports we can:</p>
 <ul>
 <li>Statically analyze the import specifier when the imported symbols are explicitly listed</li>
 <li>Statically analyze the path because it&#x2019;s a string literal</li>
 </ul>
 <p>Let&#x2019;s suppose for a second that this is a valid syntax:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="nx">from</span> <span class="nx">getPath</span><span class="p">();</span>
-</code></pre></div><p>The implementation of <code>getPath</code> could involve information which is only available at runtime, for example, we can read a property from <code>localStorage</code>, send a sync XHR, etc. The ECMAScript standard allows only string literals so that the bundler or the browser, can know the exact location of the module we&#x2019;re importing from.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">import</span> <span class="p">{</span> <span class="nx">foo</span> <span class="p">}</span> <span class="nx">from</span> <span class="nx">getPath</span><span class="p">();</span>
+</span></span></code></pre></div><p>The implementation of <code>getPath</code> could involve information which is only available at runtime, for example, we can read a property from <code>localStorage</code>, send a sync XHR, etc. The ECMAScript standard allows only string literals so that the bundler or the browser, can know the exact location of the module we&#x2019;re importing from.</p>
 <p>Now, let&#x2019;s look at another example:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="kr">import</span> <span class="o">*</span> <span class="nx">as</span> <span class="nx">foo</span> <span class="nx">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
-</code></pre></div><p>We specify the path as a string literal but we use a wildcard import. In this scenario, in the general case the bundler will be unable to determine which symbols from <code>./foo</code> we use in the current module. Imagine we have the following snippet:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="c1">// foo.js
-</span><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-<span class="kr">export</span> <span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="mf">1.618</span><span class="p">;</span>
-<span class="kr">export</span> <span class="kr">const</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
-
-<span class="c1">// bar.js
-</span><span class="c1"></span><span class="kr">import</span> <span class="o">*</span> <span class="nx">as</span> <span class="nx">foo</span> <span class="nx">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">a</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">[</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;bar&apos;</span><span class="p">)]);</span>
-</code></pre></div><p>If we invoke the bundler by specifying <code>bar.js</code> as an entry point, statically we can determine that <code>bar.js</code> uses <code>a</code> but we have no idea if <code>b</code> and <code>c</code> are going to be needed at runtime, we don&#x2019;t know what the value of <code>localStorage.get(&apos;bar&apos;)</code> is. This way we won&#x2019;t be able to get rid of the unused symbols since we don&#x2019;t know what symbols from <code>foo.js</code> its consumers use.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="kr">import</span> <span class="o">*</span> <span class="nx">as</span> <span class="nx">foo</span> <span class="nx">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
+</span></span></code></pre></div><p>We specify the path as a string literal but we use a wildcard import. In this scenario, in the general case the bundler will be unable to determine which symbols from <code>./foo</code> we use in the current module. Imagine we have the following snippet:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="c1">// foo.js
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="mf">1.618</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">export</span> <span class="kr">const</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// bar.js
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span> <span class="o">*</span> <span class="nx">as</span> <span class="nx">foo</span> <span class="nx">from</span> <span class="s1">&apos;./foo&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">.</span><span class="nx">a</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">[</span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&apos;bar&apos;</span><span class="p">)]);</span>
+</span></span></code></pre></div><p>If we invoke the bundler by specifying <code>bar.js</code> as an entry point, statically we can determine that <code>bar.js</code> uses <code>a</code> but we have no idea if <code>b</code> and <code>c</code> are going to be needed at runtime, we don&#x2019;t know what the value of <code>localStorage.get(&apos;bar&apos;)</code> is. This way we won&#x2019;t be able to get rid of the unused symbols since we don&#x2019;t know what symbols from <code>foo.js</code> its consumers use.</p>
 <p>That&#x2019;s why I often discourage people to use wildcard imports since they could block the bundler from tree-shaking effectively.</p>
 <h2 id="what-about-dynamic-imports">What about dynamic imports</h2>
 <p>Originally, I started writing this article to explain why dynamic imports could be tricky from a tooling perspective. Let&#x2019;s suppose that we have a lazy-loaded module:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="c1">// dynamic.js
-</span><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-
-<span class="c1">// foo.js
-</span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./dynamic.js&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">a</span><span class="p">));</span>
-</code></pre></div><p>If we try to bundle this with rollup by specifying <code>foo.js</code> as an entry point we&#x2019;ll get something like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">$ rollup foo.js --output.format esm
-
-foo.js &#x2192; stdout...
-
-//&#x2192; foo.js:
-import<span class="o">(</span><span class="s1">&apos;./chunk-75df839a.js&apos;</span><span class="o">)</span>.then<span class="o">(</span><span class="nv">m</span> <span class="o">=</span>&gt; console.log<span class="o">(</span>m.a<span class="o">))</span><span class="p">;</span>
-
-//&#x2192; chunk-75df839a.js:
-const <span class="nv">a</span> <span class="o">=</span> 42<span class="p">;</span>
-
-<span class="nb">export</span> <span class="o">{</span> a <span class="o">}</span><span class="p">;</span>
-created stdout in 59ms
-</code></pre></div><p>Here&#x2019;s what rollup did:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="c1">// dynamic.js
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// foo.js
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./dynamic.js&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">a</span><span class="p">));</span>
+</span></span></code></pre></div><p>If we try to bundle this with rollup by specifying <code>foo.js</code> as an entry point we&#x2019;ll get something like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ rollup foo.js --output.format esm
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">foo.js &#x2192; stdout...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">//&#x2192; foo.js:
+</span></span><span class="line"><span class="cl">import<span class="o">(</span><span class="s1">&apos;./chunk-75df839a.js&apos;</span><span class="o">)</span>.then<span class="o">(</span><span class="nv">m</span> <span class="o">=</span>&gt; console.log<span class="o">(</span>m.a<span class="o">))</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">//&#x2192; chunk-75df839a.js:
+</span></span><span class="line"><span class="cl">const <span class="nv">a</span> <span class="o">=</span> 42<span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">export</span> <span class="o">{</span> a <span class="o">}</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">created stdout in 59ms
+</span></span></code></pre></div><p>Here&#x2019;s what rollup did:</p>
 <ul>
 <li>Created a chunk from <code>foo.js</code>, bundling it with all of its static imports (in this case there are none)</li>
 <li>Statically analyzed <code>foo.js</code> and found that it dynamically imports <code>dynamic.js</code></li>
 <li>Created another chunk called <code>chunk-75df839a.js</code> by bundling together <code>dynamic.js</code> with all its static imports (in this case there are none)</li>
 </ul>
 <p>Now let&#x2019;s change something in <code>foo.js</code>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="c1">// foo.js
-</span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./dynamic.js&apos;</span> <span class="o">+</span> <span class="s1">&apos;&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">a</span><span class="p">));</span>
-</code></pre></div><p>In this case, we get:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">$ rollup foo.js --output.format esm
-
-foo.js &#x2192; stdout...
-import<span class="o">(</span><span class="s1">&apos;./dynamic.js&apos;</span> + <span class="s1">&apos;&apos;</span><span class="o">)</span>.then<span class="o">(</span><span class="nv">m</span> <span class="o">=</span>&gt; console.log<span class="o">(</span>m.a<span class="o">))</span><span class="p">;</span>
-created stdout in 39ms
-</code></pre></div><p>This means that rollup was not able to correctly figure out the entry point of the dynamically loaded chunk. Why? We changed the argument of the import from a string literal to an expression. Same, will happen if we use an expression which could be only evaluated at runtime (for example, <code>import(localStorage.getItem(&apos;foo&apos;))</code>). Webpack would handle this case because it&#x2019;ll  try to evaluate the expression statically, at build time:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">$ webpack foo.js
-
-Hash: 2a1d2bcb0c5277c3bf29
-Version: webpack 4.30.0
-Time: 396ms
-Built at: 05/11/2019 3:44:22 PM
-  Asset       Size  Chunks             Chunk Names
-   1.js  <span class="m">141</span> bytes       <span class="m">1</span>  <span class="o">[</span>emitted<span class="o">]</span>
-main.js      <span class="m">2</span> KiB       <span class="m">0</span>  <span class="o">[</span>emitted<span class="o">]</span>  main
-Entrypoint <span class="nv">main</span> <span class="o">=</span> main.js
-<span class="o">[</span>0<span class="o">]</span> ./foo.js <span class="m">58</span> bytes <span class="o">{</span>0<span class="o">}</span> <span class="o">[</span>built<span class="o">]</span>
-<span class="o">[</span>1<span class="o">]</span> ./dynamic.js <span class="m">21</span> bytes <span class="o">{</span>1<span class="o">}</span> <span class="o">[</span>built<span class="o">]</span>
-</code></pre></div><h2 id="dynamic-imports-and-typescript">Dynamic Imports and TypeScript</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="c1">// foo.js
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./dynamic.js&apos;</span> <span class="o">+</span> <span class="s1">&apos;&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="p">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">a</span><span class="p">));</span>
+</span></span></code></pre></div><p>In this case, we get:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ rollup foo.js --output.format esm
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">foo.js &#x2192; stdout...
+</span></span><span class="line"><span class="cl">import<span class="o">(</span><span class="s1">&apos;./dynamic.js&apos;</span> + <span class="s1">&apos;&apos;</span><span class="o">)</span>.then<span class="o">(</span><span class="nv">m</span> <span class="o">=</span>&gt; console.log<span class="o">(</span>m.a<span class="o">))</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">created stdout in 39ms
+</span></span></code></pre></div><p>This means that rollup was not able to correctly figure out the entry point of the dynamically loaded chunk. Why? We changed the argument of the import from a string literal to an expression. Same, will happen if we use an expression which could be only evaluated at runtime (for example, <code>import(localStorage.getItem(&apos;foo&apos;))</code>). Webpack would handle this case because it&#x2019;ll  try to evaluate the expression statically, at build time:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ webpack foo.js
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Hash: 2a1d2bcb0c5277c3bf29
+</span></span><span class="line"><span class="cl">Version: webpack 4.30.0
+</span></span><span class="line"><span class="cl">Time: 396ms
+</span></span><span class="line"><span class="cl">Built at: 05/11/2019 3:44:22 PM
+</span></span><span class="line"><span class="cl">  Asset       Size  Chunks             Chunk Names
+</span></span><span class="line"><span class="cl">   1.js  <span class="m">141</span> bytes       <span class="m">1</span>  <span class="o">[</span>emitted<span class="o">]</span>
+</span></span><span class="line"><span class="cl">main.js      <span class="m">2</span> KiB       <span class="m">0</span>  <span class="o">[</span>emitted<span class="o">]</span>  main
+</span></span><span class="line"><span class="cl">Entrypoint <span class="nv">main</span> <span class="o">=</span> main.js
+</span></span><span class="line"><span class="cl"><span class="o">[</span>0<span class="o">]</span> ./foo.js <span class="m">58</span> bytes <span class="o">{</span>0<span class="o">}</span> <span class="o">[</span>built<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>1<span class="o">]</span> ./dynamic.js <span class="m">21</span> bytes <span class="o">{</span>1<span class="o">}</span> <span class="o">[</span>built<span class="o">]</span>
+</span></span></code></pre></div><h2 id="dynamic-imports-and-typescript">Dynamic Imports and TypeScript</h2>
 <p>Now, let&#x2019;s look at another example using TypeScript. Let&#x2019;s suppose we have the following snippet:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// foo.ts
-</span><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
-
-<span class="c1">// bar.ts
-</span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./foo&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
-</code></pre></div><amp-img src="/images/dynamic-imports/foo-num.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;"></amp-img>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// foo.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">export</span> <span class="kr">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// bar.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./foo&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
+</span></span></code></pre></div><amp-img src="/images/dynamic-imports/foo-num.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;"></amp-img>
 <p>If we open <code>bar.ts</code> in a text editor and we point over <code>m.foo</code>, we&#x2019;ll see that it&#x2019;s of type <code>number</code>. This means that TypeScript&#x2019;s type inference has tracked the reference and figured out its type. Now, change <code>bar.ts</code> to:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="c1">// bar.ts
-</span><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./foo&apos;</span> <span class="o">+</span> <span class="s1">&apos;&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
-</code></pre></div><amp-img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;"></amp-img>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ts" data-lang="ts"><span class="line"><span class="cl"><span class="c1">// bar.ts
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kr">import</span><span class="p">(</span><span class="s1">&apos;./foo&apos;</span> <span class="o">+</span> <span class="s1">&apos;&apos;</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">m</span> <span class="o">=&gt;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span>
+</span></span></code></pre></div><amp-img src="/images/dynamic-imports/foo-any.png" style="display: block; margin: auto; margin-top: 10px;  margin-bottom: 10px; max-width: 500px; width: 100%;"></amp-img>
 <p>If we point over <code>m.foo</code> again, we&#x2019;ll find out that it has type <code>any</code> (TypeScript version 3.1.3). Why both differ? When TypeScript finds out that we&#x2019;ve passed a string literal to the dynamic import it follows the module reference and performs type inference; if it finds an expression, it fallbacks to type <code>any</code>.</p>
 <p>Let&#x2019;s go through a quick recap of our observations:</p>
 <ul>

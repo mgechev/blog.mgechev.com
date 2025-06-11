@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.121.1">
 		<title>Singleton in JavaScript &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -26,7 +26,7 @@
 
 		<meta property="og:title" content="Singleton in JavaScript" />
 		<meta property="og:description" content="Wikipedia describes the singleton design pattern as:
- The singleton pattern is a design pattern that restricts the instantiation of a class to one object. This is useful when exactly one object is needed to coordinate actions across the system. The concept is sometimes generalized to systems that operate more efficiently when only one object exists, or that restrict the instantiation to a certain number of objects. The term comes from the mathematical concept of a singleton." />
+The singleton pattern is a design pattern that restricts the instantiation of a class to one object. This is useful when exactly one object is needed to coordinate actions across the system. The concept is sometimes generalized to systems that operate more efficiently when only one object exists, or that restrict the instantiation to a certain number of objects. The term comes from the mathematical concept of a singleton." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2014/04/16/singleton-in-javascript/" />
 		
@@ -105,42 +105,42 @@
 </ul>
 <p>Thanks God we don’t have to consider all these corner cases in JavaScript.</p>
 <p>The simplest singleton implementation in JavaScript is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">Singleton</span> <span class="o">=</span> <span class="p">{};</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">Singleton</span> <span class="o">=</span> <span class="p">{};</span></span></span></code></pre></div>
 <p>And yes – this is singleton!</p>
 <p>Addy Osmani suggests the following implementation at his book <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">“Learning JavaScript Design Patterns”</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">mySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// Instance stores a reference to the Singleton
-</span><span class="c1"></span>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
-  <span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
-    <span class="c1">// Singleton
-</span><span class="c1"></span>    <span class="c1">// Private methods and variables
-</span><span class="c1"></span>    <span class="kd">function</span> <span class="nx">privateMethod</span><span class="p">(){</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&#34;I am private&#34;</span> <span class="p">);</span>
-    <span class="p">}</span>
-    <span class="kd">var</span> <span class="nx">privateVariable</span> <span class="o">=</span> <span class="s2">&#34;Im also private&#34;</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">privateRandomNumber</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">();</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="c1">// Public methods and variables
-</span><span class="c1"></span>      <span class="nx">publicMethod</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&#34;The public can see me!&#34;</span> <span class="p">);</span>
-      <span class="p">},</span>
-      <span class="nx">publicProperty</span><span class="o">:</span> <span class="s2">&#34;I am also public&#34;</span><span class="p">,</span>
-      <span class="nx">getRandomNumber</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">privateRandomNumber</span><span class="p">;</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">};</span>
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="c1">// Get the Singleton instance if one exists
-</span><span class="c1"></span>    <span class="c1">// or create one if it doesn&#39;t
-</span><span class="c1"></span>    <span class="nx">getInstance</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">instance</span> <span class="p">)</span> <span class="p">{</span>
-        <span class="nx">instance</span> <span class="o">=</span> <span class="nx">init</span><span class="p">();</span>
-      <span class="p">}</span>
-      <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">})();</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">mySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Instance stores a reference to the Singleton
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Singleton
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Private methods and variables
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kd">function</span> <span class="nx">privateMethod</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&#34;I am private&#34;</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">privateVariable</span> <span class="o">=</span> <span class="s2">&#34;Im also private&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">var</span> <span class="nx">privateRandomNumber</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// Public methods and variables
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="nx">publicMethod</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&#34;The public can see me!&#34;</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">publicProperty</span><span class="o">:</span> <span class="s2">&#34;I am also public&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">getRandomNumber</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">privateRandomNumber</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Get the Singleton instance if one exists
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// or create one if it doesn&#39;t
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nx">getInstance</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">instance</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nx">instance</span> <span class="o">=</span> <span class="nx">init</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">})();</span></span></span></code></pre></div>
 <p>This implementation is based on the module pattern. The module pattern is applied two times – the first application aims to provide the actual singleton and keeps the private data/behavior inside a closure. The second usage of the module pattern aims to provide the public interface used for getting the singleton object, which is kept inside a closure.</p>
 <p>It is absolutely valid and useful implementation:</p>
 <ul>
@@ -150,64 +150,64 @@
 </ul>
 <p>As drawback I can point the lack of specific “type” of the singleton (i.e. more specific than object), which won’t allow you to use the operator <code>instanceof</code>. I can argue that the definition of the <code>private</code> members can lead to poor unit testing, but if they are private, they are not intended for testing anyway.</p>
 <p>Another implementation of singleton, which I found in the network is <a href="http://stackoverflow.com/a/6733919/1106382">“The best Singleton pattern”</a>:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
-  <span class="s2">&#34;use strict&#34;</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">MySingletonClass</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span> <span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-      <span class="c1">// ...
-</span><span class="c1"></span>    <span class="p">};</span>
-  <span class="p">};</span>
-
-<span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MySingletonClass</span><span class="p">();</span>
-<span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">MySingletonClass</span><span class="p">();</span>
-<span class="c1">//a === b
-</span><span class="c1"></span><span class="nx">global</span><span class="p">.</span><span class="nx">MySingleton</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span> <span class="c1">//or b
-</span><span class="c1"></span>
-<span class="p">}(</span><span class="nb">window</span><span class="p">));</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;use strict&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">MySingletonClass</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span> <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span> <span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">MySingletonClass</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">Foo</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MySingletonClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="nx">MySingletonClass</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="c1">//a === b
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">global</span><span class="p">.</span><span class="nx">MySingleton</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span> <span class="c1">//or b
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="p">}(</span><span class="nb">window</span><span class="p">));</span></span></span></code></pre></div>
 <p>Here are the main advantages of this implementation:</p>
 <ul>
 <li>It instantiates only a single object</li>
 <li>You can use the <code>instanceof</code> operator</li>
 </ul>
 <p>As drawback I can state the fact that you can easy change the prototype property <code>_singletonInstance</code> of your singleton. This way, when <code>MySingleton</code> is called once again, it will create a new object:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">MySingleton</span><span class="p">).</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nb">Object</span><span class="p">.</span><span class="nx">getPrototypeOf</span><span class="p">(</span><span class="nx">MySingleton</span><span class="p">).</span><span class="nx">_singletonInstance</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span></span></span></code></pre></div>
 <p>Implementation I use is formed by combining both approaches from above:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">MySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-  <span class="kd">var</span> <span class="nx">INSTANCE</span><span class="p">;</span>
-
-  <span class="kd">function</span> <span class="nx">MySingleton</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">MySingleton</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="k">new</span> <span class="nx">MySingleton</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="nx">MySingleton</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="c1">//do something;
-</span><span class="c1"></span>  <span class="p">};</span>
-
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">INSTANCE</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">INSTANCE</span> <span class="o">=</span> <span class="nx">MySingleton</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="k">return</span> <span class="nx">INSTANCE</span><span class="p">;</span>
-    <span class="p">},</span>
-    <span class="nx">getInstance</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">INSTANCE</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-      <span class="p">}</span>
-      <span class="k">return</span> <span class="nx">INSTANCE</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-
-<span class="p">}());</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kd">var</span> <span class="nx">MySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">INSTANCE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">function</span> <span class="nx">MySingleton</span><span class="p">(</span><span class="nx">foo</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">MySingleton</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="k">new</span> <span class="nx">MySingleton</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">this</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="nx">foo</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">MySingleton</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">bar</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//do something;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">INSTANCE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="nx">INSTANCE</span> <span class="o">=</span> <span class="nx">MySingleton</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">INSTANCE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">getInstance</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">INSTANCE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nx">INSTANCE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}());</span></span></span></code></pre></div>
 <p>In this example we use the module pattern once again, in order to enclose the singleton implementation into a lexical closure and provide a public interface for getting its instance.</p>
 <p>Sometimes you need to pass arguments when initializing a singleton for first time. This is easy achieved using the method <code>init</code>. The <code>init</code> method is not aware of the arguments required by the singleton – all it does is to forward the call to the internal <code>MySingleton</code> function with context <code>null</code>. Inside the implementation of the <code>MySingleton</code> constructor function we make a check whether the current context – <code>this</code> is of type <code>MySingleton</code>, if it isn’t, then this means that <code>MySingleton</code> is not called with the <code>new</code> operator, so we recursively call <code>new MySingleton</code> with the required parameters.</p>
 <p>What are the benefits we get from this implementation:</p>
@@ -257,7 +257,7 @@
 
 
   
-<script type="application/javascript">
+<script>
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
