@@ -1004,22 +1004,22 @@ Regarding clustering of the chunks, it might not be practical to provide a perso
 
 # References
 
-1. Why marketers should care about mobile page speed - https://mgv.io/load-time-impact
-2. How Page Load Time Affects Conversion Rates: 12 Case Studies - https://mgv.io/conversion-rates
-3. The Cost Of JavaScript - https://mgv.io/cost-of-js
-4. WebPageTest - https://mgv.io/webpagetest
-5. Lighthouse - https://mgv.io/lighthouse
-6. Lazy prefetching of AngularJS partials - https://mgv.io/angularjs-prefetching
-7. Predictive Fetching - https://mgv.io/predictive-fetching
-8. mlx - https://mgv.io/mlx
-9. mlx Angular demo - https://mgv.io/ng-mlx
-10. mlx React demo - https://mgv.io/react-mlx
-11. mlx Google Analytics demo - https://mgv.io/ga-mlx
-12. Using the Google Analytics Core Reporting API from Node.js - https://mgv.io/ga-api
-13. Preload, Prefetch And Priorities in Chrome - https://mgv.io/prefetch-preload
-14. Markov Chains - https://mgv.io/markov
-15. mlx parser - https://mgv.io/parser-mlx
-16. ngast - https://mgv.io/ngast
-17. Tarjan's strongly connected components algorithm - https://mgv.io/tarjan
-18. Hidden Markov Chains - https://mgv.io/hidden-markov
-19. k-means clustering - https://mgv.io/k-means
+1. Why marketers should care about mobile page speed - https://business.google.com/us/think/
+2. How Page Load Time Affects Conversion Rates: 12 Case Studies - https://blog.hubspot.com/marketing/page-load-time-conversion-rates
+3. The Cost Of JavaScript - https://medium.com/dev-channel/the-cost-of-javascript-84009f51e99e
+4. WebPageTest - https://www.webpagetest.org/
+5. Lighthouse - https://developer.chrome.com/docs/lighthouse/overview/
+6. Lazy prefetching of AngularJS partials - https://blog.mgechev.com/2013/10/01/angularjs-partials-lazy-prefetching-strategy-weighted-directed-graph/
+7. Predictive Fetching - https://github.com/addyosmani/predictive-fetching
+8. mlx - https://github.com/mgechev/mlx
+9. mlx Angular demo - https://github.com/mgechev/guess-js-angular-demo
+10. mlx React demo - https://github.com/mgechev/guess-js-react-demo
+11. mlx Google Analytics demo - https://github.com/mgechev/mlx-ga-demo
+12. Using the Google Analytics Core Reporting API from Node.js - https://2ality.com/2015/10/google-analytics-api.html
+13. Preload, Prefetch And Priorities in Chrome - https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf
+14. Markov Chains - https://en.wikipedia.org/wiki/Markov_chain
+15. mlx parser - https://github.com/mgechev/mlx/tree/master/packages/parser
+16. ngast - https://github.com/mgechev/ngast
+17. Tarjan's strongly connected components algorithm - https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+18. Hidden Markov Chains - https://en.wikipedia.org/wiki/Hidden_Markov_model
+19. k-means clustering - https://en.wikipedia.org/wiki/K-means_clustering
