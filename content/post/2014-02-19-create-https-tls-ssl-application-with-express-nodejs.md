@@ -35,7 +35,7 @@ If you don’t already have certificate you need to generate one:
 
 
 You will be asked a couple of questions...
-<img src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675" />
+<img src="/images/legacy/uploads/2014/02/Screen-Shot-2014-02-19-at-10.05.55.png" alt="Certificate generation" width="831" height="375" class="aligncenter size-full wp-image-675" />
 
 In this case we generated a self-signed certificate for 365 days.
 
@@ -103,4 +103,4 @@ openssl rsa -in key.pem -out newkey.pem && mv newkey.pem key.pem
 
 Source [madboa.com](https://www.madboa.com/geek/openssl/#key-removepass).
 
-<img src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-19-at-10.14.40.png" alt="Https with Express" width="558" height="465" class="aligncenter size-full wp-image-676" />
+<img src="/images/legacy/uploads/2014/02/Screen-Shot-2014-02-19-at-10.14.40.png" alt="Https with Express" width="558" height="465" class="aligncenter size-full wp-image-676" />

@@ -18,7 +18,7 @@ url: /2012/07/08/debian-squeeze-lxde-on-google-nexus-s-or-having-some-fun-while-
 I’m here again, after a long pause. For a while I’ve got problems with my health and I’m nailed at home...so I’ve go a lot of free time. Last night I’ve decided to root my Google Nexus S.  
 I use Ubuntu
 
-[<img class="alignleft size-medium wp-image-152" style="margin: 10px;" title="Debian Squeeze with LXDE on Android 4.1" src="/images/legacy/uploads2012/07/547127_487402781271330_2093254846_n-300x180.jpg" alt="" width="300" height="180" />][1]
+[<img class="alignleft size-medium wp-image-152" style="margin: 10px;" title="Debian Squeeze with LXDE on Android 4.1" src="/images/legacy/uploads/2012/07/547127_487402781271330_2093254846_n-300x180.jpg" alt="" width="300" height="180" />][1]
 
 12.04 on my home machine so I put on it Oracle Java and Android SDK. I also installed few packages from the SDK (platform-tools). I created few udev rules, because my computer wasn’t able to know what to do when I plug-in my Nexus with a fastboot mode. In the next step I unlocked my Nexus (the reason for that was because my warranty is over...otherwise I would think a bit more before I go to the next step). Having the Android SDK, the unlock procedure is quite easy:
 
@@ -64,4 +64,4 @@ To start your VNC server at start-up add the following lines to .bashrc:
 
 And you’re done – just use your favorite VNC client to connect your phone to the Debian’s GUI.
 
- [1]: /images/legacy/uploads2012/07/547127_487402781271330_2093254846_n.jpg
+ [1]: /images/legacy/uploads/2012/07/547127_487402781271330_2093254846_n.jpg

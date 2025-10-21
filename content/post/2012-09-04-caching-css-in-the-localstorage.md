@@ -26,7 +26,7 @@ But what happens when the browser cache is empty, all your content isn’t cache
 The test is made using Google Chrome Version 20.0.1132.57.
 
 <div id="attachment_174" style="width: 725px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/09/loading.png"><img class="size-full wp-image-174 " title="Downloading required data" src="/images/legacy/uploads2012/09/loading.png" alt="" width="715" height="320" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/09/loading.png"><img class="size-full wp-image-174 " title="Downloading required data" src="/images/legacy/uploads/2012/09/loading.png" alt="" width="715" height="320" /></a><p class="wp-caption-text">
     With the blue line is the variant using localStorage. The red line is using referential CSS (not inline).
   </p>
 </div>
@@ -42,7 +42,7 @@ This is just the half of the most exiting part. The impact on the time required 
 The X-axis is the test ID and the Y-axis is the time required in ms. As you see here the browser’s caching wins. The average score for the localStorage is 42.19 versus 29.81.
 
 <div id="attachment_175" style="width: 725px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/09/onload2.png"><img class="size-full wp-image-175 " title="Time required for onload event to be fired. X axis is the test ID and the Y axis time in ms. " src="/images/legacy/uploads2012/09/onload2.png" alt="" width="715" height="320" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/09/onload2.png"><img class="size-full wp-image-175 " title="Time required for onload event to be fired. X axis is the test ID and the Y axis time in ms. " src="/images/legacy/uploads/2012/09/onload2.png" alt="" width="715" height="320" /></a><p class="wp-caption-text">
     Time required for onload event to be fired. X axis is the test ID and the Y axis time in ms.
   </p>
 </div>

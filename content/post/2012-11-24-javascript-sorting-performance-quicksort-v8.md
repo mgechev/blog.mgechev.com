@@ -32,7 +32,7 @@ A few days ago, I’ve created a <a title="Algorithms implemented in JavaScript"
 That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements. I waited...waited...and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I’ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google’s V8 engine</a>). After merge sort I’ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I’ve generated another array with 500k elements using a simple perl script. The result was very interesting...In the chart below you can see mergesort compared to heapsort for array with 50k elements.
 
 <div id="attachment_237" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="/images/legacy/uploads/2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs Mergesort 50k elements
   </p>
 </div>
@@ -147,7 +147,7 @@ If you find any mistakes in any of the implementations I’ll be glad to know an
 After I’ve made the test between merge and heap sorts I noticed that there’s a quite big difference...So that’s why I started heap vs the default sort to see how faster the native sort will be:
 
 <div id="attachment_239" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/500k-heap-vs-default.png"><img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-heap-vs-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/500k-heap-vs-default.png"><img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="/images/legacy/uploads/2012/11/500k-heap-vs-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs the default sort 500k elements
   </p>
 </div>
@@ -308,7 +308,7 @@ Let start...
 In the charts below there’s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).
 
 <div id="attachment_240" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/100-all.png"><img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="/images/legacy/uploads2012/11/100-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/100-all.png"><img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="/images/legacy/uploads/2012/11/100-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with arrays with 100 elements
   </p>
 </div>
@@ -316,7 +316,7 @@ In the charts below there’s a statistic for Selection sort, Insertion sort, Bu
 In this first chart there’s a statistic with 100 elements. In this case there’s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.
 
 <div id="attachment_241" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/10k-all.png"><img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="/images/legacy/uploads2012/11/10k-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/10k-all.png"><img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="/images/legacy/uploads/2012/11/10k-all.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements
   </p>
 </div>
@@ -324,7 +324,7 @@ In this first chart there’s a statistic with 100 elements. In this case there�
 In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let’s increase the array...Let’s try with 250k elements:
 
 <div id="attachment_242" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/250k-heap-merge-default.png"><img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="/images/legacy/uploads2012/11/250k-heap-merge-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/250k-heap-merge-default.png"><img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="/images/legacy/uploads/2012/11/250k-heap-merge-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs mergesort vs the default sort 250k elements
   </p>
 </div>
@@ -375,7 +375,7 @@ Let me include one more algorithm implementation. It will be quicksort. Its’ i
 I'll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:
 
 <div id="attachment_243" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/500k-quick-heap-default.png"><img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="/images/legacy/uploads2012/11/500k-quick-heap-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/500k-quick-heap-default.png"><img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="/images/legacy/uploads/2012/11/500k-quick-heap-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 500k elements
   </p>
 </div>
@@ -385,7 +385,7 @@ Here is something logical. Quicksort beats heapsort, but the custom (not optimiz
 Here is the last statistic with V8 v3.10.8. The array size this time will be 2 million.
 
 <div id="attachment_244" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default.png"><img class="size-full wp-image-244" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)" src="/images/legacy/uploads2012/11/2m-quick-heap-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/2m-quick-heap-default.png"><img class="size-full wp-image-244" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)" src="/images/legacy/uploads/2012/11/2m-quick-heap-default.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)
   </p>
 </div>
@@ -394,7 +394,7 @@ The default sort is more than 5 times slower...
 In the next chart there's statistics with the V8 engine used by node v0.8.12.
 
 <div id="attachment_245" style="width: 683px" class="wp-caption alignnone">
-  <a href="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png"><img class="size-full wp-image-245" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)" src="/images/legacy/uploads2012/11/2m-quick-heap-default-node.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
+  <a href="/images/legacy/uploads/2012/11/2m-quick-heap-default-node.png"><img class="size-full wp-image-245" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)" src="/images/legacy/uploads/2012/11/2m-quick-heap-default-node.png" alt="" width="673" height="385" /></a><p class="wp-caption-text">
     Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)
   </p>
 </div>

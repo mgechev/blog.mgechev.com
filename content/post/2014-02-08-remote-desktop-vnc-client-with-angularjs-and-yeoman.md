@@ -22,7 +22,7 @@ url: /2014/02/08/remote-desktop-vnc-client-with-angularjs-and-yeoman/
 
 In this blog post I’m going to show you how to build a VNC client using [AngularJS][2] and [Yeoman][3]. The source code used in the post is available at my [GitHub][4]. Click [here][5] to see the final result.
 
-[<img src="/images/legacy/uploads2014/02/yeoman-vnc-angular.png" alt="yeoman-vnc-angular" width="600" height="200" class="aligncenter size-full wp-image-647" />][1]
+[<img src="/images/legacy/uploads/2014/02/yeoman-vnc-angular.png" alt="yeoman-vnc-angular" width="600" height="200" class="aligncenter size-full wp-image-647" />][1]
 
 It seems I have affinity to the remote desktop protocols, because this is my third project at [GitHub][6], which implements one ([VNC client on 200 lines of JavaScript][7], [VNC client for Chrome DevTools][8] and [VNC client with AngularJS][4]).
 
@@ -32,7 +32,7 @@ Anyway, lets begin with the tutorial.
 
 First, lets take a look at our architecture:
 
-[<img class="aligncenter size-full wp-image-629" alt="angular-vnc" src="/images/legacy/uploads2014/02/angular-vnc.png" width="572" height="232" />][9]
+[<img class="aligncenter size-full wp-image-629" alt="angular-vnc" src="/images/legacy/uploads/2014/02/angular-vnc.png" width="572" height="232" />][9]
 
 We should have a VNC server on the machine we want to control. This machine provides interface accessible through the [RFB protocol][10]. The proxy in the middle has RFB client, which knows how to talk to the RFB server. The proxy also provides HTTP server, which is responsible for serving static files to the client and also allows communication through [socket.io][11]. The last component in our diagram is the “AngularJS VNC client”, which consists few HTML and JavaScript files provided to the browser by the proxy. This is what actually the user of our VNC client sees. He or she use the form provided in the “AngularJS VNC client” in order to enter connection details and connect to the machine he or she wants to control
 
@@ -271,7 +271,7 @@ yo angular{{< / highlight >}}
 
 Yeoman will ask you few questions, you should answer as follows:
 
-[<img class="aligncenter size-full wp-image-626" alt="Yeoman AngularJS VNC configuration" src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-08-at-19.29.28.png" width="528" height="325" />][15]
+[<img class="aligncenter size-full wp-image-626" alt="Yeoman AngularJS VNC configuration" src="/images/legacy/uploads/2014/02/Screen-Shot-2014-02-08-at-19.29.28.png" width="528" height="325" />][15]
 
 We are going to use Bootstrap and \`angular-route.js\`. Wait few seconds and all required dependencies will be resolved.
 
@@ -384,7 +384,7 @@ node index.js{{< / highlight >}}
 
 and open <http://localhost:8090>, you should see something like this:
 
-[<img class="aligncenter size-full wp-image-641" alt="VNC Login Form" src="/images/legacy/uploads2014/02/Screen-Shot-2014-02-08-at-20.43.44.png" width="374" height="369" />][16]
+[<img class="aligncenter size-full wp-image-641" alt="VNC Login Form" src="/images/legacy/uploads/2014/02/Screen-Shot-2014-02-08-at-20.43.44.png" width="374" height="369" />][16]
 
 The awesome thing is that we already have validation for the form! Did you notice that we added selector `form.ng-invalid.ng-dirty input.ng-invalid`? AngularJS is smart enough to validate the fields in our form by seeing their type (for example `input type="number"`, for the port) and their attributes (`required`, `ng-minlength`). When AngularJS detects that any field is not valid it adds the class: `ng-invalid` to the field, it also adds the class `ng-invalid` to the form, where this field is located. We, simply, take advantage, of this functionality provided by AngularJS, and define the styles: `form.ng-invalid.ng-dirty input.ng-invalid`. If you’re still not aware how the validation works checkout [Form Validation in NG-Tutorial][17].
 
@@ -905,7 +905,7 @@ Now open the url: <http://localhost:8090>, and rock!
 
 <iframe width="420" height="315" src="//www.youtube.com/embed/FwPjTt4dQmw" frameborder="0" allowfullscreen></iframe>
 
- [1]: /images/legacy/uploads2014/02/yeoman-vnc-angular.png
+ [1]: /images/legacy/uploads/2014/02/yeoman-vnc-angular.png
  [2]: http://angularjs.org/
  [3]: http://yeoman.io/
  [4]: https://github.com/mgechev/angular-vnc
@@ -913,14 +913,14 @@ Now open the url: <http://localhost:8090>, and rock!
  [6]: https://github.com/mgechev
  [7]: https://github.com/mgechev/js-vnc-demo-project
  [8]: https://github.com/mgechev/devtools-vnc
- [9]: /images/legacy/uploads2014/02/angular-vnc.png
+ [9]: /images/legacy/uploads/2014/02/angular-vnc.png
  [10]: https://en.wikipedia.org/wiki/RFB_protocol
  [11]: http://socket.io/
  [12]: #angular-vnc
  [13]: https://github.com/mgechev/angular-vnc/tree/master/proxy
  [14]: https://en.wikipedia.org/wiki/Lazy_evaluation
- [15]: /images/legacy/uploads2014/02/Screen-Shot-2014-02-08-at-19.29.28.png
- [16]: /images/legacy/uploads2014/02/Screen-Shot-2014-02-08-at-20.43.44.png
+ [15]: /images/legacy/uploads/2014/02/Screen-Shot-2014-02-08-at-19.29.28.png
+ [16]: /images/legacy/uploads/2014/02/Screen-Shot-2014-02-08-at-20.43.44.png
  [17]: http://ng-tutorial.mgechev.com/#?tutorial=form-validation&step=basic-validation
  [18]: https://en.wikipedia.org/wiki/Observer_pattern
  [19]: https://github.com/mgechev/angular-vnc/blob/master/client/app/scripts/directives/vnc-screen.js

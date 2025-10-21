@@ -317,7 +317,7 @@ And...well...thats all! We have ready to go VNC client in just few lines of Java
 
 Quick video demo
 
- [1]: /images/legacy/uploads2013/08/js-vnc.png
+ [1]: /images/legacy/uploads/2013/08/js-vnc.png
  [2]: http://www.realvnc.com/
  [3]: https://github.com/sidorares/node-rfb2
  [4]: https://npmjs.org/package/connect

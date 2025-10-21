@@ -29,7 +29,7 @@ Basic functionality of the editor can be saw here: <http://mgechev.com/canvas-ed
 
 I hope that in two/three months it’s full functionality will be implemented and ready for use. If you want to subscribe my development process you can follow me in [GitHub][3], [Twitter][4] or read my blog from time to time :-).
 
- [1]: /images/legacy/uploads2012/04/html5editor.png
+ [1]: /images/legacy/uploads/2012/04/html5editor.png
  [2]: https://github.com/mgechev/image-editor "Image editor"
  [3]: https://github.com/mgechev
  [4]: http://twitter.com/mgechev
