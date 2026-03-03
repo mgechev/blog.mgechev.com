@@ -23,20 +23,20 @@
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily &#x2014; Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? No one tests them.Why Skills Need Tests When you write a skill, you&amp;rsquo;re essentially writing documentation that an agent will follow autonomously.">
+<meta name="description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? There&amp;rsquo;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best.">
 
 <meta property="og:title" content="Skill Eval - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2026/02/26/skill-eval/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily &#x2014; Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? No one tests them.Why Skills Need Tests When you write a skill, you&amp;rsquo;re essentially writing documentation that an agent will follow autonomously.">
+<meta property="og:description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? There&amp;rsquo;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best.">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2026/02/26/skill-eval/">
 <meta name="twitter:title" content="Skill Eval - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily &#x2014; Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? No one tests them.Why Skills Need Tests When you write a skill, you&amp;rsquo;re essentially writing documentation that an agent will follow autonomously.">
+<meta name="twitter:description" content="Testing Your AI Agent Skills I&amp;rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.The problem? There&amp;rsquo;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best.">
 
 
 <script type="application/ld+json">
@@ -64,7 +64,7 @@
         "height": 60
       }
     },
-    "description": "Testing Your AI Agent Skills I\u0026rsquo;ve been working with AI coding agents daily — Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.\nThe problem? No one tests them.\nWhy Skills Need Tests When you write a skill, you\u0026rsquo;re essentially writing documentation that an agent will follow autonomously."
+    "description": "Testing Your AI Agent Skills I\u0026rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.\nThe problem? There\u0026rsquo;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best."
   }
 </script>
 
@@ -131,28 +131,46 @@
 
 
   <div class="article-body"><h1 id="testing-your-ai-agent-skills">Testing Your AI Agent Skills</h1>
-<p>I&#x2019;ve been working with AI coding agents daily &#x2014; Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building <em>skills</em> for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.</p>
-<p>The problem? No one tests them.</p>
-<h2 id="why-skills-need-tests">Why Skills Need Tests</h2>
-<p>When you write a skill, you&#x2019;re essentially writing documentation that an agent will follow autonomously. A small change &#x2014; rewording a step, reordering instructions, removing a &#x201C;verify&#x201D; command &#x2014; can silently break the agent&#x2019;s behavior. You won&#x2019;t notice until someone complains that the agent stopped following the deployment checklist, or worse, that it&#x2019;s making changes it shouldn&#x2019;t.</p>
-<p>This is the same problem we solved decades ago with unit tests for code. Skills are code for agents. They deserve the same rigor.</p>
-<h2 id="skill-eval">Skill Eval</h2>
-<p>I built <a href="https://github.com/mgechev/skill-eval">Skill Eval</a> to close this gap. It&#x2019;s a TypeScript framework that benchmarks how well an agent uses your skills. You define a task, point it at your skill, and the framework runs the agent in a Docker container, then grades the result.</p>
-<p>Here&#x2019;s what a run looks like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">&#x1F680; superlint_demo | agent=gemini provider=docker trials=5
-
-  Trial 1/5 &#x25B8; &#x2713; reward=1.00 (85.2s, ~354 tokens)
-  Trial 2/5 &#x25B8; &#x2713; reward=1.00 (91.4s, ~372 tokens)
-  Trial 3/5 &#x25B8; &#x2717; reward=0.30 (78.1s, ~298 tokens)
-  Trial 4/5 &#x25B8; &#x2713; reward=1.00 (88.7s, ~361 tokens)
-  Trial 5/5 &#x25B8; &#x2713; reward=1.00 (92.3s, ~380 tokens)
-
-  Pass Rate   86.0%
-  pass@5      100.0%
-  pass^5      65.6%
-  Total Tokens ~1765 (estimated)
-</code></pre></div><p>The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (<code>.agents/skills/</code> for Gemini, <code>.claude/skills/</code> for Claude) so the agent finds them naturally, exactly like it would in production.</p>
+<p>I&#x2019;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building <em>skills</em> for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.</p>
+<p>The problem? There&#x2019;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best. When you tweak the instructions, you have no signal telling you whether that change made things better or worse. You&#x2019;re flying blind.</p>
+<p>I built <a href="https://github.com/mgechev/skill-eval">Skill Eval</a> to fix this. It gives you a concrete score for how well an agent follows your skill, and it tracks that score over time. Edit a skill, run the eval, and you&#x2019;ll know immediately if the change was an improvement or a regression. Think of it as your test suite for agent skills.</p>
+<h2 id="why-skills-need-this">Why Skills Need This</h2>
+<p>When you write a skill, you&#x2019;re writing instructions that an agent will follow autonomously. A small change, for example rewording a step, reordering instructions, or removing a &#x201C;verify&#x201D; command, can silently break the agent&#x2019;s behavior. Without a measurement framework, you won&#x2019;t notice until someone complains that the agent stopped following the deployment checklist, or worse, that it&#x2019;s making changes it shouldn&#x2019;t.</p>
+<p>This is the same problem we solved decades ago with unit tests for code. Skills are code for agents. They deserve the same rigor - and the same feedback loop.</p>
 <h2 id="how-it-works">How It Works</h2>
+<p>Skill Eval is a TypeScript framework that benchmarks how well an agent follows your skills. You define a task, point it at your skill, and the framework runs the agent in a Docker container, then grades the result.</p>
+<p>Here&#x2019;s what a run looks like:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Auto-discovered skills: superlint
+
+&#x1F680; superlint_demo | agent=gemini provider=docker trials=5
+
+Starting eval for task: superlint_demo (5 trials)
+  Image ready: skill-eval-superlint_demo-1772578685532-ready (ba2c4c6f9193)
+  Trial 1/5 &#x25B8; &#x2713; reward=1.00 (55.0s, 2 cmds, ~716 tokens)
+  Trial 2/5 &#x25B8; &#x2713; reward=0.91 (33.1s, 2 cmds, ~798 tokens)
+  Trial 3/5 &#x25B8; &#x2713; reward=0.70 (46.8s, 2 cmds, ~798 tokens)
+  Trial 4/5 &#x25B8; &#x2713; reward=0.70 (40.5s, 2 cmds, ~648 tokens)
+  Trial 5/5 &#x25B8; &#x2713; reward=0.70 (48.4s, 2 cmds, ~650 tokens)
+Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-03-03T23-01-52-683Z.json
+
+&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+&#x2502; (index) &#x2502; Trial &#x2502; Reward &#x2502; Duration &#x2502; Commands &#x2502; Tokens (in/out) &#x2502; Graders                            &#x2502;
+&#x251C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x253C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2524;
+&#x2502; 0       &#x2502; 1     &#x2502; &apos;1.00&apos; &#x2502; &apos;55.0s&apos;  &#x2502; 2        &#x2502; &apos;~268/448&apos;      &#x2502; &apos;deterministic:1.0 llm_rubric:1.0&apos; &#x2502;
+&#x2502; 1       &#x2502; 2     &#x2502; &apos;0.91&apos; &#x2502; &apos;33.1s&apos;  &#x2502; 2        &#x2502; &apos;~268/530&apos;      &#x2502; &apos;deterministic:1.0 llm_rubric:0.7&apos; &#x2502;
+&#x2502; 2       &#x2502; 3     &#x2502; &apos;0.70&apos; &#x2502; &apos;46.8s&apos;  &#x2502; 2        &#x2502; &apos;~268/530&apos;      &#x2502; &apos;deterministic:1.0 llm_rubric:0.0&apos; &#x2502;
+&#x2502; 3       &#x2502; 4     &#x2502; &apos;0.70&apos; &#x2502; &apos;40.5s&apos;  &#x2502; 2        &#x2502; &apos;~268/380&apos;      &#x2502; &apos;deterministic:1.0 llm_rubric:0.0&apos; &#x2502;
+&#x2502; 4       &#x2502; 5     &#x2502; &apos;0.70&apos; &#x2502; &apos;48.4s&apos;  &#x2502; 2        &#x2502; &apos;~268/382&apos;      &#x2502; &apos;deterministic:1.0 llm_rubric:0.0&apos; &#x2502;
+&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2534;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;
+  Pass Rate   80.2%
+  pass@5      100.0%
+  pass^5      100.0%
+  Avg Duration 44.8s | Avg Commands 2.0
+  Total Tokens ~3610 (estimated)
+  Skills      superlint
+  Saved to    /Users/mgechev/Projects/skill-eval/results
+</code></pre></div><p>The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (<code>.agents/skills/</code> for Gemini, <code>.claude/skills/</code> for Claude) so the agent finds them naturally, exactly like it would in production.</p>
+<h2 id="task-structure">Task Structure</h2>
 <p>Each task is a self-contained directory:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">tasks/my_task/
 &#x251C;&#x2500;&#x2500; task.toml           # Timeouts, graders, resource limits
@@ -182,6 +200,7 @@
 </span><span class="w">      </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">npm run eval my_task -- --trials=5 --provider=docker</span><span class="w">
 </span><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
 </span><span class="w">          </span><span class="nt">GEMINI_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.GEMINI_API_KEY }}</span><span class="w">
+</span><span class="w">          </span><span class="nt">ANTHROPIC_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.ANTHROPIC_API_KEY }}</span><span class="w">
 </span></code></pre></div><p>A few recommendations from <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic&#x2019;s research on agent evals</a>:</p>
 <ul>
 <li><strong>Run at least 5 trials.</strong> Agent behavior is non-deterministic. A single run means nothing.</li>
@@ -194,11 +213,8 @@
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">git clone https://github.com/mgechev/skill-eval
 <span class="nb">cd</span> skill-eval <span class="o">&amp;&amp;</span> npm install
 
-<span class="c1"># Validate graders with the reference solution (no API key needed)</span>
-npm run <span class="nb">eval</span> superlint -- --validate --provider<span class="o">=</span><span class="nb">local</span>
-
 <span class="c1"># Run a real eval</span>
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key npm run <span class="nb">eval</span> superlint -- --provider<span class="o">=</span>docker --trials<span class="o">=</span><span class="m">5</span>
+<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key npm run <span class="nb">eval</span> superlint
 </code></pre></div><p>Check out the <a href="https://github.com/mgechev/skills-best-practices">Skills Best Practices</a> for guidelines on writing skills that agents can actually follow.</p>
 <p>Skills are becoming a first-class part of how we work with AI agents. As they get more complex and more teams depend on them, testing them stops being optional. Don&#x2019;t ship skills without evals.</p>
 </div>

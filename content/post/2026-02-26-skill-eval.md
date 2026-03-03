@@ -18,40 +18,59 @@ url: /2026/02/26/skill-eval
 
 # Testing Your AI Agent Skills
 
-I've been working with AI coding agents daily — Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building *skills* for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
+I've been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building *skills* for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
 
-The problem? No one tests them.
+The problem? There's no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best. When you tweak the instructions, you have no signal telling you whether that change made things better or worse. You're flying blind.
 
-## Why Skills Need Tests
+I built [Skill Eval](https://github.com/mgechev/skill-eval) to fix this. It gives you a concrete score for how well an agent follows your skill, and it tracks that score over time. Edit a skill, run the eval, and you'll know immediately if the change was an improvement or a regression. Think of it as your test suite for agent skills.
 
-When you write a skill, you're essentially writing documentation that an agent will follow autonomously. A small change — rewording a step, reordering instructions, removing a "verify" command — can silently break the agent's behavior. You won't notice until someone complains that the agent stopped following the deployment checklist, or worse, that it's making changes it shouldn't.
+## Why Skills Need This
 
-This is the same problem we solved decades ago with unit tests for code. Skills are code for agents. They deserve the same rigor.
+When you write a skill, you're writing instructions that an agent will follow autonomously. A small change, for example rewording a step, reordering instructions, or removing a "verify" command, can silently break the agent's behavior. Without a measurement framework, you won't notice until someone complains that the agent stopped following the deployment checklist, or worse, that it's making changes it shouldn't.
 
-## Skill Eval
+This is the same problem we solved decades ago with unit tests for code. Skills are code for agents. They deserve the same rigor - and the same feedback loop.
 
-I built [Skill Eval](https://github.com/mgechev/skill-eval) to close this gap. It's a TypeScript framework that benchmarks how well an agent uses your skills. You define a task, point it at your skill, and the framework runs the agent in a Docker container, then grades the result.
+## How It Works
+
+Skill Eval is a TypeScript framework that benchmarks how well an agent follows your skills. You define a task, point it at your skill, and the framework runs the agent in a Docker container, then grades the result.
 
 Here's what a run looks like:
 
 ```
+Auto-discovered skills: superlint
+
 🚀 superlint_demo | agent=gemini provider=docker trials=5
 
-  Trial 1/5 ▸ ✓ reward=1.00 (85.2s, ~354 tokens)
-  Trial 2/5 ▸ ✓ reward=1.00 (91.4s, ~372 tokens)
-  Trial 3/5 ▸ ✗ reward=0.30 (78.1s, ~298 tokens)
-  Trial 4/5 ▸ ✓ reward=1.00 (88.7s, ~361 tokens)
-  Trial 5/5 ▸ ✓ reward=1.00 (92.3s, ~380 tokens)
+Starting eval for task: superlint_demo (5 trials)
+  Image ready: skill-eval-superlint_demo-1772578685532-ready (ba2c4c6f9193)
+  Trial 1/5 ▸ ✓ reward=1.00 (55.0s, 2 cmds, ~716 tokens)
+  Trial 2/5 ▸ ✓ reward=0.91 (33.1s, 2 cmds, ~798 tokens)
+  Trial 3/5 ▸ ✓ reward=0.70 (46.8s, 2 cmds, ~798 tokens)
+  Trial 4/5 ▸ ✓ reward=0.70 (40.5s, 2 cmds, ~648 tokens)
+  Trial 5/5 ▸ ✓ reward=0.70 (48.4s, 2 cmds, ~650 tokens)
+Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-03-03T23-01-52-683Z.json
 
-  Pass Rate   86.0%
+┌─────────┬───────┬────────┬──────────┬──────────┬─────────────────┬────────────────────────────────────┐
+│ (index) │ Trial │ Reward │ Duration │ Commands │ Tokens (in/out) │ Graders                            │
+├─────────┼───────┼────────┼──────────┼──────────┼─────────────────┼────────────────────────────────────┤
+│ 0       │ 1     │ '1.00' │ '55.0s'  │ 2        │ '~268/448'      │ 'deterministic:1.0 llm_rubric:1.0' │
+│ 1       │ 2     │ '0.91' │ '33.1s'  │ 2        │ '~268/530'      │ 'deterministic:1.0 llm_rubric:0.7' │
+│ 2       │ 3     │ '0.70' │ '46.8s'  │ 2        │ '~268/530'      │ 'deterministic:1.0 llm_rubric:0.0' │
+│ 3       │ 4     │ '0.70' │ '40.5s'  │ 2        │ '~268/380'      │ 'deterministic:1.0 llm_rubric:0.0' │
+│ 4       │ 5     │ '0.70' │ '48.4s'  │ 2        │ '~268/382'      │ 'deterministic:1.0 llm_rubric:0.0' │
+└─────────┴───────┴────────┴──────────┴──────────┴─────────────────┴────────────────────────────────────┘
+  Pass Rate   80.2%
   pass@5      100.0%
-  pass^5      65.6%
-  Total Tokens ~1765 (estimated)
+  pass^5      100.0%
+  Avg Duration 44.8s | Avg Commands 2.0
+  Total Tokens ~3610 (estimated)
+  Skills      superlint
+  Saved to    /Users/mgechev/Projects/skill-eval/results
 ```
 
 The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (`.agents/skills/` for Gemini, `.claude/skills/` for Claude) so the agent finds them naturally, exactly like it would in production.
 
-## How It Works
+## Task Structure
 
 Each task is a self-contained directory:
 
@@ -91,6 +110,7 @@ jobs:
       - run: npm run eval my_task -- --trials=5 --provider=docker
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
 
 A few recommendations from [Anthropic's research on agent evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents):
@@ -108,11 +128,8 @@ If your skill has pass@5 = 100% but pass^5 = 30%, the agent *can* do it but is f
 git clone https://github.com/mgechev/skill-eval
 cd skill-eval && npm install
 
-# Validate graders with the reference solution (no API key needed)
-npm run eval superlint -- --validate --provider=local
-
 # Run a real eval
-GEMINI_API_KEY=your-key npm run eval superlint -- --provider=docker --trials=5
+GEMINI_API_KEY=your-key npm run eval superlint
 ```
 
 Check out the [Skills Best Practices](https://github.com/mgechev/skills-best-practices) for guidelines on writing skills that agents can actually follow.
