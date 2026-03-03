@@ -16,7 +16,7 @@ title: Skill Eval
 url: /2026/02/26/skill-eval
 ---
 
-# Testing Your AI Agent Skills
+# Unit Tests for AI Agent Skills
 
 I've been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building *skills* for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
 
