@@ -17,6 +17,10 @@ og_image: /images/skill-eval/dashboard.png
 url: /2026/02/26/skill-eval
 ---
 
+<div style="padding: 15px; border-radius: 5px; background-color:rgb(241 255 240); border: 1px solid #e9e9e9;">
+⭐ Find <a href="https://github.com/mgechev/skill-eval">Skill Eval on GitHub</a>
+</div>
+
 # Unit Tests for AI Agent Skills
 
 I've been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building *skills* for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
