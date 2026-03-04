@@ -12,7 +12,7 @@ tags:
 - LLMs
 - Agents
 - Evals
-title: Skill Eval
+title: Unit Tests for AI Agent Skills
 og_image: /images/skill-eval/dashboard.png
 url: /2026/02/26/skill-eval
 ---
