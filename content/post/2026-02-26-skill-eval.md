@@ -13,6 +13,7 @@ tags:
 - Agents
 - Evals
 title: Skill Eval
+og_image: /images/skill-eval/dashboard.png
 url: /2026/02/26/skill-eval
 ---
 
@@ -69,6 +70,10 @@ Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-
 ```
 
 The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (`.agents/skills/` for Gemini, `.claude/skills/` for Claude) so the agent finds them naturally, exactly like it would in production.
+
+The results are also available in a web dashboard where you can drill into individual trials and inspect grader scores:
+
+<img src="/images/skill-eval/dashboard.png" style="display: block; margin: auto" alt="Skill Eval web dashboard showing trial results with deterministic and LLM rubric grader scores">
 
 ## Task Structure
 
