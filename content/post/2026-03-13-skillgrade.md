@@ -12,7 +12,7 @@ tags:
 - LLMs
 - Agents
 - Evals
-title: "skill grade"
+title: "skillgrade"
 og_image: /images/skill-eval/dashboard.png
 url: /2026/03/14/skillgrade
 ---
@@ -21,7 +21,7 @@ url: /2026/03/14/skillgrade
 ⭐ Find <a href="https://github.com/mgechev/skillgrade">Skillgrade on GitHub</a>
 </div>
 
-# skill grade
+# skillgrade
 
 A few weeks ago I wrote about [Skill Eval](https://blog.mgechev.com/2026/02/26/skill-eval/), a framework for testing AI agent skills. The idea resonated — skills are becoming a critical part of how teams work with agents, and without a way to measure whether they work, you're guessing.
 
