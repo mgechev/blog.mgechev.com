@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html ⚡="" amp="">
+<html ⚡ amp>
   <head><script async custom-element="amp-youtube" src="https://cdn.ampproject.org/v0/amp-youtube-0.1.js"></script><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
     
 <meta name="pinterest" content="nopin">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.163.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -15,28 +15,28 @@
 
 
     
-    <style amp-custom=""></style>
+    <style amp-custom></style>
     
     <title>Flux in Depth. Store and Network Communication. - Minko Gechev&apos;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
     
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In the first post we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication.">
+<meta name="description" content="&lt;p&gt;This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In &lt;a href=&quot;https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/&quot;&gt;the first post&lt;/a&gt; we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.&lt;/p&gt;">
 
 <meta property="og:title" content="Flux in Depth. Store and Network Communication. - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2015/07/18/flux-in-depth-store-network-communication-services/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In the first post we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication.">
+<meta property="og:description" content="&lt;p&gt;This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In &lt;a href=&quot;https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/&quot;&gt;the first post&lt;/a&gt; we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.&lt;/p&gt;">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2015/07/18/flux-in-depth-store-network-communication-services/">
 <meta name="twitter:title" content="Flux in Depth. Store and Network Communication. - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In the first post we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication.">
+<meta name="twitter:description" content="&lt;p&gt;This is the second, and probably be the last, blog post of the series &amp;ldquo;Flux in Depth&amp;rdquo;. In &lt;a href=&quot;https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/&quot;&gt;the first post&lt;/a&gt; we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we&amp;rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn&amp;rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.&lt;/p&gt;">
 
 
 <script type="application/ld+json">
@@ -64,12 +64,12 @@
         "height": 60
       }
     },
-    "description": "This is the second, and probably be the last, blog post of the series \u0026ldquo;Flux in Depth\u0026rdquo;. In the first post we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we\u0026rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn\u0026rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication."
+    "description": "\u003cp\u003eThis is the second, and probably be the last, blog post of the series \u0026ldquo;Flux in Depth\u0026rdquo;. In \u003ca href=\u0022https:\/\/blog.mgechev.com\/2015\/05\/15\/flux-in-depth-overview-components\/\u0022\u003ethe first post\u003c\/a\u003e we did a quick overview of flux, took a look at the stateless, pure components, immutable data structures and component communication. This time, we\u0026rsquo;re going to introduce the store and how we can communicate with services through the network via HTTP, WebSocket or WebRTC. Since the flux architecture doesn\u0026rsquo;t define a way of communication with external services, here you can find my way of dealing with network communication. If you have any suggestions or opinions, do not hesitate to leave a comment.\u003c\/p\u003e"
   }
 </script>
 
 
-    <style amp-custom="">
+    <style amp-custom>
       html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
 
       
@@ -143,12 +143,12 @@
 <p><a href="/images/intervention.jpg"><amp-img src="/images/intervention.jpg" alt="Intervention"></amp-img></a></p>
 <h3 id="chain-of-responsibility">Chain of Responsibility</h3>
 <p>This is a design pattern, which is exclusively used in the event-driven programming. Lets change the context and talk about DOM for a while. I bet you know that you can listen for any event on the document, for example once a user clicks on a button the event will propagate to the root of the DOM tree (eventually, if nothing stop it) and be caught by your listener:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;click&apos;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
-  <span class="nx">alert</span><span class="p">(</span><span class="sb">`You actually clicked on element with #</span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&apos;id&apos;</span><span class="p">)</span><span class="si">}</span><span class="sb">, not on document`</span><span class="p">);</span>
-  <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span> <span class="o">===</span> <span class="nb">document</span><span class="p">)</span>
-<span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;awesome-button&quot;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</code></pre></div><p><a class="jsbin-embed" href="http://jsbin.com/hezizi/embed?output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.34.0"></script></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&apos;click&apos;</span><span class="p">,</span> <span class="nx">e</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">alert</span><span class="p">(</span><span class="sb">`You actually clicked on element with #</span><span class="si">${</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&apos;id&apos;</span><span class="p">)</span><span class="si">}</span><span class="sb">, not on document`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">currentTarget</span> <span class="o">===</span> <span class="nb">document</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">button</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;awesome-button&quot;</span><span class="p">&gt;</span>Click me<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span></span></code></pre></div><p><a class="jsbin-embed" href="http://jsbin.com/hezizi/embed?output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.34.0"></script></p>
 <p>If you click on the <code>awesome-button</code>, you&#x2019;ll see two alert boxes: &#x201C;You actually clicked on element with #awesome-button, not directly on document&#x201D; and &#x201C;true&#x201D;. If you change the third parameter of <code>addEventListener</code> to <code>true</code>, the event will propagate in the opposite direction (i.e. from top to bottom, capturing mode).</p>
 <p>Why I said all of this? Well, this is the pattern Chain of Responsibility:</p>
 <blockquote>
@@ -161,36 +161,36 @@
 <p>Lets take a look at the following diagram, it illustrates the initial setup of our application:</p>
 <p><a href="/images/store-services/initial-setup.png"><amp-img src="/images/store-services/initial-setup.png" alt="Initial Setup"></amp-img></a></p>
 <p>The tree on the left-hand side is the store, which serialized into JSON looks the following way:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
-  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
-  <span class="p">],</span>
-  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span> <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div><p>The tree on the right-hand side is the component tree. We already described the component trees in the <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">previous part</a>. Here is a snippet, which shows the relation between the <code>Chat</code> store and the <code>ChatBox</code> component:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&apos;react&apos;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&apos;../store/Chat&apos;</span><span class="p">;</span>
-
-<span class="kr">class</span> <span class="nx">ChatBox</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
-  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
-    <span class="nx">Chat</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;change&apos;</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span>
-      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">messages</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">}</span><span class="o">/&gt;</span>
-        <span class="o">&lt;</span><span class="nx">MessageInput</span><span class="o">/&gt;</span>
-      <span class="o">&lt;</span><span class="err">/div&gt;</span>
-    <span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>Basically, the root component (<code>ChatBox</code>) is subscribed to the <code>change</code> event of the <code>Chat</code>. When the <code>Chat</code> emits a <code>change</code> event, the <code>ChatBox</code> sets its state to be the current store and passes the store&#x2019;s content down the component tree. That&#x2019;s it.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The tree on the right-hand side is the component tree. We already described the component trees in the <a href="https://blog.mgechev.com/2015/05/15/flux-in-depth-overview-components/">previous part</a>. Here is a snippet, which shows the relation between the <code>Chat</code> store and the <code>ChatBox</code> component:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">React</span> <span class="nx">from</span> <span class="s1">&apos;react&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">import</span> <span class="nx">Chat</span> <span class="nx">from</span> <span class="s1">&apos;../store/Chat&apos;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">class</span> <span class="nx">ChatBox</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">super</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">Chat</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&apos;change&apos;</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">MessagesList</span> <span class="nx">messages</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">messages</span><span class="p">}</span><span class="o">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">&lt;</span><span class="nx">MessageInput</span><span class="o">/&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Basically, the root component (<code>ChatBox</code>) is subscribed to the <code>change</code> event of the <code>Chat</code>. When the <code>Chat</code> emits a <code>change</code> event, the <code>ChatBox</code> sets its state to be the current store and passes the store&#x2019;s content down the component tree. That&#x2019;s it.</p>
 <p>What happens if something change our store?</p>
 <p><a href="/images/store-services/message-change.png"><amp-img src="/images/store-services/message-change.png" alt="Change of store"></amp-img></a></p>
 <p>On the diagram above something changed the first message in the <code>Chat</code> store (lets say the <code>text</code> property was changed). Once a property in a <code>message</code> changes, the message emits an event and propagates it to the parent (step <code>1</code>) which means that the event reaches the <code>messages</code> collection. The <code>messages</code> collection triggers change event and propagates the event to the <code>chat</code> (root object, step <code>2</code>). The <code>chat</code> object emits a change event, which is being caught by the <code>ChatBox</code> component, which sets its state to the content of the store. That&#x2019;s it&#x2026;</p>
@@ -205,20 +205,20 @@
 <li>Users</li>
 </ul>
 <p>However, in most cases, this is not enough. Your application also has a UI state. For example, whether given dialog is opened or no, what is the dialog&#x2019;s position, etc. The data, which defines now your components will be rendered, depends on both - your UI state and the model. This is the reason I create a combined store, which presents both. For example, if we add a few dialogs to our chat application, the JSON representation of the store may look like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="p">{</span>
-  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
-    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
-  <span class="p">],</span>
-  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span><span class="p">}</span>
-  <span class="p">],</span>
-  <span class="nt">&quot;dialogsOpenStatus&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;nicknameInput&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-    <span class="nt">&quot;editMessage&quot;</span><span class="p">:</span> <span class="kc">false</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div><p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;users&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey foo&quot;</span><span class="p">,</span> <span class="nt">&quot;by&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nt">&quot;timestamp&quot;</span><span class="p">:</span> <span class="mi">1437147880686</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&quot;dialogsOpenStatus&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;nicknameInput&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&quot;editMessage&quot;</span><span class="p">:</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>I always prefer to have separation between the UI state and the model because the communication with external services usually requires only handling changes in the model, so events emitted by the UI store does not concern us.</p>
 <h3 id="quick-faq">Quick FAQ:</h3>
 <p><em>Alright, I got it. So if I have a mouse move event, which changes the store by updating the mouse position, we should go through the entire described data flow?</em><br>
 This doesn&#x2019;t seem like quite a good idea. If you have a big store and huge component tree, re-rendering it on mouse move will impact the performance of your application dramatically! What will be the biggest slowdown? Well, you&#x2019;ll have to serialize the store to a POJO (Plain Old JavaScript Object), later you need to pass it to the root component, which is responsible for passing it down to its children and so on. And all of this because of two changed numbers? It is completely unnecessary. In such cases I&#x2019;d recommend adding event listeners in the specific component, which depends on the mouse position and creating a separate store for it.</p>
@@ -293,7 +293,7 @@ Most likely you have collision in the action types. I&#x2019;d suggest to use th
       <ol class="p-crumb">
         <li><a href="https://blog.mgechev.com/">Minko Gechev&apos;s blog</a></li>
         
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
         
         <li>Flux in Depth. Store and Network Communication.</li>
       </ol>

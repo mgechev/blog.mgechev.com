@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.163.2">
 		<title>CSS3 flipping effect &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -18,15 +18,17 @@
 		
 
 		
-		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+		
 		
 		
 		<link rel="amphtml" href="https://blog.mgechev.com/amp/2013/05/04/css3-flipping-effect/">
 		
+		
 
 		<meta property="og:title" content="CSS3 flipping effect" />
 		<meta property="og:description" content="As you know because of the SIMD nature of the GPU it’s extremely good for graphical calculations. Since HTML5 and CSS3 are here we have a couple of ways for efficient and smooth animations one of them are the CSS3 transitions.
-Before few days I needed a CSS3 flipping effect which should works at least in IE10, Chrome 25&#43; and Firefox. I tried different demos which I found in the web but there were couple of issues with them." />
+Before few days I needed a CSS3 flipping effect which should works at least in IE10, Chrome 25&#43; and Firefox. I tried different demos which I found in the web but there were couple of issues with them. The lack of support of preserve-3d in IE10 was one major thing, issues with backface-visibility in Chrome were also a bit frustrating. It looks like Firefox was the champion in the CSS3 flipping effects because most of the demos were failing in IE10 or Chrome but working on Firefox." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2013/05/04/css3-flipping-effect/" />
 		
@@ -93,72 +95,72 @@ Before few days I needed a CSS3 flipping effect which should works at least in I
 <p>Before few days I needed a CSS3 flipping effect which should works at least in IE10, Chrome 25+ and Firefox. I tried different demos which I found in the web but there were couple of issues with them. The lack of support of <strong>preserve-3d</strong> in IE10 was one major thing, issues with <strong>backface-visibility</strong> in Chrome were also a bit frustrating. It looks like Firefox was the champion in the CSS3 flipping effects because most of the demos were failing in IE10 or Chrome but working on Firefox.</p>
 <p>Anyway <a href="http://jsfiddle.net/mgechev/GpK25/16/" target="_blank">here is demo</a> of the example I wrote.</p>
 <p>Here is the CSS:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-CSS" data-lang="CSS"><span class="p">.</span><span class="nc">panel</span> <span class="p">{</span>
-    <span class="k">width</span><span class="p">:</span> <span class="mi">300</span><span class="kt">px</span><span class="p">;</span>
-    <span class="k">height</span><span class="p">:</span> <span class="mi">300</span><span class="kt">px</span><span class="p">;</span>
-    <span class="k">margin</span><span class="p">:</span> <span class="kc">auto</span><span class="p">;</span>
-    <span class="k">position</span><span class="p">:</span> <span class="kc">relative</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="p">.</span><span class="nc">card</span> <span class="p">{</span>
-    <span class="k">width</span><span class="p">:</span> <span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
-    <span class="k">height</span><span class="p">:</span> <span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
-    <span class="kp">-o-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
-    <span class="kp">-ms-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
-    <span class="kp">-moz-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
-    <span class="kp">-webkit-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
-    <span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
-    <span class="kp">-webkit-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
-    <span class="kp">-ms-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
-    <span class="kp">-moz-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
-    <span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
-    <span class="k">position</span><span class="p">:</span> <span class="kc">absolute</span><span class="p">;</span>
-    <span class="k">top</span><span class="p">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
-    <span class="k">left</span><span class="p">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="p">.</span><span class="nc">front</span> <span class="p">{</span>
-    <span class="k">z-index</span><span class="p">:</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="k">background-image</span><span class="p">:</span> <span class="nb">url</span><span class="p">(</span><span class="sx">http://img.afreecodec.com/images/v3/wp-content/uploads/2011/05/00_chrome_icon.jpg</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="p">.</span><span class="nc">back</span> <span class="p">{</span>
-    <span class="k">z-index</span><span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>  
-    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>  
-    <span class="k">background-image</span><span class="p">:</span> <span class="nb">url</span><span class="p">(</span><span class="sx">http://www.digitaltrends.com/wp-content/uploads/2011/03/ie-9-icon.jpg</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="p">.</span><span class="nc">panel</span><span class="p">:</span><span class="nd">hover</span> <span class="p">.</span><span class="nc">front</span> <span class="p">{</span>
-    <span class="k">z-index</span><span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="p">.</span><span class="nc">panel</span><span class="p">:</span><span class="nd">hover</span> <span class="p">.</span><span class="nc">back</span> <span class="p">{</span>
-    <span class="k">z-index</span><span class="p">:</span> <span class="mi">2</span><span class="p">;</span>   
-    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
-    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-CSS" data-lang="CSS"><span class="line"><span class="cl"><span class="p">.</span><span class="nc">panel</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">width</span><span class="p">:</span> <span class="mi">300</span><span class="kt">px</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">height</span><span class="p">:</span> <span class="mi">300</span><span class="kt">px</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">margin</span><span class="p">:</span> <span class="kc">auto</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">position</span><span class="p">:</span> <span class="kc">relative</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nc">card</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">width</span><span class="p">:</span> <span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">height</span><span class="p">:</span> <span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-o-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-ms-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-moz-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-webkit-</span><span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">transition</span><span class="p">:</span> <span class="kc">all</span> <span class="mf">.5</span><span class="kt">s</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-webkit-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-ms-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-moz-</span><span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">backface-visibility</span><span class="p">:</span> <span class="kc">hidden</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">position</span><span class="p">:</span> <span class="kc">absolute</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">top</span><span class="p">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">left</span><span class="p">:</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nc">front</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">z-index</span><span class="p">:</span> <span class="mi">2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">background-image</span><span class="p">:</span> <span class="nb">url</span><span class="p">(</span><span class="sx">http://img.afreecodec.com/images/v3/wp-content/uploads/2011/05/00_chrome_icon.jpg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nc">back</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">z-index</span><span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">-180</span><span class="kt">deg</span><span class="p">);</span>  
+</span></span><span class="line"><span class="cl">    <span class="k">background-image</span><span class="p">:</span> <span class="nb">url</span><span class="p">(</span><span class="sx">http://www.digitaltrends.com/wp-content/uploads/2011/03/ie-9-icon.jpg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nc">panel</span><span class="p">:</span><span class="nd">hover</span> <span class="p">.</span><span class="nc">front</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">z-index</span><span class="p">:</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">180</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">.</span><span class="nc">panel</span><span class="p">:</span><span class="nd">hover</span> <span class="p">.</span><span class="nc">back</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">z-index</span><span class="p">:</span> <span class="mi">2</span><span class="p">;</span>   
+</span></span><span class="line"><span class="cl">    <span class="kp">-webkit-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-ms-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kp">-moz-</span><span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">transform</span><span class="p">:</span> <span class="nb">rotateX</span><span class="p">(</span><span class="mi">0</span><span class="kt">deg</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div>
 <p>You can see that it’s extremely simple – just rotating the front and back panes with difference 180 degrees when the user hover the panel.</p>
 <p>The HTML is even simpler:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;panel&#34;</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;front card&#34;</span><span class="p">&gt;</span>
-    
-  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-      
-  
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;back card&#34;</span><span class="p">&gt;</span>
-    
-  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-  
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;panel&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;front card&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&#34;back card&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></span></span></code></pre></div>
 <p>And of course, there’s no JavaScript. You just don’t need it.</p>
 <p>I hope that it was useful.</p>
 
@@ -200,18 +202,6 @@ Before few days I needed a CSS3 flipping effect which should works at least in I
 
 
   
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-18060688-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

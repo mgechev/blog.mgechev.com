@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.163.2">
 		<title>skill grade &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -18,15 +18,21 @@
 		
 
 		
-		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+		
 		
 		
 		<link rel="amphtml" href="https://blog.mgechev.com/amp/2026/03/14/skillgrade/">
 		
+		
 
 		<meta property="og:title" content="skill grade" />
-		<meta property="og:description" content="⭐ Find Skillgrade on GitHub  skill grade A few weeks ago I wrote about Skill Eval, a framework for testing AI agent skills. The idea resonated — skills are becoming a critical part of how teams work with agents, and without a way to measure whether they work, you&rsquo;re guessing.
-The problem was that Skill Eval required too much setup. You had to clone a repo, understand a specific directory structure, write TypeScript config, and wire everything together before you could run your first eval." />
+		<meta property="og:description" content="
+⭐ Find Skillgrade on GitHub
+
+skill grade
+A few weeks ago I wrote about Skill Eval, a framework for testing AI agent skills. The idea resonated — skills are becoming a critical part of how teams work with agents, and without a way to measure whether they work, you&rsquo;re guessing.
+The problem was that Skill Eval required too much setup. You had to clone a repo, understand a specific directory structure, write TypeScript config, and wire everything together before you could run your first eval. The barrier to entry was high for something that should be simple." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2026/03/14/skillgrade/" />
 		
@@ -96,39 +102,39 @@ The problem was that Skill Eval required too much setup. You had to clone a repo
 <p>A few weeks ago I wrote about <a href="https://blog.mgechev.com/2026/02/26/skill-eval/">Skill Eval</a>, a framework for testing AI agent skills. The idea resonated — skills are becoming a critical part of how teams work with agents, and without a way to measure whether they work, you&rsquo;re guessing.</p>
 <p>The problem was that Skill Eval required too much setup. You had to clone a repo, understand a specific directory structure, write TypeScript config, and wire everything together before you could run your first eval. The barrier to entry was high for something that should be simple.</p>
 <p>I rewrote it from scratch as <strong><a href="https://github.com/mgechev/skillgrade">Skillgrade</a></strong> — a CLI tool you install globally and run from your skill directory. The workflow is now three commands:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g skillgrade
-
-<span class="nb">cd</span> my-skill/
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade init
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade --smoke
-</code></pre></div><p>That&rsquo;s it. <code>skillgrade init</code> reads your <code>SKILL.md</code>, generates an <code>eval.yaml</code> with AI-powered tasks and graders, and you&rsquo;re ready to run. No cloning, no boilerplate, no project structure to learn.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i -g skillgrade
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> my-skill/
+</span></span><span class="line"><span class="cl"><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade init
+</span></span><span class="line"><span class="cl"><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade --smoke
+</span></span></code></pre></div><p>That&rsquo;s it. <code>skillgrade init</code> reads your <code>SKILL.md</code>, generates an <code>eval.yaml</code> with AI-powered tasks and graders, and you&rsquo;re ready to run. No cloning, no boilerplate, no project structure to learn.</p>
 <h2 id="what-changed">What Changed</h2>
 <p>The biggest shift is moving from a framework you build on top of to a tool you point at your skill. Everything lives in a single <code>eval.yaml</code> file:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">defaults</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">agent</span><span class="p">:</span><span class="w"> </span><span class="l">gemini</span><span class="w">
-</span><span class="w">  </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l">docker</span><span class="w">
-</span><span class="w">  </span><span class="nt">trials</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
-</span><span class="w">  </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="m">300</span><span class="w">
-</span><span class="w">  </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="m">0.8</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">tasks</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">fix-linting-errors</span><span class="w">
-</span><span class="w">    </span><span class="nt">instruction</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
-</span><span class="sd">      </span><span class="w">      </span><span class="l">Use the superlint tool to fix coding standard violations in app.js.</span><span class="w">
-</span><span class="w">    </span><span class="nt">workspace</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l">fixtures/broken-app.js</span><span class="w">
-</span><span class="w">        </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l">app.js</span><span class="w">
-</span><span class="w">    </span><span class="nt">graders</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">deterministic</span><span class="w">
-</span><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">bash graders/check.sh</span><span class="w">
-</span><span class="w">        </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="m">0.7</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">llm_rubric</span><span class="w">
-</span><span class="w">        </span><span class="nt">rubric</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
-</span><span class="sd">          </span><span class="w">          </span><span class="l">Did the agent follow the check → fix → verify workflow?</span><span class="w">
-</span><span class="w">        </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="m">0.3</span><span class="w">
-</span></code></pre></div><p>Tasks, graders, Docker config, agent selection — all in one place. String values like <code>instruction</code> and <code>rubric</code> support file references, so you can point to external markdown files when things get complex.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">defaults</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">agent</span><span class="p">:</span><span class="w"> </span><span class="l">gemini</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l">docker</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">trials</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="m">300</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">threshold</span><span class="p">:</span><span class="w"> </span><span class="m">0.8</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">tasks</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">fix-linting-errors</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">instruction</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">      Use the superlint tool to fix coding standard violations in app.js.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">workspace</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">src</span><span class="p">:</span><span class="w"> </span><span class="l">fixtures/broken-app.js</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">dest</span><span class="p">:</span><span class="w"> </span><span class="l">app.js</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">graders</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">deterministic</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">bash graders/check.sh</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="m">0.7</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">llm_rubric</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">rubric</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">          Did the agent follow the check → fix → verify workflow?</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="m">0.3</span><span class="w">
+</span></span></span></code></pre></div><p>Tasks, graders, Docker config, agent selection — all in one place. String values like <code>instruction</code> and <code>rubric</code> support file references, so you can point to external markdown files when things get complex.</p>
 <p>The agent is auto-detected from your API key. Set <code>GEMINI_API_KEY</code> and it uses Gemini. Set <code>ANTHROPIC_API_KEY</code> and it uses Claude. Set <code>OPENAI_API_KEY</code> and it uses Codex. Override with <code>--agent=claude</code> if you need to.</p>
 <h2 id="presets">Presets</h2>
 <p>One thing I noticed when using Skill Eval was that I kept running the same configurations over and over. Quick smoke test during development. Thorough regression suite before merging. Skillgrade bakes these into presets:</p>
@@ -140,27 +146,27 @@ The problem was that Skill Eval required too much setup. You had to clone a repo
 <p>Instead of remembering the right combination of <code>--trials</code> and thresholds, you pick the preset that matches your intent.</p>
 <h2 id="ci-mode">CI Mode</h2>
 <p>Running evals in CI was possible before but required more work than it should. Now it&rsquo;s a flag:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="c"># .github/workflows/skillgrade.yml</span><span class="w">
-</span><span class="w"></span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
-</span><span class="sd">    npm i -g skillgrade
-</span><span class="sd">    cd skills/superlint
-</span><span class="sd">    GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} skillgrade --regression --ci --provider=local</span><span class="w">    
-</span></code></pre></div><p><code>--ci</code> exits with code 1 if the pass rate falls below <code>--threshold</code> (default: 0.8). Use <code>--provider=local</code> in CI — the runner is already an ephemeral sandbox, so Docker adds overhead without benefit.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># .github/workflows/skillgrade.yml</span><span class="w">
+</span></span></span><span class="line"><span class="cl">- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span></span></span><span class="line"><span class="cl"><span class="sd">    npm i -g skillgrade
+</span></span></span><span class="line"><span class="cl"><span class="sd">    cd skills/superlint
+</span></span></span><span class="line"><span class="cl"><span class="sd">    GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} skillgrade --regression --ci --provider=local</span><span class="w">
+</span></span></span></code></pre></div><p><code>--ci</code> exits with code 1 if the pass rate falls below <code>--threshold</code> (default: 0.8). Use <code>--provider=local</code> in CI — the runner is already an ephemeral sandbox, so Docker adds overhead without benefit.</p>
 <h2 id="preview">Preview</h2>
 <p>After a run, you can review results in two ways:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">skillgrade preview           <span class="c1"># CLI report</span>
-skillgrade preview browser   <span class="c1"># web UI → http://localhost:3847</span>
-</code></pre></div><p>Reports are saved to <code>$TMPDIR/skillgrade/&lt;skill-name&gt;/results/</code> by default. Override with <code>--output=DIR</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">skillgrade preview           <span class="c1"># CLI report</span>
+</span></span><span class="line"><span class="cl">skillgrade preview browser   <span class="c1"># web UI → http://localhost:3847</span>
+</span></span></code></pre></div><p>Reports are saved to <code>$TMPDIR/skillgrade/&lt;skill-name&gt;/results/</code> by default. Override with <code>--output=DIR</code>.</p>
 <h2 id="getting-started">Getting Started</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g skillgrade
-
-<span class="c1"># Go to your skill directory (must have SKILL.md)</span>
-<span class="nb">cd</span> my-skill/
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade init
-
-<span class="c1"># Run a smoke test</span>
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade --smoke
-</code></pre></div><p>Check out the <a href="https://github.com/mgechev/skillgrade/tree/main/examples">examples</a> in the repo — <a href="https://github.com/mgechev/skillgrade/blob/main/examples/superlint">superlint</a> for a simple setup and <a href="https://github.com/mgechev/skillgrade/blob/main/examples/angular-modern">angular-modern</a> for a TypeScript grader.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i -g skillgrade
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Go to your skill directory (must have SKILL.md)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> my-skill/
+</span></span><span class="line"><span class="cl"><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade init
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Run a smoke test</span>
+</span></span><span class="line"><span class="cl"><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key skillgrade --smoke
+</span></span></code></pre></div><p>Check out the <a href="https://github.com/mgechev/skillgrade/tree/main/examples">examples</a> in the repo — <a href="https://github.com/mgechev/skillgrade/blob/main/examples/superlint">superlint</a> for a simple setup and <a href="https://github.com/mgechev/skillgrade/blob/main/examples/angular-modern">angular-modern</a> for a TypeScript grader.</p>
 <p>If you were using Skill Eval, the migration is straightforward: move your task config into <code>eval.yaml</code> and drop the framework dependency. The grading model is the same — deterministic and LLM rubric graders with configurable weights.</p>
 <p>The core idea hasn&rsquo;t changed. Skills are instructions for agents, and instructions need tests. Skillgrade just makes it easier to write and run those tests. Don&rsquo;t ship skills without evals.</p>
 
@@ -202,18 +208,6 @@ skillgrade preview browser   <span class="c1"># web UI → http://localhost:3847
 
 
   
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-18060688-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

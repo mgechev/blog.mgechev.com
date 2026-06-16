@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html {{ with .Site.LanguageCode }}lang="{{ . }}"{{ end }}>
+<html {{ with .Site.Language.Locale }}lang="{{ . }}"{{ end }}>
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -22,10 +22,14 @@
 		{{ end }}
 
 		{{ if .Site.Params.enableRSS }}
-		<link href="{{ .Site.RSSLink }}" rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}">
+		{{ with .OutputFormats.Get "RSS" }}
+		<link href="{{ .RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}">
 		{{ end }}
+		{{ end }}
+		{{ if .File }}
 		{{ if hasPrefix .File.Path "post" }}
 		<link rel="amphtml" href="{{ replace .Permalink .Site.BaseURL (printf "%samp/" .Site.BaseURL) }}">
+		{{ end }}
 		{{ end }}
 
 		<meta property="og:title" content="{{ .Title }}" />

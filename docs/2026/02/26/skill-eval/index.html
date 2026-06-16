@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		
 		
-		<meta name="generator" content="Hugo 0.91.2" />
+		<meta name="generator" content="Hugo 0.163.2">
 		<title>Unit Tests for AI Agent Skills &middot; Minko Gechev&#39;s blog</title>
 		<link rel="shortcut icon" href="https://blog.mgechev.com/images/favicon.ico">
 		<link rel="stylesheet" href="https://blog.mgechev.com/css/highlight.css">
@@ -18,15 +18,21 @@
 		
 
 		
-		<link href="https://blog.mgechev.com/feed.xml" rel="alternate" type="application/rss+xml" title="Minko Gechev&#39;s blog">
+		
+		
 		
 		
 		<link rel="amphtml" href="https://blog.mgechev.com/amp/2026/02/26/skill-eval/">
 		
+		
 
 		<meta property="og:title" content="Unit Tests for AI Agent Skills" />
-		<meta property="og:description" content="⭐ Find Skill Eval on GitHub  Unit Tests for AI Agent Skills I&rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
-The problem? There&rsquo;s no way to know if they actually work." />
+		<meta property="og:description" content="
+⭐ Find Skill Eval on GitHub
+
+Unit Tests for AI Agent Skills
+I&rsquo;ve been working with AI coding agents daily - Antigravity, Gemini CLI, Claude Code, and others. One pattern I keep seeing is teams building skills for these agents: procedural instructions that teach the model how to use internal tools, follow specific workflows, or comply with team conventions.
+The problem? There&rsquo;s no way to know if they actually work. You write a text file, hand it to an agent, and hope for the best. When you tweak the instructions, you have no signal telling you whether that change made things better or worse. You&rsquo;re flying blind." />
 		<meta property="og:type" content="article" />
 		<meta property="og:url" content="https://blog.mgechev.com/2026/02/26/skill-eval/" />
 		
@@ -102,70 +108,70 @@ The problem? There&rsquo;s no way to know if they actually work." />
 <h2 id="how-it-works">How It Works</h2>
 <p>Skill Eval is a TypeScript framework that benchmarks how well an agent follows your skills. You define a task, point it at your skill, and the framework runs the agent in a Docker container, then grades the result.</p>
 <p>Here&rsquo;s what a run looks like:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">Auto-discovered skills: superlint
-
-🚀 superlint_demo | agent=gemini provider=docker trials=5
-
-Starting eval for task: superlint_demo (5 trials)
-  Image ready: skill-eval-superlint_demo-1772578685532-ready (ba2c4c6f9193)
-  Trial 1/5 ▸ ✓ reward=1.00 (55.0s, 2 cmds, ~716 tokens)
-  Trial 2/5 ▸ ✓ reward=0.91 (33.1s, 2 cmds, ~798 tokens)
-  Trial 3/5 ▸ ✓ reward=0.70 (46.8s, 2 cmds, ~798 tokens)
-  Trial 4/5 ▸ ✓ reward=0.70 (40.5s, 2 cmds, ~648 tokens)
-  Trial 5/5 ▸ ✓ reward=0.70 (48.4s, 2 cmds, ~650 tokens)
-Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-03-03T23-01-52-683Z.json
-
-┌─────────┬───────┬────────┬──────────┬──────────┬─────────────────┬────────────────────────────────────┐
-│ (index) │ Trial │ Reward │ Duration │ Commands │ Tokens (in/out) │ Graders                            │
-├─────────┼───────┼────────┼──────────┼──────────┼─────────────────┼────────────────────────────────────┤
-│ 0       │ 1     │ &#39;1.00&#39; │ &#39;55.0s&#39;  │ 2        │ &#39;~268/448&#39;      │ &#39;deterministic:1.0 llm_rubric:1.0&#39; │
-│ 1       │ 2     │ &#39;0.91&#39; │ &#39;33.1s&#39;  │ 2        │ &#39;~268/530&#39;      │ &#39;deterministic:1.0 llm_rubric:0.7&#39; │
-│ 2       │ 3     │ &#39;0.70&#39; │ &#39;46.8s&#39;  │ 2        │ &#39;~268/530&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
-│ 3       │ 4     │ &#39;0.70&#39; │ &#39;40.5s&#39;  │ 2        │ &#39;~268/380&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
-│ 4       │ 5     │ &#39;0.70&#39; │ &#39;48.4s&#39;  │ 2        │ &#39;~268/382&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
-└─────────┴───────┴────────┴──────────┴──────────┴─────────────────┴────────────────────────────────────┘
-  Pass Rate   80.2%
-  pass@5      100.0%
-  pass^5      100.0%
-  Avg Duration 44.8s | Avg Commands 2.0
-  Total Tokens ~3610 (estimated)
-  Skills      superlint
-  Saved to    /Users/mgechev/Projects/skill-eval/results
-</code></pre></div><p>The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (<code>.agents/skills/</code> for Gemini, <code>.claude/skills/</code> for Claude) so the agent finds them naturally, exactly like it would in production.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Auto-discovered skills: superlint
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">🚀 superlint_demo | agent=gemini provider=docker trials=5
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Starting eval for task: superlint_demo (5 trials)
+</span></span><span class="line"><span class="cl">  Image ready: skill-eval-superlint_demo-1772578685532-ready (ba2c4c6f9193)
+</span></span><span class="line"><span class="cl">  Trial 1/5 ▸ ✓ reward=1.00 (55.0s, 2 cmds, ~716 tokens)
+</span></span><span class="line"><span class="cl">  Trial 2/5 ▸ ✓ reward=0.91 (33.1s, 2 cmds, ~798 tokens)
+</span></span><span class="line"><span class="cl">  Trial 3/5 ▸ ✓ reward=0.70 (46.8s, 2 cmds, ~798 tokens)
+</span></span><span class="line"><span class="cl">  Trial 4/5 ▸ ✓ reward=0.70 (40.5s, 2 cmds, ~648 tokens)
+</span></span><span class="line"><span class="cl">  Trial 5/5 ▸ ✓ reward=0.70 (48.4s, 2 cmds, ~650 tokens)
+</span></span><span class="line"><span class="cl">Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-03-03T23-01-52-683Z.json
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">┌─────────┬───────┬────────┬──────────┬──────────┬─────────────────┬────────────────────────────────────┐
+</span></span><span class="line"><span class="cl">│ (index) │ Trial │ Reward │ Duration │ Commands │ Tokens (in/out) │ Graders                            │
+</span></span><span class="line"><span class="cl">├─────────┼───────┼────────┼──────────┼──────────┼─────────────────┼────────────────────────────────────┤
+</span></span><span class="line"><span class="cl">│ 0       │ 1     │ &#39;1.00&#39; │ &#39;55.0s&#39;  │ 2        │ &#39;~268/448&#39;      │ &#39;deterministic:1.0 llm_rubric:1.0&#39; │
+</span></span><span class="line"><span class="cl">│ 1       │ 2     │ &#39;0.91&#39; │ &#39;33.1s&#39;  │ 2        │ &#39;~268/530&#39;      │ &#39;deterministic:1.0 llm_rubric:0.7&#39; │
+</span></span><span class="line"><span class="cl">│ 2       │ 3     │ &#39;0.70&#39; │ &#39;46.8s&#39;  │ 2        │ &#39;~268/530&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
+</span></span><span class="line"><span class="cl">│ 3       │ 4     │ &#39;0.70&#39; │ &#39;40.5s&#39;  │ 2        │ &#39;~268/380&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
+</span></span><span class="line"><span class="cl">│ 4       │ 5     │ &#39;0.70&#39; │ &#39;48.4s&#39;  │ 2        │ &#39;~268/382&#39;      │ &#39;deterministic:1.0 llm_rubric:0.0&#39; │
+</span></span><span class="line"><span class="cl">└─────────┴───────┴────────┴──────────┴──────────┴─────────────────┴────────────────────────────────────┘
+</span></span><span class="line"><span class="cl">  Pass Rate   80.2%
+</span></span><span class="line"><span class="cl">  pass@5      100.0%
+</span></span><span class="line"><span class="cl">  pass^5      100.0%
+</span></span><span class="line"><span class="cl">  Avg Duration 44.8s | Avg Commands 2.0
+</span></span><span class="line"><span class="cl">  Total Tokens ~3610 (estimated)
+</span></span><span class="line"><span class="cl">  Skills      superlint
+</span></span><span class="line"><span class="cl">  Saved to    /Users/mgechev/Projects/skill-eval/results
+</span></span></code></pre></div><p>The agent gets only the task assignment as its prompt. Skills are placed in the standard discovery paths (<code>.agents/skills/</code> for Gemini, <code>.claude/skills/</code> for Claude) so the agent finds them naturally, exactly like it would in production.</p>
 <p>The results are also available in a web dashboard where you can drill into individual trials and inspect grader scores:</p>
 <img src="/images/skill-eval/dashboard.png" style="display: block; margin: auto" alt="Skill Eval web dashboard showing trial results with deterministic and LLM rubric grader scores">
 <h2 id="task-structure">Task Structure</h2>
 <p>Each task is a self-contained directory:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">tasks/my_task/
-├── task.toml           # Timeouts, graders, resource limits
-├── instruction.md      # What the agent should do
-├── environment/Dockerfile
-├── tests/test.sh       # Deterministic grader
-├── prompts/quality.md  # LLM rubric grader
-├── solution/solve.sh   # Reference solution
-└── skills/my_skill/    # The skill being tested
-    └── SKILL.md
-</code></pre></div><p>You can use two types of graders. <strong>Deterministic graders</strong> run a shell script and check outcomes — did the file get fixed? Is the metadata file present? <strong>LLM rubric graders</strong> evaluate qualitative aspects — did the agent follow the correct workflow? Did it use the right tool instead of a general-purpose alternative?</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">tasks/my_task/
+</span></span><span class="line"><span class="cl">├── task.toml           # Timeouts, graders, resource limits
+</span></span><span class="line"><span class="cl">├── instruction.md      # What the agent should do
+</span></span><span class="line"><span class="cl">├── environment/Dockerfile
+</span></span><span class="line"><span class="cl">├── tests/test.sh       # Deterministic grader
+</span></span><span class="line"><span class="cl">├── prompts/quality.md  # LLM rubric grader
+</span></span><span class="line"><span class="cl">├── solution/solve.sh   # Reference solution
+</span></span><span class="line"><span class="cl">└── skills/my_skill/    # The skill being tested
+</span></span><span class="line"><span class="cl">    └── SKILL.md
+</span></span></code></pre></div><p>You can use two types of graders. <strong>Deterministic graders</strong> run a shell script and check outcomes — did the file get fixed? Is the metadata file present? <strong>LLM rubric graders</strong> evaluate qualitative aspects — did the agent follow the correct workflow? Did it use the right tool instead of a general-purpose alternative?</p>
 <p>Each grader returns a score between 0.0 and 1.0 with configurable weights, so you can combine &ldquo;did it work?&rdquo; with &ldquo;did it work the right way?&rdquo;</p>
 <h2 id="using-it-in-ci">Using It in CI</h2>
 <p>This is where it gets practical. Add a GitHub Action that runs your skill evals on every PR that touches a skill:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Skill Eval</span><span class="w">
-</span><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;skills/**&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tasks/**&#39;</span><span class="p">]</span><span class="w">
-</span><span class="w">
-</span><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w">
-</span><span class="w">  </span><span class="nt">eval</span><span class="p">:</span><span class="w">
-</span><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
-</span><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v4</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/setup-node@v4</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">npm install</span><span class="w">
-</span><span class="w">      </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">npm run eval my_task -- --trials=5 --provider=docker</span><span class="w">
-</span><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
-</span><span class="w">          </span><span class="nt">GEMINI_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.GEMINI_API_KEY }}</span><span class="w">
-</span><span class="w">          </span><span class="nt">ANTHROPIC_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.ANTHROPIC_API_KEY }}</span><span class="w">
-</span></code></pre></div><p>A few recommendations from <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic&rsquo;s research on agent evals</a>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Skill Eval</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">on</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">paths</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;skills/**&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;tasks/**&#39;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">eval</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/setup-node@v4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">npm install</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">npm run eval my_task -- --trials=5 --provider=docker</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">GEMINI_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.GEMINI_API_KEY }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">ANTHROPIC_API_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.ANTHROPIC_API_KEY }}</span><span class="w">
+</span></span></span></code></pre></div><p>A few recommendations from <a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic&rsquo;s research on agent evals</a>:</p>
 <ul>
 <li><strong>Run at least 5 trials.</strong> Agent behavior is non-deterministic. A single run means nothing.</li>
 <li><strong>Use pass@k for capabilities.</strong> &ldquo;Can the agent solve this at least once in 5 tries?&rdquo; tells you if the skill works.</li>
@@ -174,12 +180,12 @@ Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-
 </ul>
 <p>If your skill has pass@5 = 100% but pass^5 = 30%, the agent <em>can</em> do it but is flaky. Investigate the transcript.</p>
 <h2 id="getting-started">Getting Started</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">git clone https://github.com/mgechev/skill-eval
-<span class="nb">cd</span> skill-eval <span class="o">&amp;&amp;</span> npm install
-
-<span class="c1"># Run a real eval</span>
-<span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key npm run <span class="nb">eval</span> superlint
-</code></pre></div><p>Check out the <a href="https://github.com/mgechev/skills-best-practices">Skills Best Practices</a> for guidelines on writing skills that agents can actually follow.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/mgechev/skill-eval
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> skill-eval <span class="o">&amp;&amp;</span> npm install
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Run a real eval</span>
+</span></span><span class="line"><span class="cl"><span class="nv">GEMINI_API_KEY</span><span class="o">=</span>your-key npm run <span class="nb">eval</span> superlint
+</span></span></code></pre></div><p>Check out the <a href="https://github.com/mgechev/skills-best-practices">Skills Best Practices</a> for guidelines on writing skills that agents can actually follow.</p>
 <p>Skills are becoming a first-class part of how we work with AI agents. As they get more complex and more teams depend on them, testing them stops being optional. Don&rsquo;t ship skills without evals.</p>
 
                 </section>
@@ -220,18 +226,6 @@ Report saved to: /Users/mgechev/Projects/skill-eval/results/superlint_demo_2026-
 
 
   
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-18060688-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
 
 
 <script async src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>

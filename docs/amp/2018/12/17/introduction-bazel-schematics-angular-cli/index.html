@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html ⚡="" amp="">
+<html ⚡ amp>
   <head><meta charset="utf-8"><script async src="https://cdn.ampproject.org/v0.js"></script>
     
 <meta name="pinterest" content="nopin">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <meta name="theme-color" content="#263238">
 
-<meta name="generator" content="Hugo 0.91.2">
+<meta name="generator" content="Hugo 0.163.2">
 
 <link rel="apple-touch-icon" href="https://blog.mgechev.com/images/logo.png">
 
@@ -15,28 +15,28 @@
 
 
     
-    <style amp-custom=""></style>
+    <style amp-custom></style>
     
     <title>Introducing Bazel Schematics for Angular CLI - Minko Gechev&apos;s blog</title>
-    <style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate="">body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
     
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
     
-<meta name="description" content="In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.What&amp;rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets.">
+<meta name="description" content="&lt;p&gt;In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by &lt;a href=&quot;https://github.com/kyliau&quot;&gt;Keen Liau&lt;/a&gt; on &lt;a href=&quot;https://github.com/angular/angular/pull/27277&quot;&gt;GitHub&lt;/a&gt;. With the &lt;code&gt;@angular/bazel&lt;/code&gt; package, we want to let developers use Angular CLI with Bazel as a build tool.&lt;/p&gt;&lt;h2 id=&quot;whats-bazel&quot;&gt;What&amp;rsquo;s Bazel?&lt;/h2&gt;&lt;p&gt;Google open sourced the software responsible for building most of our projects under the name &lt;a href=&quot;https://bazel.build&quot;&gt;Bazel&lt;/a&gt;. Bazel is a powerful tool which can keep track of the dependencies between different &lt;strong&gt;packages and build targets&lt;/strong&gt;.&lt;/p&gt;">
 
 <meta property="og:title" content="Introducing Bazel Schematics for Angular CLI - Minko Gechev&apos;s blog">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.mgechev.com/2018/12/17/introduction-bazel-schematics-angular-cli/">
 <meta property="og:site_name" content="Minko Gechev&apos;s blog">
-<meta property="og:description" content="In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.What&amp;rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets.">
+<meta property="og:description" content="&lt;p&gt;In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by &lt;a href=&quot;https://github.com/kyliau&quot;&gt;Keen Liau&lt;/a&gt; on &lt;a href=&quot;https://github.com/angular/angular/pull/27277&quot;&gt;GitHub&lt;/a&gt;. With the &lt;code&gt;@angular/bazel&lt;/code&gt; package, we want to let developers use Angular CLI with Bazel as a build tool.&lt;/p&gt;&lt;h2 id=&quot;whats-bazel&quot;&gt;What&amp;rsquo;s Bazel?&lt;/h2&gt;&lt;p&gt;Google open sourced the software responsible for building most of our projects under the name &lt;a href=&quot;https://bazel.build&quot;&gt;Bazel&lt;/a&gt;. Bazel is a powerful tool which can keep track of the dependencies between different &lt;strong&gt;packages and build targets&lt;/strong&gt;.&lt;/p&gt;">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="Minko Gechev&apos;s blog">
 <meta name="twitter:url" content="https://blog.mgechev.com/2018/12/17/introduction-bazel-schematics-angular-cli/">
 <meta name="twitter:title" content="Introducing Bazel Schematics for Angular CLI - Minko Gechev&apos;s blog">
-<meta name="twitter:description" content="In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.What&amp;rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets.">
+<meta name="twitter:description" content="&lt;p&gt;In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by &lt;a href=&quot;https://github.com/kyliau&quot;&gt;Keen Liau&lt;/a&gt; on &lt;a href=&quot;https://github.com/angular/angular/pull/27277&quot;&gt;GitHub&lt;/a&gt;. With the &lt;code&gt;@angular/bazel&lt;/code&gt; package, we want to let developers use Angular CLI with Bazel as a build tool.&lt;/p&gt;&lt;h2 id=&quot;whats-bazel&quot;&gt;What&amp;rsquo;s Bazel?&lt;/h2&gt;&lt;p&gt;Google open sourced the software responsible for building most of our projects under the name &lt;a href=&quot;https://bazel.build&quot;&gt;Bazel&lt;/a&gt;. Bazel is a powerful tool which can keep track of the dependencies between different &lt;strong&gt;packages and build targets&lt;/strong&gt;.&lt;/p&gt;">
 
 
 <script type="application/ld+json">
@@ -64,12 +64,12 @@
         "height": 60
       }
     },
-    "description": "In this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by Keen Liau on GitHub. With the @angular\/bazel package, we want to let developers use Angular CLI with Bazel as a build tool.\nWhat\u0026rsquo;s Bazel? Google open sourced the software responsible for building most of our projects under the name Bazel. Bazel is a powerful tool which can keep track of the dependencies between different packages and build targets."
+    "description": "\u003cp\u003eIn this blog post, we want to share our new schematics for Angular CLI which provide Bazel build support. You can find the implementation by \u003ca href=\u0022https:\/\/github.com\/kyliau\u0022\u003eKeen Liau\u003c\/a\u003e on \u003ca href=\u0022https:\/\/github.com\/angular\/angular\/pull\/27277\u0022\u003eGitHub\u003c\/a\u003e. With the \u003ccode\u003e@angular\/bazel\u003c\/code\u003e package, we want to let developers use Angular CLI with Bazel as a build tool.\u003c\/p\u003e\n\u003ch2 id=\u0022whats-bazel\u0022\u003eWhat\u0026rsquo;s Bazel?\u003c\/h2\u003e\n\u003cp\u003eGoogle open sourced the software responsible for building most of our projects under the name \u003ca href=\u0022https:\/\/bazel.build\u0022\u003eBazel\u003c\/a\u003e. Bazel is a powerful tool which can keep track of the dependencies between different \u003cstrong\u003epackages and build targets\u003c\/strong\u003e.\u003c\/p\u003e"
   }
 </script>
 
 
-    <style amp-custom="">
+    <style amp-custom>
       html { font-size: 18px;}@media (max-width: 768px) { html { font-size: 15px; }}body { font-family: Lato,'Hiragino Kaku Gothic Pro',メイリオ,Meiryo,sans-serif; font-size: inherit; margin: 0; color: #263238;}html, body { margin: 0;}a { text-decoration: none; color: #e91e63;}p { margin: 0;}ul,ol { margin: 0; padding: 0;}h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 700;}h1 { font-size: 1.8rem; line-height: 2rem; margin: 1.5rem 0; }h2 { font-size: 1.4rem; line-height: 2rem; margin: 1.5rem 0; }h3 { font-size: 1.2rem; line-height: 1.5rem; margin: 1.5rem 0; }h4, h5, h6 { font-size: 1rem; line-height: 1.5rem; margin: 1.5rem 0; }.clearfix::after { content: ''; display: block; clear: both;}main { display: block;}/* Layouts */.l-header { padding: .5rem 0; margin-bottom: 2rem; border-bottom: 1px dashed #cfd8dc; text-align: center;}.l-footer { font-size: .8rem; padding: 1rem 0; border-top: 1px dashed #cfd8dc;}.l-container { max-width: 42rem; margin: 0 auto; padding: 0 1rem;}/* Parts:logo */.p-logo { font-family: Lobster, cursive;}.p-logo a { color: #000; font-size: 1.6rem; line-height: 2rem;}/* Parts:section */section { border-top: 2px solid #eceff1; padding: 1.5rem 0;}section>header { text-transform: uppercase; font-weight: 700; margin-bottom: 2rem; text-align: center;}section>header span { display: inline-block; background-color: #000; color: #fff; letter-spacing: 3px; font-size: .7rem; padding: .5rem .75rem;}/* Parts:facts */.p-facts { list-style: none; font-size: .8rem; margin-bottom: 1rem;}.p-facts:last-child { margin-bottom: 0;}.p-facts li { display: inline-block; margin-right: .5rem; text-transform: uppercase;}.p-facts li header { margin-bottom: .25rem; font-weight: 700;}.p-facts li header a { color: #000; text-decoration: underline;}.p-facts li li { display: inline-block; margin-right: .5rem;}.p-facts li li::after { content: ',';}.p-facts li li:last-child::after { content: '';}/* Parts:crumb */.p-crumb { list-style: none; margin-bottom: 1rem; font-size: .8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}.p-crumb:last-child { margin-bottom: 0;}.p-crumb li { display: inline;}.p-crumb li::after { content: '›'; margin: 0 .5rem;}.p-crumb li:last-child::after { content: '';}/* Parts:page-title */.p-page-title { margin-bottom: 2rem;}.p-page-title .title { margin-bottom: .5rem;}/* Parts:share */.p-share { margin-bottom: 1.5rem;}.p-share a { display: inline-block; text-align: center; padding: .5rem .5rem; margin-right: .25rem; font-size: .6rem; background-color: #eceff1; font-weight: 700k}.p-share a.ht { color: #00a4de; }.p-share a.fb { color: #3b5998; }.p-share a.tw { color: #1da1f2; }.p-share a.gp { color: #dd4b39; }.p-share a.ln { color: #00c300; }.p-share a.ht::before { content: 'Hatena'; }.p-share a.fb::before { content: 'Facebook'; }.p-share a.tw::before { content: 'Twitter'; }.p-share a.gp::before { content: 'Google+'; }.p-share a.ln::before { content: 'LINE'; }/* Parts:terms */.p-terms { padding-left: 2rem;}/* Parts:paginator */.p-paginator { text-align: center; margin-bottom: 3rem; padding-top: 2rem;}.p-paginator a { display: inline-block; border: 2px solid #eceff1; color: #263238; line-height: 2rem; padding: 0 1rem;}/* Parts:article */.p-articles { list-style: none;}.p-articles>li { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #cfd8dc;}.p-articles>li:last-child { border-bottom: none; padding-bottom: 0;}.p-articles.thin>li { margin-bottom: 1rem; padding-bottom: 1rem;}article .article-header { display: table-cell; height: 6rem; vertical-align: middle;}article .title { margin: 0; margin-bottom: .5rem; font-size: 1.4rem; line-height: 2rem;}article .title a { color: #000;}article .header-wrapper { margin-bottom: 1.5rem;}article .thumbnail { display: none;}article .summary { margin-bottom: 1.5rem;}article .readmore { text-align: center;}article .readmore a { font-size: .8rem; color: #000; text-decoration: underline;}article.li.sm .header-wrapper { margin-bottom: 0;}.article-body h2 { padding: 1rem 0; border-bottom: 2px solid #eceff1;}.article-body h2:first-child { margin-top: 0; }.article-body h3 { color: #cddc39;}.article-body h4 { border-left: solid .25rem #cddc39; padding: 0 .5rem;}.article-body p { margin: 1.5rem 0; line-height: 1.5rem;}.article-body a { text-decoration: underline;}.article-body ul,.article-body ol { padding-left: 1.5rem;}.article-body code { display: inline-block; font-family: Menlo, consolas, monospace; background-color: #eceff1; font-size: .8rem; padding: 0 .5rem; line-height: 1.5rem;}.article-body pre { margin: 1.5rem 0; padding: 1.5rem; font-size: .8rem; background-color: #263238; color: #fff; overflow: auto;}.article-body pre code { background-color: transparent;}.article-body blockquote { margin: 1.5rem 0; padding: .5rem 0; font-size: .8rem; border-top: 1px solid #eceff1; border-bottom: 1px solid #eceff1; color: #607d8b;}.article-body blockquote p { margin: .5rem 0; line-height: 1rem;}.article-body strong { box-shadow: 0 -.5rem 0 0 #f06292 inset;}.article-body em { font-style: normal; font-weight: 700; color: #ff5722;}.article-body figure { margin: 1.5rem -2rem; }.article-body figure.left,.article-body figure.right { width: 15rem; height: 12rem; margin-top: 0; margin-left: 0; margin-right: 0;}.article-body figure.left { float: left; margin-right: 1rem; margin-left: -2rem; }.article-body figure.right { float: right; margin-left: 1rem; margin-right: -2rem; }@media (max-width: 768px) { .article-body figure { margin: 1.5rem -1rem; } .article-body figure.left, .article-body figure.right { float: none; margin: 0 -1rem; width: auto; height: auto; }}.article-body figcaption { padding: .5rem 0; font-size: .8rem; text-align: center;}.article-body figcaption a { color: #263238;}img { max-width: 100%;}
 
       
@@ -143,53 +143,53 @@
 <p><strong>Does this mean we want to replace webpack in Angular CLI? No.</strong> Although webpack and Bazel have some intersection regarding vision, to a large extent they are orthogonal. For example, Bazel is a universal build tool which can bundle JavaScript projects with webpack.</p>
 <h2 id="introducing-bazel-schematics-for-angular-cli">Introducing Bazel Schematics for Angular CLI</h2>
 <p>The <code>@angular/bazel</code> schematics allow us to bootstrap a project in a way that our build will be managed by Bazel. Here&#x2019;s how we can use them:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">npm i -g yarn
-yarn global add @angular/bazel@7.2.0-rc.0
-</code></pre></div><p>After we have the schematics installed, just execute:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">ng new bzl-app --collection<span class="o">=</span>@angular/bazel
-</code></pre></div><p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">npm i -g yarn
+</span></span><span class="line"><span class="cl">yarn global add @angular/bazel@7.2.0-rc.0
+</span></span></code></pre></div><p>After we have the schematics installed, just execute:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ng new bzl-app --collection<span class="o">=</span>@angular/bazel
+</span></span></code></pre></div><p><em>Once the Angular CLI asks us for routing respond with &#x201C;No.&#x201D; For styles choose CSS.</em></p>
 <p>This will create the following directory structure:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt">.
-&#x251C;&#x2500;&#x2500; BUILD.bazel
-&#x251C;&#x2500;&#x2500; README.md
-&#x251C;&#x2500;&#x2500; WORKSPACE
-&#x251C;&#x2500;&#x2500; angular.json
-&#x251C;&#x2500;&#x2500; e2e
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.conf.js
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.on-prepare.js
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; src
-&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app.e2e-spec.ts
-&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; app.po.ts
-&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tsconfig.e2e.json
-&#x251C;&#x2500;&#x2500; package.json
-&#x251C;&#x2500;&#x2500; src
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; assets
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; browserslist
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environments
-&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environment.prod.ts
-&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; environment.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; favicon.ico
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; index.html
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; initialize_testbed.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; karma.conf.js
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.dev.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.prod.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; polyfills.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; styles.css
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; test.ts
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.app.json
-&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.spec.json
-&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tslint.json
-&#x251C;&#x2500;&#x2500; tsconfig.json
-&#x251C;&#x2500;&#x2500; tslint.json
-&#x2514;&#x2500;&#x2500; yarn.lock
-
-6 directories, 36 files
-</code></pre></div><p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; BUILD.bazel
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; README.md
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; WORKSPACE
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; angular.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; e2e
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.conf.js
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; protractor.on-prepare.js
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; src
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app.e2e-spec.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; app.po.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tsconfig.e2e.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; package.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; src
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; BUILD.bazel
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; app
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; assets
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; browserslist
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environments
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; environment.prod.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; environment.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; favicon.ico
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; index.html
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; initialize_testbed.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; karma.conf.js
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.dev.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.prod.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; main.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; polyfills.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; styles.css
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; test.ts
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.app.json
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x251C;&#x2500;&#x2500; tsconfig.spec.json
+</span></span><span class="line"><span class="cl">&#x2502;&#xA0;&#xA0; &#x2514;&#x2500;&#x2500; tslint.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; tsconfig.json
+</span></span><span class="line"><span class="cl">&#x251C;&#x2500;&#x2500; tslint.json
+</span></span><span class="line"><span class="cl">&#x2514;&#x2500;&#x2500; yarn.lock
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">6 directories, 36 files
+</span></span></code></pre></div><p>In the snippet above we can see that the structure of the Bazel project is quite similar to a standard Angular CLI project today with a few significant differences:</p>
 <ul>
 <li>We have a <code>WORKSPACE</code> file. It configures our build dependencies, such as Bazel rules for TypeScript, web testing, and others.</li>
 <li>There are a few <code>BUILD.bazel</code> files which contain build configuration. We don&#x2019;t have to worry about them at the moment. In the future releases, Angular CLI will manage them automatically for us. In short, they divide our project into packages, configure the build configuration for each package, and define the dependencies between the individual packages.</li>
@@ -203,8 +203,8 @@ yarn global add @angular/bazel@7.2.0-rc.0
 </ul>
 <p>These steps are required to ensure that the Bazel rules for Angular are the same in both <code>node_modules</code> and in the Bazel workspace. In the next versions of the schematics, Bazel will reuse the rules from the <code>node_modules</code> directory.</p>
 <p>Now in the project folder run:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash">yarn
-</code></pre></div><p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">yarn
+</span></span></code></pre></div><p>Keep in mind that the first build may take a bit longer compared to the build with the default Angular CLI schematics. This happens because by default Bazel rebuilds a lot of the artifacts from source code. The same happens in Google, with the difference that here we take advantage of remote caching. In future releases we&#x2019;ll make sure that we distribute already compiled artifacts, to speed the cold build up.</p>
 <p>As the next step, let us start the development server! As expected, run <code>ng serve</code> (or <code>npm start</code>). The cold build may take a few minutes, please, don&#x2019;t interrupt it. Once it completes, open <a href="http://127.0.0.1:4200">127.0.0.1:4200</a>. If all the steps so far have been successful, you should see the familiar home screen of the CLI:</p>
 <amp-img src="/images/bazel-angular-cli/angular-cli.png" style="display: block; margin: auto"></amp-img>
 <p>Notice that if we update <code>app.component.ts</code> the browser will not automatically refresh. Bazel will not even recompile the changed file. In future releases of the schematics, this will be fixed. Until now, feel free to use <code>ibazel</code>:</p>
@@ -248,7 +248,7 @@ yarn global add @angular/bazel@7.2.0-rc.0
       <ol class="p-crumb">
         <li><a href="https://blog.mgechev.com/">Minko Gechev&apos;s blog</a></li>
         
-        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://blog.mgechev.com/post/" itemprop="url"><span itemprop="title">post</span></a></li>
         
         <li>Introducing Bazel Schematics for Angular CLI</li>
       </ol>
